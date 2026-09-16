@@ -1,1 +1,0 @@
-Trigger Netlify deployment after repository linking.

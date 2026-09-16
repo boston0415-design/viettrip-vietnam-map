@@ -1,1 +1,183 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>일상탈출 베트남맵</title><style>html,body{margin:0;height:100%;font-family:system-ui,sans-serif}body{display:flex;align-items:center;justify-content:center;background:#f5f6f8;color:#334155}.card{background:white;padding:22px 24px;border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.10);text-align:center}</style></head><body><div class="card"><b>일상탈출 베트남맵 불러오는 중…</b></div><script>(async()=>{try{const files=['gzip/00.txt','gzip/01.txt','gzip/02.txt','gzip/03.txt','gzip/04.txt','gzip/05.txt','gzip/06.txt','gzip/07.txt','gzip/08.txt','gzip/09.txt','gzip/10.txt','gzip/11.txt','gzip/12.txt','gzip/13.txt','gzip/14.txt'];let b='';for(const f of files){const r=await fetch(f,{cache:'no-store'});if(!r.ok)throw new Error(f+' '+r.status);b+=await r.text();}const bin=atob(b),bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);const ds=new DecompressionStream('gzip');let html=await new Response(new Blob([bytes]).stream().pipeThrough(ds)).text();html=html.replace('</body>','<script src="./hotfix.js?v=20260917-0608"><\/script></body>');document.open();document.write(html);document.close();}catch(e){console.error(e);document.body.innerHTML='<div class="card"><b>사이트 로딩 오류</b><br><button onclick="location.reload()" style="margin-top:12px;padding:10px 14px">다시 시도</button></div>';}})();</script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<!-- build: modular-source-v2-20260917 -->
+<title>일상탈출 베트남맵</title>
+<link rel="stylesheet" href="./assets/css/base.css">
+<link rel="stylesheet" href="./assets/css/responsive.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">일상탈출 베트남맵
+      <small>베트남 호치민 일상탈출 회원이 함께 만드는 로컬지도</small>
+      <a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener">☘ 베트남 호치민 일상탈출 카페로 이동하기</a>
+    </div>
+    <div class="search"><input id="searchInput" placeholder="업체명, 지역, 세부분류 검색"><button id="searchBtn">검색</button></div>
+    <div class="actions">
+      <button id="locBtn" class="btn primary">현재 위치</button>
+      <button id="addBtn" class="btn">업체 등록</button>
+      <button id="adminBtn" class="btn" type="button">관리자</button>
+    </div>
+  </header>
+  <div class="content">
+    <aside class="side" id="businessSide">
+      <div class="mobileSideHead">
+        <strong>등록 업체</strong>
+        <button id="mobileListClose" type="button" aria-label="업체 목록 닫기">×</button>
+      </div>
+      <div class="filters">
+        <div id="cats" class="row"></div>
+        <div id="subs" class="row subs"></div>
+        <div class="sort"><span id="count">0개 업체</span><select id="sort"><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
+      </div>
+      <div id="list" class="list"></div>
+    </aside>
+    <main class="mapwrap">
+      <div id="map" class="map"></div>
+      <div id="mapLoadState" class="mapLoadState">
+        <div class="mapLoadCard">
+          <b id="mapLoadTitle">지도 불러오는 중…</b>
+          <span id="mapLoadText">잠시만 기다려주세요.</span>
+          <button id="mapRetryBtn" class="btn primary" type="button" style="display:none">지도 다시 불러오기</button>
+        </div>
+      </div>
+      <button id="mobileListBtn" class="mobileListBtn" type="button">업체 목록 <span id="mobileListCount">0</span></button>
+      <div id="regHint" class="regHint">등록할 업체 아이콘을 지도에서 클릭하세요</div>
+      <div class="areaLegend mobileCollapsed" id="areaLegend">
+        <strong id="areaLegendTitle" class="areaTitle">지역 대분류 · <span id="activeCityName">호치민</span> <span class="mobileFilterHint">필터</span> <span class="arrow">▲</span></strong>
+        <div id="cityChips" class="cityRow"></div>
+        <div id="quickAreas" class="areaLegendRow"></div><div id="subNav" class="areaLegendRow subNav"></div><div id="tagNav" class="areaLegendRow subNav restaurantTagNav"></div>
+        <div class="areaLegendRow ratingLegend">
+          <span class="quickLabel">회원평점</span>
+          <button type="button" class="ratingFilterBtn" data-rating-filter="1"><i class="areaSwatch" style="background:#dc2626"></i>1★</button>
+          <button type="button" class="ratingFilterBtn" data-rating-filter="2"><i class="areaSwatch" style="background:#f97316"></i>2★</button>
+          <button type="button" class="ratingFilterBtn" data-rating-filter="3"><i class="areaSwatch" style="background:#eab308"></i>3★</button>
+          <button type="button" class="ratingFilterBtn" data-rating-filter="4"><i class="areaSwatch" style="background:#16a34a"></i>4★</button>
+          <button type="button" class="ratingFilterBtn" data-rating-filter="4.5"><i class="areaSwatch" style="background:#d4a017"></i>4.5+</button>
+          <button type="button" class="ratingFilterBtn" data-rating-filter="5"><i class="areaSwatch" style="background:#c28d00"></i>5★</button>
+        </div>
+        <div class="areaLegendRow benefitLegend">
+          <span class="quickLabel">혜택업소</span>
+          <button type="button" class="benefitFilterBtn" data-benefit-filter="benefit"><span class="benefitMark">%</span>혜택업소</button>
+        </div>
+      </div>
+      <div id="areaPanel" class="areaPanel">
+        <div class="areaPanelHead">
+          <strong id="areaPanelTitle">호치민 주요지역</strong>
+          <button id="areaPanelClose" class="areaPanelClose" type="button">×</button>
+        </div>
+        <div id="typeFilters" class="typeFilters"></div><div id="areaList" class="areaList"></div>
+      </div>
+      <section id="detail" class="detail"></section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="registerMethodModal" class="modalback">
+  <div class="modal" style="max-width:520px">
+    <h3>업체 등록 방법</h3>
+    <div class="methodGrid">
+      <button id="registerByMap" class="methodBtn" type="button">
+        <strong>📍 지도에서 클릭</strong>
+        <span>지도에서 업체 아이콘을 클릭하면 상호명과 주소를 자동으로 불러옵니다.</span>
+      </button>
+      <button id="registerByAddress" class="methodBtn" type="button">
+        <strong>⌨ 주소로 등록</strong>
+        <span>업체 주소를 입력하면 Google 지도가 위치를 찾아 등록합니다.</span>
+      </button>
+    </div>
+    <div class="modalactions"><button class="btn" data-close="registerMethodModal">취소</button></div>
+  </div>
+</div>
+
+
+<div id="adminLoginModal" class="modalback">
+  <div class="modal" style="max-width:360px">
+    <h3>관리자 로그인</h3>
+    <div class="field">
+      <label>비밀번호</label>
+      <input id="adminPassword" type="password" inputmode="numeric" autocomplete="current-password" placeholder="관리자 비밀번호">
+      <div id="adminLoginStatus" class="inlineHelp">비밀번호만 입력하면 관리자 모드로 전환됩니다.</div>
+    </div>
+    <div class="modalactions">
+      <button class="btn" data-close="adminLoginModal" type="button">취소</button>
+      <button id="adminLoginSubmit" class="btn primary" type="button">확인</button>
+    </div>
+  </div>
+</div>
+
+<div id="placeModal" class="modalback">
+  <div class="modal">
+    <h3 id="placeModalTitle">업체 등록</h3>
+    <div class="field"><label>업체명</label><input id="pName" placeholder="예: Uraetei Japanese BBQ"><div class="inlineHelp">주소가 아니라 실제 상호명을 입력해주세요. Google 업체를 선택하면 상호명이 자동 입력됩니다.</div></div>
+    <div class="grid2"><div class="field"><label>업종</label><select id="pCat"></select></div><div class="field"><label id="pSubLabel">세부분류</label><select id="pSub"></select></div></div>
+    <div id="restaurantTagField" class="field hiddenField">
+      <label>식당 특징 <span style="font-size:11px;color:#64748b">여러 개 선택 가능</span></label>
+      <div id="restaurantTagOptions" class="tagChoiceGrid"></div>
+      <div class="inlineHelp">예: 일식 + 고기·구이 / 베트남 + 해산물 / 일식 + 오마카세</div>
+    </div>
+    <div class="field"><label>지역</label><input id="pArea" placeholder="예: 1군"></div>
+    <div class="field"><label>주소</label>
+      <div class="addressLookup">
+        <input id="pAddress" placeholder="예: 2 Đ. Lê Duẩn, Bến Nghé, Quận 1">
+        <button id="findAddressBtn" class="btn" type="button">주소로 위치 찾기</button>
+      </div>
+      <div id="addressLookupStatus" class="lookupStatus">지도에서 업체를 클릭하거나 주소를 입력해 위치를 찾을 수 있습니다.</div>
+    </div>
+    <div class="field"><label>등록자 별점</label><div id="placeStars" class="stars"></div></div>
+    <div class="field">
+      <label>회원혜택</label>
+      <div class="checkline">
+        <input id="pBenefitEnabled" type="checkbox">
+        <label for="pBenefitEnabled" style="margin:0;font-size:13px;font-weight:800">이 업체에 회원혜택 마크 표시</label>
+      </div>
+      <div class="inlineHelp">카페 회원 할인, 페이백, 특별혜택이 있을 때 체크하세요.</div>
+    </div>
+    <div id="benefitField" class="field hiddenField">
+      <label>회원혜택 내용</label>
+      <input id="pBenefitText" placeholder="예: 카페 회원 10% 할인 / 20만동 페이백">
+    </div>
+    <div class="field"><label>설명</label><textarea id="pDesc"></textarea></div>
+    <div class="field photoPicker">
+      <label>업체 사진 · 최대 5장</label>
+      <input id="pPhotos" type="file" accept="image/*" multiple>
+      <div class="photoHelp">사진은 자동으로 WebP 압축됩니다. 기존 업체 수정에서도 사진 추가·교체·삭제가 가능합니다.</div>
+      <div id="pPhotoPreview" class="placePhotoPreview"></div>
+      <div id="pPhotoCount" class="placePhotoCount"></div>
+    </div>
+    <div id="selectedMapPlace" class="placeHint">지도에서 선택한 위치로 등록됩니다.</div>
+    <div id="placeSaveStatus" class="inlineHelp" style="margin-top:8px;min-height:18px"></div><div class="modalactions"><button class="btn" data-close="placeModal">취소</button><button id="savePlace" class="btn primary" type="button">등록</button></div>
+  </div>
+</div>
+
+<div id="reviewModal" class="modalback">
+  <div class="modal">
+    <h3>회원 후기</h3>
+    <div class="field"><label>닉네임</label><input id="rName"></div>
+    <div class="field"><label>평점</label><div id="stars" class="stars"></div><div style="font-size:11px;color:#64748b;margin-top:6px">같은 기기에서는 업소별 평점 1회만 반영되며, 다시 작성하면 기존 평점이 수정됩니다.</div></div>
+    <div class="field"><label>후기</label><textarea id="rText"></textarea></div>
+    <div class="field photoPicker">
+      <label>사진 · 최대 3장</label>
+      <input id="rPhotos" type="file" accept="image/*" multiple>
+      <div class="photoHelp">휴대폰 원본은 자동으로 WebP 압축합니다. 긴 변 1024px, 보통 1장 약 100~500KB 수준입니다.</div>
+      <div id="rPhotoPreview" class="photoPreview"></div>
+    </div>
+    <div class="modalactions"><button class="btn" data-close="reviewModal">취소</button><button id="saveReview" class="btn primary">저장</button></div>
+  </div>
+</div>
+
+<script src="./assets/js/01-data-storage.js"></script>
+<script src="./assets/js/02-services-media.js"></script>
+<script src="./assets/js/03-business-ui.js"></script>
+<script src="./assets/js/04-rendering.js"></script>
+<script src="./assets/js/05-places-registration.js"></script>
+<script src="./assets/js/06-save-motion.js"></script>
+<script src="./assets/js/07-ranges-categories.js"></script>
+<script src="./assets/js/08-search-audit.js"></script>
+<script src="./assets/js/09-init-events.js"></script>
+</body>
+</html>

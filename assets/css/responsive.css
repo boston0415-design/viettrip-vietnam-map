@@ -1,0 +1,414 @@
+/* ===== FINAL RESPONSIVE LAYOUT OVERRIDES ===== */
+
+/* Desktop / laptop: list + map + detail, without crowding each other */
+@media (min-width:901px){
+  html,body{min-width:0;overflow:hidden}
+  .app{height:100vh;min-height:620px;grid-template-rows:76px minmax(0,1fr)}
+  .top{
+    min-width:0;
+    padding:9px 12px;
+    gap:10px;
+  }
+  .brand{
+    flex:0 0 auto;
+    font-size:22px;
+  }
+  .search{
+    min-width:220px;
+    max-width:none;
+    flex:1 1 420px;
+  }
+  .actions{flex:0 0 auto}
+  .content{
+    min-width:0;
+    grid-template-columns:350px minmax(0,1fr);
+  }
+  .side{
+    width:auto;
+    min-width:0;
+    overflow:hidden;
+  }
+  .filters{padding:10px}
+  .list{padding:9px}
+  .card{padding:11px}
+  .mapwrap{
+    min-width:0;
+    overflow:hidden;
+  }
+  .detail{
+    width:clamp(330px,31vw,405px);
+    right:14px;
+    top:14px;
+    max-height:calc(100% - 28px);
+    z-index:12;
+  }
+
+  .areaLegend{
+    left:14px;
+    right:auto;
+    bottom:14px;
+    width:auto;
+    max-width:min(820px,calc(100% - 28px));
+    max-height:44vh;
+    overflow:auto;
+    padding:9px 11px;
+    z-index:7;
+  }
+
+  /* 상세 패널이 열리면 왼쪽 필터가 상세 아래까지 침범하지 않게 폭 제한 */
+  .mapwrap.detailOpen .areaLegend{
+    max-width:calc(100% - clamp(360px,34vw,440px));
+  }
+
+  .areaLegendRow{gap:7px}
+  .cityRow{gap:5px}
+  .navCat,.navSub,.cityChip,.ratingFilterBtn,.benefitFilterBtn{
+    white-space:nowrap;
+  }
+  .mobileSideHead,.mobileListBtn,.mobileFilterHint{display:none!important}
+}
+
+/* Medium laptop / small desktop */
+@media (min-width:901px) and (max-width:1199px){
+  .content{grid-template-columns:300px minmax(0,1fr)}
+  .brand{font-size:20px}
+  .brand small{display:none}
+  .brand .cafeLink{font-size:10px}
+  .top{gap:7px}
+  .actions{gap:5px}
+  .actions .btn{padding:9px 10px}
+  .detail{width:min(340px,42vw)}
+  .mapwrap.detailOpen .areaLegend{
+    max-width:calc(100% - 365px);
+  }
+  .areaLegend{max-height:40vh}
+}
+
+/* Wide desktop */
+@media (min-width:1500px){
+  .content{grid-template-columns:380px minmax(0,1fr)}
+  .detail{width:410px}
+  .areaLegend{max-width:900px}
+}
+
+/* Mobile / tablet portrait: map-first */
+@media (max-width:900px){
+  html,body{
+    width:100%;
+    height:100%;
+    min-height:100%;
+    overflow:hidden!important;
+    overscroll-behavior:none;
+  }
+  body{position:fixed;inset:0}
+  .app{
+    width:100%;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    grid-template-rows:72px minmax(0,1fr)!important;
+    overflow:hidden;
+  }
+  .top{
+    min-height:72px!important;
+    height:72px;
+    padding:6px 7px!important;
+    gap:5px!important;
+    overflow:hidden;
+  }
+  .brand{
+    min-width:0;
+    max-width:none;
+    flex:1 1 auto;
+    font-size:18px!important;
+    line-height:1.05;
+    letter-spacing:-.8px;
+    white-space:nowrap;
+    overflow:hidden;
+  }
+  .brand small{display:none!important}
+  .brand .cafeLink{
+    display:block;
+    max-width:100%;
+    font-size:8.5px!important;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .search{display:none!important}
+  .actions{
+    flex:0 0 auto;
+    margin-left:0!important;
+    gap:4px!important;
+  }
+  .actions .btn{
+    min-width:0;
+    min-height:40px!important;
+    height:40px;
+    padding:7px 8px!important;
+    border-radius:11px!important;
+    font-size:0!important;
+  }
+  #locBtn::after{content:'내 위치';font-size:11px;font-weight:900}
+  #addBtn::after{content:'등록';font-size:11px;font-weight:900}
+  #adminBtn::after{content:'관리';font-size:11px;font-weight:900}
+  #adminBtn.adminOn::after{content:'관리 ON';font-size:10px}
+
+  .content{
+    display:block!important;
+    position:relative!important;
+    width:100%;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .mapwrap{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .map{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+  }
+
+  /* Business list becomes an optional bottom sheet */
+  .side{
+    position:absolute!important;
+    z-index:40!important;
+    left:7px!important;
+    right:7px!important;
+    top:auto!important;
+    bottom:max(7px,env(safe-area-inset-bottom))!important;
+    width:auto!important;
+    height:min(72%,640px)!important;
+    max-height:calc(100% - 14px)!important;
+    min-height:0!important;
+    border:1px solid #e5e7eb!important;
+    border-radius:20px!important;
+    box-shadow:0 18px 50px rgba(15,23,42,.28)!important;
+    transform:translateY(calc(100% + 24px))!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    transition:transform .22s ease,opacity .16s ease!important;
+    overflow:hidden!important;
+  }
+  .side.mobileOpen{
+    transform:translateY(0)!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+  .mobileSideHead{
+    display:flex!important;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px 6px;
+    background:#fff;
+  }
+  .mobileSideHead button{
+    width:34px;height:34px;border:0;border-radius:999px;
+    background:#f1f5f9;color:#334155;font-size:22px;
+  }
+  .side .filters{padding:6px 9px 8px!important}
+  .side .list{padding:7px 9px 12px!important;overflow:auto!important}
+  .side .card{padding:10px!important}
+  .side .name{font-size:14px}
+  .side .rating{font-size:18px}
+
+  .mobileListBtn{
+    display:flex!important;
+    align-items:center;
+    gap:6px;
+    position:absolute!important;
+    z-index:9!important;
+    left:8px!important;
+    top:8px!important;
+    border:1px solid rgba(255,255,255,.9)!important;
+    background:rgba(17,24,39,.92)!important;
+    color:#fff!important;
+    border-radius:999px!important;
+    padding:7px 10px!important;
+    font-size:10px!important;
+    font-weight:900!important;
+    box-shadow:0 5px 16px rgba(0,0,0,.18)!important;
+    backdrop-filter:blur(7px);
+  }
+
+  /* Compact filter sheet. Later desktop rules are explicitly overridden here. */
+  .areaLegend{
+    position:absolute!important;
+    left:7px!important;
+    right:7px!important;
+    bottom:max(7px,env(safe-area-inset-bottom))!important;
+    width:auto!important;
+    max-width:none!important;
+    max-height:min(46%,430px)!important;
+    overflow:auto!important;
+    padding:8px 9px!important;
+    z-index:11!important;
+    border-radius:16px!important;
+    background:rgba(255,255,255,.96)!important;
+    backdrop-filter:blur(10px);
+  }
+  .areaLegend strong.areaTitle{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:6px!important;
+    position:sticky!important;
+    top:-8px!important;
+    z-index:2!important;
+    margin:0!important;
+    padding:8px 1px 7px!important;
+    background:rgba(255,255,255,.98)!important;
+    font-size:11px!important;
+  }
+  .mobileFilterHint{
+    display:inline-flex!important;
+    margin-left:auto!important;
+    margin-right:4px!important;
+    font-size:9px!important;
+    padding:3px 6px!important;
+  }
+  .areaLegend.mobileCollapsed{
+    max-height:44px!important;
+    overflow:hidden!important;
+    padding-top:1px!important;
+    padding-bottom:1px!important;
+  }
+  .areaLegend.mobileCollapsed strong.areaTitle{
+    top:0!important;
+    padding:10px 1px!important;
+  }
+  .areaLegend.mobileCollapsed .cityRow,
+  .areaLegend.mobileCollapsed #quickAreas,
+  .areaLegend.mobileCollapsed #subNav,
+  .areaLegend.mobileCollapsed #tagNav,
+  .areaLegend.mobileCollapsed .ratingLegend,
+  .areaLegend.mobileCollapsed .benefitLegend{
+    display:none!important;
+  }
+  .areaLegendRow{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:5px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    padding-bottom:5px!important;
+    scrollbar-width:none!important;
+  }
+  .areaLegendRow::-webkit-scrollbar,.cityRow::-webkit-scrollbar{display:none!important}
+  .cityRow{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:5px!important;
+    overflow-x:auto!important;
+    padding:5px 0 7px!important;
+  }
+  .cityChip,.navCat,.navSub,.ratingFilterBtn,.benefitFilterBtn{
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
+    padding:6px 8px!important;
+    font-size:10px!important;
+  }
+  .ratingLegend,.benefitLegend{overflow-x:auto!important}
+
+  /* Mobile detail is a bottom sheet. Hide filters while reading details. */
+  .detail{
+    position:absolute!important;
+    left:7px!important;
+    right:7px!important;
+    top:auto!important;
+    bottom:max(7px,env(safe-area-inset-bottom))!important;
+    width:auto!important;
+    max-height:min(62%,560px)!important;
+    overflow:auto!important;
+    padding:13px!important;
+    border-radius:20px!important;
+    z-index:30!important;
+  }
+  .detail h2{font-size:20px!important}
+  .scorebig{font-size:30px!important}
+  .mapwrap.detailOpen .areaLegend,
+  .mapwrap.detailOpen .mobileListBtn,
+  .mapwrap.listOpen .areaLegend,
+  .mapwrap.listOpen .mobileListBtn{
+    display:none!important;
+  }
+
+  .areaPanel{
+    position:absolute!important;
+    left:7px!important;
+    right:7px!important;
+    top:auto!important;
+    bottom:max(58px,calc(env(safe-area-inset-bottom) + 52px))!important;
+    width:auto!important;
+    max-width:none!important;
+    max-height:55%!important;
+    overflow:auto!important;
+    z-index:20!important;
+  }
+
+  .regHint{
+    top:8px!important;
+    max-width:calc(100% - 110px)!important;
+    padding:7px 10px!important;
+    font-size:10px!important;
+    white-space:normal!important;
+  }
+
+  .modalback{
+    padding:6px!important;
+    align-items:flex-end!important;
+  }
+  .modal{
+    width:100%!important;
+    max-width:none!important;
+    max-height:92dvh!important;
+    border-radius:20px 20px 10px 10px!important;
+    padding:14px!important;
+  }
+  .grid2{grid-template-columns:1fr!important}
+}
+
+/* Small phones */
+@media (max-width:480px){
+  .app{grid-template-rows:68px minmax(0,1fr)!important}
+  .top{height:68px;min-height:68px!important;padding:5px 6px!important}
+  .brand{font-size:17px!important}
+  .brand .cafeLink{font-size:8px!important}
+  .actions .btn{height:38px;min-height:38px!important;padding:6px 7px!important}
+  #locBtn::after,#addBtn::after,#adminBtn::after{font-size:10px}
+  .areaLegend{left:5px!important;right:5px!important;bottom:max(5px,env(safe-area-inset-bottom))!important}
+  .mobileListBtn{left:6px!important;top:6px!important}
+  .detail{left:5px!important;right:5px!important;bottom:max(5px,env(safe-area-inset-bottom))!important}
+}
+
+/* Mobile landscape: preserve map height */
+@media (max-width:900px) and (max-height:600px){
+  .app{grid-template-rows:56px minmax(0,1fr)!important}
+  .top{height:56px;min-height:56px!important;padding:4px 6px!important}
+  .brand{font-size:16px!important}
+  .brand .cafeLink{display:none!important}
+  .actions .btn{height:36px;min-height:36px!important}
+  .areaLegend{max-height:62%!important}
+  .detail{max-height:80%!important}
+  .side{height:84%!important}
+}
+
+
+.mapLoadState{
+  position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;
+  background:#f3f6fa;transition:opacity .18s ease;
+}
+.mapLoadState.hidden{opacity:0;pointer-events:none}
+.mapLoadCard{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  background:rgba(255,255,255,.96);border:1px solid #e2e8f0;border-radius:16px;
+  padding:16px 18px;box-shadow:0 10px 30px rgba(15,23,42,.12);text-align:center;
+}
+.mapLoadCard b{font-size:14px;color:#111827}
+.mapLoadCard span{font-size:11px;color:#64748b}
