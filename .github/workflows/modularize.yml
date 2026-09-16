@@ -1,0 +1,125 @@
+name: Modularize site source
+
+on:
+  push:
+    paths:
+      - '.github/workflows/modularize.yml'
+      - 'gzip/**'
+
+permissions:
+  contents: write
+
+jobs:
+  modularize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Rebuild maintainable source files
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import base64, gzip, re, shutil
+
+          gzip_dir = Path('gzip')
+          parts = sorted(gzip_dir.glob('*.txt'))
+          if not parts:
+              raise SystemExit('No gzip source chunks found')
+
+          encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts)
+          html = gzip.decompress(base64.b64decode(encoded)).decode('utf-8')
+
+          css_match = re.search(r'<style>(.*?)</style>', html, re.S)
+          js_match = re.search(r'<script>(.*?)</script>', html, re.S)
+          if not css_match or not js_match:
+              raise SystemExit('Inline style/script not found in source bundle')
+
+          css = css_match.group(1)
+          js = js_match.group(1)
+
+          css_marker = '/* ===== FINAL RESPONSIVE LAYOUT OVERRIDES ===== */'
+          css_cut = css.find(css_marker)
+          if css_cut < 0:
+              raise SystemExit('Responsive CSS marker not found')
+
+          css_dir = Path('assets/css')
+          js_dir = Path('assets/js')
+          css_dir.mkdir(parents=True, exist_ok=True)
+          js_dir.mkdir(parents=True, exist_ok=True)
+
+          (css_dir / 'base.css').write_text(css[:css_cut].strip() + '\n', encoding='utf-8')
+          (css_dir / 'responsive.css').write_text(css[css_cut:].strip() + '\n', encoding='utf-8')
+
+          def pos(marker):
+              i = js.find(marker)
+              if i < 0:
+                  raise SystemExit(f'JS split marker not found: {marker}')
+              return i
+
+          cuts = [
+              ('01-data-storage.js', 0, pos('function setDbStatus(')),
+              ('02-services-media.js', pos('function setDbStatus('), pos('function businessMarkerIcon(')),
+              ('03-business-ui.js', pos('function businessMarkerIcon('), pos('function renderMarkers(')),
+              ('04-rendering.js', pos('function renderMarkers('), pos('function reverseGeocodeLatLng(')),
+              ('05-places-registration.js', pos('function reverseGeocodeLatLng('), pos('async function savePlace(')),
+              ('06-save-motion.js', pos('async function savePlace('), pos('function estimateBoundsZoom(')),
+              ('07-ranges-categories.js', pos('function estimateBoundsZoom('), pos('function auditCategoryCityIsolation(')),
+              ('08-search-audit.js', pos('function auditCategoryCityIsolation('), pos('function locateUser(')),
+              ('09-init-events.js', pos('function locateUser('), len(js)),
+          ]
+
+          for filename, start, end in cuts:
+              if start < 0 or end <= start:
+                  raise SystemExit(f'Invalid JS split: {filename}')
+              (js_dir / filename).write_text(js[start:end].strip() + '\n', encoding='utf-8')
+
+          head = html[:css_match.start()]
+          middle = html[css_match.end():js_match.start()]
+          tail = html[js_match.end():]
+
+          css_refs = (
+              '<link rel="stylesheet" href="./assets/css/base.css">\n'
+              '<link rel="stylesheet" href="./assets/css/responsive.css">'
+          )
+          js_refs = '\n'.join(
+              f'<script src="./assets/js/{filename}"></script>'
+              for filename, _, _ in cuts
+          )
+
+          modular = head + css_refs + middle + js_refs + tail
+          modular = re.sub(
+              r'<!-- build:.*?-->',
+              '<!-- build: modular-source-v2-20260917 -->',
+              modular,
+              count=1,
+          )
+          Path('index.html').write_text(modular, encoding='utf-8')
+
+          # Old transport bundles are no longer needed after modularization.
+          shutil.rmtree('gzip', ignore_errors=True)
+          shutil.rmtree('chunks', ignore_errors=True)
+          for trigger in Path('.').glob('deploy-trigger-*.txt'):
+              trigger.unlink(missing_ok=True)
+          PY
+
+      - name: Validate JavaScript files
+        shell: bash
+        run: |
+          for file in assets/js/*.js; do
+            node --check "$file"
+          done
+
+      - name: Commit modular source
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to commit"
+            exit 0
+          fi
+          git commit -m "Refactor site into modular source files [skip ci]"
+          git push
