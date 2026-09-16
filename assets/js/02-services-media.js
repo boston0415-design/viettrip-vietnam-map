@@ -852,13 +852,41 @@ async function supaPatch(table,query,row){
 
 
 async function fetchSharedDb(){
-  const [places,reviews]=await Promise.all([
-    supaGet('places_public','select=*&order=created_at.asc'),
-    supaGet('reviews','select=*&order=created_at.asc')
-  ]);
+  // 업체와 후기 로딩을 분리한다.
+  // 후기 API가 일시적으로 실패해도 업체 목록/지도 마커는 반드시 표시한다.
+  let places=[];
+  let reviews=[];
+  let placeError=null;
+
+  try{
+    places=await supaGet('places_public','select=*&order=created_at.asc');
+  }catch(err){
+    placeError=err;
+    console.warn('places_public load failed; trying public places fallback',err);
+    try{
+      places=await supaGet(
+        'places',
+        'select=id,name,category,subcategory,area,address,lat,lng,description,initial_rating,member_benefit,benefit_text,photo_urls,tags,created_at,updated_at&order=created_at.asc'
+      );
+      placeError=null;
+    }catch(fallbackErr){
+      console.error('places fallback load failed',fallbackErr);
+      placeError=fallbackErr;
+    }
+  }
+
+  if(placeError)throw placeError;
+
+  try{
+    reviews=await supaGet('reviews','select=*&order=created_at.asc');
+  }catch(err){
+    console.warn('reviews load failed; businesses will still be shown',err);
+    reviews=[];
+  }
+
   return dedupeDbData({
-    places:places.map(remotePlaceToLocal),
-    reviews:reviews.map(remoteReviewToLocal)
+    places:(places||[]).map(remotePlaceToLocal),
+    reviews:(reviews||[]).map(remoteReviewToLocal)
   });
 }
 
