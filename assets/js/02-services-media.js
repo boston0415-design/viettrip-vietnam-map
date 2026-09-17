@@ -135,7 +135,13 @@ function normalizeCafeReviewUrl(value){
   if(raw.length>2000||/[\\\s]/.test(raw))return null;
   try{
     const url=new URL(raw);
-    if(!['http:','https:'].includes(url.protocol)||!['cafe.naver.com','m.cafe.naver.com'].includes(url.hostname)||url.username||url.password||url.port)return null;
+    if(!['http:','https:'].includes(url.protocol)||!['cafe.naver.com','m.cafe.naver.com','naver.me'].includes(url.hostname)||url.username||url.password||url.port)return null;
+    // Naver's Copy URL action also produces naver.me share links.
+    if(url.hostname==='naver.me'){
+      if(!/^\/[A-Za-z0-9]{1,64}\/?$/.test(url.pathname))return null;
+      url.protocol='https:';url.hash='';
+      return url.href;
+    }
     const articlePath=/^\/[a-zA-Z0-9_-]+\/[1-9]\d*\/?$/.test(url.pathname)||/^\/ca-fe\/(?:web\/)?cafes\/[1-9]\d*\/articles\/[1-9]\d*\/?$/.test(url.pathname);
     const legacyPath=/^\/ArticleRead\.nhn$/i.test(url.pathname)&&/^[1-9]\d*$/.test(url.searchParams.get('clubid')||'')&&/^[1-9]\d*$/.test(url.searchParams.get('articleid')||'');
     if(!articlePath&&!legacyPath)return null;
