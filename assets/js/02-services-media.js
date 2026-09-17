@@ -129,6 +129,21 @@ function remotePlaceToLocal(p){
   };
 }
 
+function normalizeCafeReviewUrl(value){
+  const raw=String(value||'').trim();
+  if(!raw)return '';
+  if(raw.length>2000||/[\\\s]/.test(raw))return null;
+  try{
+    const url=new URL(raw);
+    if(!['http:','https:'].includes(url.protocol)||!['cafe.naver.com','m.cafe.naver.com'].includes(url.hostname)||url.username||url.password||url.port)return null;
+    const articlePath=/^\/[a-zA-Z0-9_-]+\/[1-9]\d*\/?$/.test(url.pathname)||/^\/ca-fe\/(?:web\/)?cafes\/[1-9]\d*\/articles\/[1-9]\d*\/?$/.test(url.pathname);
+    const legacyPath=/^\/ArticleRead\.nhn$/i.test(url.pathname)&&/^[1-9]\d*$/.test(url.searchParams.get('clubid')||'')&&/^[1-9]\d*$/.test(url.searchParams.get('articleid')||'');
+    if(!articlePath&&!legacyPath)return null;
+    url.protocol='https:';url.hash='';
+    return url.href;
+  }catch{return null}
+}
+
 function remoteReviewToLocal(r){
   return {
     id:r.id,
@@ -136,6 +151,7 @@ function remoteReviewToLocal(r){
     nickname:r.author_name||'회원',
     rating:r.rating==null?null:Number(r.rating),
     text:r.body||'',
+    cafeUrl:r.cafe_url||'',
     createdAt:r.created_at,
     createdBy:'',
     createdByHash:r.created_by_hash||'',
@@ -943,10 +959,10 @@ async function uploadMissingLocal(local,remote){
     if(remoteReviewIds.has(normalized.id)) continue;
 
     if(remoteReviewByIdentity.has(reviewIdentityKey(normalized)))continue;
-    await supaRpc('device_upsert_review',{
+    await supaRpc('device_upsert_review_with_link',{
       p_review_id:normalized.id,p_place_id:normalized.placeId,p_device_id:getDeviceId(),
       p_nickname:normalized.nickname||'',p_rating:normalized.rating==null?null:Number(normalized.rating),
-      p_body:normalized.text||'',p_photo_urls:normalized.photoUrls||[]
+      p_body:normalized.text||'',p_photo_urls:normalized.photoUrls||[],p_cafe_url:normalizeCafeReviewUrl(normalized.cafeUrl)||null
     });
   }
 }

@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     const date=new Date(review.created_at);
     if(!Number.isNaN(date.getTime())){const time=node('time',date.toLocaleDateString('ko-KR'));time.dateTime=date.toISOString();meta.append(time)}
     card.append(meta,node('p',review.body,'communityReviewText'));
+    const cafeUrl=normalizeCafeReviewUrl(review.cafe_url);
+    if(cafeUrl){const link=node('a','카페 후기 원문 보기 ↗','cafeOriginalLink');link.href=cafeUrl;link.target='_blank';link.rel='noopener noreferrer';card.append(link)}
     const photos=node('div',null,'communityReviewPhotos');
     for(const value of (Array.isArray(review.photo_urls)?review.photo_urls:[]).slice(0,3)){
       const url=reviewPhotoUrl(value);if(!url)continue;
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(busy)return;busy=true;more.disabled=true;status.textContent='후기 불러오는 중…';
     const token=generation;
     try{
-      const rows=await communityRead('reviews_public',`select=id,place_id,author_name,rating,body,photo_urls,created_at${scopePlaceId?'&place_id=eq.'+encodeURIComponent(scopePlaceId):''}&body=not.is.null&body=neq.&order=created_at.desc,id.desc&limit=${COMMUNITY_REVIEW_PAGE_SIZE}&offset=${offset}`);
+      const rows=await communityRead('reviews_public',`select=id,place_id,author_name,rating,body,photo_urls,created_at,cafe_url${scopePlaceId?'&place_id=eq.'+encodeURIComponent(scopePlaceId):''}&body=not.is.null&body=neq.&order=created_at.desc,id.desc&limit=${COMMUNITY_REVIEW_PAGE_SIZE}&offset=${offset}`);
       const ids=[...new Set(rows.map(r=>r.place_id))].filter(id=>/^[0-9a-f-]{36}$/i.test(id));
       if(ids.length){
         const found=await communityRead('places_public',`select=id,name,address&id=in.(${ids.join(',')})`);

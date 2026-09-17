@@ -281,6 +281,8 @@ function openReview(){
 
   $('#rName').value=mine?.nickname||$('#rName').value||'';
   $('#rText').value=mine?.text||'';
+  $('#rCafeUrl').value=mine?.cafeUrl||'';
+  $('#reviewCafeLink').open=!!mine?.cafeUrl;
   if($('#rPhotos'))$('#rPhotos').value='';
 
   renderStars();
@@ -292,6 +294,9 @@ async function saveReview(){
   if(state.reviewSaveInProgress)return;
   const text=$('#rText').value.trim();
   const nickname=$('#rName').value.trim();
+  const cafeUrl=normalizeCafeReviewUrl($('#rCafeUrl').value);
+  if(cafeUrl===null){alert('네이버 카페 게시글의 공유 링크를 확인해주세요.');return}
+  if(cafeUrl&&!text){alert('카페 링크와 함께 간단한 후기를 입력해주세요.');return}
   if(state.rating==null&&!text){alert('별점을 선택하거나 후기를 입력하세요.');return}
   if(text&&!nickname){alert('후기를 남길 닉네임을 입력하세요.');return}
   const placeId=state.selected;
@@ -311,14 +316,15 @@ async function saveReview(){
   try{
     const photoUrls=await uploadSelectedReviewPhotos(placeId,reviewId);
 
-    const remoteId=await supaRpc('device_upsert_review',{
+    const remoteId=await supaRpc('device_upsert_review_with_link',{
       p_review_id:reviewId,
       p_place_id:placeId,
       p_device_id:deviceId,
       p_nickname:nickname,
       p_rating:state.rating==null?null:Number(state.rating),
       p_body:text,
-      p_photo_urls:photoUrls
+      p_photo_urls:photoUrls,
+      p_cafe_url:cafeUrl
     });
 
     if(remoteId)reviewId=String(remoteId).replace(/^"|"$/g,'');
@@ -330,7 +336,7 @@ async function saveReview(){
       existing.text=text||existing.text;
       existing.createdAt=now;
       existing.createdBy=deviceId;
-      if(text)existing.photoUrls=photoUrls;
+      if(text){existing.photoUrls=photoUrls;existing.cafeUrl=cafeUrl}
     }else{
       existing={
         id:reviewId,
@@ -340,7 +346,8 @@ async function saveReview(){
         text,
         createdAt:now,
         createdBy:deviceId,
-        photoUrls
+        photoUrls,
+        cafeUrl
       };
       x.reviews.push(existing);
     }

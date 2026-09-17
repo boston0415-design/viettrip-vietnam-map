@@ -66,7 +66,7 @@ function renderRestaurantTagChoices(selected=[]){
 
   const isRestaurant=$('#pCat')?.value==='restaurant';
   field.classList.toggle('hiddenField',!isRestaurant);
-  if($('#pSubLabel'))$('#pSubLabel').textContent=isRestaurant?'음식 종류':'세부분류';
+  if($('#pSubLabel'))$('#pSubLabel').textContent=isRestaurant?'나라별 음식':'세부분류';
 
   if(!isRestaurant){
     box.innerHTML='';
@@ -74,12 +74,14 @@ function renderRestaurantTagChoices(selected=[]){
   }
 
   const selectedSet=new Set(selected||[]);
-  box.innerHTML=RESTAURANT_TAGS.map(tag=>`
+  const groups=[...RESTAURANT_TAG_GROUPS];
+  const previous=[...selectedSet].filter(tag=>!RESTAURANT_TAGS.includes(tag));
+  if(previous.length)groups.push({label:'기존 선택',tags:previous});
+  box.innerHTML=groups.map(group=>`<fieldset class="restaurantTagGroup"><legend>${esc(group.label)}</legend><div>${group.tags.map(tag=>`
     <label class="tagChoice">
       <input type="checkbox" value="${esc(tag)}" ${selectedSet.has(tag)?'checked':''}>
       <span>${esc(tag)}</span>
-    </label>
-  `).join('');
+    </label>`).join('')}</div></fieldset>`).join('');
 }
 
 function selectedRestaurantTags(){
