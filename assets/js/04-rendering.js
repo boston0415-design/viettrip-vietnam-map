@@ -367,7 +367,7 @@ function renderDetail(){
 
   d.classList.add('show');
   $('.mapwrap')?.classList.add('detailOpen');
-  d.innerHTML=`<div class="detailHeader"><div class="detailTitleWrap"><h2><button type="button" class="businessReviewName" data-place-reviews="${esc(p.id)}">${esc(p.name)}<span class="reviewNameHint">회원 후기 보기 ›</span></button></h2></div><button id="detailCloseBtn" class="detailClose" type="button" aria-label="상세 닫기">×</button></div>
+  d.innerHTML=`<div class="detailHeader"><div class="detailTitleWrap"><h2><button type="button" class="businessReviewName" data-place-reviews="${esc(p.id)}">${esc(p.name)}<span class="reviewNameHint">회원 후기 ${st.reviews.length}개 보기 ›</span></button></h2></div><button id="detailCloseBtn" class="detailClose" type="button" aria-label="상세 닫기">×</button></div>
   <div class="copyRow">
     ${copyButtonHtml('업체명 복사',p.name)}
     ${p.address?copyButtonHtml('주소 복사',p.address):''}

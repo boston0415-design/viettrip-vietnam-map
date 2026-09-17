@@ -30,3 +30,8 @@
   .content.desktopListCollapsed{grid-template-columns:minmax(0,1fr)}
   .content.desktopListCollapsed>#businessSide{display:none}
 }
+
+.personalPlaceTabs [data-personal-view="hidden"]{border:1px solid #d5dfe8}
+#hiddenPlacesCount{display:inline-block;min-width:15px;margin-left:2px;color:#087883;font-variant-numeric:tabular-nums}
+.hiddenPlacesHelp{margin:4px 0 6px;padding:7px 9px;background:#f0f7f8;border-radius:7px;font-size:11px;color:#365d63;line-height:1.45}
+.hiddenPlacesHelp[hidden]{display:none}

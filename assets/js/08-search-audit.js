@@ -12,7 +12,7 @@ function auditCategoryCityIsolation(){
     }else if(def.kind==='area'){
       result.categories[def.id]=currentAreas().filter(a=>normalizeAreaType(a)===def.type).length;
     }else if(def.kind==='airport'){
-      result.categories[def.id]=currentPoints().filter(p=>['공항','그랩승차','택시승차','터미널'].includes(p.type)).length;
+      result.categories[def.id]=currentPoints().filter(p=>['공항','그랩승차','택시승차','터미널','그린SM승차','버스승차'].includes(p.type)).length;
     }else if(def.id==='metro'){
       result.categories[def.id]=currentPoints().filter(p=>p.type==='전철역').length;
     }else if(def.kind==='point'){
@@ -45,13 +45,15 @@ function airportGroupPoints(group='all'){
 
   if(group==='airport') return points.filter(isAirportMainPoint);
   if(group==='grab') return points.filter(p=>p.type==='그랩승차');
+  if(group==='green') return points.filter(p=>p.type==='그린SM승차');
+  if(group==='bus') return points.filter(p=>p.type==='버스승차');
   if(group==='taxi') return points.filter(p=>p.type==='택시승차');
   if(group==='terminal') return points.filter(isAirportTerminalPoint);
 
   return points.filter(p=>
     isAirportMainPoint(p) ||
     p.type==='그랩승차' ||
-    p.type==='택시승차' ||
+    p.type==='택시승차' || p.type==='그린SM승차' || p.type==='버스승차' ||
     isAirportTerminalPoint(p)
   );
 }
@@ -116,6 +118,8 @@ function subItemsForNav(def){
       {label:'공항',kind:'point-group',value:'airport'},
       {label:'Grab',kind:'point-group',value:'grab'},
       {label:'택시',kind:'point-group',value:'taxi'},
+      ...(airportGroupPoints('green').length?[{label:'Green SM',kind:'point-group',value:'green'}]:[]),
+      ...(airportGroupPoints('bus').length?[{label:'버스·셔틀',kind:'point-group',value:'bus'}]:[]),
       {label:'터미널',kind:'point-group',value:'terminal'}
     ];
   }
@@ -512,7 +516,7 @@ function renderAreaList(){
   });
 
   currentPoints().forEach(p=>{
-    const airportFamily=isAirportMainPoint(p)||isAirportTerminalPoint(p)||['그랩승차','택시승차'].includes(p.type);
+    const airportFamily=isAirportMainPoint(p)||isAirportTerminalPoint(p)||['그랩승차','택시승차','그린SM승차','버스승차'].includes(p.type);
     allRows.push({
       kind:'point',
       name:p.name,

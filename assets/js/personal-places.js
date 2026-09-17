@@ -57,7 +57,7 @@
       refresh(id,action);
       announce(!result.saved?'이 브라우저에서 저장할 수 없어 이번 화면에서만 적용됩니다.':action==='favorite'
         ?(result.active?'이 브라우저의 즐겨찾기에 저장했습니다.':'즐겨찾기에서 해제했습니다.')
-        :(result.active?'회원 등록 표시를 숨겼습니다. ‘숨긴 업체’에서 되돌릴 수 있습니다.':'숨기기를 해제했습니다. 전체 목록에서 다시 볼 수 있습니다.'));
+        :(result.active?'업체를 숨겼습니다. 업체 목록 → ‘숨긴 업체’에서 눈 모양을 눌러 복구할 수 있습니다.':'숨기기를 해제했습니다. 전체 목록에서 다시 볼 수 있습니다.'));
     });
   });
   window.addEventListener?.('storage',event=>{

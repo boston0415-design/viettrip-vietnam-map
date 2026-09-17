@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-09-17",
+  "places": [
+    {
+      "client_id": "curated-exchange-ha-tam",
+      "name": "하탐 환전소 · Hà Tâm",
+      "category": "exchange",
+      "subcategory": "환전소·금은방",
+      "area": "호치민",
+      "address": "2 Nguyễn An Ninh, Bến Thành, Hồ Chí Minh, Vietnam",
+      "lat": 10.7721811,
+      "lng": 106.6974148,
+      "description": "벤탄시장 서쪽의 하탐 금은방·환전소입니다. 방문 당일 취급 통화와 실제 받을 금액을 창구에서 확인하세요. 별점과 후기는 회원이 직접 남깁니다."
+    },
+    {
+      "client_id": "curated-exchange-mai-van",
+      "name": "마이반 환전소 · Mai Vân",
+      "category": "exchange",
+      "subcategory": "환전소·금은방",
+      "area": "호치민",
+      "address": "1A Nguyễn An Ninh, Bến Thành, Hồ Chí Minh, Vietnam",
+      "lat": 10.7720544,
+      "lng": 106.6974602,
+      "description": "벤탄시장 옆, 하탐 맞은편의 마이반 금은방·환전소입니다. 지도 검색에는 Money exchange로 표시되기도 합니다. 방문 당일 취급 통화와 실제 받을 금액을 창구에서 확인하세요."
+    }
+  ]
+}
