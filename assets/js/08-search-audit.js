@@ -459,6 +459,8 @@ function switchCity(key){
 }
 function renderAreaList(){
   const city=currentCity();
+  const typeLabel=AREA_TYPES.find(([id])=>id===state.areaType)?.[1];
+  $('#areaPanelTitle').textContent=`${city.label} · ${state.areaType==='all'?'지역 정보':typeLabel||'지역 정보'}`;
 
   $('#typeFilters').innerHTML=AREA_TYPES.map(([id,label])=>
     `<button type="button" class="typeChip ${state.areaType===id?'active':''}" data-area-type="${id}">${label}</button>`
@@ -480,7 +482,6 @@ function renderAreaList(){
         state.clickInfo.close();
         state.clickInfo=null;
       }
-      $('#areaPanelTitle').textContent=`${currentCity().label} · ${AREA_TYPES.find(x=>x[0]===state.areaType)?.[1]||state.areaType}`;
       renderAreaList();
 
       if(['거리','시장','관광명소','한인생활권'].includes(state.areaType)){
@@ -557,6 +558,7 @@ function renderAreaList(){
       </button>
     `).join('')}
   `).join(''):'<div class="areaRowDesc" style="padding:12px">해당 분류의 위치가 아직 없습니다.</div>';
+  $('#areaList').scrollTop=0;
 
   document.querySelectorAll('[data-area-row]').forEach(btn=>{
     btn.addEventListener('click',()=>jumpToPopularArea(btn.dataset.areaRow,false));
@@ -671,6 +673,7 @@ function bindAreaNavigation(){
   $('#closeMapFilters')?.addEventListener('click',()=>setMobileLegendExpanded(false,{restoreFocus:true}));
   $('#openAreaDirectory')?.addEventListener('click',()=>{
     setMobileLegendExpanded(false);
+    renderAreaList();
     panel.classList.add('show');
     $('#areaPanelClose')?.focus({preventScroll:true});
   });

@@ -29,3 +29,21 @@
 }
 @media(min-width:901px){.app{min-height:0}#areaLegend{bottom:26px}.mapwrap.detailOpen #areaLegend{max-width:calc(100% - clamp(360px,34vw,440px))}}
 @media(max-width:900px) and (max-height:500px){#areaLegend:not(.mobileCollapsed){max-height:74%!important}}
+
+/* Keep the directory heading and categories in view while its entries scroll. */
+#areaPanel{display:none;flex-direction:column;box-sizing:border-box;max-height:min(480px,calc(100% - 108px));overflow:hidden}
+#areaPanel.show{display:flex}
+#areaPanel .areaPanelHead{flex:none;gap:8px}
+#areaPanelClose{display:grid;place-items:center;flex:none;width:36px;min-height:36px;border-radius:9px}
+#areaPanelClose:hover{background:#f1f6f4}
+#typeFilters{flex:none;flex-wrap:wrap;gap:5px;overflow:visible;border-bottom:1px solid #e9eeeb;margin-bottom:8px}
+#typeFilters .typeChip{min-height:30px;white-space:nowrap}
+#areaList{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable}
+#areaList>*{flex:none}
+#areaPanelClose:focus-visible,#typeFilters .typeChip:focus-visible,#areaList .areaRow:focus-visible{outline:2px solid #247f78;outline-offset:-2px}
+@media(max-width:900px){
+ #areaPanel{overflow:hidden!important;max-height:55%!important}
+ #areaPanelClose{width:44px;min-height:44px}
+ #typeFilters{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+ #typeFilters .typeChip{flex:none;min-height:36px}
+}
