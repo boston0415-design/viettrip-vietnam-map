@@ -11,11 +11,11 @@ run(`
 class TestCircle{constructor(options){this.options=options}addListener(){}setMap(map){this.removed=map===null}}
 google={maps:{Circle:TestCircle}};
 state.map={};setDbStatus=()=>{};
-const originalDollar=$;
+const originalQuery=document.querySelector;
 state.map={getDiv:()=>({clientWidth:1000,clientHeight:800,getBoundingClientRect:()=>({top:0,bottom:800,height:800})})};
-$=()=>({getBoundingClientRect:()=>({top:500,bottom:800,width:800,height:300})});
+document.querySelector=()=>({getBoundingClientRect:()=>({top:500,bottom:800,width:800,height:300})});
 assert.equal(rangeViewportPadding(80).bottom,316,'range must avoid the bottom category panel');
-$=originalDollar;state.map={};
+document.querySelector=originalQuery;state.map={};
 let checked=0;
 for(const [city,data] of Object.entries(CITY_DATA)){
  for(const area of [...data.areas,...(EXTRA_DATA[city]?.zones||[])]){
