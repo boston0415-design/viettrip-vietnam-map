@@ -282,12 +282,9 @@ function initMap(){
 
     state.clickLatLng=e.latLng;
 
-    // 지도 빈 곳 클릭 시 오른쪽 업체 상세창 및 선택 상태 정리.
+    // 빈 지도는 정보창만 닫는다. 선택한 분류의 아이콘과 범위는 유지한다.
     closeDetailPanel();
     closeAreaPanel();
-    clearSelectedSystemIcons();
-    clearSelectionRanges();
-    closeSystemInfo();
   });
   renderPopularAreas();
   renderGolfCourses();
