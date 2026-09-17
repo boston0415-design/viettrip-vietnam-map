@@ -1,3 +1,13 @@
+function rangeViewportPadding(padding=78){
+  const result={top:padding,bottom:padding,left:padding,right:padding};
+  const mapRect=state.map?.getDiv?.()?.getBoundingClientRect?.();
+  const legendRect=$('#areaLegend')?.getBoundingClientRect?.();
+  if(mapRect && legendRect && legendRect.width>0 && legendRect.height>0 && legendRect.top<mapRect.bottom && legendRect.bottom>mapRect.top){
+    result.bottom=Math.max(padding,Math.min(mapRect.height-140,mapRect.bottom-legendRect.top+16));
+  }
+  return result;
+}
+
 function estimateBoundsZoom(bounds,padding=78,maxZoom=16){
   if(!state.map || !bounds || bounds.isEmpty())return null;
 
@@ -5,8 +15,9 @@ function estimateBoundsZoom(bounds,padding=78,maxZoom=16){
   const sw=bounds.getSouthWest();
   const div=state.map.getDiv();
 
-  const width=Math.max(140,(div?.clientWidth||800)-padding*2);
-  const height=Math.max(140,(div?.clientHeight||600)-padding*2);
+  const inset=rangeViewportPadding(padding);
+  const width=Math.max(140,(div?.clientWidth||800)-inset.left-inset.right);
+  const height=Math.max(140,(div?.clientHeight||600)-inset.top-inset.bottom);
 
   let lngDiff=ne.lng()-sw.lng();
   if(lngDiff<0)lngDiff+=360;
@@ -34,6 +45,10 @@ async function smoothFitBounds(bounds,{padding=78,maxZoom=16,duration=560}={}){
   const targetCenter={lat:center.lat(),lng:center.lng()};
   const targetZoom=estimateBoundsZoom(bounds,padding,maxZoom);
   if(!Number.isFinite(targetZoom))return;
+  // Keep the complete range above the floating category panel.
+  const inset=rangeViewportPadding(padding);
+  const offsetY=(inset.bottom-inset.top)/2/(256*Math.pow(2,targetZoom));
+  targetCenter.lat=Math.atan(Math.sinh(Math.PI*(1-2*(mercatorY(targetCenter.lat)+offsetY))))*180/Math.PI;
 
   const currentCenter=state.map.getCenter();
   const startCenter={
