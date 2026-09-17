@@ -33,3 +33,15 @@
 }
 @media(max-width:480px){.brandTitle{font-size:15px;gap:4px}.brandMark{width:17px;height:21px}.top .brand .cafeLink{margin-left:21px;font-size:9px!important}}
 @media(max-width:360px){.brandTitle{font-size:13px}.brandMark{display:none}.top .brand .cafeLink{margin-left:0}}
+
+/* Cuisine and review additions share the existing form and mobile spacing. */
+#restaurantTagOptions{display:grid;gap:12px;width:100%}
+.restaurantTagGroup{min-width:0;margin:0;padding:0;border:0}
+.restaurantTagGroup legend{font-size:12px;font-weight:700;color:#526575;margin-bottom:7px}
+.restaurantTagGroup>div{display:flex;flex-wrap:wrap;gap:6px}
+.restaurantTagGroup .tagChoice{font-size:12px;font-weight:600}
+.reviewCafeLink{border:1px solid #dce7e8;border-radius:10px;margin:12px 0;padding:0 12px}
+.reviewCafeLink summary{cursor:pointer;font-size:13px;font-weight:700;color:#087c86;min-height:44px;align-content:center;padding:10px 0}
+.reviewCafeLink .field{margin-top:2px}
+.cafeOriginalLink{display:inline-flex;align-items:center;min-height:36px;margin:6px 0;color:#087f70;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+@media(min-width:901px){#tagNav{max-height:94px;overflow-y:auto}}

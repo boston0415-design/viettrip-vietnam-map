@@ -18,7 +18,7 @@ for(const f of ['01-data-storage.js','02-services-media.js'])vm.runInContext(fs.
   await fetchSharedDb();assert(publicReads.includes('reviews_public'));assert(!publicReads.includes('reviews'));
   let writes=[];supaRpc=async(name,data)=>writes.push({name,data});supaInsert=async()=>{throw Error('unexpected direct write')};
   await uploadMissingLocal({places:[],reviews:[other,{...local,id:'missing'}]},{places:[],reviews:[]});
-  assert.equal(writes.length,1);assert.equal(writes[0].name,'device_upsert_review');
+  assert.equal(writes.length,1);assert.equal(writes[0].name,'device_upsert_review_with_link');
   assert.equal(writes[0].data.p_device_id,'test-private-device');
   console.log('PASS public review privacy, own/other detection, deduplication, public reads, and own-only migration');
  })()`,ctx);

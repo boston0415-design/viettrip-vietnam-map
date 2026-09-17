@@ -4,7 +4,8 @@
 .top .brandTitle{font-weight:800;line-height:1.25;letter-spacing:-1px}
 .top .brand small{color:#64748b;font-weight:450;letter-spacing:-.2px}
 .top .brand .cafeLink{display:flex!important;align-items:center;gap:10px;color:#087f8c;font-weight:650;line-height:1.5;letter-spacing:-.2px;overflow:visible}
-.cafeAddress{font-size:11px;letter-spacing:0;color:#72838f;font-weight:450}
+.top .cafeLink>span:first-child{flex-shrink:0}
+.cafeAddress{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;letter-spacing:0;color:#72838f;font-weight:450}
 .top .search{border:1px solid #dbe5ea;background:#f7fafb;border-radius:12px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
 .top .search:focus-within{border-color:#087f8c;box-shadow:0 0 0 3px #087f8c12}
 .top .search input{border:0;border-radius:0;background:transparent;color:#173247;font-weight:450;box-shadow:none}

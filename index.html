@@ -30,7 +30,7 @@
     </div>
   </header>
   <div class="communityStats" aria-label="전체 지도 이용 통계">
-    <span title="2026년 9월 17일부터 집계한 방문 횟수입니다. 페이지를 열거나 새로고침할 때마다 1회 집계합니다. 실제 사람 수와는 다릅니다.">누적 방문 <b id="totalVisits">—</b><small>회</small></span>
+    <span title="같은 브라우저에서는 최초 접속 후 30분 동안 1회 집계하며, 이후 재접속하면 다시 집계합니다. 과거 누적 수치는 유지됩니다. 브라우저 저장을 차단하면 중복 집계될 수 있으며 실제 사람 수와는 다릅니다.">누적 방문 <b id="totalVisits">—</b><small>회</small></span>
     <span>등록 업체 <b id="totalPlaces">—</b><small>곳</small></span>
     <span><button id="openCommunityReviews" class="statsReviewButton" type="button" aria-haspopup="dialog">회원 후기 <b id="totalReviews">—</b><small>개</small><span aria-hidden="true"> ›</span></button></span>
   </div>
@@ -153,9 +153,9 @@
     <div class="field"><label>업체명</label><input id="pName" placeholder="예: Uraetei Japanese BBQ"><div class="inlineHelp">주소가 아니라 실제 상호명을 입력해주세요. Google 업체를 선택하면 상호명이 자동 입력됩니다.</div></div>
     <div class="grid2"><div class="field"><label>업종</label><select id="pCat"></select></div><div class="field"><label id="pSubLabel">세부분류</label><select id="pSub"></select></div></div>
     <div id="restaurantTagField" class="field hiddenField">
-      <label>식당 특징 <span style="font-size:11px;color:#64748b">여러 개 선택 가능</span></label>
+      <label>메뉴·특징 <span style="font-size:11px;color:#64748b">여러 개 선택 가능</span></label>
       <div id="restaurantTagOptions" class="tagChoiceGrid"></div>
-      <div class="inlineHelp">예: 일식 + 고기·구이 / 베트남 + 해산물 / 일식 + 오마카세</div>
+      <div class="inlineHelp">나라별 음식 1개와 메뉴·특징 여러 개를 조합하세요. 식단 정보는 업소에서 직접 확인한 항목만 선택해주세요.</div>
     </div>
     <div class="field"><label>지역</label><input id="pArea" placeholder="예: 1군"></div>
     <div class="field"><label>주소</label>
@@ -195,9 +195,13 @@
   <div class="modal">
     <h3>별점·후기 남기기</h3>
     <p style="font-size:12px;color:#64748b">별점만 또는 후기만 등록할 수 있습니다. 같은 기기·브라우저에서는 업소별로 각각 1개만 저장되며, 다시 작성하면 기존 내용이 수정됩니다.</p>
-    <div class="field"><label>닉네임 · 후기 작성 시 필수</label><input id="rName"></div>
+    <div class="field"><label for="rName">닉네임 · 글 후기 작성 시 필수</label><input id="rName" autocomplete="nickname" placeholder="카페에서 사용하는 닉네임을 적어주세요"><div class="inlineHelp">후기에 공개됩니다. 별점만 남길 때는 생략할 수 있습니다.</div></div>
     <div class="field"><label>별점 · 선택</label><div id="stars" class="stars"></div><div style="font-size:11px;color:#64748b;margin-top:6px">입력하지 않은 항목의 기존 별점·후기는 그대로 유지됩니다.</div></div>
-    <div class="field"><label>후기 · 선택</label><textarea id="rText" placeholder="후기만 남겨도 됩니다."></textarea></div>
+    <div class="field"><label for="rText">후기 · 선택</label><textarea id="rText" placeholder="후기만 남겨도 됩니다."></textarea></div>
+    <details id="reviewCafeLink" class="reviewCafeLink">
+      <summary>카페 후기 링크 추가하기 · 선택</summary>
+      <div class="field"><label for="rCafeUrl">네이버 카페 게시글 주소</label><input id="rCafeUrl" type="url" inputmode="url" placeholder="https://cafe.naver.com/카페주소/글번호" aria-describedby="rCafeHelp"><div id="rCafeHelp" class="inlineHelp">일상탈출 카페에 작성한 후기의 공유 링크를 붙여주세요. 간단한 후기와 함께 저장하면 원문으로 연결됩니다. 회원 전용 글은 카페 가입·로그인이 필요할 수 있습니다.</div></div>
+    </details>
     <div class="field photoPicker">
       <label>사진 · 최대 3장</label>
       <input id="rPhotos" type="file" accept="image/*" multiple>
