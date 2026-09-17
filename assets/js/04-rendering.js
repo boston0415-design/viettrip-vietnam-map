@@ -506,6 +506,10 @@ function inferCategory(name='',types=[]){
   const t=new Set(types||[]);
   if(t.has('golf_course') || n.includes('golf')) return ['golf','골프장'];
   if(n.includes('market') || n.includes('chợ') || n.includes('cho ') || n.includes('night market')) return ['market',n.includes('night')?'야시장':'전통시장'];
+  const heritageName=n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').normalize('NFC').trim().replace(/\s+/g,' ');
+  // Match the palace's known names, without treating every hotel named "Palace" as a relic.
+  const independencePalace=/^(?:통일궁|독립궁|(?:the )?(?:independence|reunification) palace|dinh doc lap)(?:$|\s*[（(])/.test(heritageName);
+  if(t.has('historical_landmark') || t.has('historical_place') || independencePalace) return ['attraction','역사·문화유적'];
   if(t.has('tourist_attraction') || t.has('park') || n.includes('beach') || n.includes('square')) return ['attraction',n.includes('beach')?'해변':'랜드마크'];
   if(t.has('lodging')) return ['stay','호텔'];
   if(t.has('spa')) return ['spa','스파'];

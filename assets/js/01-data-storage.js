@@ -8,7 +8,7 @@ const CONFIG={
     exchange:{label:'환전소',subs:['환전소·금은방','은행','공항 환전']},
     shopping:{label:'쇼핑',subs:['마트','쇼핑몰','백화점','아울렛']},
     market:{label:'시장',subs:['전통시장','야시장']},
-    attraction:{label:'관광명소',subs:['광장·거리','해변','랜드마크','공원']},
+    attraction:{label:'관광명소',subs:['광장·거리','해변','랜드마크','역사·문화유적','공원']},
     bar:{label:'클럽·바',subs:['클럽','루프탑 바','펍']},
     golf:{label:'골프장',subs:['골프장','실내 골프']}
   }
