@@ -262,6 +262,7 @@ function initMap(){
   for(const event of ['dragstart','zoom_changed'])state.map.addListener(event,()=>{
     hideHover();
     if(!supportsMapHover())closeSystemInfo();
+    if(event==='zoom_changed')refreshReferenceRangeVisibility();
   });
   initAddressAutocomplete();
   state.map.addListener('click',e=>{

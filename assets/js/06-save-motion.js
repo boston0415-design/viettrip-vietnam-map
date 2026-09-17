@@ -404,8 +404,16 @@ function makeAreaLabel(position,text,feature={}){
 
       this.div=div;
       this.getPanes().overlayMouseTarget.appendChild(div);
+      this.updateZoomAppearance();
+    }
+    updateZoomAppearance(){
+      if(!this.div)return;
+      const style=referenceRangeZoomStyle({strokeOpacity:1});
+      this.div.style.display=style.visible?'':'none';
+      this.div.style.opacity=String(style.strokeOpacity);
     }
     draw(){
+      this.updateZoomAppearance();
       const p=this.getProjection().fromLatLngToDivPixel(new google.maps.LatLng(this.pos));
       if(this.div&&p){this.div.style.left=p.x+'px';this.div.style.top=p.y+'px'}
     }
@@ -611,22 +619,41 @@ function pathCenter(path){
   return {lat:c.lat(),lng:c.lng()};
 }
 
+// Reference circles help with the area overview, but must not obscure streets
+// and businesses up close. Fade the fill at zoom 15–16 and outlines at 15–17.
+// Only presentation changes: geographic radii, selected filters and markers stay.
+function referenceRangeZoomStyle(base,zoom=state.map?.getZoom?.()){
+  const value=Number(zoom);
+  const z=Number.isFinite(value)?value:15;
+  const outline=Math.max(0,Math.min(1,(17-z)/2));
+  const style={visible:outline>0,clickable:outline>0,strokeOpacity:base.strokeOpacity*outline};
+  if(base.fillOpacity!=null)style.fillOpacity=base.fillOpacity*Math.max(0,Math.min(1,16-z));
+  return style;
+}
+
+function refreshReferenceRangeVisibility(){
+  (state.selectionOverlays||[]).forEach(overlay=>{
+    if(overlay._referenceRangeStyle)overlay.setOptions(referenceRangeZoomStyle(overlay._referenceRangeStyle));
+  });
+  (state.areaLabels||[]).forEach(label=>label.updateZoomAppearance?.());
+}
+
 function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,strokeOpacity=.75,feature={}){
   center=validMapLocation(center);
   radius=Number(radius);
   if(!state.map || !center || !Number.isFinite(radius) || radius<=0)return null;
+  const baseStyle={fillOpacity,strokeOpacity};
   const circle=new google.maps.Circle({
     map:state.map,
     center,
     radius,
     fillColor:color,
-    fillOpacity,
     strokeColor:color,
-    strokeOpacity,
     strokeWeight:1.25,
-    clickable:true,
+    ...referenceRangeZoomStyle(baseStyle),
     zIndex:2
   });
+  circle._referenceRangeStyle=baseStyle;
 
   bindMapFeatureInfo(circle,{...feature,center},center,radius,{backgroundRange:true});
 
@@ -635,16 +662,17 @@ function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,stroke
 }
 
 function addSelectionPath(path,color='#1a73e8',feature={}){
+  const baseStyle={strokeOpacity:.5};
   const line=new google.maps.Polyline({
     map:state.map,
     path,
     geodesic:true,
     strokeColor:color,
-    strokeOpacity:.5,
     strokeWeight:4,
-    clickable:true,
+    ...referenceRangeZoomStyle(baseStyle),
     zIndex:2
   });
+  line._referenceRangeStyle=baseStyle;
 
   bindMapFeatureInfo(line,feature,pathCenter(path),null,{backgroundRange:true});
 
