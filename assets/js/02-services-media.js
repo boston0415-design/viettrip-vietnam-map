@@ -47,8 +47,14 @@ function normalizeReviewTime(v){
   return Number.isFinite(t) ? t : 0;
 }
 function reviewIdentityKey(r){
-  const who=(r.createdBy||'').trim();
+  const who=(r.createdByHash || (r.createdBy && r.createdBy===getDeviceId() && state.deviceHash) || r.createdBy || '').trim();
   return who ? `${r.placeId}|${who}` : `${r.placeId}|legacy|${r.id}`;
+}
+function isOwnReview(r){
+  if(!r)return false;
+  return r.createdByHash
+    ? !!state.deviceHash && r.createdByHash===state.deviceHash
+    : !!r.createdBy && r.createdBy===getDeviceId();
 }
 function dedupeReviews(reviews){
   const map=new Map();
@@ -131,7 +137,8 @@ function remoteReviewToLocal(r){
     rating:r.rating==null?null:Number(r.rating),
     text:r.body||'',
     createdAt:r.created_at,
-    createdBy:r.created_by||'',
+    createdBy:'',
+    createdByHash:r.created_by_hash||'',
     photoUrls:Array.isArray(r.photo_urls)?r.photo_urls:[]
   };
 }
@@ -879,7 +886,7 @@ async function fetchSharedDb(){
   if(placeError)throw placeError;
 
   try{
-    reviews=await supaGet('reviews','select=*&order=created_at.asc');
+    reviews=await supaGet('reviews_public','select=*&order=created_at.asc');
   }catch(err){
     console.warn('reviews load failed; businesses will still be shown',err);
     reviews=[];
@@ -899,7 +906,7 @@ async function uploadMissingLocal(local,remote){
   const remoteReviewIds=new Set(remote.reviews.map(r=>r.id));
   const remoteReviewByIdentity=new Map(
     remote.reviews
-      .filter(r=>r.createdBy)
+      .filter(r=>r.createdByHash||r.createdBy)
       .map(r=>[reviewIdentityKey(r),r])
   );
   const localToRemoteId=new Map();
@@ -928,27 +935,19 @@ async function uploadMissingLocal(local,remote){
   });
 
   for(const r of dedupeReviews(local.reviews)){
+    // Publicly read reviews must never be re-uploaded as this device's content.
+    if(!isOwnReview(r))continue;
     const remotePlaceId=localToRemoteId.get(r.placeId)||r.placeId;
     const normalized={...r, placeId:remotePlaceId};
 
     if(remoteReviewIds.has(normalized.id)) continue;
 
-    const existingByDevice = normalized.createdBy ? remoteReviewByIdentity.get(reviewIdentityKey(normalized)) : null;
-    if(existingByDevice){
-      await supaPatch(
-        'reviews',
-        `id=eq.${existingByDevice.id}`,
-        {
-          rating:normalized.rating==null?null:Number(normalized.rating),
-          body:normalized.text||null,
-          author_name:normalized.nickname||null,
-          created_at:normalized.createdAt||new Date().toISOString()
-        }
-      );
-      continue;
-    }
-
-    await supaInsert('reviews',reviewToRemote(normalized));
+    if(remoteReviewByIdentity.has(reviewIdentityKey(normalized)))continue;
+    await supaRpc('device_upsert_review',{
+      p_review_id:normalized.id,p_place_id:normalized.placeId,p_device_id:getDeviceId(),
+      p_nickname:normalized.nickname||'',p_rating:normalized.rating==null?null:Number(normalized.rating),
+      p_body:normalized.text||'',p_photo_urls:normalized.photoUrls||[]
+    });
   }
 }
 

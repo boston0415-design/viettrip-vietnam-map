@@ -273,7 +273,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
   setTimeout(()=>selectPlace(newId,false,true),80);
 }
 function openReview(){
-  const mine=db().reviews.find(r=>r.placeId===state.selected && (r.createdBy||'')===getDeviceId());
+  const mine=db().reviews.find(r=>r.placeId===state.selected && isOwnReview(r));
 
   state.rating=mine?.rating??null;
   state.reviewExistingPhotos=[...(mine?.photoUrls||[])].slice(0,3);
@@ -305,7 +305,7 @@ async function saveReview(){
   const now=new Date().toISOString();
   const x=db();
 
-  let existing=x.reviews.find(r=>r.placeId===placeId && (r.createdBy||'')===deviceId);
+  let existing=x.reviews.find(r=>r.placeId===placeId && isOwnReview(r));
   let reviewId=existing?.id || crypto.randomUUID();
 
   try{
