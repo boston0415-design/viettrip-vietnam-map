@@ -1,67 +1,79 @@
-/* Header proportions only: keep map controls and filtering independent. */
-.top{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans KR","Malgun Gothic",sans-serif}
-.top .brand{min-width:0!important;overflow:visible;letter-spacing:-.6px}
-.top .brandTitle{font-weight:800;line-height:1.25;letter-spacing:-1px}
-.top .brand small{color:#64748b;font-weight:450;letter-spacing:-.2px}
-.top .brand .cafeLink{display:flex!important;align-items:center;gap:10px;color:#087f8c;font-weight:650;line-height:1.5;letter-spacing:-.2px;overflow:visible}
+/* Header-only design: equal side columns keep search on the viewport centre. */
+.top{--header-ink:#244a4c;--header-accent:#247f78;--header-line:#e1e9e7;font-family:system-ui,-apple-system,"Segoe UI","Noto Sans KR","Malgun Gothic",sans-serif;background:#fff;border-color:var(--header-line)}
+.top .brand{min-width:0!important;overflow:visible;color:var(--header-ink);letter-spacing:0}
+.top .brandTitle{display:flex;align-items:center;font-family:"Gowun Dodum","Noto Sans KR","Malgun Gothic",sans-serif;font-weight:400;line-height:1.3;letter-spacing:-.7px;white-space:nowrap}
+.top .brandTitle em{font-weight:400;color:var(--header-accent)}
+.top .brandMark{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--header-accent);background:#edf5f1;border:1px solid #e0ece6;border-radius:13px}
+.top .brandMark svg{width:62%;height:70%;stroke-width:1.6}
+.top .brand small{color:#687d80;font-weight:400;letter-spacing:-.15px;line-height:1.5}
+.top .brand .cafeLink{display:flex!important;align-items:center;gap:9px;line-height:1.5;font-weight:550;letter-spacing:-.15px;color:#2a766e;text-decoration:none;overflow:visible;width:fit-content;max-width:100%}
 .top .cafeLink>span:first-child{flex-shrink:0}
-.cafeAddress{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;letter-spacing:0;color:#72838f;font-weight:450}
-.top .search{border:1px solid #dbe5ea;background:#f7fafb;border-radius:12px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
-.top .search:focus-within{border-color:#087f8c;box-shadow:0 0 0 3px #087f8c12}
-.top .search input{border:0;border-radius:0;background:transparent;color:#173247;font-weight:450;box-shadow:none}
-.top .search input::placeholder{color:#71828e;opacity:1}
-.top .search button{border:0;border-left:1px solid #dbe5ea;border-radius:0;background:#edf5f6;color:#076d78;font-weight:700}
-.top .search button:hover{background:#e0eff1}
-.top .actions{align-items:center}
-.top .actions .btn{font-weight:650;border-color:#dbe5ea;color:#334b5b;background:#fff}
-.top .actions .btn.primary{color:#fff;background:#087f8c;border-color:#087f8c}
+.top .cafeLink:hover{color:#175e57;text-decoration:underline;text-underline-offset:3px}
+.cafeAddress{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;letter-spacing:0;color:#82918f;font-weight:400}
+.top .search{display:flex;align-items:center;border:1px solid #dce6e2;background:#f5f8f6;border-radius:24px;overflow:hidden;box-shadow:0 2px 7px #254b4410;transition:border-color .15s,box-shadow .15s}
+.top .search:focus-within{border-color:#53938b;background:#fff;box-shadow:0 0 0 3px #247f7812}
+.top .searchGlyph{width:18px;height:18px;flex:0 0 18px;margin-left:17px;color:#718881;pointer-events:none}
+.top .search input{flex:1;min-width:0;border:0;border-radius:0;background:transparent;color:#294947;font:inherit;font-weight:400;box-shadow:none}
+.top .search input::placeholder{color:#81908c;opacity:1}
+.top .search button{flex-shrink:0;align-self:stretch;border:0;border-left:1px solid #e0e8e3;border-radius:0;background:transparent;color:#2a7168;font:inherit;font-weight:600}
+.top .search button:hover{background:#e7f1eb}
+.top .actions{display:flex;align-items:center}
+.top .actions .btn{font:inherit;font-weight:550;border-color:var(--header-line);color:#4a6261;background:#fff;transition:background .15s,border-color .15s}
+.top .actions .btn:hover{background:#f3f7f5;border-color:#c8dad2}
+.top .actions .btn.primary{color:#276e62;background:#edf5ee;border-color:#dbe9dd}
+.top .actions .btn.primary:hover{background:#e2efe4}
 .top .actions .btn.adminOn{background:#fff7e6;color:#925c00;border-color:#efcf8d}
-.top button:focus-visible{outline:2px solid #087f8c;outline-offset:2px}
+.top button:focus-visible{outline:2px solid var(--header-accent);outline-offset:3px}
 @media(min-width:901px){
- .app{grid-template-rows:94px 28px minmax(0,1fr)}
- .top{display:grid;grid-template-columns:minmax(300px,1fr) minmax(220px,500px) auto;gap:24px;padding:12px 24px;min-height:0}
- .top .brandTitle{font-size:28px;gap:9px;white-space:nowrap}
- .top .brandMark{width:27px;height:31px}
- .top .brand small{display:block;font-size:12px;margin:3px 0 3px 36px}
- .top .brand .cafeLink{font-size:13px;margin:0 0 0 36px}
- .top .search{width:100%;min-width:0;max-width:500px;height:44px;margin:0;justify-self:center}
- .top .search input{min-width:0;padding:9px 14px;font-size:14px}
- .top .search button{padding:0 17px;font-size:13px}
- .top .actions{gap:7px;margin:0;justify-self:end}
- .top .actions .btn{min-height:42px;padding:9px 12px;font-size:13px;border-radius:11px;white-space:nowrap}
+ .app{grid-template-rows:100px 28px minmax(0,1fr)}
+ .top{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,500px) minmax(0,1fr);gap:24px;padding:12px 28px;min-height:0}
+ .top .brand{justify-self:start;max-width:100%}
+ .top .brandTitle{font-size:clamp(27px,2.1vw,32px);gap:10px}
+ .top .brandMark{width:36px;height:40px}
+ .top .brand small{display:block;font-size:11px;margin:1px 0 3px 46px;white-space:nowrap}
+ .top .brand .cafeLink{font-size:12px;margin:0 0 0 46px;max-width:calc(100% - 46px)}
+ .top .search{width:100%;min-width:0;max-width:500px;height:46px;margin:0;justify-self:center}
+ .top .search input{padding:11px 12px;font-size:14px}
+ .top .search button{padding:0 20px;font-size:13px}
+ .top .actions{gap:8px;margin:0;justify-self:end}
+ .top .actions .btn{min-height:42px;padding:9px 12px;font-size:13px;border-radius:12px;white-space:nowrap}
 }
 @media(min-width:901px) and (max-width:1199px){
- .app{grid-template-rows:88px 28px minmax(0,1fr)}
- .top{grid-template-columns:minmax(280px,1fr) minmax(200px,360px) auto;gap:16px;padding:10px 18px}
- .top .brandTitle{font-size:25px}.top .brand small{font-size:11px}
- .top .brand .cafeLink{font-size:12px;gap:7px}.cafeAddress{font-size:10px}
- .top .actions .btn{font-size:12px;padding:8px 10px}
+ .app{grid-template-rows:94px 28px minmax(0,1fr)}
+ .top{grid-template-columns:minmax(0,1fr) minmax(230px,32vw) minmax(0,1fr);gap:16px;padding:10px 18px}
+ .top .brandTitle{font-size:25px;gap:8px}.top .brandMark{width:30px;height:35px;border-radius:11px}
+ .top .brand small{font-size:10px;margin-left:38px}
+ .top .brand .cafeLink{font-size:12px;margin-left:38px;max-width:calc(100% - 38px)}
+ .top .cafeAddress{display:none}
+ .top .actions{gap:6px}.top .actions .btn{font-size:12px;padding:8px 10px}
+ .top .searchGlyph{margin-left:14px}.top .search input{padding-left:9px;font-size:13px}.top .search button{padding:0 14px}
 }
 @media(max-width:900px){
  .app{grid-template-rows:118px 32px minmax(0,1fr)!important}
- .top{grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:54px 40px!important;gap:8px!important;height:118px!important;padding:8px 10px!important}
+ .top{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:54px 40px!important;gap:8px!important;height:118px!important;padding:8px 10px!important}
  .top .brand{grid-column:1;grid-row:1}
- .top .brandTitle{font-size:20px!important;gap:6px;white-space:nowrap;letter-spacing:-.8px;line-height:1.3}
- .top .brandMark{display:inline-flex;width:21px;height:27px}
+ .top .brandTitle{font-size:21px!important;gap:6px;white-space:nowrap;letter-spacing:-.65px;line-height:1.25}
+ .top .brandMark{width:25px;height:30px;border-radius:10px}
  .top .brand small{display:none!important}
- .top .brand .cafeLink{font-size:12px!important;margin:4px 0 0 27px;min-height:20px;gap:0}
+ .top .brand .cafeLink{font-size:11px!important;margin:3px 0 0 31px;min-height:20px;gap:0}
  .top .cafeAddress{display:none}
  .top .actions{grid-column:2;grid-row:1;gap:4px!important}
- .top .actions .btn{min-width:40px!important;min-height:44px!important;height:44px!important;padding:4px 6px!important;border-radius:10px!important}
- .top .search{grid-column:1/-1;grid-row:2;height:40px!important;max-width:none;width:100%!important;border-radius:10px}
- .top .search input{font-size:16px!important;padding:7px 11px!important;min-height:0}
- .top .search button{min-height:38px;min-width:52px;padding:0 12px;font-size:13px}
+ .top .actions .btn{min-width:40px!important;min-height:44px!important;height:44px!important;padding:4px 6px!important;border-radius:11px!important}
+ .top .search{grid-column:1/-1;grid-row:2;height:40px!important;max-width:none;width:100%!important;border-radius:20px}
+ .top .searchGlyph{width:17px;height:17px;flex-basis:17px;margin-left:13px}
+ .top .search input{font-size:16px!important;padding:7px 9px!important;min-height:0}
+ .top .search button{min-height:38px;min-width:52px;padding:0 13px;font-size:13px}
 }
-@media(max-width:360px){
+@media(max-width:380px){
  .top{padding-left:8px!important;padding-right:8px!important;column-gap:6px!important}
- .top .brandTitle{font-size:18px!important;letter-spacing:-.9px}
+ .top .brandTitle{font-size:20px!important;letter-spacing:-.85px}
  .top .brandMark{display:none}.top .brand .cafeLink{margin-left:0!important}
  .top .actions{gap:3px!important}.top .actions .btn{min-width:38px!important;padding:4px!important}
 }
 @media(min-width:600px) and (max-width:900px) and (max-height:500px){
  .app{grid-template-rows:64px 28px minmax(0,1fr)!important}
  .top{grid-template-columns:minmax(200px,1fr) minmax(170px,1fr) auto!important;grid-template-rows:48px!important;height:64px!important;gap:12px!important;padding:8px 12px!important}
- .top .brandTitle{font-size:20px!important}.top .brandMark{width:20px;height:24px}
- .top .brand .cafeLink{margin-top:2px!important;font-size:11px!important}
+ .top .brandTitle{font-size:21px!important}.top .brandMark{width:24px;height:29px}
+ .top .brand .cafeLink{margin-top:2px!important;font-size:11px!important;margin-left:30px}
  .top .search{grid-column:2;grid-row:1}.top .actions{grid-column:3;grid-row:1}
 }
