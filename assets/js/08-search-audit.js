@@ -391,10 +391,9 @@ function fitSelectedCityView(key){
 
   areas.forEach(a=>{
     if(a.center)extendPoint(a.center);
-    if(a.kind==='circle' && validMapLocation(a.center) && Number(a.radius)>0){
-      extendBoundsByCircle(bounds,a.center,a.radius);
+    if(validMapLocation(a.center)){
+      extendBoundsByCircle(bounds,a.center,areaRangeRadius(a));
     }
-    if(Array.isArray(a.path))a.path.forEach(extendPoint);
   });
 
   points.forEach(extendPoint);

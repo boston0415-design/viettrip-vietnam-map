@@ -156,18 +156,8 @@ function categoryRangeColor(categoryId){
 }
 
 function businessCircleRadius(categoryId){
-  return ({
-    stay:150,
-    restaurant:110,
-    spa:110,
-    karaoke:120,
-    cafe:100,
-    shopping:130,
-    bar:120,
-    market:130,
-    attraction:150,
-    golf:180
-  })[categoryId]||110;
+  // One radius policy per place type, shared by registered and built-in places.
+  return ({shopping:180,market:250,attraction:300,golf:700})[categoryId]||150;
 }
 
 function airportMainRadius(p){
@@ -193,81 +183,12 @@ function pointCircleRadius(type,p=null){
 }
 
 
-function pointHaloSize(type){
-  if(type==='공항')return 68;
-  if(type==='전철역')return 58;
-  if(type==='기차역')return 58;
-  if(type==='병원')return 56;
-  if(type==='쇼핑')return 54;
-  if(type==='터미널')return 52;
-  if(type==='그랩승차'||type==='택시승차')return 48;
-  return 52;
-}
-
-function addPointRangeHalo(type,location){
-  if(!state.map || !location)return null;
-
-  const size=pointHaloSize(type);
-  const color=poiColor(type);
-
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-    <circle cx="${size/2}" cy="${size/2}" r="${size/2-4}"
-      fill="${color}" fill-opacity=".09"
-      stroke="#ffffff" stroke-opacity=".95" stroke-width="6"/>
-    <circle cx="${size/2}" cy="${size/2}" r="${size/2-5}"
-      fill="none" stroke="${color}" stroke-opacity=".98" stroke-width="3.5"/>
-  </svg>`;
-
-  const marker=new google.maps.Marker({
-    map:state.map,
-    position:location,
-    clickable:true,
-    zIndex:35,
-    icon:{
-      url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),
-      scaledSize:new google.maps.Size(size,size),
-      anchor:new google.maps.Point(size/2,size/2)
-    }
-  });
-
-  marker.addListener('click',async ()=>{
-    closeSystemInfo();
-    await focusRangeLocation(location,1);
-  });
-
-  state.selectionOverlays.push(marker);
-  return marker;
-}
-
-
 function addUnifiedPointRange(type,location,p=null){
-  // Airport/POI coordinates identify a point, not the property's boundary.
-  return addPointRangeHalo(type,location);
+  return addPointCoverageCircle(type,location,p);
 }
 
 function addPointCoverageCircle(type,location,p=null){
-  if(!state.map)return;
-  const color=poiColor(type);
-  const circle=new google.maps.Circle({
-    map:state.map,
-    center:location,
-    radius:pointCircleRadius(type,p),
-    fillColor:color,
-    fillOpacity:type==='공항'?.07:.11,
-    strokeColor:color,
-    strokeOpacity:type==='공항'?.82:.90,
-    strokeWeight:type==='공항'?3:2.6,
-    clickable:true,
-    zIndex:12
-  });
-
-  circle.addListener('click',async ()=>{
-    closeSystemInfo();
-    await focusRangeLocation(location,1);
-  });
-
-  state.selectionOverlays.push(circle);
-  return circle;
+  return addSelectionCircle(location,pointCircleRadius(type,p),poiColor(type));
 }
 
 
@@ -500,39 +421,7 @@ function showPointCategory(type){
 
 
 function addGolfRangeRing(location,g=null){
-  if(!state.map || !location)return null;
-
-  const size=86;
-  const color='#15803d';
-
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-    <circle cx="${size/2}" cy="${size/2}" r="${size/2-7}"
-      fill="${color}" fill-opacity=".10"
-      stroke="#ffffff" stroke-opacity=".96" stroke-width="7"/>
-    <circle cx="${size/2}" cy="${size/2}" r="${size/2-9}"
-      fill="none" stroke="${color}" stroke-opacity=".96" stroke-width="4"/>
-  </svg>`;
-
-  const ring=new google.maps.Marker({
-    map:state.map,
-    position:location,
-    title:g?.name?`${g.name} 범위`:'골프장 범위',
-    clickable:true,
-    zIndex:34,
-    icon:{
-      url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),
-      scaledSize:new google.maps.Size(size,size),
-      anchor:new google.maps.Point(size/2,size/2)
-    }
-  });
-
-  ring.addListener('click',async ()=>{
-    closeSystemInfo();
-    await focusRangeLocation(location,1);
-  });
-
-  state.selectionOverlays.push(ring);
-  return ring;
+  return addSelectionCircle(location,businessCircleRadius('golf'),categoryRangeColor('golf'));
 }
 
 function createGolfMarker(g,location,clearExisting=true){
@@ -604,9 +493,8 @@ async function showGolfCategory(){
     createGolfMarker(g,location,false);
     addGolfRangeRing(location,g);
 
-    // 화면 맞춤 계산은 실제 골프장 주변 약 700m를 기준으로 하되,
-    // 사용자에게 보이는 범위는 줌과 무관한 단일 링으로 표시.
-    extendBoundsByCircle(bounds,location,700);
+    // Fit exactly the same geographic radius that is rendered.
+    extendBoundsByCircle(bounds,location,businessCircleRadius('golf'));
     shown++;
   });
 
@@ -764,8 +652,7 @@ async function jumpToGolf(name){
   addGolfRangeRing(location,g);
   state.rangeSelectionKey=`golf:${state.city}:${g.name}`;
 
-  // 이동 완료 후 확대까지 모두 easing으로 처리
-  focusRangeLocation(location,1);
+  fitCircleGeometry(location,businessCircleRadius('golf'),{padding:82,maxZoom:16});
   closeAreaPanel();
   setDbStatus(`${g.name} 선택됨`,true);
 
@@ -804,7 +691,7 @@ function jumpToPoi(name){
     addUnifiedPointRange(p.type,location,p);
     state.rangeSelectionKey=`poi:${state.city}:${p.name}`;
 
-    focusRangeLocation(location,1);
+    fitCircleGeometry(location,pointCircleRadius(p.type,p),{padding:82,maxZoom:16});
     closeAreaPanel();
     setDbStatus(`${p.name} 선택됨`,true);
   });

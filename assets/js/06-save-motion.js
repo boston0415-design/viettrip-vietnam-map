@@ -408,14 +408,7 @@ function clearSelectionRanges(resetKey=true){
 }
 
 function toggleSelectionRange(key,drawFn){
-  // 같은 대분류/소분류를 다시 클릭하면 범위만 사라짐
-  if(state.rangeSelectionKey===key && state.selectionOverlays.length){
-    clearSelectionRanges(true);
-    clearAreaLabels();
-    if(state.clickInfo){state.clickInfo.close();state.clickInfo=null}
-    return false;
-  }
-
+  // Re-selecting an active category must keep its range visible.
   clearSelectionRanges(false);
   drawFn();
   state.rangeSelectionKey=key;
@@ -602,15 +595,18 @@ function pathCenter(path){
 }
 
 function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,strokeOpacity=.75){
+  center=validMapLocation(center);
+  radius=Number(radius);
+  if(!state.map || !center || !Number.isFinite(radius) || radius<=0)return null;
   const circle=new google.maps.Circle({
     map:state.map,
     center,
     radius,
     fillColor:color,
-    fillOpacity,
+    fillOpacity:.12,
     strokeColor:color,
-    strokeOpacity,
-    strokeWeight:2.6,
+    strokeOpacity:.8,
+    strokeWeight:2,
     clickable:true,
     zIndex:2
   });
@@ -645,35 +641,28 @@ function addSelectionPath(path,color='#1a73e8'){
   return line;
 }
 
-// Curated centers/radii are navigation hints, not surveyed boundaries.
-// Only sourced, explicitly verified paths may be drawn as road geometry.
+function areaRangeRadius(area){
+  const radius=Number(area?.radius);
+  if(Number.isFinite(radius)&&radius>0)return radius;
+  return ({'거리':500,'야시장':250,'해변':500,'광장':250})[area?.type]||300;
+}
+
+// All ranges are geographic circles measured in meters, never pixel-sized rings.
+// They indicate nearby areas, not surveyed property/administrative boundaries.
 function drawAreaReference(area,bounds=null){
   const center=validMapLocation(area?.center);
   if(!center)return null;
-  if(area.geometryVerified===true && area.geometrySource && Array.isArray(area.path) && area.path.length>1 && area.path.every(validMapLocation)){
-    const line=addSelectionPath(area.path,area.color);
-    if(bounds)area.path.forEach(p=>bounds.extend(p));
-    return line;
-  }
-  const marker=new google.maps.Marker({
-    map:state.map,position:center,title:`${area.name} · 참고 위치`,zIndex:30,
-    icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:area.color||'#1a73e8',fillOpacity:1,strokeColor:'#ffffff',strokeWeight:2}
-  });
-  marker.addListener('click',()=>jumpToPopularArea(area.name));
-  state.selectionOverlays.push(marker);
-  if(bounds){
-    const radius=Number(area.radius);
-    if(Number.isFinite(radius)&&radius>0)extendBoundsByCircle(bounds,center,radius);
-    else bounds.extend(center);
-  }
-  return marker;
+  const radius=areaRangeRadius(area);
+  const circle=addSelectionCircle(center,radius,area.color||'#1a73e8');
+  if(bounds)extendBoundsByCircle(bounds,center,radius);
+  return circle;
 }
 
 function drawCityRange(key){
   const c=CITY_DATA[key];
   if(!c)return;
   [...(c.areas||[]),...(EXTRA_DATA[key]?.zones||[])].forEach(a=>drawAreaReference(a));
-  setDbStatus('주요 지역의 참고 위치 · 행정구역 경계가 아닙니다.',true);
+  setDbStatus('주요 지역 주변 범위 · 행정구역 경계가 아닙니다.',true);
 }
 
 function showCityRange(key,selectionKey=`city:${key}`){
@@ -694,7 +683,7 @@ function showAreaRange(area){
 
     drawAreaReference(area,bounds);
     fitUnifiedBounds(bounds,{padding:90,maxZoom:Math.min(16,area.zoom||16)});
-    setDbStatus(`${area.name} · 참고 위치 (실제 경계·도로 구간 아님)`,true);
+    setDbStatus(`${area.name} · 주변 반경 ${areaRangeRadius(area)}m`,true);
   });
 }
 
@@ -722,7 +711,7 @@ function showTypeRanges(type){
   state.rangeSelectionKey=`type:${state.city}:${type}`;
   refreshRegisteredCoverage();
   fitUnifiedBounds(bounds,{padding:82,maxZoom:16});
-  setDbStatus(`${type} · 참고 위치 표시 (실제 경계 아님)`,true);
+  setDbStatus(`${type} · 주변 범위 표시`,true);
   return true;
 }
 
@@ -753,7 +742,7 @@ function jumpToPopularArea(name,openPanel=false){
   clearAreaLabels();
   if(!visible)return;
 
-  const label=makeAreaLabel(area.center,`${area.name} · 참고 위치`);
+  const label=makeAreaLabel(area.center,`${area.name} · 주변 ${areaRangeRadius(area)}m`);
   label._areaName=area.name;
   state.areaLabels.push(label);
 }
