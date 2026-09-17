@@ -175,12 +175,8 @@ function matchesRatingFilter(rating,filter){
 
 
 function ratingFilterPlaces(filter=state.ratingFilter){
-  if(filter==='all')return placesForCurrentCity();
-
-  return placesForCurrentCity()
-    .map(p=>({...p,...stats(p.id)}))
-    .filter(p=>matchesRatingFilter(p.rating,filter))
-    .filter(p=>Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)));
+  // 목록과 지도 이동은 동일한 도시·분류·검색·혜택 조건을 사용한다.
+  return items({ratingFilter:filter}).filter(p=>validMapLocation(p));
 }
 
 function benefitFilterPlaces(filter=state.benefitFilter){
@@ -233,7 +229,6 @@ async function focusRatingFilterResults(filter=state.ratingFilter){
   closeSystemInfo();
 
   if(!visible.length){
-    fitSelectedCityView(state.city);
     setDbStatus(`${filter}★ 평점 업체가 없습니다.`,false);
     return;
   }
@@ -294,7 +289,7 @@ function renderRatingFilterState(){
   });
 }
 
-function items(){
+function items({ratingFilter=state.ratingFilter}={}){
   let arr=placesForCurrentCity()
     .filter(p=>CONFIG.categories[p.category] && p.subcategory!=='프라이빗 룸')
     .map(p=>({...p,...stats(p.id)}));
@@ -302,7 +297,7 @@ function items(){
   if(state.cat!=='all')arr=arr.filter(p=>p.category===state.cat);
   if(state.sub!=='all')arr=arr.filter(p=>normalizedRestaurantSub(p.subcategory)===state.sub || p.subcategory===state.sub);
   if(state.cat==='restaurant' && state.restaurantTag!=='all')arr=arr.filter(p=>hasRestaurantTag(p,state.restaurantTag));
-  if(state.ratingFilter!=='all')arr=arr.filter(p=>matchesRatingFilter(p.rating,state.ratingFilter));
+  if(ratingFilter!=='all')arr=arr.filter(p=>matchesRatingFilter(p.rating,ratingFilter));
   if(state.benefitFilter!=='all')arr=arr.filter(p=>matchesBenefitFilter(p,state.benefitFilter));
   if(state.query){const q=state.query.toLowerCase();arr=arr.filter(p=>`${p.name} ${p.area} ${p.address} ${p.subcategory} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q))}
   if(state.sort==='reviews')arr.sort((a,b)=>b.count-a.count);

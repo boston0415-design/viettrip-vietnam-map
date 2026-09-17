@@ -312,24 +312,10 @@ document.querySelectorAll('[data-rating-filter]').forEach(btn=>{
     const value=btn.dataset.ratingFilter;
     const turningOff=state.ratingFilter===value;
 
-    // 회원평점은 현재 도시 전체 업체를 대상으로 독립적으로 작동.
+    // 회원평점은 현재 선택한 도시·분류·검색 조건에 추가로 적용한다.
     state.ratingFilter=turningOff?'all':value;
-    state.benefitFilter='all';
     state.selected=null;
 
-    // 기존 대분류·검색·시스템 범위를 초기화해서 평점 결과만 보이게 한다.
-    state.cat='all';
-    state.sub='all';
-    state.navCategory=null;
-    state.selectedNavItem=null;
-    state.query='';
-
-    if($('#searchInput'))$('#searchInput').value='';
-
-    clearSelectionRanges();
-    clearAreaLabels();
-    clearSelectedSystemIcons();
-    clearSearchMarker();
     closeSystemInfo();
 
     renderRatingFilterState();
@@ -337,8 +323,7 @@ document.querySelectorAll('[data-rating-filter]').forEach(btn=>{
     renderAll();
 
     if(turningOff){
-      fitSelectedCityView(state.city);
-      setDbStatus(`${currentCity().label} 주요정보`,true);
+      setDbStatus(`평점 필터 해제 · 현재 선택 조건 업체 ${items().length}곳`,true);
       return;
     }
 
