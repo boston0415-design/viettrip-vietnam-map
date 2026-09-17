@@ -605,7 +605,7 @@ function openMobileBusinessList(){
 
 function syncMobileListCount(){
   const count=$('#mobileListCount');
-  if(count)count.textContent=String(items().length);
+  if(count)count.textContent=String(items({forList:true}).length);
 }
 
 function bindAreaNavigation(){

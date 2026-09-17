@@ -621,7 +621,7 @@ function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,stroke
     zIndex:2
   });
 
-  bindMapFeatureInfo(circle,{...feature,center},center,radius);
+  bindMapFeatureInfo(circle,{...feature,center},center,radius,{backgroundRange:true});
 
   state.selectionOverlays.push(circle);
   return circle;
@@ -639,7 +639,7 @@ function addSelectionPath(path,color='#1a73e8',feature={}){
     zIndex:2
   });
 
-  bindMapFeatureInfo(line,feature,pathCenter(path));
+  bindMapFeatureInfo(line,feature,pathCenter(path),null,{backgroundRange:true});
 
   state.selectionOverlays.push(line);
   return line;
