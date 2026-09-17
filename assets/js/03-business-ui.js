@@ -1,34 +1,71 @@
-// One consistent outline icon family for business cards and map pins.
-function businessGlyphPath(category){
-  const paths={
-    restaurant:'M3 3v5a3 3 0 0 0 6 0V3M6 3v18M18 3v18m0-18c-4 2-5 9 0 9',
-    stay:'M3 19V7m18 12V7M3 16h18M3 11h18v5M6 11V8h4v3m4 0V8h4v3',
-    spa:'M7 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM10 12h7l3 3H10M3 17h18M5 17v4m14-4v4M11 3l-1 3 2 3m5-6-1 3 2 3',
-    cafe:'M4 5h12v9a5 5 0 0 1-10 0V5m10 1h2a3 3 0 0 1 0 6h-2M3 21h17',
-    karaoke:'M12 2a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4ZM5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8M9 6h6M9 9h6',
-    exchange:'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
-    bus:'M5 3h14v16H5V3Zm0 4h14M5 13h14M8 16h.01M16 16h.01M7 19v3m10-3v3',
-    shopping:'M4 8h16l-1 13H5L4 8Zm4 0V6a4 4 0 0 1 8 0v2',
-    market:'M3 10h18l-2-6H5l-2 6Zm2 0v11h14V10M9 21v-7h6v7M2 10c0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0',
-    attraction:'M3 10h18L12 3 3 10Zm2 3v7m5-7v7m4-7v7m5-7v7M2 22h20',
-    golf:'M7 20V3l12 4-12 5M4 21c-3 3 15 3 15 0',
-    airport:'m3 14 7-4V4c0-3 4-3 4 0v6l7 4v3l-7-2v4l3 2H7l3-2v-4l-7 2v-3Z',
-    taxi:'m4 9 2-5h12l2 5M3 9h18v9H3V9Zm2 9v3m14-3v3M6 13h2m8 0h2M10 2h4',
-    train:'M6 3h12v15H6V3Zm0 8h12M9 6h6M9 15h.01M15 15h.01M8 18l-3 4m11-4 3 4M7 21h10',
-    home:'m2 11 10-8 10 8M5 9v12h14V9m-9 12v-7h4v7',
-    hospital:'M8 3h8v5h5v8h-5v5H8v-5H3V8h5V3Z',
-    bar:'M4 3h16l-8 10L4 3Zm8 10v8m-5 0h10'
-  };
-  return paths[category]||'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0ZM9 10a3 3 0 1 0 6 0 3 3 0 1 0-6 0';
+// Google Material Symbols Rounded, fill 1, 24px; Apache-2.0.
+// Vendored as paths: no icon font or remote requests. See assets/licenses/material-symbols-NOTICE.txt.
+const MAP_SYMBOL_PATHS={
+  "headphones": "M280-120h-80q-33 0-56.5-23.5T120-200v-280q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-480v280q0 33-23.5 56.5T760-120h-80q-33 0-56.5-23.5T600-200v-160q0-33 23.5-56.5T680-440h80v-40q0-117-81.5-198.5T480-760q-117 0-198.5 81.5T200-480v40h80q33 0 56.5 23.5T360-360v160q0 33-23.5 56.5T280-120Z",
+  "restaurant": "M280-600v-240q0-17 11.5-28.5T320-880q17 0 28.5 11.5T360-840v240h40v-240q0-17 11.5-28.5T440-880q17 0 28.5 11.5T480-840v240q0 56-34.5 98T360-446v326q0 17-11.5 28.5T320-80q-17 0-28.5-11.5T280-120v-326q-51-14-85.5-56T160-600v-240q0-17 11.5-28.5T200-880q17 0 28.5 11.5T240-840v240h40Zm400 200h-80q-17 0-28.5-11.5T560-440v-240q0-70 51.5-135T718-880q18 0 30 14t12 33v713q0 17-11.5 28.5T720-80q-17 0-28.5-11.5T680-120v-280Z",
+  "bed": "M80-240v-200q0-27 11-49t29-39v-112q0-50 35-85t85-35h160q23 0 43 8.5t37 23.5q17-15 37-23.5t43-8.5h160q50 0 85 35t35 85v112q18 17 29 39t11 49v200q0 17-11.5 28.5T840-200q-17 0-28.5-11.5T800-240v-40H160v40q0 17-11.5 28.5T120-200q-17 0-28.5-11.5T80-240Zm440-320h240v-80q0-17-11.5-28.5T720-680H560q-17 0-28.5 11.5T520-640v80Zm-320 0h240v-80q0-17-11.5-28.5T400-680H240q-17 0-28.5 11.5T200-640v80Z",
+  "massage": "M314-409q-44-5-78.5-31T184-507L80-760l240-120 80 120h208q16 0 31 6.5t26 17.5l222 222q13 14 11 32t-17 29l-12 9q-20 14-45 13.5T777-443L510-592l-80-6q-13-1-22 7t-10 21q-1 12 7.5 21.5T426-538l66 5 87 50q19 10 23.5 27.5T601-421q-6 17-22.5 28t-40.5 9l-224-25ZM168-131q-16 5-30-3.5T119-159q-5-17 3.5-30.5T148-208l150-40q72-19 153-35.5T599-300q66 0 124 23.5T836-212q13 9 13.5 24.5T839-160q-11 12-27 14.5t-30-7.5q-45-32-91.5-49.5T599-220q-64 0-141 16.5T319-171l-151 40Z",
+  "local_cafe": "M200-120q-17 0-28.5-11.5T160-160q0-17 11.5-28.5T200-200h560q17 0 28.5 11.5T800-160q0 17-11.5 28.5T760-120H200Zm120-160q-66 0-113-47t-47-113v-320q0-33 23.5-56.5T240-840h560q33 0 56.5 23.5T880-760v120q0 33-23.5 56.5T800-560h-80v120q0 66-47 113t-113 47H320Zm400-360h80v-120h-80v120Z",
+  "mic": "M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 240v-83q-92-13-157.5-78T203-479q-2-17 9-29t28-12q17 0 28.5 11.5T284-480q14 70 69.5 115T480-320q72 0 127-45.5T676-480q4-17 15.5-28.5T720-520q17 0 28 12t9 29q-14 91-79 157t-158 79v83q0 17-11.5 28.5T480-120q-17 0-28.5-11.5T440-160Z",
+  "attach_money": "M481-120q-17 0-28.5-11.5T441-160v-46q-45-10-79-35t-55-70q-7-14-.5-29.5T330-363q14-6 29 .5t23 21.5q17 30 43 45.5t64 15.5q41 0 69.5-18.5T587-356q0-35-22-55.5T463-458q-86-27-118-64.5T313-614q0-65 42-101t86-41v-44q0-17 11.5-28.5T481-840q17 0 28.5 11.5T521-800v44q38 6 66 24.5t46 45.5q9 13 3.5 29T614-634q-14 6-29 .5T557-653q-13-14-30.5-21.5T483-682q-44 0-67 19.5T393-614q0 33 30 52t104 40q69 20 104.5 63.5T667-358q0 71-42 108t-104 46v44q0 17-11.5 28.5T481-120Z",
+  "shopping_bag": "M240-80q-33 0-56.5-23.5T160-160v-480q0-33 23.5-56.5T240-720h80q0-66 47-113t113-47q66 0 113 47t47 113h80q33 0 56.5 23.5T800-640v480q0 33-23.5 56.5T720-80H240Zm160-640h160q0-33-23.5-56.5T480-800q-33 0-56.5 23.5T400-720Zm200 200q17 0 28.5-11.5T640-560v-80h-80v80q0 17 11.5 28.5T600-520Zm-240 0q17 0 28.5-11.5T400-560v-80h-80v80q0 17 11.5 28.5T360-520Z",
+  "storefront": "M201-120q-33 0-56.5-23.5T121-200v-318q-23-21-35.5-54t-.5-72l42-136q8-26 28.5-43t47.5-17h556q27 0 47 16.5t29 43.5l42 136q12 39-.5 71T841-518v318q0 33-23.5 56.5T761-120H201Zm368-440q27 0 41-18.5t11-41.5l-22-140h-78v148q0 21 14 36.5t34 15.5Zm-180 0q23 0 37.5-15.5T441-612v-148h-78l-22 140q-4 24 10.5 42t37.5 18Zm-178 0q18 0 31.5-13t16.5-33l22-154h-78l-40 134q-6 20 6.5 43t41.5 23Zm540 0q29 0 42-23t6-43l-42-134h-76l22 154q3 20 16.5 33t31.5 13Z",
+  "account_balance": "M200-320v-200q0-17 11.5-28.5T240-560q17 0 28.5 11.5T280-520v200q0 17-11.5 28.5T240-280q-17 0-28.5-11.5T200-320Zm240 0v-200q0-17 11.5-28.5T480-560q17 0 28.5 11.5T520-520v200q0 17-11.5 28.5T480-280q-17 0-28.5-11.5T440-320ZM120-120q-17 0-28.5-11.5T80-160q0-17 11.5-28.5T120-200h720q17 0 28.5 11.5T880-160q0 17-11.5 28.5T840-120H120Zm560-200v-200q0-17 11.5-28.5T720-560q17 0 28.5 11.5T760-520v200q0 17-11.5 28.5T720-280q-17 0-28.5-11.5T680-320Zm160-320H116q-15 0-25.5-10.5T80-676v-22q0-11 5.5-19t14.5-13l344-172q17-8 36-8t36 8l342 171q11 5 16.5 15t5.5 21v15q0 17-11.5 28.5T840-640Z",
+  "golf_course": "M780-120q-25 0-42.5-17.5T720-180q0-25 17.5-42.5T780-240q25 0 42.5 17.5T840-180q0 25-17.5 42.5T780-120ZM400-80q-100 0-170-23.5T160-160q0-23 33-41t87-29v30q0 17 11.5 28.5T320-160q17 0 28.5-11.5T360-200v-616q0-23 19-34.5t39-1.5l190 93q23 11 23 36t-22 36l-169 87v362q86 5 143 26.5t57 51.5q0 33-70 56.5T400-80Z",
+  "local_bar": "M440-200v-200L138-740q-8-8-13-18.5t-5-21.5q0-26 18-43t44-17h596q26 0 44 17t18 43q0 11-5 21.5T822-740L520-400v200h160q17 0 28.5 11.5T720-160q0 17-11.5 28.5T680-120H280q-17 0-28.5-11.5T240-160q0-17 11.5-28.5T280-200h160ZM298-680h364l72-80H226l72 80Z",
+  "sports_bar": "M240-200v-266q-52-14-86-56t-34-98q0-53 30.5-94t78.5-57q23-48 68.5-78T400-879q35 0 65.5 12t55.5 32q10-2 19-3.5t20-1.5q66 0 113 47t47 113q0 22-5.5 42T698-600h62q33 0 56.5 23.5T840-520v240q0 33-23.5 56.5T760-200h-80q-21 21-34.5 50.5T600-120H320q-33 0-56.5-23.5T240-200Zm-40-420q0 33 23.5 56.5T280-540q32 0 54.5-21t46.5-47q25-27 56.5-49.5T520-680h120q0-33-23.5-56.5T560-760q-25 0-42 6.5l-17 6.5-31-26q-11-9-28.5-17.5T400-799q-32 0-58.5 17T301-736l-14 30-32 11q-25 8-40 28.5T200-620Zm480 340h80v-240h-80v240Z",
+  "shopping_cart": "M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM208-800h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h440q17 0 28.5 11.5T760-320q0 17-11.5 28.5T720-280H280q-45 0-68-39.5t-2-78.5l54-98-144-304H80q-17 0-28.5-11.5T40-840q0-17 11.5-28.5T80-880h65q11 0 21 6t15 17l27 57Z",
+  "apartment": "M200-120q-33 0-56.5-23.5T120-200v-400q0-33 23.5-56.5T200-680h80v-80q0-33 23.5-56.5T360-840h240q33 0 56.5 23.5T680-760v240h80q33 0 56.5 23.5T840-440v240q0 33-23.5 56.5T760-120H520v-160h-80v160H200Zm0-80h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 320h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 480h80v-80h-80v80Zm0-160h80v-80h-80v80Z",
+  "beach_access": "M758-148 560-346q-11-11-11-28t11-28q11-11 28-11t28 11l198 198q11 11 11 28t-11 28q-11 11-28 11t-28-11Zm-453-65q-28 28-65.5 26.5T182-219q-60-93-63.5-201.5T168-625q3 34 17 76.5t38.5 89.5q24.5 47 58.5 96.5t75 97.5l-52 52Zm107-107q-48-48-84-104.5T271.5-534q-20.5-53-23-96.5T267-695q21-22 64.5-20t97 22.5q53.5 20.5 110 57T643-551L412-320Zm330-459q31 20 33 57t-26 65l-51 51q-47-41-96.5-74t-96-58q-46.5-25-89-39.5T340-795q95-49 203-45t199 61Z",
+  "park": "M402-240H195q-24 0-36-21t2-41l119-178h-3q-24 0-35.5-21.5T244-543l203-290q6-8 15-12.5t18-4.5q9 0 18 4.5t15 12.5l203 290q14 20 2.5 41.5T683-480h-3l119 178q14 20 2 41t-36 21H558v120q0 17-11.5 28.5T518-80h-76q-17 0-28.5-11.5T402-120v-120Z",
+  "flight": "M480-120 377-91q-14 4-25.5-4.5T340-118q0-12 3-19.5t8-11.5l69-51v-220l-291 86q-19 5-34-6t-15-31q0-15 5-25t14-15l321-189v-220q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v220l321 189q9 5 14 15t5 25q0 20-15 31t-34 6l-291-86v220l69 51q5 4 8 11.5t3 19.5q0 14-11.5 22.5T583-91l-103-29Z",
+  "local_taxi": "M240-200v20q0 25-17.5 42.5T180-120q-25 0-42.5-17.5T120-180v-286q0-7 1-14t3-13l75-213q8-24 29-39t47-15h85v-40q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800v40h85q26 0 47 15t29 39l75 213q2 6 3 13t1 14v286q0 25-17.5 42.5T780-120q-25 0-42.5-17.5T720-180v-20H240Zm-8-360h496l-42-120H274l-42 120Zm68 240q25 0 42.5-17.5T360-380q0-25-17.5-42.5T300-440q-25 0-42.5 17.5T240-380q0 25 17.5 42.5T300-320Zm360 0q25 0 42.5-17.5T720-380q0-25-17.5-42.5T660-440q-25 0-42.5 17.5T600-380q0 25 17.5 42.5T660-320Z",
+  "directions_bus": "M320-200v20q0 25-17.5 42.5T260-120q-25 0-42.5-17.5T200-180v-62q-18-20-29-44.5T160-340v-380q0-83 77-121.5T480-880q172 0 246 37t74 123v380q0 29-11 53.5T760-242v62q0 25-17.5 42.5T700-120q-25 0-42.5-17.5T640-180v-20H320Zm-80-360h480v-120H240v120Zm100 240q25 0 42.5-17.5T400-380q0-25-17.5-42.5T340-440q-25 0-42.5 17.5T280-380q0 25 17.5 42.5T340-320Zm280 0q25 0 42.5-17.5T680-380q0-25-17.5-42.5T620-440q-25 0-42.5 17.5T560-380q0 25 17.5 42.5T620-320Z",
+  "train": "M160-340v-380q0-53 27.5-84.5t72.5-48q45-16.5 102.5-22T480-880q66 0 124.5 5.5t102 22q43.5 16.5 68.5 48t25 84.5v380q0 59-40.5 99.5T660-200l20 20q17 17 8 38.5T655-120q-7 0-13.5-2.5T630-130l-70-70H400l-70 70q-5 5-11.5 7.5T305-120q-23 0-32.5-21.5T280-180l20-20q-59 0-99.5-40.5T160-340Zm80-220h200v-120H240v120Zm280 0h200v-120H520v120ZM340-320q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm280 0q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Z",
+  "home": "M160-200v-360q0-19 8.5-36t23.5-28l240-180q21-16 48-16t48 16l240 180q15 11 23.5 28t8.5 36v360q0 33-23.5 56.5T720-120H600q-17 0-28.5-11.5T560-160v-200q0-17-11.5-28.5T520-400h-80q-17 0-28.5 11.5T400-360v200q0 17-11.5 28.5T360-120H240q-33 0-56.5-23.5T160-200Z",
+  "local_hospital": "M420-420v80q0 25 17.5 42.5T480-280q25 0 42.5-17.5T540-340v-80h80q25 0 42.5-17.5T680-480q0-25-17.5-42.5T620-540h-80v-80q0-25-17.5-42.5T480-680q-25 0-42.5 17.5T420-620v80h-80q-25 0-42.5 17.5T280-480q0 25 17.5 42.5T340-420h80ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z",
+  "location_on": "M480-107q-14 0-28-5t-25-15q-65-60-115-117t-83.5-110.5q-33.5-53.5-51-103T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 45-17.5 94.5t-51 103Q698-301 648-244T533-127q-11 10-25 15t-28 5Zm0-373q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Z"
+};
+
+function businessSymbolKey(category,subcategory=''){
+  const sub=String(subcategory||'').trim();
+  if(category==='bar'){
+    if(!sub || /클럽|club|디스코/i.test(sub))return 'headphones';
+    if(/펍|pub|beer|맥주/i.test(sub))return 'sports_bar';
+    return 'local_bar';
+  }
+  if(category==='stay' && /아파트|apartment/i.test(sub))return 'apartment';
+  if(category==='shopping' && /마트|market|grocery/i.test(sub))return 'shopping_cart';
+  if(category==='attraction'){
+    if(/해변|beach/i.test(sub))return 'beach_access';
+    if(/공원|park/i.test(sub))return 'park';
+  }
+  return ({restaurant:'restaurant',stay:'bed',spa:'massage',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',train:'train',home:'home',hospital:'local_hospital'})[category]||'location_on';
 }
-function businessGlyph(category){return `<svg class="businessGlyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${businessGlyphPath(category)}"/></svg>`}
+
+function businessGlyphPath(category,subcategory=''){
+  const key=businessSymbolKey(category,subcategory);
+  return MAP_SYMBOL_PATHS[key];
+}
+function businessGlyphContent(category,subcategory=''){
+  const key=businessSymbolKey(category,subcategory);
+  return '<path transform="translate(0 24) scale(.025)" fill="currentColor" d="'+MAP_SYMBOL_PATHS[key]+'"/>';
+}
+function businessGlyph(category,subcategory=''){
+  return '<svg class="businessGlyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+businessGlyphContent(category,subcategory)+'</svg>';
+}
+// Keep category hues while giving white symbols at least 3:1 background contrast.
+function mapIconColor(color){
+  return ({'#f97316':'#d66019','#10b981':'#078966','#f59e0b':'#b7770c','#0ea5e9':'#0284c7'})[color]||color;
+}
 function roundMapIcon(category,color,memberBenefit=false){
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,8) scale(.667)" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<rect x="18" y="0" width="14" height="14" rx="4" fill="#087f5b" stroke="white" stroke-width="1"/><text x="25" y="10.5" fill="white" font-family="Arial,sans-serif" font-size="11" font-weight="700" text-anchor="middle">%</text>':''}</svg>`;
+  color=mapIconColor(color);
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(5,5) scale(.917)" color="white">${businessGlyphContent(category)}</g>${memberBenefit?'<rect x="18" y="0" width="14" height="14" rx="4" fill="#087f5b" stroke="white" stroke-width="1"/><text x="25" y="10.5" fill="white" font-family="Arial,sans-serif" font-size="11" font-weight="700" text-anchor="middle">%</text>':''}</svg>`;
   return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
 }
 function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,benefitText=''){
-  const color=categoryRangeColor(category);
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42"><rect x="3" y="4" width="34" height="34" rx="10" fill="#173247" opacity=".18"/><path d="m16 34 4 6 4-6" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="2" width="34" height="34" rx="10" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,7)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<g aria-label="회원 할인·혜택"><rect x="23" y="0.5" width="16" height="16" rx="5" fill="#087f5b" stroke="white" stroke-width="1"/><text x="31" y="12" fill="white" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">%</text></g>':''}</svg>`;
+  const color=mapIconColor(categoryRangeColor(category));
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42"><rect x="3" y="4" width="34" height="34" rx="10" fill="#173247" opacity=".12"/><path d="m16 34 4 6 4-6" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="2" width="34" height="34" rx="10" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,7)" color="white">${businessGlyphContent(category,subcategory)}</g>${memberBenefit?'<g aria-label="회원 할인·혜택"><rect x="23" y="0.5" width="16" height="16" rx="5" fill="#087f5b" stroke="white" stroke-width="1"/><text x="31" y="12" fill="white" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">%</text></g>':''}</svg>`;
   return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,34),anchor:new google.maps.Point(16,32)};
 }
 
@@ -546,7 +583,7 @@ function personalPlaceActionsHtml(p){
 function renderList(){
   const arr=items({forList:true});$('#count').textContent=state.sharedDbLoading && !arr.length?'업체 불러오는 중…':`${arr.length}개 업체`;
   $('#list').innerHTML=arr.length
-    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 ${p.reviews.length}개 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside"><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
+    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 ${p.reviews.length}개 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside"><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
     : state.sharedDbLoading
       ? '<div class="empty"><b>공용 업체 불러오는 중…</b><br>잠시만 기다려주세요.</div>'
       : window.PersonalPlaces?.getView()==='hidden'
