@@ -20,24 +20,12 @@ function businessGlyphPath(category){
   return paths[category]||'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0ZM9 10a3 3 0 1 0 6 0 3 3 0 1 0-6 0';
 }
 function businessGlyph(category){return `<svg class="businessGlyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${businessGlyphPath(category)}"/></svg>`}
+function roundMapIcon(category,color,memberBenefit=false){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,8) scale(.667)" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<circle cx="26" cy="6" r="4" fill="#087f5b" stroke="white" stroke-width="1"/>':''}</svg>`;
+  return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
+}
 function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,benefitText=''){
-
-  const r=rating==null?null:Number(rating);
-
-  // 등록업체 마커의 메인 색상은 평점이 아니라 업종별로 고정한다.
-  // 같은 업종은 평점과 관계없이 항상 같은 색으로 표시.
-  const color=categoryRangeColor(category);
-
-  const score=r==null?'':r.toFixed(1);
-
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56"><path d="M24 3C13 3 5 11 5 22c0 12 19 26 19 26s19-14 19-26C43 11 35 3 24 3Z" fill="white" stroke="${color}" stroke-width="1.6"/><g transform="translate(13,11) scale(.92)" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<circle cx="39" cy="8" r="7" fill="#087f5b"/><text x="39" y="11" text-anchor="middle" font-size="9" fill="white">%</text>':''}${score?`<rect x="27" y="37" width="20" height="14" rx="7" fill="#173247"/><text x="37" y="47" text-anchor="middle" font-family="Arial" font-size="9" fill="white">${score}</text>`:''}</svg>`;
-
-  return {
-    url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),
-    scaledSize:new google.maps.Size(44,51.333),
-    anchor:new google.maps.Point(22,44),
-    labelOrigin:new google.maps.Point(22,22)
-  };
+  return roundMapIcon(category,categoryRangeColor(category),memberBenefit);
 }
 
 function catLabel(id){return CONFIG.categories[id]?.label||id}

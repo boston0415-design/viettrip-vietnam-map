@@ -280,46 +280,60 @@ function poiColor(type){
   })[type]||'#475569';
 }
 function poiSvg(type,label,hover=false){
-  const color=poiColor(type);
   const categories={'공항':'airport','터미널':'airport','그랩승차':'taxi','택시승차':'taxi','전철역':'train','기차역':'train','한인생활권':'home','병원':'hospital','쇼핑':'shopping'};
-  return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="${hover?'#f0f9ff':'#fff'}" stroke="${color}" stroke-width="1.6"/><g transform="translate(9,9) scale(.92)" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(categories[type]||'attraction')}"/></g></svg>`),scaledSize:new google.maps.Size(40,40),anchor:new google.maps.Point(20,20)};
+  return roundMapIcon(categories[type]||'attraction',poiColor(type));
 }
 
 // One information layout for registered places, system POIs and geographic ranges.
 function mapFeatureHtml(feature={},radius=null){
   const name=feature.name||feature.label||'선택한 위치';
   const type=feature.type||(feature.category?catLabel(feature.category):'위치 정보');
-  const description=feature.description||feature.desc||'등록된 상세 설명이 없습니다.';
+  const description=feature.description||feature.desc||'';
   const address=feature.address||feature.formatted_address||'';
-  const pos=validMapLocation(feature.center||feature);
-  const locationText=address|| (pos?`좌표 ${pos.lat.toFixed(5)}, ${pos.lng.toFixed(5)} · 상세 주소 미등록`:'개별 도로명 주소가 없는 구역입니다.');
-  const rangeText=radius?`<p class="mapInfoRange">중심에서 반경 ${Math.round(radius).toLocaleString('ko-KR')}m의 주변 참고 범위입니다. 실제 부지·행정 경계가 아닙니다.</p>`:'';
   const benefit=feature.memberBenefit?`<p class="mapInfoBenefit">회원 혜택 · ${esc(feature.benefitText||'상세 혜택은 업체에 확인해주세요.')}</p>`:'';
-  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small><p>${esc(description)}</p><p class="mapInfoAddress">${esc(locationText)}</p>${rangeText}${benefit}</section>`;
+  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}</section>`;
 }
+function supportsMapHover(){
+  return !isMobileMapLayout() && (!window.matchMedia || window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+}
+// Non-interactive overlay cannot steal the pointer from the marker underneath.
 function showPositionHover(position,html){
-  const info=hoverInfo();info.setContent(html);info.setPosition(position);
-  info.open({map:state.map,shouldFocus:false});
+  if(!supportsMapHover() || !position || !state.map)return;
+  clearTimeout(state.hoverHideTimer);
+  if(!state.hoverOverlay){
+    class MapHoverCard extends google.maps.OverlayView{
+      onAdd(){this.div=document.createElement('div');this.div.className='mapHoverCard';this.div.setAttribute('role','tooltip');this.getPanes().floatPane.appendChild(this.div)}
+      draw(){
+        if(!this.div||!this.position)return;
+        this.div.innerHTML=this.html;
+        const projection=this.getProjection(),latLng=new google.maps.LatLng(this.position);
+        const pixel=projection.fromLatLngToDivPixel(latLng),container=projection.fromLatLngToContainerPixel(latLng),map=this.getMap().getDiv();
+        const w=this.div.offsetWidth,h=this.div.offsetHeight;
+        const x=Math.max(8,Math.min(container.x+14,map.clientWidth-w-8));
+        const y=Math.max(8,Math.min(container.y-h-18,map.clientHeight-h-8));
+        this.div.style.left=(pixel.x+x-container.x)+'px';this.div.style.top=(pixel.y+y-container.y)+'px';
+      }
+      onRemove(){this.div?.remove();this.div=null}
+    }
+    state.hoverOverlay=new MapHoverCard();
+  }
+  const overlay=state.hoverOverlay;
+  overlay.position=position;overlay.html=html;
+  if(overlay.getMap()!==state.map)overlay.setMap(state.map);else overlay.draw();
 }
 function bindMapFeatureInfo(target,feature,position,radius=null,{click=true}={}){
   const html=()=>mapFeatureHtml(feature,radius);
-  target.addListener('mouseover',event=>showPositionHover(event?.latLng||position,html()));
-  target.addListener('mouseout',hideHover);
+  target.addListener('mouseover',event=>{if(supportsMapHover())showPositionHover(event?.latLng||position,html());});
+  target.addListener('mouseout',()=>hideHover(80));
   if(click)target.addListener('click',event=>{hideHover();showClickInfo(event?.latLng||position,html());});
 }
+function showHover(marker,html){showPositionHover(marker.getPosition(),html)}
+function hideHover(delay=0){
+  clearTimeout(state.hoverHideTimer);
+  const close=()=>{state.hoverOverlay?.setMap(null);state.hoverInfo?.close()};
+  if(delay>0)state.hoverHideTimer=setTimeout(close,delay);else close();
+}
 
-function hoverInfo(){
-  if(!state.hoverInfo) state.hoverInfo=new google.maps.InfoWindow({disableAutoPan:true});
-  return state.hoverInfo;
-}
-function showHover(marker,html){
-  const info=hoverInfo();
-  info.setContent(html);
-  info.open({map:state.map,anchor:marker,shouldFocus:false});
-}
-function hideHover(){
-  if(state.hoverInfo) state.hoverInfo.close();
-}
 function infoHtml(title,type,desc,extra='',copyAddress='',showCopy=false){
   const combined=[title,copyAddress].filter(Boolean).join('\n');
   const copyControls=showCopy
@@ -357,10 +371,10 @@ function closeSystemInfo(){
 function showClickInfo(position,html,anchorMarker=null){
   if(state.clickInfo) state.clickInfo.close();
 
-  // InfoWindow가 스스로 지도를 밀어서 중앙 정렬을 깨뜨리지 못하게 함.
+  // On narrow screens, keep tapped information inside the visible map.
   state.clickInfo=new google.maps.InfoWindow({
     content:html,
-    disableAutoPan:true
+    disableAutoPan:!isMobileMapLayout()
   });
 
   if(anchorMarker){
@@ -377,9 +391,7 @@ function renderPoiMarkers(){
   state.poiMarkers=[];
 }
 
-function golfSvg(hover=false){
-  return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="${hover?'#f0fdf4':'white'}" stroke="#15803d" stroke-width="1.6"/><g transform="translate(8,7)" fill="none" stroke="#15803d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath('golf')}"/></g></svg>`),scaledSize:new google.maps.Size(40,40),anchor:new google.maps.Point(20,20)};
-}
+function golfSvg(hover=false){return roundMapIcon('golf','#15803d')}
 
 function renderGolfCourses(){
   state.golfMarkers.forEach(m=>m.setMap(null));
