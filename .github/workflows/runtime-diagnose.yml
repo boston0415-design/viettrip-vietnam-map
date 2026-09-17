@@ -18,13 +18,18 @@ jobs:
           npm init -y >/dev/null 2>&1
           npm install playwright@1.55.0 --no-save
           npx playwright install chromium --with-deps
-      - name: Inspect live site
+      - name: Inspect mobile live site
         run: |
           cat > diag.cjs <<'NODE'
           const { chromium } = require('playwright');
           (async()=>{
             const browser=await chromium.launch({headless:true});
-            const page=await browser.newPage({viewport:{width:1365,height:900}});
+            const page=await browser.newPage({
+              viewport:{width:390,height:844},
+              isMobile:true,
+              hasTouch:true,
+              deviceScaleFactor:2
+            });
             page.on('console',m=>{
               if(['error','warning'].includes(m.type())) console.log('CONSOLE',m.type(),m.text());
             });
@@ -33,26 +38,37 @@ jobs:
               const u=r.url();
               if(u.includes('supabase.co/rest/v1/')) console.log('API',r.status(),u.split('?')[0]);
             });
-            await page.goto('https://ornate-tarsier-b1a553.netlify.app/?diag=1',{waitUntil:'domcontentloaded',timeout:60000});
+            await page.goto('https://ornate-tarsier-b1a553.netlify.app/?mobile_diag=1',{waitUntil:'domcontentloaded',timeout:60000});
             await page.waitForTimeout(10000);
-            const info=await page.evaluate(()=>({
+            const before=await page.evaluate(()=>({
               countText:document.querySelector('#count')?.textContent||'',
               mobileCount:document.querySelector('#mobileListCount')?.textContent||'',
-              cards:document.querySelectorAll('#list [data-id]').length,
-              listText:(document.querySelector('#list')?.innerText||'').slice(0,1000),
-              mapState:document.querySelector('#mapLoadTitle')?.textContent||'',
-              hasState:typeof state!=='undefined',
-              city:typeof state!=='undefined'?state.city:null,
+              cards:document.querySelectorAll('#list .card, #list [data-id]').length,
+              mapExists:!!(typeof state!=='undefined'&&state.map),
+              markers:typeof state!=='undefined'?(state.markers||[]).length:null,
               cachePlaces:typeof db==='function'?(db().places||[]).length:null,
               cityPlaces:typeof placesForCurrentCity==='function'?placesForCurrentCity().length:null,
               itemCount:typeof items==='function'?items().length:null,
-              hasFetchShared:typeof fetchSharedDb==='function',
-              hasGuard:typeof window.ensureSharedBusinesses==='function'
+              mapOverlayClass:document.querySelector('#mapLoadState')?.className||'',
+              listSideClass:document.querySelector('#businessSide')?.className||'',
+              listButtonDisplay:getComputedStyle(document.querySelector('#mobileListBtn')).display
             }));
-            console.log('DIAG',JSON.stringify(info));
-            await page.screenshot({path:'runtime.png',fullPage:true});
+            console.log('MOBILE_BEFORE',JSON.stringify(before));
+            const btn=page.locator('#mobileListBtn');
+            if(await btn.count()) await btn.click({force:true});
+            await page.waitForTimeout(800);
+            const after=await page.evaluate(()=>({
+              listSideClass:document.querySelector('#businessSide')?.className||'',
+              listDisplay:getComputedStyle(document.querySelector('#businessSide')).display,
+              listTransform:getComputedStyle(document.querySelector('#businessSide')).transform,
+              listRect:(()=>{const r=document.querySelector('#businessSide').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}})(),
+              cards:document.querySelectorAll('#list .card, #list [data-id]').length,
+              listText:(document.querySelector('#list')?.innerText||'').slice(0,800)
+            }));
+            console.log('MOBILE_AFTER',JSON.stringify(after));
+            await page.screenshot({path:'runtime-mobile.png',fullPage:true});
             await browser.close();
-            if(info.cards<1) process.exitCode=2;
+            if(before.itemCount<1) process.exitCode=2;
           })().catch(e=>{console.error('DIAG_FATAL',e);process.exit(3)});
           NODE
           node diag.cjs
@@ -60,5 +76,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: runtime-screenshot
-          path: runtime.png
+          name: runtime-mobile-screenshot
+          path: runtime-mobile.png
