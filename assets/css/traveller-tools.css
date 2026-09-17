@@ -1,0 +1,53 @@
+.statsReviewButton{display:inline-flex;align-items:baseline;gap:5px;padding:3px 1px;border:0;background:transparent;color:#475569;font:inherit;cursor:pointer}
+.statsReviewButton:hover{color:#1d4ed8;text-decoration:underline;text-underline-offset:3px}
+.statsReviewButton:focus-visible,.travellerToolbar button:focus-visible{outline:2px solid #2563eb;outline-offset:2px;border-radius:5px}
+.travellerDialog{box-sizing:border-box;width:min(640px,calc(100% - 24px));max-height:86dvh;margin:auto;border:1px solid #e2e8f0;border-radius:18px;padding:24px;background:#fff;color:#172033;box-shadow:0 24px 80px #0f172a30;overflow:auto}
+.travellerDialog::backdrop{background:#0f172a80}
+.travellerDialogHead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:20px}
+.travellerDialogHead h2{font-size:21px;margin:0 0 6px;letter-spacing:-.5px}
+.travellerDialogHead p{margin:0;color:#64748b;font-size:13px}
+.travellerDialogHead>button{flex-shrink:0;width:36px;height:36px;border:1px solid #e2e8f0;border-radius:50%;background:#fff;font-size:24px;cursor:pointer}
+.travellerDialog p{line-height:1.65}
+.travellerDialog select{width:100%;margin:7px 0 15px;min-height:42px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px;font:inherit}
+.travellerDialog label{font-size:13px;font-weight:700}
+.communityReviewCard{border-top:1px solid #e2e8f0;padding:19px 0}
+.reviewPlaceLink{border:0;padding:0;background:none;font:inherit;font-size:16px;font-weight:750;text-align:left;color:#1d4ed8;cursor:pointer;overflow-wrap:anywhere}
+.reviewPlaceLink:disabled{opacity:.55;cursor:wait}
+.reviewPlaceAddress{font-size:12px;color:#64748b;margin:5px 0 12px}
+.communityReviewMeta{display:flex;align-items:center;gap:12px;font-size:12px;flex-wrap:wrap}
+.communityReviewMeta time{margin-left:auto;color:#64748b}
+.communityReviewRating{color:#a16207;font-weight:700}
+.communityReviewText{font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}
+.detail .reviewtxt{white-space:pre-wrap;overflow-wrap:anywhere}
+.communityReviewPhotos{display:flex;gap:8px;flex-wrap:wrap}
+.communityReviewPhotos img{width:110px;height:90px;object-fit:cover;border-radius:8px}
+#communityReviewStatus{color:#64748b;font-size:13px}
+.travellerToolbar{display:flex;gap:6px;margin:7px 0}
+.travellerToolbar button{border:1px solid #cbd5e1;background:#fff;color:#334155;padding:6px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer}
+.travellerToolbar button[aria-expanded=true]{color:#b91c1c;border-color:#b91c1c;background:#fff7f7}
+.adminRegionControls{padding:10px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:9px;margin-bottom:8px}
+.adminRegionControls[hidden]{display:none}
+.adminRegionControls label{font-size:11px;font-weight:700}
+.adminSelectRow{display:flex;gap:6px;margin:5px 0}
+.adminSelectRow select{flex:1;min-width:0;max-width:100%;height:35px;border:1px solid #cbd5e1;border-radius:5px;background:#fff;font-size:12px}
+.adminSelectRow button{border:1px solid #cbd5e1;border-radius:5px;background:#fff;font-size:11px;padding:0 10px;cursor:pointer}
+.adminRegionControls p{font-size:11px;line-height:1.5;margin:5px 0;color:#475569}
+.adminRegionControls small{display:block;font-size:10px;line-height:1.5;color:#64748b}
+.adminRegionControls a{color:#475569}
+.guideIntro{background:#f0f7ff;border:1px solid #dbeafe;padding:14px;border-radius:10px;font-size:13px}
+.guideSection{margin-top:22px}.guideSection h3{font-size:16px;margin:0 0 10px}
+.guideSection ol{padding-left:23px;margin:0;font-size:14px;line-height:1.7}
+.guideSection li{padding-left:3px;margin:8px 0}
+.guideSection details{border-top:1px solid #e2e8f0;padding:12px 0;font-size:13px}
+.guideSection summary{font-weight:700;cursor:pointer;line-height:1.6}
+.guideSection details p{margin:8px 0}
+.guideActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.guideActions button,.guideActions a{display:inline-flex;align-items:center;border:1px solid #cbd5e1;background:#fff;color:#1d4ed8;border-radius:7px;padding:8px 10px;text-decoration:none;font-size:12px;cursor:pointer}
+.guideNote{font-size:12px;color:#64748b;line-height:1.6}
+.guidePhrase{padding:10px 12px;background:#f8fafc;border-radius:8px;margin:8px 0}
+.guidePhrase p{margin:3px 0}.guidePhrase button{margin-top:5px}
+@media(max-width:900px){
+  .areaLegend.mobileCollapsed .travellerToolbar,.areaLegend.mobileCollapsed .adminRegionControls{display:none}
+  .travellerDialog{padding:18px;max-height:90dvh;border-radius:14px}
+  .travellerDialogHead h2{font-size:19px}.travellerToolbar button{min-height:34px}
+}

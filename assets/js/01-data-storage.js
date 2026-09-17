@@ -229,8 +229,8 @@ const EXTRA_DATA={
       {name:'일반택시 승차 · 노이바이 T1',type:'택시승차',lat:21.21425,lng:105.80245,icon:'TAXI',desc:'T1 도착층 지정 택시 승차구역. 현장 TAXI 표지 우선.'},
       {name:'노이바이 T2 국제선',type:'터미널',lat:21.21858,lng:105.79228,icon:'T2',desc:'국제선 터미널.'},
       {name:'일반택시 승차 · 노이바이 T2',type:'택시승차',lat:21.21820,lng:105.79225,icon:'TAXI',desc:'T2 도착층 지정 택시 승차구역. 현장 TAXI 표지 우선.'},
-      {name:'Grab T1 승차 · Lane 3 Hall E',type:'그랩승차',lat:21.21440,lng:105.80225,icon:'G',desc:'2026년 8월 Grab 공식 안내: T1 3차선, Hall E 앞.'},
-      {name:'Grab T2 승차 · P1 주차장',type:'그랩승차',lat:21.21815,lng:105.79155,icon:'G',desc:'2026년 8월 Grab 공식 안내: T2 P1 주차장(지붕 구역).'},
+      {name:'Grab T1 승차 안내 · Hall E / P2',type:'그랩승차',lat:21.21440,lng:105.80225,icon:'G',desc:'2026년 8월 VOV 안내: Hall E 인근 P2 지정 승차구역. 이 핀은 터미널 주변 참고 위치입니다. 실제 승차 지점은 앱·현장 표지를 확인하세요.'},
+      {name:'Grab T2 승차 · P1 주차장',type:'그랩승차',lat:21.21815,lng:105.79155,icon:'G',desc:'2026년 8월 VOV 안내: T2 P1 지정 주차장, 혼잡 시 P7 안내 가능. 핀은 주변 참고 위치이며 앱·현장 표지에서 최종 승차 지점을 확인하세요.'},
       {name:'T1↔T2 무료 셔틀 · T1',type:'공항',lat:21.21435,lng:105.80265,icon:'B',desc:'T1 도착층 Hall A. 터미널 간 무료 셔틀.'},
       {name:'T1↔T2 무료 셔틀 · T2',type:'공항',lat:21.21830,lng:105.79200,icon:'B',desc:'T2 도착층 Lane 2, 지정 기둥 인근. 현장 안내 우선.'},
       {name:'미딩 버스터미널',type:'터미널',lat:21.02815,lng:105.77860,icon:'B',desc:'하노이 서부·북서부 방면 주요 버스터미널.'},
@@ -254,7 +254,6 @@ const EXTRA_DATA={
       {name:'다낭 T2 국제선',type:'터미널',lat:16.04320,lng:108.20110,icon:'T2',desc:'국제선 터미널.'},
       {name:'일반택시 · Xanh SM 승차 · 다낭 T2',type:'택시승차',lat:16.04295,lng:108.20115,icon:'TAXI',desc:'T2 도착층 택시·전기택시 승차구역. 현장 표지 우선.'},
       {name:'Grab T1 국내선 · A/B1/B2/C',type:'그랩승차',lat:16.04410,lng:108.19810,icon:'G',desc:'2026년 6월 Grab 공식 안내: 국내선은 서비스 방식에 따라 A 또는 B1·B2·C 승차구역을 이용. 정확한 지점은 Grab 앱 안내를 우선.'},
-      {name:'Grab T2 국제선 · 위치 6·7',type:'그랩승차',lat:16.04295,lng:108.20065,icon:'G',desc:'Grab 공식 안내: 국제선 터미널 앞 고가도로 아래 위치 6·7.'},
       {name:'Grab T2 국제선 · Lane 1·2',type:'그랩승차',lat:16.04275,lng:108.20095,icon:'G',desc:'Grab 공항 안내에 표시된 국제선 도착 Lane 1·2. 앱 안내 우선.'},
       {name:'다낭 중앙 버스터미널',type:'터미널',lat:16.06670,lng:108.17180,icon:'B',desc:'후에·호이안 외곽·중부 지역 장거리 버스 이용.'},
       {name:'Family Hospital Da Nang',type:'병원',address:'73 Nguyen Huu Tho Street, Da Nang City',icon:'H',desc:'외국인 진료 지원이 있는 종합병원. 한국어 핫라인 0911 424 040, 응급 24/7.'},
@@ -306,7 +305,7 @@ const EXTRA_DATA={
       {name:'호이안 버스터미널',type:'터미널',lat:15.88730,lng:108.32760,icon:'B',desc:'호이안 시내 버스·지역 이동 거점.'},
       {name:'다낭 국제공항 이용',type:'공항',lat:16.04392,lng:108.19937,icon:'✈',desc:'호이안 항공 이동은 보통 다낭 국제공항을 이용.'},
       {name:'Grab T1 국내선 · A/B1/B2/C (다낭공항)',type:'그랩승차',lat:16.04410,lng:108.19810,icon:'G',desc:'2026년 Grab 안내 기준. 국내선은 서비스에 따라 A 또는 B1·B2·C 승차구역을 이용하며 앱의 최종 픽업 안내를 우선하세요.'},
-      {name:'Grab T2 국제선 · 위치 6·7 (다낭공항)',type:'그랩승차',lat:16.04295,lng:108.20065,icon:'G',desc:'다낭 국제선 GrabCar 승차 위치. 현장 표지와 Grab 앱의 최종 안내를 우선하세요.'},
+      {name:'Grab T2 국제선 · Lane 1·2 (다낭공항)',type:'그랩승차',lat:16.04275,lng:108.20095,icon:'G',desc:'Grab 공항 안내의 국제선 도착 Lane 1·2. 이 핀은 주변 참고 위치입니다. 앱과 현장 표지의 최종 승차 지점을 확인하세요.'},
       {name:'Saigon Hoi An General Hospital',type:'병원',address:'06 Phan Dinh Phung, Hoi An Tay Ward, Da Nang City',icon:'H',desc:'호이안 종합병원. 24/7 응급 핫라인 1900 8686 30.'},
       {name:'Hoi An Regional Medical Center',type:'병원',address:'04 Tran Hung Dao, Hoi An Ward, Da Nang City',icon:'H',desc:'호이안 지역 공공 의료기관. 대표전화 0235 3861364.'}
     ]

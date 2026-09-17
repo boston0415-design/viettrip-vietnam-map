@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="./assets/css/responsive.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/community-stats.css?v=20260917-stats1">
 <link rel="stylesheet" href="./assets/css/list-layout.css?v=20260917-list1">
+<link rel="stylesheet" href="./assets/css/traveller-tools.css?v=20260917-tools1">
 </head>
 <body>
 <div class="app">
@@ -27,7 +28,7 @@
   <div class="communityStats" aria-label="전체 지도 이용 통계">
     <span title="2026년 9월 17일부터 집계한 방문 횟수입니다. 같은 탭의 새로고침은 중복 집계하지 않습니다. 실제 사람 수와는 다릅니다.">누적 방문 <b id="totalVisits">—</b><small>회</small></span>
     <span>등록 업체 <b id="totalPlaces">—</b><small>곳</small></span>
-    <span>회원 후기 <b id="totalReviews">—</b><small>개</small></span>
+    <span><button id="openCommunityReviews" class="statsReviewButton" type="button" aria-haspopup="dialog">회원 후기 <b id="totalReviews">—</b><small>개</small><span aria-hidden="true"> ›</span></button></span>
   </div>
   <div class="content">
     <aside class="side" id="businessSide">
@@ -57,6 +58,16 @@
       <div class="areaLegend mobileCollapsed" id="areaLegend">
         <strong id="areaLegendTitle" class="areaTitle">지역 대분류 · <span id="activeCityName">호치민</span> <span class="mobileFilterHint">필터</span> <span class="arrow">▲</span></strong>
         <div id="cityChips" class="cityRow"></div>
+        <div class="travellerToolbar">
+          <button id="openTransportGuide" type="button">공항·교통 안내</button>
+          <button id="openAdminRegions" type="button" aria-expanded="false" aria-controls="adminRegionControls">행정구역 경계</button>
+        </div>
+        <div id="adminRegionControls" class="adminRegionControls" hidden>
+          <label for="adminRegionSelect">지도에 표시할 행정구역</label>
+          <div class="adminSelectRow"><select id="adminRegionSelect"><option value="">경계 불러오기…</option></select><button id="fitAllAdminRegion" type="button">전체 경계</button><button id="clearAdminRegion" type="button">해제</button></div>
+          <p id="adminRegionStatus" role="status">구역을 선택하면 경계 전체로 지도가 이동합니다.</p>
+          <small id="adminRegionSource"></small>
+        </div>
         <div id="quickAreas" class="areaLegendRow"></div><div id="subNav" class="areaLegendRow subNav"></div><div id="tagNav" class="areaLegendRow subNav restaurantTagNav"></div>
         <div class="areaLegendRow ratingLegend">
           <span class="quickLabel">회원평점</span>
@@ -178,17 +189,32 @@
   </div>
 </div>
 
-<script src="./assets/js/01-data-storage.js?v=20260917-range3"></script>
+<dialog id="communityReviewsDialog" class="travellerDialog" aria-labelledby="communityReviewsTitle">
+  <div class="travellerDialogHead"><div><h2 id="communityReviewsTitle">회원 후기</h2><p>전체 지역의 방문 후기 · 최근 작성순</p></div><button type="button" data-traveller-close aria-label="후기 창 닫기">×</button></div>
+  <div id="communityReviewFeed" aria-live="polite"></div>
+  <p id="communityReviewStatus" role="status"></p>
+  <button id="moreCommunityReviews" class="btn" type="button" hidden>후기 더 보기</button>
+</dialog>
+<dialog id="transportGuideDialog" class="travellerDialog" aria-labelledby="transportGuideTitle">
+  <div class="travellerDialogHead"><div><h2 id="transportGuideTitle">처음 가는 베트남, 이동 안내</h2><p>공항에서 숙소까지 차근차근</p></div><button type="button" data-traveller-close aria-label="교통 안내 닫기">×</button></div>
+  <label for="transportCity">여행 지역</label><select id="transportCity"></select>
+  <div id="transportGuideBody"></div>
+</dialog>
+
+<script src="./assets/js/01-data-storage.js?v=20260917-tools1"></script>
 <script src="./assets/js/02-services-media.js?v=20260917-list1"></script>
 <script src="./assets/js/03-business-ui.js?v=20260917-list1"></script>
 <script src="./assets/js/04-rendering.js?v=20260917-feedback1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260917-range3"></script>
 <script src="./assets/js/06-save-motion.js?v=20260917-feedback1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260917-range3"></script>
-<script src="./assets/js/08-search-audit.js?v=20260917-range3"></script>
+<script src="./assets/js/08-search-audit.js?v=20260917-tools1"></script>
 <script src="./assets/js/09-init-events.js?v=20260917-rating-scope1"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260917-range3"></script>
 <script src="./assets/js/community-stats.js?v=20260917-feedback1"></script>
 <script src="./assets/js/list-layout.js?v=20260917-list1"></script>
+<script src="./assets/js/community-reviews.js?v=20260917-tools1"></script>
+<script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
+<script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 </body>
 </html>

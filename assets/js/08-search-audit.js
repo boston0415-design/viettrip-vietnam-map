@@ -409,6 +409,7 @@ function fitSelectedCityView(key){
 
 function switchCity(key){
   if(!CITY_DATA[key])return;
+  if(typeof resetAdministrativeRegions==='function')resetAdministrativeRegions();
 
   cancelPendingMapWork();
 
