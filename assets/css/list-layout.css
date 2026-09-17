@@ -17,7 +17,11 @@
 .memberMapKey span{width:13px;height:13px;border-radius:4px;background:#0d8691;border:1px solid white;box-shadow:0 1px 2px #17324733}
 .personalPlaceStatus{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:1100;width:max-content;max-width:calc(100vw - 32px);padding:11px 15px;border-radius:10px;background:#173247;color:white;box-shadow:0 4px 18px #17324730;font-size:13px;line-height:1.5;pointer-events:none}
 .personalPlaceStatus[hidden]{display:none}
-@media(max-width:900px){.personalPlaceTabs{margin:2px 0;gap:1px}.personalPlaceTabs button{padding:5px 7px;font-size:11px}.personalLocalHint{font-size:9px}.memberMapKey{top:12px;right:8px;font-size:10px;padding:5px 7px}.cardPersonalActions button{width:32px;height:32px}.cardAside{gap:0}}
+@media(max-width:900px){.personalPlaceTabs{margin:2px 0;gap:1px}.personalPlaceTabs button{padding:5px 7px;font-size:11px}.personalLocalHint{font-size:9px}.memberMapKey{top:12px;right:8px;font-size:10px;padding:5px 7px}.cardPersonalActions button{width:32px;height:32px}.cardAside{gap:0}
+ .side .list .card{position:relative;min-height:76px;margin-bottom:0!important}
+ .side .cardPersonalActions{position:absolute;right:8px;top:33px}
+ .side .card .badges{padding-right:38px}.side .card .meta{padding-right:72px}
+}
 #desktopListToggle{display:none}
 @media(min-width:901px){
   #desktopListToggle{display:flex;align-items:center;justify-content:center;position:absolute;left:0;top:45%;width:26px;height:52px;padding:0;z-index:8;border:1px solid #dbe2ea;border-left:0;border-radius:0 9px 9px 0;background:#fff;color:#475569;font-size:26px;box-shadow:2px 2px 7px rgba(15,23,42,.10)}
