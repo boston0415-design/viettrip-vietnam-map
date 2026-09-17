@@ -34,6 +34,19 @@ Object.assign(state,{city:'hcmc',navCategory:'restaurant',cat:'restaurant',sub:'
 const marker={setMap(){throw Error('panel must not remove markers')}};state.markers=[marker];state.selectionOverlays=[marker];
 const criteria=()=>JSON.stringify([state.city,state.cat,state.sub,state.ratingFilter,state.benefitFilter,state.query,state.markers,state.selectionOverlays]);
 const originalCriteria=criteria();
+// Prefer the selected marker coordinates over an ambiguous business name.
+let route=new URL(businessDirectionsUrl(fixture.places[0]));
+assert.equal(route.origin,'https://www.google.com');assert.equal(route.pathname,'/maps/dir/');
+assert.equal(route.searchParams.get('api'),'1');assert.equal(route.searchParams.get('destination'),'10.77,106.7');
+assert(!route.searchParams.has('origin'),'Google Maps must determine the live device origin');
+assert(!route.searchParams.has('key'));assert(!route.searchParams.has('travelmode'),'leave travel mode choice in Google Maps');
+route=new URL(businessDirectionsUrl({name:'A & B',address:'1군 #2',lat:null,lng:''}));
+assert.equal(route.searchParams.get('destination'),'A & B 1군 #2','missing coordinates must not become 0,0');
+assert.equal(businessDirectionsUrl({}), '');
+assert.equal(new URL(businessDirectionsUrl({name:'valid address',lat:999,lng:NaN})).searchParams.get('destination'),'valid address');
+const routeLink=businessDirectionsLinkHtml({name:'<unsafe>',lat:10,lng:106});
+assert(routeLink.includes('&lt;unsafe&gt;'));assert(routeLink.includes('rel="noopener noreferrer"'));assert(!routeLink.includes('onclick='));
+assert.equal(criteria(),originalCriteria);
 `);
 (async()=>{
  nodes.get('#businessSide').classList.add('mobileOpen');wrap.classList.add('listOpen');
@@ -43,7 +56,8 @@ const originalCriteria=criteria();
  assert(!nodes.get('#businessSide').classList.contains('mobileOpen'),'list closes on selection');
  assert(!wrap.classList.contains('listOpen'));assert(wrap.classList.contains('detailOpen'));
  assert(nodes.get('#areaLegendBody').hidden);assert(detail.innerHTML.includes('회원 후기 1개 보기'));
- assert(detail.innerHTML.includes('테스트 &lt;업체&gt;'));assert(!detail.innerHTML.includes('id="adminDeleteBtn"'));
+ assert(detail.innerHTML.includes('테스트 &lt;업체&gt;'));
+ assert.equal((detail.innerHTML.match(/class="directionsButton/g)||[]).length,2,'directions available in the phone summary and desktop actions');assert(!detail.innerHTML.includes('id="adminDeleteBtn"'));
  run('assert.equal(lastPan.y,74);assert.equal(lastPan.x,0);assert.equal(criteria(),originalCriteria)');
  for(let i=0;i<3;i++){
   nodes.get('#detailExpandBtn').onclick();flush();assert.equal(nodes.get('#detailBody').hidden,false);

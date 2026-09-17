@@ -208,6 +208,24 @@ function encodeCopyValue(text){
   return encodeURIComponent(String(text||''));
 }
 
+// Maps URLs use the device location in Google Maps when origin is omitted.
+// No Directions/Routes API call, stored origin, or background location tracking.
+function businessDirectionsUrl(place){
+  if(!place)return '';
+  const present=value=>value!==null && value!==undefined && String(value).trim()!=='';
+  const lat=Number(place.lat),lng=Number(place.lng);
+  const hasCoordinates=present(place.lat)&&present(place.lng)&&Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180;
+  const destination=hasCoordinates?`${lat},${lng}`:[place.name,place.address].filter(present).join(' ').trim().slice(0,200);
+  if(!destination)return '';
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&dir_action=navigate`;
+}
+
+function businessDirectionsLinkHtml(place,compact=false){
+  const url=businessDirectionsUrl(place);
+  if(!url)return '';
+  return `<a class="directionsButton${compact?'':' copyBtn'}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(place.name||'선택한 업체')} 현재 위치에서 길찾기 · 구글 지도 새 창" title="구글 지도에서 현재 위치를 허용하고 이동 수단을 선택하세요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-8a4 4 0 0 1 4-4h10M14 3l5 5-5 5"/></svg><span>길찾기</span></a>`;
+}
+
 function copyButtonHtml(label,text){
   if(!text)return '';
   return `<button type="button" class="copyBtn" data-copy-value="${encodeCopyValue(text)}" onclick="return handleCopyButton(event,this)">${esc(label)}</button>`;
@@ -367,7 +385,7 @@ function syncDetailPanelLayout(){
   if(body)body.hidden=!expanded;
   if(toggle){
     toggle.setAttribute('aria-expanded',String(expanded));
-    toggle.textContent=expanded?'지도 더 보기 ▾':'상세정보 펼치기 ▴';
+    toggle.textContent=expanded?'지도보기 ▾':'상세보기 ▴';
   }
   $('.mapwrap')?.classList.add('detailOpen');
 }
@@ -424,11 +442,13 @@ function renderDetail(){
     ${p.address?`<p class="detailSummaryAddress" title="${esc(p.address)}">${esc(p.address)}</p>`:''}
   </div>
   <div class="detailQuickActions">
-    <button type="button" id="detailExpandBtn" aria-expanded="false" aria-controls="detailBody">상세정보 펼치기 ▴</button>
+    <button type="button" id="detailExpandBtn" aria-expanded="false" aria-controls="detailBody">상세보기 ▴</button>
+    ${businessDirectionsLinkHtml(p,true)}
     <button type="button" class="grabButton" data-grab-place="${esc(p.id)}">그랩으로 이동</button>
   </div>
   <div id="detailBody" class="detailBody">
   <div class="copyRow">
+    ${businessDirectionsLinkHtml(p)}
     ${copyButtonHtml('업체명 복사',p.name)}
     ${p.address?copyButtonHtml('주소 복사',p.address):''}
     <button type="button" class="copyBtn grabButton" data-grab-place="${esc(p.id)}">그랩으로 이동</button>
