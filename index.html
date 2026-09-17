@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="./assets/css/interface-polish.css?v=20260918-feedback-links2">
 <link rel="stylesheet" href="./assets/css/mobile-access.css?v=mobile1">
 <link rel="stylesheet" href="./assets/css/header-layout.css?v=brand-centered3">
+<link rel="stylesheet" href="./assets/css/map-filters.css?v=compact1">
 </head>
 <body>
 <div class="app">
@@ -78,11 +79,18 @@
       <button id="mobileListBtn" class="mobileListBtn" type="button">업체 목록 <span id="mobileListCount">0</span></button>
       <div id="regHint" class="regHint">등록할 업체 아이콘을 지도에서 클릭하세요</div>
       <div class="areaLegend mobileCollapsed" id="areaLegend">
-        <strong id="areaLegendTitle" class="areaTitle">지역 대분류 · <span id="activeCityName">호치민</span> <span class="mobileFilterHint">필터</span> <span class="arrow">▲</span></strong>
+        <button id="areaLegendTitle" class="areaTitle" type="button" aria-expanded="false" aria-controls="areaLegendBody" aria-label="지도 필터 열기">
+          <svg class="filterGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="white"/><circle cx="15" cy="17" r="2" fill="white"/></svg>
+          <span class="filterSummary"><span id="activeCityName">호치민</span><span id="filterSelectionSummary"> · 전체</span></span>
+          <span class="filterToggleLabel">필터</span><span class="filterChevron" aria-hidden="true">⌃</span>
+        </button>
+        <div id="areaLegendBody" class="areaLegendBody" hidden>
+        <div class="areaLegendOptions">
         <div id="cityChips" class="cityRow"></div>
         <div class="travellerToolbar">
           <button id="openTransportGuide" type="button">공항·교통 안내</button>
           <button id="openAdminRegions" type="button" aria-expanded="false" aria-controls="adminRegionControls">행정구역 경계</button>
+          <button id="openAreaDirectory" type="button" aria-controls="areaPanel">지역 정보 목록</button>
         </div>
         <div id="adminRegionControls" class="adminRegionControls" hidden>
           <label for="adminRegionSelect">지도에 표시할 행정구역</label>
@@ -104,6 +112,9 @@
           <span class="quickLabel">혜택업소</span>
           <button type="button" class="benefitFilterBtn" data-benefit-filter="benefit"><span class="benefitMark">%</span>혜택업소</button>
 
+        </div>
+        </div>
+        <div class="mapFilterFooter"><span>선택한 조건으로 지도를 표시합니다</span><button id="closeMapFilters" type="button">지도 보기</button></div>
         </div>
       </div>
       <div id="areaPanel" class="areaPanel">
@@ -231,12 +242,12 @@
 <script src="./assets/js/02-services-media.js?v=20260918-naver-short1"></script>
 <script src="./assets/js/personal-places.js?v=20260918-personal1"></script>
 <script src="./assets/js/03-business-ui.js?v=20260918-feedback-links2"></script>
-<script src="./assets/js/04-rendering.js?v=20260918-feedback-links2"></script>
+<script src="./assets/js/04-rendering.js?v=20260918-compact-filters1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260917-range3"></script>
 <script src="./assets/js/06-save-motion.js?v=20260918-naver-short1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260917-range3"></script>
-<script src="./assets/js/08-search-audit.js?v=20260917-tools1"></script>
-<script src="./assets/js/09-init-events.js?v=20260917-rating-scope1"></script>
+<script src="./assets/js/08-search-audit.js?v=20260918-compact-filters1"></script>
+<script src="./assets/js/09-init-events.js?v=20260918-compact-filters1"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260918-feedback-links2"></script>
 <script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>
 <script src="./assets/js/list-layout.js?v=20260917-list1"></script>

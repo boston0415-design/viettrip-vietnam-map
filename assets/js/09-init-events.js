@@ -265,6 +265,7 @@ function initMap(){
   });
   initAddressAutocomplete();
   state.map.addListener('click',e=>{
+    setMobileLegendExpanded(false);
     closeSystemInfo();
     // 업체 등록 모드에서는 기존 등록용 클릭 로직 사용.
     if(state.registerMode){
@@ -473,26 +474,10 @@ document.querySelectorAll('.modalback').forEach(modal=>{
 });
 
 
-document.addEventListener('click',e=>{
-  if(!isMobileMapLayout())return;
-
-  const control=e.target.closest(
-    '[data-city],[data-nav-cat],[data-business-sub],[data-restaurant-tag],[data-rating-filter],[data-benefit-filter],[data-nav-area],[data-nav-point],[data-nav-golf],[data-point-group]'
-  );
-  if(!control)return;
-
-  // 선택 결과가 지도에서 바로 보이도록 필터 시트를 자동으로 접는다.
-  setTimeout(()=>collapseMobileLegend(),80);
-});
-
 window.addEventListener('resize',()=>{
   if(!isMobileMapLayout()){
     $('#businessSide')?.classList.remove('mobileOpen');
     $('.mapwrap')?.classList.remove('listOpen','detailOpen');
-    $('#areaLegend')?.classList.remove('mobileCollapsed');
-  }else if(!$('#areaLegend')?.classList.contains('mobileCollapsed')){
-    // 화면 회전 후 과도하게 열린 채 남는 것을 방지
-    collapseMobileLegend();
   }
   refreshMapAfterMobileLayout();
 });
@@ -502,6 +487,13 @@ document.addEventListener('keydown',e=>{
   if(closeTopModalOrRegisterMode()){
     e.preventDefault();
     e.stopPropagation();
+    return;
+  }
+  // Native dialogs manage their own Escape key; otherwise close only the filter menu.
+  if(document.querySelector('dialog[open]'))return;
+  if($('#areaLegendTitle')?.getAttribute('aria-expanded')==='true'){
+    setMobileLegendExpanded(false,{restoreFocus:true});
+    e.preventDefault();
   }
 });
 

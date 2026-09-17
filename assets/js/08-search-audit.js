@@ -149,6 +149,7 @@ function subItemsForNav(def){
 }
 
 function renderHierarchyNav(){
+  syncMapFilterSummary();
   $('#quickAreas').innerHTML=
     `<span class="quickLabel">분류</span>`+
     NAV_CATEGORIES.map(c=>
@@ -582,11 +583,53 @@ function refreshMapAfterMobileLayout(){
   });
 }
 
-function setMobileLegendExpanded(expanded){
+function mapFilterSummary(){
+  const def=navDef(state.navCategory);
+  const parts=[currentCity().label];
+  const category=def?.label || CONFIG.categories[state.cat]?.label;
+  if(category)parts.push(category);
+  if(state.sub && state.sub!=='all')parts.push(state.sub);
+  const item=state.selectedNavItem;
+  if(item && !['all','__all__',state.sub].includes(item)){
+    const label=def?.id==='airport'
+      ? ({airport:'공항',grab:'Grab',taxi:'택시',green:'Green SM',bus:'버스·셔틀',terminal:'터미널'}[item]||item)
+      : item;
+    parts.push(label);
+  }
+  if(state.restaurantTag && state.restaurantTag!=='all')parts.push(state.restaurantTag);
+  if(state.ratingFilter && state.ratingFilter!=='all')parts.push(state.ratingFilter==='4.5'?'4.5★ 이상':`${state.ratingFilter}★`);
+  if(state.benefitFilter && state.benefitFilter!=='all')parts.push('% 혜택');
+  if(state.query)parts.push(`검색: ${state.query}`);
+  if(parts.length===1)parts.push('전체');
+  return parts;
+}
+
+function syncMapFilterSummary(){
+  const title=$('#areaLegendTitle');
+  if(!title)return;
+  const parts=mapFilterSummary();
+  const city=$('#activeCityName'),selection=$('#filterSelectionSummary');
+  if(city)city.textContent=parts[0];
+  if(selection)selection.textContent=` · ${parts.slice(1).join(' · ')}`;
+  const expanded=!$('#areaLegend')?.classList.contains('mobileCollapsed');
+  const full=parts.join(' · ');
+  title.title=full;
+  title.setAttribute('aria-label',`지도 필터 ${expanded?'접기':'열기'}: ${full}`);
+}
+
+// Both desktop and mobile share one disclosure state; filters and layers are untouched.
+function setMobileLegendExpanded(expanded,{restoreFocus=false}={}){
   const legend=$('#areaLegend');
   if(!legend)return;
+  const title=$('#areaLegendTitle'),body=$('#areaLegendBody');
+  if(!expanded && (restoreFocus || body?.contains(document.activeElement)))title?.focus({preventScroll:true});
   legend.classList.toggle('mobileCollapsed',!expanded);
-  refreshMapAfterMobileLayout();
+  if(body)body.hidden=!expanded;
+  title?.setAttribute('aria-expanded',String(expanded));
+  const label=title?.querySelector('.filterToggleLabel');
+  if(label)label.textContent=expanded?'접기':'필터';
+  if(expanded)closeAreaPanel();
+  syncMapFilterSummary();
 }
 
 function collapseMobileLegend(){
@@ -618,21 +661,19 @@ function bindAreaNavigation(){
   const legend=$('#areaLegend');
 
   title.addEventListener('click',()=>{
-    if(isMobileMapLayout()){
-      const willExpand=legend.classList.contains('mobileCollapsed');
-      setMobileLegendExpanded(willExpand);
-      title.classList.toggle('open',willExpand);
-      return;
-    }
-
-    const next=!panel.classList.contains('show');
-    panel.classList.toggle('show',next);
-    title.classList.toggle('open',next);
+    setMobileLegendExpanded(legend.classList.contains('mobileCollapsed'));
+  });
+  $('#closeMapFilters')?.addEventListener('click',()=>setMobileLegendExpanded(false,{restoreFocus:true}));
+  $('#openAreaDirectory')?.addEventListener('click',()=>{
+    setMobileLegendExpanded(false);
+    panel.classList.add('show');
+    $('#areaPanelClose')?.focus({preventScroll:true});
   });
 
   $('#areaPanelClose').addEventListener('click',()=>{
     panel.classList.remove('show');
     title.classList.remove('open');
+    title.focus({preventScroll:true});
   });
 
   $('#mobileListBtn')?.addEventListener('click',openMobileBusinessList);
@@ -642,9 +683,7 @@ function bindAreaNavigation(){
   renderAreaList();
   syncMobileListCount();
 
-  if(isMobileMapLayout()){
-    setMobileLegendExpanded(false);
-  }
+  setMobileLegendExpanded(false);
 }
 
 function renderPopularAreas(){

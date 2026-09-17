@@ -11,7 +11,13 @@ assert(start>=0&&end>start,'capture the real map click listener');
 
 const context=vm.createContext({console,assert,Map,Set,URL,setTimeout:()=>0,clearTimeout(){},setInterval(){},clearInterval(){}});
 context.window=context;
-context.document={addEventListener(){},querySelector(){return {classList:{remove(){}}}},querySelectorAll(){return []}};
+const classes=new Set(['mobileCollapsed']),attributes={};
+const legend={classList:{remove:k=>classes.delete(k),contains:k=>classes.has(k),toggle(k,on){on?classes.add(k):classes.delete(k)}}};
+const filterLabel={textContent:''};
+const title={classList:{remove(){}},setAttribute:(k,v)=>attributes[k]=v,querySelector:()=>filterLabel,focus(){}};
+const body={hidden:true,contains:()=>false};
+const nodes={'#areaLegend':legend,'#areaLegendTitle':title,'#areaLegendBody':body,'#activeCityName':{},'#filterSelectionSummary':{}};
+context.document={addEventListener(){},querySelector:s=>nodes[s]||{classList:{remove(){}}},querySelectorAll(){return []}};
 for(const file of fs.readdirSync(root).filter(f=>/^0[1-8]-/.test(f)).sort()){
   vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context,{filename:file});
 }
