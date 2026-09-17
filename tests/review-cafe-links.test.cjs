@@ -3,9 +3,10 @@ const ctx=vm.createContext({console,assert,URL,Map,Set,Date,setTimeout:()=>0,cle
 ctx.window=ctx;ctx.document={querySelector:()=>null,querySelectorAll:()=>[]};
 for(const f of ['01-data-storage.js','02-services-media.js','03-business-ui.js'])vm.runInContext(fs.readFileSync(`${__dirname}/../assets/js/${f}`,'utf8'),ctx);
 vm.runInContext(`
- for(const url of ['https://cafe.naver.com/talkvietnam/123','https://m.cafe.naver.com/talkvietnam/123?ref=share','https://cafe.naver.com/ca-fe/cafes/123/articles/456','https://m.cafe.naver.com/ArticleRead.nhn?clubid=123&articleid=456'])assert.equal(normalizeCafeReviewUrl(url),url);
+ for(const url of ['https://naver.me/5394bkDO','https://naver.me/5394bkD0','https://naver.me/Ab12Cd34?from=share','https://cafe.naver.com/talkvietnam/123','https://m.cafe.naver.com/talkvietnam/123?ref=share','https://cafe.naver.com/ca-fe/cafes/123/articles/456','https://m.cafe.naver.com/ArticleRead.nhn?clubid=123&articleid=456'])assert.equal(normalizeCafeReviewUrl(url),url);
  assert.equal(normalizeCafeReviewUrl('http://cafe.naver.com/talkvietnam/123#comment'),'https://cafe.naver.com/talkvietnam/123');
- for(const url of ['javascript:alert(1)','https://cafe.naver.com.evil.com/talkvietnam/123','https://cafe.naver.com@evil.com/talkvietnam/123','https://cafe.naver.com/talkvietnam','https://cafe.naver.com/redirect?url=https://evil.com','https://cafe.naver.com:123/talkvietnam/1','https://user@cafe.naver.com/talkvietnam/123'])assert.equal(normalizeCafeReviewUrl(url),null,url);
+ for(const url of ['https://naver.me.evil.com/5394bkDO','https://naver.me@evil.com/5394bkDO','https://user@naver.me/5394bkDO','https://naver.me/','https://naver.me/a/b','https://naver.me/%2Fexample','https://naver.me:123/5394bkDO','javascript:alert(1)','https://cafe.naver.com.evil.com/talkvietnam/123','https://cafe.naver.com@evil.com/talkvietnam/123','https://cafe.naver.com/talkvietnam','https://cafe.naver.com/redirect?url=https://evil.com','https://cafe.naver.com:123/talkvietnam/1','https://user@cafe.naver.com/talkvietnam/123'])assert.equal(normalizeCafeReviewUrl(url),null,url);
+ assert.equal(normalizeCafeReviewUrl('  http://naver.me/5394bkDO#share  '),'https://naver.me/5394bkDO');
  assert.equal(normalizeCafeReviewUrl(''),'');
  assert.equal(remoteReviewToLocal({cafe_url:'https://cafe.naver.com/talkvietnam/1'}).cafeUrl,'https://cafe.naver.com/talkvietnam/1');
  for(const sub of ['한식','일식','베트남','중식','양식','기타'])assert(CONFIG.categories.restaurant.subs.includes(sub));

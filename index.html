@@ -5,14 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <!-- build: modular-source-v4-20260917-range3 -->
 <title>일상탈출 베트남맵</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&amp;display=swap&amp;text=%EC%9D%BC%EC%83%81%ED%83%88%EC%B6%9C%20%EB%B2%A0%ED%8A%B8%EB%82%A8%EB%A7%B5">
 <link rel="stylesheet" href="./assets/css/base.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/responsive.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/community-stats.css?v=20260917-stats1">
 <link rel="stylesheet" href="./assets/css/list-layout.css?v=20260917-list1">
 <link rel="stylesheet" href="./assets/css/traveller-tools.css?v=20260917-tools1">
-<link rel="stylesheet" href="./assets/css/interface-polish.css?v=polish1">
+<link rel="stylesheet" href="./assets/css/interface-polish.css?v=20260918-feedback-links2">
 <link rel="stylesheet" href="./assets/css/mobile-access.css?v=mobile1">
-<link rel="stylesheet" href="./assets/css/header-layout.css?v=brand2">
+<link rel="stylesheet" href="./assets/css/header-layout.css?v=brand-centered3">
 </head>
 <body>
 <div class="app">
@@ -22,7 +25,7 @@
       <small>회원의 경험으로 함께 만드는 베트남 로컬지도</small>
       <a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a>
     </div>
-    <div class="search" role="search"><input id="searchInput" aria-label="업체명, 지역, 세부분류 검색" placeholder="업체명·지역·분류 검색"><button id="searchBtn">검색</button></div>
+    <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" aria-label="업체명, 지역, 세부분류 검색" placeholder="업체명·지역·분류 검색"><button id="searchBtn">검색</button></div>
     <div class="actions">
       <button id="locBtn" class="btn primary">현재 위치</button>
       <button id="addBtn" class="btn">업체 등록</button>
@@ -200,7 +203,7 @@
     <div class="field"><label for="rText">후기 · 선택</label><textarea id="rText" placeholder="후기만 남겨도 됩니다."></textarea></div>
     <details id="reviewCafeLink" class="reviewCafeLink">
       <summary>카페 후기 링크 추가하기 · 선택</summary>
-      <div class="field"><label for="rCafeUrl">네이버 카페 게시글 주소</label><input id="rCafeUrl" type="url" inputmode="url" placeholder="https://cafe.naver.com/카페주소/글번호" aria-describedby="rCafeHelp"><div id="rCafeHelp" class="inlineHelp">일상탈출 카페에 작성한 후기의 공유 링크를 붙여주세요. 간단한 후기와 함께 저장하면 원문으로 연결됩니다. 회원 전용 글은 카페 가입·로그인이 필요할 수 있습니다.</div></div>
+      <div class="field"><label for="rCafeUrl">네이버 카페 게시글 주소</label><input id="rCafeUrl" type="url" inputmode="url" placeholder="네이버 카페에서 복사한 주소를 붙여주세요" aria-describedby="rCafeHelp"><div id="rCafeHelp" class="inlineHelp">일상탈출 카페 글의 ‘URL 복사’ 주소를 붙여주세요. naver.me 단축 주소도 사용할 수 있습니다. 간단한 후기와 함께 저장하면 원문으로 연결됩니다. 회원 전용 글은 카페 가입·로그인이 필요할 수 있습니다.</div></div>
     </details>
     <div class="field photoPicker">
       <label>사진 · 최대 3장</label>
@@ -224,20 +227,20 @@
   <div id="transportGuideBody"></div>
 </dialog>
 
-<script src="./assets/js/01-data-storage.js?v=20260917-tools1"></script>
-<script src="./assets/js/02-services-media.js?v=20260917-list1"></script>
+<script src="./assets/js/01-data-storage.js?v=20260918-feedback-links2"></script>
+<script src="./assets/js/02-services-media.js?v=20260918-naver-short1"></script>
 <script src="./assets/js/personal-places.js?v=20260918-personal1"></script>
-<script src="./assets/js/03-business-ui.js?v=20260917-list1"></script>
-<script src="./assets/js/04-rendering.js?v=20260917-feedback1"></script>
+<script src="./assets/js/03-business-ui.js?v=20260918-feedback-links2"></script>
+<script src="./assets/js/04-rendering.js?v=20260918-feedback-links2"></script>
 <script src="./assets/js/05-places-registration.js?v=20260917-range3"></script>
-<script src="./assets/js/06-save-motion.js?v=20260917-feedback1"></script>
+<script src="./assets/js/06-save-motion.js?v=20260918-naver-short1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260917-range3"></script>
 <script src="./assets/js/08-search-audit.js?v=20260917-tools1"></script>
 <script src="./assets/js/09-init-events.js?v=20260917-rating-scope1"></script>
-<script src="./assets/js/10-runtime-guard.js?v=20260917-range3"></script>
-<script src="./assets/js/community-stats.js?v=20260917-feedback1"></script>
+<script src="./assets/js/10-runtime-guard.js?v=20260918-feedback-links2"></script>
+<script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>
 <script src="./assets/js/list-layout.js?v=20260917-list1"></script>
-<script src="./assets/js/community-reviews.js?v=20260917-tools1"></script>
+<script src="./assets/js/community-reviews.js?v=20260918-feedback-links2"></script>
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=polish1"></script>

@@ -128,7 +128,7 @@
 
       let reviews=[];
       try{
-        reviews=await supaGet('reviews','select=*&order=created_at.asc');
+        reviews=await supaGet('reviews_public','select=*&order=created_at.asc');
         reviews=(reviews||[]).map(remoteReviewToLocal);
       }catch(err){
         console.warn('runtime guard: reviews failed; keep businesses visible',err);

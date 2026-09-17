@@ -295,7 +295,7 @@ async function saveReview(){
   const text=$('#rText').value.trim();
   const nickname=$('#rName').value.trim();
   const cafeUrl=normalizeCafeReviewUrl($('#rCafeUrl').value);
-  if(cafeUrl===null){alert('네이버 카페 게시글의 공유 링크를 확인해주세요.');return}
+  if(cafeUrl===null){alert('네이버 카페의 ‘URL 복사’로 받은 주소를 붙여주세요. cafe.naver.com과 naver.me 주소를 사용할 수 있습니다.');return}
   if(cafeUrl&&!text){alert('카페 링크와 함께 간단한 후기를 입력해주세요.');return}
   if(state.rating==null&&!text){alert('별점을 선택하거나 후기를 입력하세요.');return}
   if(text&&!nickname){alert('후기를 남길 닉네임을 입력하세요.');return}
