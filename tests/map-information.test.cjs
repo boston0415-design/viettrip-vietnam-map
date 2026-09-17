@@ -3,6 +3,7 @@ const root=path.join(__dirname,'../assets/js');
 const c=vm.createContext({console,assert,setTimeout,clearTimeout,setInterval,clearInterval,URL});c.window=c;c.matchMedia=q=>({matches:q.includes('hover')});c.document={addEventListener(){},querySelector(){return {}},querySelectorAll(){return []}};
 for(const f of fs.readdirSync(root).filter(f=>/^0[1-8]-/.test(f)).sort())vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),c);
 vm.runInContext(`
+const actualShowClickInfo=showClickInfo;
 let hovered='',clicked='';showPositionHover=(position,html)=>{assert(position);hovered=html};showClickInfo=(position,html)=>{assert(position);clicked=html};hideHover=()=>{};
 class Target{constructor(options){this.options=options;this.events={}}addListener(name,fn){(this.events[name]||=[]).push(fn)}setIcon(){}setMap(){}}
 google={maps:{Circle:Target,Marker:Target,Size:class{},Point:class{}}};state.map={};
@@ -34,6 +35,14 @@ for(const type of ['그랩승차','택시승차','그린SM승차','버스승차'
  assert(clicked.includes('현재 위치에서 걸어가기'));
 }
 assert.equal(mapFeatureDirectionsHtml({}),'');
+// Clicking a route card allows Google Maps to keep its controls in view on PC and phone.
+let infoOptions,infoPosition,infoOpened=0;
+google.maps.InfoWindow=class{constructor(options){infoOptions=options}setPosition(position){infoPosition=position}open(){infoOpened++}close(){}};
+for(const mobile of [false,true]){
+ window.matchMedia=q=>({matches:mobile?q.includes('max-width'):q.includes('hover')});
+ actualShowClickInfo(pos,clicked);assert.equal(infoOptions.disableAutoPan,false);assert.equal(infoPosition,pos);
+}
+assert.equal(infoOpened,2);window.matchMedia=q=>({matches:q.includes('max-width')});
 // A touch on a filled range closes information instead of opening another card.
 dismissals=0;registrations=0;
 closeSystemInfo=()=>{dismissals++};closeDetailPanel=()=>{};closeAreaPanel=()=>{};

@@ -400,10 +400,10 @@ function closeSystemInfo(){
 function showClickInfo(position,html,anchorMarker=null){
   if(state.clickInfo) state.clickInfo.close();
 
-  // On narrow screens, keep tapped information inside the visible map.
+  // Clicked cards may include route controls; keep them inside the map on every screen.
   state.clickInfo=new google.maps.InfoWindow({
     content:html,
-    disableAutoPan:!isMobileMapLayout()
+    disableAutoPan:false
   });
 
   if(anchorMarker){
