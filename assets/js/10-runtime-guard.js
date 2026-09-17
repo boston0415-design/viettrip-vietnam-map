@@ -79,12 +79,76 @@
     };
   }
 
+  // 시장·관광명소·골프장은 정적 지도 데이터와 회원 등록업체가 함께 존재한다.
+  // 기존에는 상단 분류가 정적 데이터만 보고, 등록업체 목록/마커는 전체 업종을 그대로 보여
+  // 분류 범위가 서로 어긋났다. 해당 분류를 누르면 같은 업종 등록업체만 같이 보이게 통일한다.
+  const HYBRID_NAV_BUSINESS_CATEGORY={
+    'market-nav':'market',
+    'attraction-nav':'attraction',
+    'golf-nav':'golf'
+  };
+
+  if(typeof items==='function'){
+    const baseItems=items;
+    items=function(){
+      let arr=baseItems();
+      const category=HYBRID_NAV_BUSINESS_CATEGORY[state.navCategory];
+      if(category && state.cat==='all')arr=arr.filter(p=>p.category===category);
+      return arr;
+    };
+  }
+
+  // 모든 CONFIG 업종에 범위 색/반경이 명시적으로 존재하도록 보완.
+  if(typeof categoryRangeColor==='function'){
+    const baseCategoryRangeColor=categoryRangeColor;
+    categoryRangeColor=function(categoryId){
+      return ({market:'#8b5cf6',attraction:'#10b981'})[categoryId] || baseCategoryRangeColor(categoryId);
+    };
+  }
+  if(typeof businessCircleRadius==='function'){
+    const baseBusinessCircleRadius=businessCircleRadius;
+    businessCircleRadius=function(categoryId){
+      return ({market:130,attraction:150,golf:180})[categoryId] || baseBusinessCircleRadius(categoryId);
+    };
+  }
+
+  function refreshHybridRegisteredBusinesses(){
+    const category=HYBRID_NAV_BUSINESS_CATEGORY[state.navCategory];
+    if(!category)return;
+    if(typeof renderList==='function')renderList();
+    if(typeof renderMarkers==='function')renderMarkers();
+    if(typeof addRegisteredBusinessCoverage==='function')addRegisteredBusinessCoverage(category,'all');
+    if(typeof syncMobileListCount==='function')syncMobileListCount();
+  }
+
+  if(typeof showTypeRanges==='function'){
+    const baseShowTypeRanges=showTypeRanges;
+    showTypeRanges=function(type){
+      const result=baseShowTypeRanges(type);
+      refreshHybridRegisteredBusinesses();
+      return result;
+    };
+  }
+
+  if(typeof showGolfCategory==='function'){
+    const baseShowGolfCategory=showGolfCategory;
+    showGolfCategory=async function(){
+      const result=await baseShowGolfCategory();
+      refreshHybridRegisteredBusinesses();
+      return result;
+    };
+  }
+
   function categoryScopeAudit(){
     const navLabels=new Set((NAV_CATEGORIES||[]).map(x=>x.label));
     const configLabels=new Set(Object.values(CONFIG?.categories||{}).map(x=>x.label));
     const missingInNav=[...configLabels].filter(x=>!navLabels.has(x));
     const unknownNav=[...navLabels].filter(x=>!configLabels.has(x) && !['거리','공항','전철','기차역','한인생활권','병원'].includes(x));
-    return {missingInNav,unknownNav};
+    const hybridCounts={};
+    Object.entries(HYBRID_NAV_BUSINESS_CATEGORY).forEach(([nav,category])=>{
+      hybridCounts[nav]=(db().places||[]).filter(p=>p.category===category).length;
+    });
+    return {missingInNav,unknownNav,hybridCounts};
   }
 
   function cityScopeAudit(){
@@ -165,6 +229,7 @@
         if(typeof renderMarkers==='function')renderMarkers();
       }
       if(typeof renderHierarchyNav==='function')renderHierarchyNav();
+      refreshHybridRegisteredBusinesses();
       if(typeof syncMobileListCount==='function')syncMobileListCount();
 
       const audit=cityScopeAudit();
