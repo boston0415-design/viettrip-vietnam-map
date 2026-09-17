@@ -1,0 +1,22 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path');
+const root=path.join(__dirname,'../assets/js');
+const ctx=vm.createContext({console,assert,setTimeout:()=>0,clearTimeout(){},setInterval:()=>0,clearInterval(){},URL,Map,Set,Promise});ctx.window=ctx;
+ctx.document={addEventListener(){},querySelector(){return {value:'',classList:{toggle(){},add(){},remove(){}}}},querySelectorAll(){return []}};
+for(const file of fs.readdirSync(root).filter(f=>/^\d/.test(f)&&f.endsWith('.js')&&!f.startsWith('09-')).sort())vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),ctx);
+vm.runInContext(`
+assert.equal(state.sort,'newest');
+const fixtures=[{id:'old',name:'Old',createdAt:'2026-09-01',updatedAt:'2026-10-01'},{id:'new',name:'New',createdAt:'2026-09-17'},{id:'unknown',name:'Unknown',createdAt:null}].map(p=>({...p,category:'stay',subcategory:'호텔',...CITY_DATA.hcmc.center}));
+db=()=>({places:fixtures,reviews:[]});stats=id=>({rating:id==='old'?5:3,count:1,reviews:[]});
+assert.deepEqual(items().map(p=>p.id),['new','old','unknown']);
+state.sort='rating';assert.equal(items()[0].id,'old');
+assert.equal(remotePlaceToLocal({created_at:'2026-09-17'}).createdAt,'2026-09-17');
+`,ctx);
+let click,collapsed=false,desktop=true,resizes=0;
+const attrs={},center={lat:10,lng:106},state={city:'hcmc',cat:'stay',selected:'old',map:{getCenter:()=>center,setCenter:c=>assert.equal(c,center)}};
+const before=JSON.stringify({city:state.city,cat:state.cat,selected:state.selected});
+const button={addEventListener:(event,fn)=>click=fn,setAttribute:(k,v)=>attrs[k]=v};
+const browser={document:{addEventListener:(e,fn)=>fn(),getElementById:()=>button,querySelector:()=>({classList:{toggle:()=>collapsed=!collapsed}})},window:{matchMedia:()=>({matches:desktop}),google:{maps:{event:{trigger:()=>resizes++}}}},state,requestAnimationFrame:fn=>fn()};browser.google=browser.window.google;
+vm.runInNewContext(fs.readFileSync(path.join(root,'list-layout.js'),'utf8'),browser);
+click();assert.equal(attrs['aria-expanded'],'false');click();assert.equal(attrs['aria-expanded'],'true');assert.equal(resizes,2);
+desktop=false;click();assert.equal(resizes,2);assert.equal(JSON.stringify({city:state.city,cat:state.cat,selected:state.selected}),before);
+console.log('PASS newest ordering, rating ordering, timestamp mapping, list toggle, preserved filters/center, mobile guard');

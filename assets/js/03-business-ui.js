@@ -301,7 +301,8 @@ function items({ratingFilter=state.ratingFilter}={}){
   if(ratingFilter!=='all')arr=arr.filter(p=>matchesRatingFilter(p.rating,ratingFilter));
   if(state.benefitFilter!=='all')arr=arr.filter(p=>matchesBenefitFilter(p,state.benefitFilter));
   if(state.query){const q=state.query.toLowerCase();arr=arr.filter(p=>`${p.name} ${p.area} ${p.address} ${p.subcategory} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q))}
-  if(state.sort==='reviews')arr.sort((a,b)=>b.count-a.count);
+  if(state.sort==='newest')arr.sort((a,b)=>(Date.parse(b.createdAt)||0)-(Date.parse(a.createdAt)||0)||a.name.localeCompare(b.name,'ko'));
+  else if(state.sort==='reviews')arr.sort((a,b)=>b.reviews.length-a.reviews.length);
   else if(state.sort==='name')arr.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   else arr.sort((a,b)=>(b.rating??-1)-(a.rating??-1)||b.count-a.count);
   return arr;

@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="./assets/css/base.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/responsive.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/community-stats.css?v=20260917-stats1">
+<link rel="stylesheet" href="./assets/css/list-layout.css?v=20260917-list1">
 </head>
 <body>
 <div class="app">
@@ -37,11 +38,12 @@
       <div class="filters">
         <div id="cats" class="row"></div>
         <div id="subs" class="row subs"></div>
-        <div class="sort"><span id="count">0개 업체</span><select id="sort"><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
+        <div class="sort"><span id="count">0개 업체</span><select id="sort" aria-label="업체 정렬"><option value="newest">최근 등록순</option><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
       </div>
       <div id="list" class="list"></div>
     </aside>
     <main class="mapwrap">
+      <button id="desktopListToggle" type="button" aria-controls="businessSide" aria-expanded="true" aria-label="업체 목록 접기" title="업체 목록 접기">‹</button>
       <div id="map" class="map"></div>
       <div id="mapLoadState" class="mapLoadState">
         <div class="mapLoadCard">
@@ -177,8 +179,8 @@
 </div>
 
 <script src="./assets/js/01-data-storage.js?v=20260917-range3"></script>
-<script src="./assets/js/02-services-media.js?v=20260917-feedback1"></script>
-<script src="./assets/js/03-business-ui.js?v=20260917-feedback1"></script>
+<script src="./assets/js/02-services-media.js?v=20260917-list1"></script>
+<script src="./assets/js/03-business-ui.js?v=20260917-list1"></script>
 <script src="./assets/js/04-rendering.js?v=20260917-feedback1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260917-range3"></script>
 <script src="./assets/js/06-save-motion.js?v=20260917-feedback1"></script>
@@ -187,5 +189,6 @@
 <script src="./assets/js/09-init-events.js?v=20260917-rating-scope1"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260917-range3"></script>
 <script src="./assets/js/community-stats.js?v=20260917-feedback1"></script>
+<script src="./assets/js/list-layout.js?v=20260917-list1"></script>
 </body>
 </html>

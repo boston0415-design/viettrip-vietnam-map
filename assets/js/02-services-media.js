@@ -118,6 +118,7 @@ function remotePlaceToLocal(p){
     tags:Array.isArray(p.tags)?p.tags:[],
     ownerKeyHash:p.owner_key_hash||'',
     deleteRequested:!!p.delete_requested,
+    createdAt:p.created_at||null,
     updatedAt:p.updated_at||null
   };
 }
@@ -1051,7 +1052,7 @@ async function bootstrapSharedDb({force=false}={}){
 }
 
 
-let state={sharedDbLoading:true,city:'hcmc',navCategory:null,areaType:'all',cat:'all',sub:'all',query:'',sort:'rating',ratingFilter:'all',benefitFilter:'all',restaurantTag:'all',selectedNavItem:null,selected:null,rating:5,newPlaceRating:5,reviewNewFiles:[],reviewExistingPhotos:[],reviewPreviewUrls:[],placeNewFiles:[],placeExistingPhotos:[],placePreviewUrls:[],placePhotoProcessing:false,placeSaveInProgress:false,editPlaceId:null,editMode:null,deviceHash:null,isAdmin:false,map:null,markers:[],premiumCircles:[],premiumPulseTimer:null,golfMarkers:[],poiMarkers:[],areaOverlays:[],selectionOverlays:[],rangeSelectionKey:null,rangeMoveIdleListener:null,rangeMoveAnimationToken:0,areaLabels:[],clickLatLng:null,registerMode:false,hoverInfo:null,clickInfo:null,addressAutocomplete:null,searchMarker:null,searchCandidate:null,addressSearchMarker:null,userMarker:null,userAccuracyCircle:null,userInfo:null,locationWatch:null};
+let state={sharedDbLoading:true,city:'hcmc',navCategory:null,areaType:'all',cat:'all',sub:'all',query:'',sort:'newest',ratingFilter:'all',benefitFilter:'all',restaurantTag:'all',selectedNavItem:null,selected:null,rating:5,newPlaceRating:5,reviewNewFiles:[],reviewExistingPhotos:[],reviewPreviewUrls:[],placeNewFiles:[],placeExistingPhotos:[],placePreviewUrls:[],placePhotoProcessing:false,placeSaveInProgress:false,editPlaceId:null,editMode:null,deviceHash:null,isAdmin:false,map:null,markers:[],premiumCircles:[],premiumPulseTimer:null,golfMarkers:[],poiMarkers:[],areaOverlays:[],selectionOverlays:[],rangeSelectionKey:null,rangeMoveIdleListener:null,rangeMoveAnimationToken:0,areaLabels:[],clickLatLng:null,registerMode:false,hoverInfo:null,clickInfo:null,addressAutocomplete:null,searchMarker:null,searchCandidate:null,addressSearchMarker:null,userMarker:null,userAccuracyCircle:null,userInfo:null,locationWatch:null};
 const $=s=>document.querySelector(s);
 function db(){
   try{
