@@ -321,11 +321,20 @@ function showPositionHover(position,html){
   overlay.position=position;overlay.html=html;
   if(overlay.getMap()!==state.map)overlay.setMap(state.map);else overlay.draw();
 }
-function bindMapFeatureInfo(target,feature,position,radius=null,{click=true}={}){
+function bindMapFeatureInfo(target,feature,position,radius=null,{click=true,backgroundRange=false}={}){
   const html=()=>mapFeatureHtml(feature,radius);
   target.addListener('mouseover',event=>{if(supportsMapHover())showPositionHover(event?.latLng||position,html());});
   target.addListener('mouseout',()=>hideHover(80));
-  if(click)target.addListener('click',event=>{hideHover();showClickInfo(event?.latLng||position,html());});
+  if(click)target.addListener('click',event=>{
+    // On touch, a filled range behaves like the map background, not another place.
+    if(backgroundRange&&!supportsMapHover()){
+      closeSystemInfo();
+      if(state.registerMode){registerMapClick(event);return}
+      closeDetailPanel();closeAreaPanel();
+      return;
+    }
+    hideHover();showClickInfo(event?.latLng||position,html());
+  });
 }
 function showHover(marker,html){showPositionHover(marker.getPosition(),html)}
 function hideHover(delay=0){

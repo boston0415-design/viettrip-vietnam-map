@@ -21,8 +21,7 @@ function renderMarkers(){
     state.markers.push(m);
   });
 
-  // 4.5+ 업체도 업종 색상을 그대로 유지한다.
-  // 평점 차이는 숫자 배지만으로 표시하고 별도 금색 링/펄스는 사용하지 않는다.
+  // Member places keep category colors; ratings remain in lists and information cards.
   clearPremiumEffects();
 }
 

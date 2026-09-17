@@ -46,6 +46,12 @@
           <button type="button" data-benefit-filter="all" class="active">전체 업체</button>
           <button type="button" data-benefit-filter="benefit">% 할인·혜택 업소</button>
         </div>
+        <div class="personalPlaceTabs" role="group" aria-label="내 업체 목록" title="현재 기기·브라우저에 저장됩니다. 다른 회원의 목록에는 영향을 주지 않습니다.">
+          <button type="button" data-personal-view="all" aria-pressed="true">전체</button>
+          <button type="button" data-personal-view="favorites" aria-pressed="false">☆ 즐겨찾기</button>
+          <button type="button" data-personal-view="hidden" aria-pressed="false">숨긴 업체</button>
+          <span class="personalLocalHint">이 기기에 저장</span>
+        </div>
         <div id="cats" class="row"></div>
         <div id="subs" class="row subs"></div>
         <div class="sort"><span id="count">0개 업체</span><select id="sort" aria-label="업체 정렬"><option value="newest">최근 등록순</option><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
@@ -55,6 +61,8 @@
     <main class="mapwrap">
       <button id="desktopListToggle" type="button" aria-controls="businessSide" aria-expanded="true" aria-label="업체 목록 접기" title="업체 목록 접기">‹</button>
       <div id="map" class="map"></div>
+      <div class="memberMapKey"><span aria-hidden="true"></span>회원 등록 업소</div>
+      <div id="personalPlaceStatus" class="personalPlaceStatus" role="status" hidden></div>
       <div id="mapLoadState" class="mapLoadState">
         <div class="mapLoadCard">
           <b id="mapLoadTitle">지도 불러오는 중…</b>
@@ -212,6 +220,7 @@
 
 <script src="./assets/js/01-data-storage.js?v=20260917-tools1"></script>
 <script src="./assets/js/02-services-media.js?v=20260917-list1"></script>
+<script src="./assets/js/personal-places.js?v=20260918-personal1"></script>
 <script src="./assets/js/03-business-ui.js?v=20260917-list1"></script>
 <script src="./assets/js/04-rendering.js?v=20260917-feedback1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260917-range3"></script>

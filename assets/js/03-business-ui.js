@@ -3,9 +3,9 @@ function businessGlyphPath(category){
   const paths={
     restaurant:'M3 3v5a3 3 0 0 0 6 0V3M6 3v18M18 3v18m0-18c-4 2-5 9 0 9',
     stay:'M3 19V7m18 12V7M3 16h18M3 11h18v5M6 11V8h4v3m4 0V8h4v3',
-    spa:'M12 21C3 18 2 11 4 8c4 0 7 4 8 8 1-4 4-8 8-8 2 3 1 10-8 13ZM12 15c-4-4-4-8 0-12 4 4 4 8 0 12',
+    spa:'M7 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM10 12h7l3 3H10M3 17h18M5 17v4m14-4v4M11 3l-1 3 2 3m5-6-1 3 2 3',
     cafe:'M4 5h12v9a5 5 0 0 1-10 0V5m10 1h2a3 3 0 0 1 0 6h-2M3 21h17',
-    karaoke:'m9 14 5-5M6 17l-3 4m5-7-3 3 3 3 3-3m0-13a5 5 0 1 1 7 7l-7-7Z',
+    karaoke:'M12 2a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4ZM5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8M9 6h6M9 9h6',
     shopping:'M4 8h16l-1 13H5L4 8Zm4 0V6a4 4 0 0 1 8 0v2',
     market:'M3 10h18l-2-6H5l-2 6Zm2 0v11h14V10M9 21v-7h6v7M2 10c0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0',
     attraction:'M3 10h18L12 3 3 10Zm2 3v7m5-7v7m4-7v7m5-7v7M2 22h20',
@@ -25,7 +25,9 @@ function roundMapIcon(category,color,memberBenefit=false){
   return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
 }
 function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,benefitText=''){
-  return roundMapIcon(category,categoryRangeColor(category),memberBenefit);
+  const color=categoryRangeColor(category);
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42"><rect x="3" y="4" width="34" height="34" rx="10" fill="#173247" opacity=".18"/><path d="m16 34 4 6 4-6" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="2" width="34" height="34" rx="10" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,7)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<circle cx="34" cy="5" r="4" fill="#087f5b" stroke="white" stroke-width="1"/>':''}</svg>`;
+  return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(40,42),anchor:new google.maps.Point(20,40)};
 }
 
 function catLabel(id){return CONFIG.categories[id]?.label||id}
@@ -258,7 +260,7 @@ function renderRatingFilterState(){
   });
 }
 
-function items({ratingFilter=state.ratingFilter}={}){
+function items({ratingFilter=state.ratingFilter,forList=false}={}){
   let arr=placesForCurrentCity()
     .filter(p=>CONFIG.categories[p.category] && p.subcategory!=='프라이빗 룸')
     .map(p=>({...p,...stats(p.id)}));
@@ -269,6 +271,7 @@ function items({ratingFilter=state.ratingFilter}={}){
   if(ratingFilter!=='all')arr=arr.filter(p=>matchesRatingFilter(p.rating,ratingFilter));
   if(state.benefitFilter!=='all')arr=arr.filter(p=>matchesBenefitFilter(p,state.benefitFilter));
   if(state.query){const q=state.query.toLowerCase();arr=arr.filter(p=>`${p.name} ${p.area} ${p.address} ${p.subcategory} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q))}
+  if(window.PersonalPlaces)arr=window.PersonalPlaces.filter(arr,forList);
   if(state.sort==='newest')arr.sort((a,b)=>(Date.parse(b.createdAt)||0)-(Date.parse(a.createdAt)||0)||a.name.localeCompare(b.name,'ko'));
   else if(state.sort==='reviews')arr.sort((a,b)=>b.reviews.length-a.reviews.length);
   else if(state.sort==='name')arr.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
@@ -524,18 +527,31 @@ function renderCats(){
     });
   }
 }
+function personalPlaceActionsHtml(p){
+  const personal=window.PersonalPlaces;if(!personal)return '';
+  const favorite=personal.isFavorite(p.id),hidden=personal.isHidden(p.id);
+  const star='<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9Z"/>';
+  const eye=hidden?'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>':'<path d="m3 3 18 18M10 5.2c.7-.1 1.3-.2 2-.2 7 0 10 7 10 7a17 17 0 0 1-3.5 4.5M6 6.5A18 18 0 0 0 2 12s3 7 10 7c1.8 0 3.3-.4 4.6-1M10 10a3 3 0 0 0 4 4"/>';
+  const icon=path=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+  return `<div class="cardPersonalActions"><button type="button" data-personal-action="favorite" data-place-id="${esc(p.id)}" class="${favorite?'isFavorite':''}" aria-pressed="${favorite}" aria-label="${esc(p.name)} 즐겨찾기 ${favorite?'해제':'추가'}" title="즐겨찾기 ${favorite?'해제':'추가'}">${icon(star)}</button><button type="button" data-personal-action="hide" data-place-id="${esc(p.id)}" aria-label="${esc(p.name)} ${hidden?'숨기기 해제':'내 목록에서 숨기기'}" title="${hidden?'숨기기 해제':'내 목록에서 숨기기'}">${icon(eye)}</button></div>`;
+}
 function renderList(){
-  const arr=items();$('#count').textContent=state.sharedDbLoading && !arr.length?'업체 불러오는 중…':`${arr.length}개 업체`;
+  const arr=items({forList:true});$('#count').textContent=state.sharedDbLoading && !arr.length?'업체 불러오는 중…':`${arr.length}개 업체`;
   $('#list').innerHTML=arr.length
-    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
+    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside"><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
     : state.sharedDbLoading
       ? '<div class="empty"><b>공용 업체 불러오는 중…</b><br>잠시만 기다려주세요.</div>'
-      : '<div class="empty">현재 조건에 맞는 업체가 없습니다.<br>업종·평점·혜택 조건을 조정해 보세요.</div>';
+      : window.PersonalPlaces?.getView()==='hidden'
+        ? '<div class="empty">현재 지역·분류에 숨긴 업체가 없습니다.<br>숨기기 해제 후 전체 목록에서 다시 볼 수 있습니다.</div>'
+        : window.PersonalPlaces?.getView()==='favorites'
+          ? '<div class="empty">현재 지역·분류에 즐겨찾기한 업체가 없습니다.<br>업체 카드의 ☆을 눌러 저장해 보세요.</div>'
+          : '<div class="empty">현재 조건에 맞는 업체가 없습니다.<br>업종·평점·혜택 조건을 조정해 보세요.</div>';
   document.querySelectorAll('[data-id]').forEach(el=>el.onclick=(event)=>{
-    if(event.target.closest('[data-place-reviews]'))return;
+    if(event.target.closest('[data-place-reviews],[data-personal-action]'))return;
     closeMobileBusinessList();
     selectPlace(el.dataset.id,true);
   });
+  document.querySelectorAll('[data-personal-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.personalView===(window.PersonalPlaces?.getView()||'all'))));
   renderRatingFilterState();
   syncMobileListCount();
 }

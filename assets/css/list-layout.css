@@ -1,6 +1,23 @@
 .list .card,.list .card.best,.list .card.good{background:#fff;border-color:#e2e8f0;box-shadow:none;outline:none}
 .list .card:hover{background:#f8fafc;border-color:#b8c5d6}
 .list .card.active,.list .card.active:hover{background:#f0f6ff;border-color:#1a73e8;box-shadow:inset 3px 0 0 #1a73e8;outline:2px solid rgba(26,115,232,.12)}
+.personalPlaceTabs{display:flex;align-items:center;gap:3px;margin:5px 0;flex-wrap:wrap}
+.personalPlaceTabs button{border:0;border-radius:7px;background:transparent;padding:6px 9px;min-height:32px;color:#526276;font:inherit;font-size:12px;cursor:pointer}
+.personalPlaceTabs button[aria-pressed="true"]{background:#e7f3f4;color:#087883;font-weight:750}
+.personalLocalHint{margin-left:auto;font-size:10px;color:#718096;white-space:nowrap}
+.cardAside{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:3px}
+.cardPersonalActions{display:flex;gap:3px}
+.cardPersonalActions button{display:grid;place-items:center;width:32px;height:32px;padding:6px;border:0;border-radius:7px;background:transparent;color:#718096;cursor:pointer}
+.cardPersonalActions svg{width:20px;height:20px}
+.cardPersonalActions button:hover{background:#edf2f7;color:#173247}
+.cardPersonalActions .isFavorite{color:#b47700;background:#fff6dc}
+.cardPersonalActions .isFavorite svg{fill:#f8d774}
+.cardPersonalActions button:focus-visible,.personalPlaceTabs button:focus-visible{outline:2px solid #087883;outline-offset:1px}
+.memberMapKey{position:absolute;top:12px;right:12px;z-index:5;display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #e2e8f0;border-radius:8px;background:#ffffffed;color:#334155;font-size:11px;pointer-events:none}
+.memberMapKey span{width:13px;height:13px;border-radius:4px;background:#0d8691;border:1px solid white;box-shadow:0 1px 2px #17324733}
+.personalPlaceStatus{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:1100;width:max-content;max-width:calc(100vw - 32px);padding:11px 15px;border-radius:10px;background:#173247;color:white;box-shadow:0 4px 18px #17324730;font-size:13px;line-height:1.5;pointer-events:none}
+.personalPlaceStatus[hidden]{display:none}
+@media(max-width:900px){.personalPlaceTabs{margin:2px 0;gap:1px}.personalPlaceTabs button{padding:5px 7px;font-size:11px}.personalLocalHint{font-size:9px}.memberMapKey{top:12px;right:8px;font-size:10px;padding:5px 7px}.cardPersonalActions button{width:32px;height:32px}.cardAside{gap:0}}
 #desktopListToggle{display:none}
 @media(min-width:901px){
   #desktopListToggle{display:flex;align-items:center;justify-content:center;position:absolute;left:0;top:45%;width:26px;height:52px;padding:0;z-index:8;border:1px solid #dbe2ea;border-left:0;border-radius:0 9px 9px 0;background:#fff;color:#475569;font-size:26px;box-shadow:2px 2px 7px rgba(15,23,42,.10)}
