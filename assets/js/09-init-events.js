@@ -343,20 +343,7 @@ document.querySelectorAll('[data-benefit-filter]').forEach(btn=>{
     const turningOff=state.benefitFilter===value;
 
     state.benefitFilter=turningOff?'all':value;
-    state.ratingFilter='all';
     state.selected=null;
-    state.cat='all';
-    state.sub='all';
-    state.navCategory=null;
-    state.selectedNavItem=null;
-    state.query='';
-
-    if($('#searchInput'))$('#searchInput').value='';
-
-    clearSelectionRanges();
-    clearAreaLabels();
-    clearSelectedSystemIcons();
-    clearSearchMarker();
     closeSystemInfo();
 
     renderRatingFilterState();
@@ -477,7 +464,7 @@ document.querySelectorAll('[data-close]').forEach(btn=>{
 
 document.querySelectorAll('.modalback').forEach(modal=>{
   modal.addEventListener('click',e=>{
-    if(e.target===modal)closeModalById(modal.id);
+    if(e.target===modal && !['placeModal','registerMethodModal','reviewModal'].includes(modal.id))closeModalById(modal.id);
   });
 });
 

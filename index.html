@@ -10,13 +10,15 @@
 <link rel="stylesheet" href="./assets/css/community-stats.css?v=20260917-stats1">
 <link rel="stylesheet" href="./assets/css/list-layout.css?v=20260917-list1">
 <link rel="stylesheet" href="./assets/css/traveller-tools.css?v=20260917-tools1">
+<link rel="stylesheet" href="./assets/css/interface-polish.css?v=polish1">
 </head>
 <body>
 <div class="app">
   <header class="top">
-    <div class="brand">일상탈출 베트남맵
-      <small>베트남 호치민 일상탈출 회원이 함께 만드는 로컬지도</small>
-      <a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener">☘ 베트남 호치민 일상탈출 카페로 이동하기</a>
+    <div class="brand">
+      <div class="brandTitle"><span class="brandMark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><span>일상탈출 <em>베트남맵</em></span></div>
+      <small>회원의 경험으로 함께 만드는 베트남 로컬지도</small>
+      <a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener">일상탈출 카페 <span aria-hidden="true">↗</span></a>
     </div>
     <div class="search"><input id="searchInput" placeholder="업체명, 지역, 세부분류 검색"><button id="searchBtn">검색</button></div>
     <div class="actions">
@@ -37,6 +39,11 @@
         <button id="mobileListClose" type="button" aria-label="업체 목록 닫기">×</button>
       </div>
       <div class="filters">
+        <div class="browseHeading">업체 둘러보기 <span>이름을 누르면 후기를 볼 수 있어요</span></div>
+        <div class="benefitTabs" role="group" aria-label="회원 혜택 구분">
+          <button type="button" data-benefit-filter="all" class="active">전체 업체</button>
+          <button type="button" data-benefit-filter="benefit">% 할인·혜택 업소</button>
+        </div>
         <div id="cats" class="row"></div>
         <div id="subs" class="row subs"></div>
         <div class="sort"><span id="count">0개 업체</span><select id="sort" aria-label="업체 정렬"><option value="newest">최근 등록순</option><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
@@ -216,5 +223,6 @@
 <script src="./assets/js/community-reviews.js?v=20260917-tools1"></script>
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
+<script src="./assets/js/interface-polish.js?v=polish1"></script>
 </body>
 </html>

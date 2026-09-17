@@ -1,5 +1,19 @@
+// One consistent outline icon family for business cards and map pins.
+function businessGlyphPath(category){
+  const paths={
+    restaurant:'M5 3v7m3-7v7M3 6h7M6.5 10v11M17 3v18m0-18c-4 3-4 9 0 9',
+    stay:'M3 20V7h18v13M3 14h18M7 10h3m4 0h3M6 20v-3m12 3v-3',
+    spa:'M12 21C3 18 2 11 4 8c4 0 7 4 8 8 1-4 4-8 8-8 2 3 1 10-8 13ZM12 15c-4-4-4-8 0-12 4 4 4 8 0 12',
+    cafe:'M4 5h12v9a5 5 0 0 1-10 0V5m10 1h2a3 3 0 0 1 0 6h-2M3 21h17',
+    karaoke:'m9 14 5-5M6 17l-3 4m5-7-3 3 3 3 3-3m0-13a5 5 0 1 1 7 7l-7-7Z',
+    shopping:'M4 8h16l-1 13H5L4 8Zm4 0V6a4 4 0 0 1 8 0v2',
+    bar:'M4 3h16l-8 10L4 3Zm8 10v8m-5 0h10'
+  };
+  return paths[category]||'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0ZM9 10a3 3 0 1 0 6 0 3 3 0 1 0-6 0';
+}
+function businessGlyph(category){return `<svg class="businessGlyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${businessGlyphPath(category)}"/></svg>`}
 function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,benefitText=''){
-  const emoji=categoryIcon(category,subcategory);
+
   const r=rating==null?null:Number(rating);
 
   // 등록업체 마커의 메인 색상은 평점이 아니라 업종별로 고정한다.
@@ -32,10 +46,7 @@ function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,bene
       ${markerBadge}
 
       <circle cx="26" cy="25" r="15.5" fill="rgba(255,255,255,.98)"/>
-      <text x="26" y="31"
-        text-anchor="middle"
-        font-size="19"
-        font-family="Arial,'Apple Color Emoji','Segoe UI Emoji',sans-serif">${emoji}</text>
+      <g transform="translate(15,14) scale(.92)" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>
 
       ${score?`
         <rect x="31" y="39" rx="7" ry="7" width="20" height="14"
@@ -181,10 +192,7 @@ function ratingFilterPlaces(filter=state.ratingFilter){
 }
 
 function benefitFilterPlaces(filter=state.benefitFilter){
-  return placesForCurrentCity()
-    .map(p=>({...p,...stats(p.id)}))
-    .filter(p=>matchesBenefitFilter(p,filter))
-    .filter(p=>Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)));
+  return items().filter(p=>matchesBenefitFilter(p,filter)).filter(p=>validMapLocation(p));
 }
 
 async function focusBenefitFilterResults(filter=state.benefitFilter){
@@ -287,6 +295,7 @@ function renderRatingFilterState(){
   });
   document.querySelectorAll('[data-benefit-filter]').forEach(btn=>{
     btn.classList.toggle('active',state.benefitFilter===btn.dataset.benefitFilter);
+    btn.setAttribute('aria-pressed',String(state.benefitFilter===btn.dataset.benefitFilter));
   });
 }
 
@@ -558,14 +567,16 @@ function renderCats(){
 function renderList(){
   const arr=items();$('#count').textContent=state.sharedDbLoading && !arr.length?'업체 불러오는 중…':`${arr.length}개 업체`;
   $('#list').innerHTML=arr.length
-    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><div class="name">${esc(p.name||'업체명 미입력')}</div><div class="badges"><span class="badge main">${categoryIcon(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
+    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
     : state.sharedDbLoading
       ? '<div class="empty"><b>공용 업체 불러오는 중…</b><br>잠시만 기다려주세요.</div>'
-      : '<div class="empty">등록된 업체가 없습니다.<br>위의 <b>업체 등록</b> 버튼으로 실제 업체를 추가하세요.</div>';
-  document.querySelectorAll('[data-id]').forEach(el=>el.onclick=()=>{
+      : '<div class="empty">현재 조건에 맞는 업체가 없습니다.<br>업종·평점·혜택 조건을 조정해 보세요.</div>';
+  document.querySelectorAll('[data-id]').forEach(el=>el.onclick=(event)=>{
+    if(event.target.closest('[data-place-reviews]'))return;
     closeMobileBusinessList();
     selectPlace(el.dataset.id,true);
   });
+  renderRatingFilterState();
   syncMobileListCount();
 }
 function ratingStyle(r){

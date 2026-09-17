@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const feed=document.getElementById('communityReviewFeed');
   const status=document.getElementById('communityReviewStatus');
   const more=document.getElementById('moreCommunityReviews');
-  let offset=0,busy=false,generation=0;
+  let offset=0,busy=false,generation=0,scopePlaceId=null;
   const places=new Map();
   function node(tag,text,className){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(className)n.className=className;return n}
   async function showPlace(id,button){
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(busy)return;busy=true;more.disabled=true;status.textContent='후기 불러오는 중…';
     const token=generation;
     try{
-      const rows=await communityRead('reviews',`select=id,place_id,author_name,rating,body,photo_urls,created_at&body=not.is.null&body=neq.&order=created_at.desc,id.desc&limit=${COMMUNITY_REVIEW_PAGE_SIZE}&offset=${offset}`);
+      const rows=await communityRead('reviews',`select=id,place_id,author_name,rating,body,photo_urls,created_at${scopePlaceId?'&place_id=eq.'+encodeURIComponent(scopePlaceId):''}&body=not.is.null&body=neq.&order=created_at.desc,id.desc&limit=${COMMUNITY_REVIEW_PAGE_SIZE}&offset=${offset}`);
       const ids=[...new Set(rows.map(r=>r.place_id))].filter(id=>/^[0-9a-f-]{36}$/i.test(id));
       if(ids.length){
         const found=await communityRead('places_public',`select=id,name,address&id=in.(${ids.join(',')})`);
@@ -91,9 +91,18 @@ document.addEventListener('DOMContentLoaded',()=>{
       more.textContent='다시 시도';more.hidden=false;
     }finally{if(token===generation){busy=false;more.disabled=false}}
   }
-  document.getElementById('openCommunityReviews').addEventListener('click',()=>{
+  function openFeed(place=null){
+    scopePlaceId=place?.id||null;
     generation++;busy=false;offset=0;places.clear();feed.replaceChildren();more.hidden=true;
+    document.getElementById('communityReviewsTitle').textContent=place?`${place.name} 후기`:'회원 후기';
+    dialog.querySelector('.travellerDialogHead p').textContent=place?'이 업체의 방문 후기 · 최근 작성순':'전체 지역의 방문 후기 · 최근 작성순';
     dialog.showModal();load();
+  }
+  document.getElementById('openCommunityReviews').addEventListener('click',()=>openFeed());
+  document.addEventListener('click',event=>{
+    const button=event.target.closest('[data-place-reviews]');if(!button)return;
+    const place=db().places.find(p=>p.id===button.dataset.placeReviews);
+    if(place)openFeed(place);
   });
   more.addEventListener('click',load);
   document.querySelectorAll('.travellerDialog').forEach(d=>{
