@@ -27,7 +27,7 @@
  .detail .copyBtn,.detail .btn{min-height:44px;font-size:12px}.copyRow{flex-wrap:wrap}
  .modalback{padding:max(6px,env(safe-area-inset-top)) 6px max(6px,env(safe-area-inset-bottom))!important}
  .modal{max-height:calc(100dvh - 20px)!important;overscroll-behavior:contain;scroll-padding-bottom:70px}
- .modal input,.modal textarea,.modal select,.travellerDialog select{font-size:16px!important;min-height:44px}
+ .modal input:not([type="checkbox"]):not([type="radio"]),.modal textarea,.modal select,.travellerDialog select{font-size:16px!important;min-height:44px}
  .modal button,.travellerDialog .btn{min-height:44px}
  .travellerDialog{width:calc(100% - 16px);max-height:calc(100dvh - 24px);padding:16px;overscroll-behavior:contain}
  .travellerDialogHead h2{font-size:19px}.communityReviewText{font-size:14px}
@@ -42,3 +42,7 @@
  .side.mobileOpen{height:94%!important}.areaLegend{max-height:82%!important}.detail{max-height:90%!important}
 }
 @media(prefers-reduced-motion:reduce){.side{transition:none!important}}
+
+@media(max-width:900px){.modal input[type="checkbox"],.modal input[type="radio"]{width:18px!important;height:18px!important;min-height:18px!important;flex:0 0 18px}.modal label:has(input[type="checkbox"]),.modal label:has(input[type="radio"]){min-height:44px;display:inline-flex;align-items:center;gap:6px}}
+/* The map frame must never scroll when focus moves into a sheet or the screen rotates. */
+@media(max-width:900px){.content,.mapwrap{overflow:clip!important}.side:not(.mobileOpen){visibility:hidden}.side.mobileOpen{visibility:visible}}

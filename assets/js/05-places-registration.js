@@ -492,6 +492,7 @@ function setAddressLocation(place){
     zIndex:9990,
     title:finalName||address||'등록 위치'
   });
+  bindMapFeatureInfo(state.addressSearchMarker,{name:finalName||'등록 위치',address,type:'등록할 업체',...state.clickLatLng},state.clickLatLng);
 
   cancelPendingMapWork();
   focusLocationAtZoom(state.clickLatLng,17);
