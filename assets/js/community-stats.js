@@ -5,7 +5,7 @@
   // Our stated rule, not a claim about Naver's internal counting algorithm.
   const VISIT_WINDOW_MS=30*60*1000;
   const VISIT_KEY='viettrip_counted_visit_v2';
-  let visitToken;
+  let visitToken,visitRecorded=false;
   function reuseVisitToken(){
     if(visitToken)return visitToken;
     let storage;
@@ -14,6 +14,7 @@
     try{
       const previous=JSON.parse(storage?.getItem(VISIT_KEY)||'null');
       if(previous&&typeof previous.id==='string'&&/^[0-9a-f-]{36}$/i.test(previous.id)&&previous.expires>now&&previous.expires<=now+VISIT_WINDOW_MS){
+        visitRecorded=previous.recorded===true;
         return visitToken=previous.id;
       }
     }catch{}
@@ -42,8 +43,16 @@
     const getToken=()=>reuseVisitToken();
     const id=typeof navigator!=='undefined'&&navigator.locks?.request
       ?await navigator.locks.request(VISIT_KEY,getToken):getToken();
-    const response=await request('site_visits',{method:'POST',headers:{Prefer:'resolution=ignore-duplicates,return=minimal'},body:JSON.stringify({id})});
+    if(visitRecorded)return;
+    const response=await request('site_visits',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({id})});
     if(!response.ok&&response.status!==409)throw new Error('Visit not recorded');
+    visitRecorded=true;
+    for(const getStore of [()=>localStorage,()=>sessionStorage]){
+      try{
+        const storage=getStore(),saved=JSON.parse(storage.getItem(VISIT_KEY)||'null');
+        if(saved?.id===id)storage.setItem(VISIT_KEY,JSON.stringify({...saved,recorded:true}));
+      }catch{}
+    }
   }
   async function visits(){
     try{await recordVisit()}catch{} // Failed recording must not hide the existing total.
