@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       // Fetch all feedback for this place, including rating-only rows, for correct averages.
       const feedback=[];
       for(let from=0;;from+=500){
-        const page=await communityRead('reviews',`select=*&place_id=eq.${encodeURIComponent(id)}&order=created_at.desc,id.desc&limit=500&offset=${from}`);
+        const page=await communityRead('reviews_public',`select=*&place_id=eq.${encodeURIComponent(id)}&order=created_at.desc,id.desc&limit=500&offset=${from}`);
         feedback.push(...page);if(page.length<500)break;
       }
       if(token!==generation||!dialog.open)return;
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(busy)return;busy=true;more.disabled=true;status.textContent='후기 불러오는 중…';
     const token=generation;
     try{
-      const rows=await communityRead('reviews',`select=id,place_id,author_name,rating,body,photo_urls,created_at${scopePlaceId?'&place_id=eq.'+encodeURIComponent(scopePlaceId):''}&body=not.is.null&body=neq.&order=created_at.desc,id.desc&limit=${COMMUNITY_REVIEW_PAGE_SIZE}&offset=${offset}`);
+      const rows=await communityRead('reviews_public',`select=id,place_id,author_name,rating,body,photo_urls,created_at${scopePlaceId?'&place_id=eq.'+encodeURIComponent(scopePlaceId):''}&body=not.is.null&body=neq.&order=created_at.desc,id.desc&limit=${COMMUNITY_REVIEW_PAGE_SIZE}&offset=${offset}`);
       const ids=[...new Set(rows.map(r=>r.place_id))].filter(id=>/^[0-9a-f-]{36}$/i.test(id));
       if(ids.length){
         const found=await communityRead('places_public',`select=id,name,address&id=in.(${ids.join(',')})`);

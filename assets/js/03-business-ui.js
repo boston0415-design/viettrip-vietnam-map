@@ -6,7 +6,7 @@ function businessGlyphPath(category){
     spa:'M7 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM10 12h7l3 3H10M3 17h18M5 17v4m14-4v4M11 3l-1 3 2 3m5-6-1 3 2 3',
     cafe:'M4 5h12v9a5 5 0 0 1-10 0V5m10 1h2a3 3 0 0 1 0 6h-2M3 21h17',
     karaoke:'M12 2a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4ZM5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8M9 6h6M9 9h6',
-    exchange:'M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4M12 9v6',
+    exchange:'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
     bus:'M5 3h14v16H5V3Zm0 4h14M5 13h14M8 16h.01M16 16h.01M7 19v3m10-3v3',
     shopping:'M4 8h16l-1 13H5L4 8Zm4 0V6a4 4 0 0 1 8 0v2',
     market:'M3 10h18l-2-6H5l-2 6Zm2 0v11h14V10M9 21v-7h6v7M2 10c0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0',
@@ -29,7 +29,7 @@ function roundMapIcon(category,color,memberBenefit=false){
 function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,benefitText=''){
   const color=categoryRangeColor(category);
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42"><rect x="3" y="4" width="34" height="34" rx="10" fill="#173247" opacity=".18"/><path d="m16 34 4 6 4-6" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="2" width="34" height="34" rx="10" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,7)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<g aria-label="회원 할인·혜택"><rect x="23" y="0.5" width="16" height="16" rx="5" fill="#087f5b" stroke="white" stroke-width="1"/><text x="31" y="12" fill="white" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">%</text></g>':''}</svg>`;
-  return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(40,42),anchor:new google.maps.Point(20,40)};
+  return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,34),anchor:new google.maps.Point(16,32)};
 }
 
 function catLabel(id){return CONFIG.categories[id]?.label||id}
