@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>일상탈출 베트남맵</title>
+  <defs>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#288c80"/>
+      <stop offset="1" stop-color="#144b55"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#teal)" d="M0 0h512v512H0z"/>
+  <path fill="#fbfdf8" d="M256 116c-72 0-124 52-124 120 0 80 102 159 114 168a16 16 0 0 0 20 0c12-9 114-88 114-168 0-68-52-120-124-120Z"/>
+  <circle cx="256" cy="238" r="65" fill="#216f70"/>
+  <path d="m227 231 29 30 29-30" fill="none" stroke="#bce9d6" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

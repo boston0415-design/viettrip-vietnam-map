@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <!-- build: modular-source-v4-20260917-range3 -->
 <title>일상탈출 베트남맵</title>
+<meta name="theme-color" content="#247f78">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="베트남맵">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./assets/icons/vietmap.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/vietmap-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/vietmap-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&amp;display=swap&amp;text=%EC%9D%BC%EC%83%81%ED%83%88%EC%B6%9C%20%EB%B2%A0%ED%8A%B8%EB%82%A8%EB%A7%B5">
@@ -18,6 +27,7 @@
 <link rel="stylesheet" href="./assets/css/header-layout.css?v=brand-centered3">
 <link rel="stylesheet" href="./assets/css/map-filters.css?v=area-directory1">
 <link rel="stylesheet" href="./assets/css/detail-layout.css?v=directions1">
+<link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-home1">
 </head>
 <body>
 <div class="app">
@@ -34,10 +44,19 @@
       <button id="adminBtn" class="btn" type="button">관리자</button>
     </div>
   </header>
+  <div class="mapUtilityBar">
+  <div class="appInstallBar" id="homeScreenBar">
+    <img src="./assets/icons/vietmap-192.png" alt="" width="28" height="28">
+    <div class="appInstallCopy"><strong>홈 화면에서 지도를 바로 열어요</strong><span>아이콘 하나로 지도·회원 후기까지</span></div>
+    <button id="openHomeScreen" class="appInstallButton" type="button" aria-haspopup="dialog" aria-controls="homeScreenDialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m-4-4 4 4 4-4M5 15v5h14v-5"/></svg>홈 화면에 추가
+    </button>
+  </div>
   <div class="communityStats" aria-label="전체 지도 이용 통계">
     <span title="같은 브라우저에서는 최초 접속 후 30분 동안 1회 집계하며, 이후 재접속하면 다시 집계합니다. 과거 누적 수치는 유지됩니다. 브라우저 저장을 차단하면 중복 집계될 수 있으며 실제 사람 수와는 다릅니다.">누적 방문 <b id="totalVisits">—</b><small>회</small></span>
     <span>등록 업체 <b id="totalPlaces">—</b><small>곳</small></span>
     <span><button id="openCommunityReviews" class="statsReviewButton" type="button" aria-haspopup="dialog">회원 후기 <b id="totalReviews">—</b><small>개</small><span aria-hidden="true"> ›</span></button></span>
+  </div>
   </div>
   <div class="content">
     <aside class="side" id="businessSide">
@@ -239,6 +258,35 @@
   <div id="transportGuideBody"></div>
 </dialog>
 
+<dialog id="homeScreenDialog" class="travellerDialog homeScreenDialog" aria-labelledby="homeScreenTitle" aria-describedby="homeScreenIntro">
+  <div class="travellerDialogHead">
+    <div class="homeScreenIdentity"><img src="./assets/icons/vietmap-192.png" alt="베트남맵 홈 화면 아이콘" width="62" height="62"><div><h2 id="homeScreenTitle">베트남맵을 홈 화면에</h2><p>일상탈출 · 언제든, 한 번에</p></div></div>
+    <button id="closeHomeScreen" type="button" aria-label="홈 화면 추가 안내 닫기">×</button>
+  </div>
+  <p id="homeScreenIntro" class="homeScreenIntro">홈 화면에 추가한 아이콘을 누르면 지도가 바로 열립니다. 인터넷에 연결하면 열 때와 화면으로 돌아올 때 업소·후기를 다시 불러옵니다.</p>
+  <p id="homeScreenInApp" class="homeScreenNotice" hidden>카페·카카오톡 안에서는 추가 메뉴가 없을 수 있어요. 메뉴의 <strong>다른 브라우저로 열기</strong>를 누르거나, 아래 지도 주소를 복사해 Chrome 또는 Safari에서 열어주세요.</p>
+  <button id="homeScreenInstall" class="homeScreenInstall" type="button" hidden>이 기기에 베트남맵 추가</button>
+  <p id="homeScreenStatus" class="homeScreenStatus" role="status" aria-live="polite" hidden></p>
+  <div class="homeScreenPlatforms" role="group" aria-label="기기별 홈 화면 추가 방법">
+    <button type="button" data-home-platform="android" aria-pressed="true">안드로이드</button>
+    <button type="button" data-home-platform="ios" aria-pressed="false">아이폰</button>
+    <button type="button" data-home-platform="desktop" aria-pressed="false">PC</button>
+  </div>
+  <section class="homeScreenPlatform" data-home-instructions="android" aria-label="안드로이드 추가 방법">
+    <ol><li><strong>Chrome</strong>에서 이 지도를 엽니다.</li><li>오른쪽 위 <strong>⋮ 메뉴 → 홈 화면에 추가</strong> 또는 <strong>앱 설치</strong>를 누릅니다.</li><li><strong>설치 / 추가</strong>를 확인하면 홈 화면에서 베트남맵 아이콘을 찾을 수 있어요.</li></ol>
+    <p>메뉴 이름은 브라우저에 따라 다를 수 있습니다. 이미 아이콘이 있다면 그 아이콘으로 열어주세요.</p>
+  </section>
+  <section class="homeScreenPlatform" data-home-instructions="ios" aria-label="아이폰 추가 방법" hidden>
+    <ol><li><strong>Safari</strong>에서 이 지도를 엽니다.</li><li><strong>공유 버튼 → 홈 화면에 추가</strong>를 누릅니다. 공유 버튼이 안 보이면 페이지 메뉴에서 공유를 선택하세요.</li><li><strong>웹 앱으로 열기</strong>가 보이면 켠 뒤, 오른쪽 위 <strong>추가</strong>를 누릅니다.</li></ol>
+    <p>홈 화면에 추가 항목이 없으면 공유 메뉴 맨 아래 ‘동작 편집’에서 추가할 수 있어요.</p>
+  </section>
+  <section class="homeScreenPlatform" data-home-instructions="desktop" aria-label="PC 추가 방법" hidden>
+    <ol><li><strong>Chrome 또는 Edge</strong>에서 지도를 엽니다.</li><li>주소창의 <strong>설치 아이콘</strong>이나 브라우저 메뉴의 <strong>앱 설치</strong>를 선택합니다.</li><li>휴대폰에도 추가하려면 아래 주소를 휴대폰에서 열고 <strong>안드로이드 / 아이폰 안내</strong>를 따라주세요.</li></ol>
+  </section>
+  <div class="homeScreenLink"><input id="homeScreenLink" type="text" readonly aria-label="홈 화면에 추가할 지도 주소" value="https://viettrip-vietnam-map.pages.dev/"><button id="copyHomeScreenLink" type="button">주소 복사</button></div>
+  <p class="homeScreenFineprint">홈 화면 추가는 무료입니다. 지도 이용에는 인터넷 연결이 필요합니다.</p>
+</dialog>
+
 <script src="./assets/js/01-data-storage.js?v=20260918-tour-boarding1"></script>
 <script src="./assets/js/02-services-media.js?v=20260918-naver-short1"></script>
 <script src="./assets/js/personal-places.js?v=20260918-personal1"></script>
@@ -256,6 +304,7 @@
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=polish1"></script>
+<script src="./assets/js/home-screen.js?v=20260918-home1"></script>
 <script src="./assets/js/panel-history.js?v=20260918-back2"></script>
 </body>
 </html>

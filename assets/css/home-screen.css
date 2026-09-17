@@ -1,0 +1,69 @@
+/* Share the existing statistics row on desktop; keep the phone strip compact. */
+.app{grid-template-rows:100px auto minmax(0,1fr)}
+.mapUtilityBar{display:flex;align-items:center;justify-content:space-between;min-width:0;background:#fff;border-bottom:1px solid #e3ece8}
+.mapUtilityBar .communityStats{align-self:stretch;border:0;min-height:28px;margin-left:auto}
+.appInstallBar{display:flex;align-items:center;gap:9px;min-width:0;min-height:44px;padding:4px 0 4px 28px;color:#345e59}
+.appInstallBar[hidden]{display:none}
+.appInstallBar>img{width:28px;height:28px;border-radius:8px;flex-shrink:0}
+.appInstallCopy{display:flex;align-items:baseline;gap:10px;min-width:0}
+.appInstallCopy strong{font-size:12px;font-weight:650;white-space:nowrap}
+.appInstallCopy span{font-size:11px;color:#748781;white-space:nowrap}
+.appInstallButton{display:inline-flex;align-items:center;justify-content:center;gap:5px;border:1px solid #cce1d7;border-radius:9px;padding:5px 9px;min-height:34px;background:#eff7f2;color:#226c60;font-size:11px;font-weight:650;white-space:nowrap;flex-shrink:0;cursor:pointer}
+.appInstallButton svg{width:17px;height:17px;flex-shrink:0}
+.appInstallButton:hover{background:#e1f0e8;border-color:#abcfc1}
+.appInstallButton:focus-visible,.homeScreenDialog button:focus-visible,.homeScreenDialog a:focus-visible{outline:2px solid #247f78;outline-offset:3px}
+.homeScreenDialog{width:min(460px,calc(100% - 24px));padding:24px;border-radius:22px}
+.homeScreenDialog .travellerDialogHead{margin-bottom:16px;align-items:center}
+.homeScreenIdentity{display:flex;align-items:center;gap:13px;min-width:0}
+.homeScreenIdentity img{width:62px;height:62px;border-radius:17px;flex-shrink:0}
+.homeScreenIdentity h2{font-size:20px!important;font-weight:750;margin:0 0 5px!important;color:#244a4c}
+.homeScreenIdentity p{font-size:12px!important;color:#677f77}
+.homeScreenDialog .travellerDialogHead>button{width:40px;height:40px;color:#647c76}
+.homeScreenIntro{margin:0 0 14px;color:#48665f;font-size:13px;line-height:1.7}
+.homeScreenInstall{width:100%;min-height:46px;border:0;border-radius:12px;background:#247f78;color:#fff;font-size:14px;font-weight:650;cursor:pointer;margin-bottom:12px}
+.homeScreenInstall[hidden],.homeScreenNotice[hidden],.homeScreenStatus[hidden],.homeScreenPlatform[hidden]{display:none}
+.homeScreenInstall:disabled{opacity:.65;cursor:wait}
+.homeScreenPlatforms{display:flex;gap:5px;padding:4px;border-radius:11px;background:#f0f5f2;margin:12px 0}
+.homeScreenPlatforms button{flex:1;min-height:38px;padding:7px 10px;border:0;border-radius:8px;color:#64776e;background:transparent;font-size:12px;font-weight:600;cursor:pointer}
+.homeScreenPlatforms button[aria-pressed="true"]{background:#fff;color:#216b60;box-shadow:0 1px 4px #254b4414}
+.homeScreenPlatform ol{list-style:none;counter-reset:install;display:grid;gap:12px;margin:16px 0;padding:0}
+.homeScreenPlatform li{counter-increment:install;position:relative;padding:0 0 0 33px;font-size:13px;line-height:1.65;color:#425c53}
+.homeScreenPlatform li::before{content:counter(install);position:absolute;left:0;top:0;width:23px;height:23px;display:grid;place-items:center;background:#eaf3ed;border-radius:8px;color:#327968;font-size:11px;font-weight:700}
+.homeScreenPlatform strong{font-weight:650;color:#244a4c}
+.homeScreenPlatform p,.homeScreenFineprint{font-size:11px;color:#74827c;line-height:1.65}
+.homeScreenNotice{background:#fff8e9;border:1px solid #ecdec0;border-radius:11px;padding:11px 12px;font-size:12px;color:#795e28;line-height:1.65;margin:10px 0}
+.homeScreenStatus{background:#edf6f0;border-radius:10px;padding:10px 12px;color:#286b56;font-size:12px;line-height:1.6;margin:10px 0}
+.homeScreenLink{display:flex;gap:8px;padding-top:14px;border-top:1px solid #e6eee8}
+.homeScreenLink input{flex:1;width:0;min-width:0;padding:8px 10px;border:1px solid #dfe8e2;border-radius:9px;background:#f9fbf9;color:#6a7f76;font-size:12px}
+.homeScreenLink button{border:1px solid #d6e4db;background:#fff;color:#2e6658;border-radius:9px;min-height:40px;padding:8px 12px;font-size:12px;white-space:nowrap}
+.homeScreenFineprint{margin:12px 0 0}
+@media(min-width:901px) and (max-width:1199px){
+ .app{grid-template-rows:94px auto minmax(0,1fr)}
+ .appInstallBar{padding-left:18px}.appInstallCopy span{display:none}
+}
+@media(max-width:900px){
+ .app{grid-template-rows:118px auto minmax(0,1fr)!important}
+ .mapUtilityBar{flex-direction:column;align-items:stretch}
+ .appInstallBar{min-height:44px;padding:0 10px;border-bottom:1px solid #edf2ee;gap:8px;background:#f8fbf8}
+ .appInstallBar>img{width:27px;height:27px;border-radius:8px}
+ .appInstallCopy{flex:1;display:block}
+ .appInstallCopy strong{display:block;font-size:11px}
+ .appInstallCopy span{display:block;font-size:10px;margin-top:2px}
+ .appInstallButton{min-height:36px;padding:6px 9px;font-size:11px}
+ .mapUtilityBar .communityStats{min-height:32px;margin-left:0}
+ .homeScreenDialog{padding:20px;max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+ .homeScreenIdentity img{width:52px;height:52px;border-radius:14px}
+ .homeScreenIdentity h2{font-size:18px!important}
+ .homeScreenLink input{font-size:16px}
+}
+@media(max-width:359px){.appInstallCopy span{display:none}.appInstallCopy strong{font-size:10px}.appInstallButton{font-size:10px;gap:3px;padding:6px}.appInstallBar{gap:6px}}
+@media(min-width:600px) and (max-width:900px) and (max-height:500px){
+ .app{grid-template-rows:64px auto minmax(0,1fr)!important}
+ .mapUtilityBar{flex-direction:row}.mapUtilityBar .communityStats{min-height:28px;margin-left:auto}
+ .appInstallBar{padding-left:12px;min-height:40px;border:0;background:#fff}.appInstallCopy span{display:none}.appInstallCopy strong{font-size:10px}
+ .appInstallBar>img{display:none}.appInstallButton{min-height:34px;font-size:10px}
+}
+@media(display-mode:standalone),(display-mode:fullscreen){
+ .appInstallBar{display:none}.mapUtilityBar{justify-content:flex-end}
+ .app{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+}

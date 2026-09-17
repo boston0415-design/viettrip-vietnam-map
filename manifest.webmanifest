@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "name": "일상탈출 베트남맵",
+  "short_name": "베트남맵",
+  "description": "회원의 경험으로 함께 만드는 베트남 지도. 업소, 후기, 할인 혜택과 교통 정보를 확인하세요.",
+  "lang": "ko",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#247f78",
+  "prefer_related_applications": false,
+  "icons": [
+    {"src": "/assets/icons/vietmap-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/assets/icons/vietmap-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/assets/icons/vietmap-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
