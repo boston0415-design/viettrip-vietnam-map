@@ -5,14 +5,17 @@ const TRANSPORT_SOURCES={
   han:'https://english.vov.vn/en/travel/noi-bai-airport-opens-dedicated-immigration-lanes-reorganizes-pick-up-zones-post1320744.vov',
   hanBus:'https://www.noibaiairport.vn/vi/phuong-tien-van-chuyen-cong-cong-nid1.html',
   dad:'https://www.grab.com/global/airport-rides/da-nang-international-airport/',
-  grab:'https://www.grab.com/global/airport-rides/'
+  grab:'https://www.grab.com/global/airport-rides/',
+  green:'https://www.greensm.com/vn-vi/news/huong-dan-su-dung-xanhnow-tai-san-bay',
+  bus152:'https://thaiest.com/vietnam/travel/ho-chi-minh-airport-bus-152',
+  bus109:'https://en.sggp.org.vn/bus-no-109-changed-its-route-connecting-to-new-terminal-3-post117254.html'
 };
 const TRANSPORT_GUIDES={
   hcmc:{airport:'떤선녓공항 · SGN',note:'국제선은 T2, 국내선은 T1 또는 T3입니다. 항공권의 터미널을 먼저 확인하세요. T3는 T1·T2와 떨어져 있습니다.',terminals:[
     {label:'T2 · 국제선 도착',point:'떤선녓 T2 국제선 터미널',steps:'짐을 찾고 도착장으로 나온 뒤, Grab 앱에서 T2 국제선 도착 승차 지점을 선택하세요. 앱의 사진·표지 안내를 따라 지정 주차구역으로 이동합니다. 일반택시는 TAXI 표지가 있는 공식 대기열에서 탑승하세요.',source:'sgn'},
     {label:'T1 · 국내선 도착',point:'떤선녓 T1 국내선 터미널',steps:'Grab 공식 안내의 D1 승차구역을 확인하세요. 도착 출구와 가장 가까운 차로가 반드시 Grab 승차장은 아닙니다. 호출 화면에 표시된 지점과 현장 안내판을 대조하세요.',source:'sgn'},
     {label:'T3 · 국내선 도착',point:'떤선녓 T3 국내선 터미널',steps:'도착장에서 지상층으로 내려가 PNA 주차장 방향 표지를 따라 이동하세요. PNA 주차장 1층(지상층)의 Grab 지정 구역에서 탑승합니다. 아래 공식 사진 안내로 엘리베이터와 이동 방향을 확인할 수 있습니다.',source:'t3'}
-  ],public:'공항버스는 노선별 정류장이 다릅니다. 공항의 BUS 표지에서 목적지·막차·요금을 확인한 뒤 탑승하세요. 시내 전철을 이용할 때는 지도에서 전철 분류를 선택해 역을 찾고, 역의 노선도에서 진행 방향을 확인하세요.'},
+  ],public:'T1·T2에서는 152번, T3에서는 109번 승차 안내를 확인하세요. 109번은 T1·T2를 경유하지 않습니다. 도착 터미널과 시내 하차 지점을 먼저 비교하고 현장에서 운행시간·요금·짐 요금을 확인하세요. 시내 전철을 이용할 때는 지도에서 전철 분류를 선택해 역을 찾고, 역의 노선도에서 진행 방향을 확인하세요.'},
   hanoi:{airport:'노이바이공항 · HAN',note:'T1은 국내선, T2는 국제선입니다. 2026년 8월 승차 동선 변경 안내가 있으므로 예전 출구 번호만 보고 차량을 부르지 마세요.',terminals:[
     {label:'T2 · 국제선 도착',point:'노이바이 T2 국제선',steps:'Grab 등 앱 호출 차량은 T2 P1 주차장 지정 구역을 확인하세요. 혼잡 시 P7로 안내될 수 있습니다. 도착장의 승차 표지와 앱이 지정하는 지점으로 이동하고, 일반택시 대기열과 구분하세요.',source:'han'},
     {label:'T1 · 국내선 도착',point:'노이바이 T1 국내선',steps:'앱 호출 차량은 Hall E 인근 P2 지정 승차구역 안내를 확인하세요. 출구 앞에서 임의로 기다리지 말고, 앱에 표시된 최종 승차 지점에서 기사와 만납니다.',source:'han'}
@@ -43,6 +46,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const sourceLink=(key,label='안내 원문 보기')=>`<a href="${esc(TRANSPORT_SOURCES[key])}" target="_blank" rel="noopener noreferrer">${label} ↗</a>`;
   function render(){
     const key=select.value,guide=TRANSPORT_GUIDES[key];if(!guide)return;
+    const transportPoints=(EXTRA_DATA[key==='hoian'?'danang':key]?.points||[]).filter(p=>['그린SM승차','버스승차'].includes(p.type));
     const selected=db().places.find(p=>p.id===state.selected);
     const destination=selected&&placeCityKey(selected)===key?selected:null;
     body.innerHTML=`<div class="guideIntro"><strong>${esc(guide.airport)}</strong><p>${esc(guide.note)}</p></div>
@@ -55,6 +59,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </ol></section>
     <section class="guideSection"><h3>어디서 타나요?</h3>${guide.terminals.map((t,i)=>`<details ${i===0?'open':''}><summary>${esc(t.label)}</summary><p>${esc(t.steps)}</p><div class="guideActions"><button type="button" data-terminal="${i}">터미널 위치 보기</button>${sourceLink(t.source,t.source==='han'?'VOV 승차 동선 안내':'공식 안내 보기')}</div></details>`).join('')||'<p>도착 공항 안내는 여행 지역에서 호치민 등 실제 도착 지역을 선택하세요.</p>'}
     <p class="guideNote">지도 핀은 터미널·승차구역 주변을 찾는 참고 위치입니다. 실제 차로·출구는 현장 표지와 앱의 최종 픽업 안내를 따르세요. 길을 건널 때는 지정 보행로를 이용하세요.</p></section>
+    ${transportPoints.length?`<section class="guideSection"><h3>Green SM · 버스·셔틀 승차 안내</h3>${transportPoints.map((p,i)=>`<details><summary>${esc(p.name)}</summary><p>${esc(p.desc)}</p><div class="guideActions"><button type="button" data-transport-point="${i}">지도에서 위치 보기</button>${p.sourceUrl?`<a href="${esc(p.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(p.sourceLabel||'안내 원문')} ↗</a>`:''}</div></details>`).join('')}</section>`:''}
     ${destination?`<section class="guideSection"><h3>선택한 업체까지 이동</h3><p><b>${esc(destination.name)}</b><br>${esc(destination.address)}</p><div class="guideActions"><button type="button" id="copyGuideDestination">업체명·주소 복사</button><a href="${esc(transportRouteUrl(destination.address?destination.name+' '+destination.address:destination.lat+','+destination.lng))}" target="_blank" rel="noopener noreferrer">Google 지도 길찾기 ↗</a></div></section>`:''}
     <section class="guideSection"><h3>택시·버스·예약 차량 고르기</h3><details><summary>앱 호출 차량 / 일반택시</summary><p>앱 호출은 앱에 배정된 차량을 이용하세요. 일반택시는 공항 공식 대기열에서 타고, 출발 전에 미터기 또는 정액 총요금과 추가요금을 확인하세요. 앱으로 카드 결제한 운임을 현금으로 다시 내지 않도록 결제 내역을 확인하세요.</p></details><details><summary>버스·셔틀 / 시외 이동</summary><p>${esc(guide.public)}</p>${guide.publicSource?`<div class="guideActions">${sourceLink(guide.publicSource,'공항 버스·택시 안내')}</div>`:''}</details></section>
     <section class="guideSection"><h3>기사에게 보여주세요</h3>
@@ -68,6 +73,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(!state.map||!point){document.getElementById('transportActionStatus').textContent='지도 위치를 아직 불러올 수 없습니다. 안내 원문에서 승차 위치를 확인해주세요.';return}
       dialog.close();if(state.city!==targetCity)switchCity(targetCity);
       jumpToPoi(point.name);
+    }));
+    body.querySelectorAll('[data-transport-point]').forEach(button=>button.addEventListener('click',()=>{
+      const point=transportPoints[Number(button.dataset.transportPoint)],targetCity=key==='hoian'?'danang':key;
+      if(!state.map||!point)return;
+      dialog.close();if(state.city!==targetCity)switchCity(targetCity);jumpToPoi(point.name);
     }));
     async function copy(value,button){try{await navigator.clipboard.writeText(value);button.textContent='복사했어요'}catch{document.getElementById('transportActionStatus').textContent='복사가 지원되지 않습니다. 화면의 문장을 길게 눌러 복사해주세요.'}}
     body.querySelectorAll('[data-copy-phrase]').forEach(b=>b.addEventListener('click',()=>copy(b.dataset.copyPhrase,b)));

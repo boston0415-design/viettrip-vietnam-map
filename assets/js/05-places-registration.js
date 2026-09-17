@@ -272,6 +272,8 @@ function poiColor(type){
     '터미널':'#0ea5e9',
     '그랩승차':'#16a34a',
     '택시승차':'#f59e0b',
+    '그린SM승차':'#089b9a',
+    '버스승차':'#334eb7',
     '전철역':'#6366f1',
     '기차역':'#4f46e5',
     '한인생활권':'#16a34a',
@@ -280,7 +282,11 @@ function poiColor(type){
   })[type]||'#475569';
 }
 function poiSvg(type,label,hover=false){
-  const categories={'공항':'airport','터미널':'airport','그랩승차':'taxi','택시승차':'taxi','전철역':'train','기차역':'train','한인생활권':'home','병원':'hospital','쇼핑':'shopping'};
+  const categories={'공항':'airport','터미널':'airport','그랩승차':'taxi','택시승차':'taxi','그린SM승차':'taxi','버스승차':'bus','전철역':'train','기차역':'train','한인생활권':'home','병원':'hospital','쇼핑':'shopping'};
+  if(type==='그린SM승차'){
+    const svg='<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="12.5" fill="#089b9a" stroke="white" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="700" font-size="12">SM</text></svg>';
+    return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
+  }
   return roundMapIcon(categories[type]||'attraction',poiColor(type));
 }
 
@@ -291,7 +297,10 @@ function mapFeatureHtml(feature={},radius=null){
   const description=feature.description||feature.desc||'';
   const address=feature.address||feature.formatted_address||'';
   const benefit=feature.memberBenefit?`<p class="mapInfoBenefit">회원 혜택 · ${esc(feature.benefitText||'상세 혜택은 업체에 확인해주세요.')}</p>`:'';
-  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}</section>`;
+  let source='';
+  try{const url=new URL(feature.sourceUrl);if(url.protocol==='https:')source=`<p><a href="${esc(url.href)}" target="_blank" rel="noopener noreferrer">${esc(feature.sourceLabel||'안내 원문')} ↗</a></p>`}catch{}
+  const note=feature.locationNote?`<p class="mapInfoAddress">${esc(feature.locationNote)}</p>`:'';
+  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}${note}${source}</section>`;
 }
 function supportsMapHover(){
   return !isMobileMapLayout() && (!window.matchMedia || window.matchMedia('(hover: hover) and (pointer: fine)').matches);
@@ -326,8 +335,8 @@ function bindMapFeatureInfo(target,feature,position,radius=null,{click=true,back
   target.addListener('mouseover',event=>{if(supportsMapHover())showPositionHover(event?.latLng||position,html());});
   target.addListener('mouseout',()=>hideHover(80));
   if(click)target.addListener('click',event=>{
-    // On touch, a filled range behaves like the map background, not another place.
-    if(backgroundRange&&!supportsMapHover()){
+    // Filled ranges dismiss information on every device; hover remains available on desktop.
+    if(backgroundRange){
       closeSystemInfo();
       if(state.registerMode){registerMapClick(event);return}
       closeDetailPanel();closeAreaPanel();

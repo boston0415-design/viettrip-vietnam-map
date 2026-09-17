@@ -163,6 +163,7 @@ function categoryRangeColor(categoryId){
     karaoke:'#8b5cf6',
     cafe:'#b7791f',
     shopping:'#db2777',
+    exchange:'#0f766e',
     bar:'#6366f1',
     golf:'#15803d',
     market:'#8b5cf6',
@@ -189,7 +190,7 @@ function airportMainRadius(p){
 function pointCircleRadius(type,p=null){
   if(type==='공항') return airportMainRadius(p);
   if(type==='터미널') return 180;
-  if(type==='그랩승차' || type==='택시승차') return 90;
+  if(['그랩승차','택시승차','그린SM승차','버스승차'].includes(type)) return 90;
   if(type==='전철역') return 420;
   if(type==='기차역') return 220;
   if(type==='병원') return 170;
@@ -275,7 +276,7 @@ function matchesNavigationScope(p){
 }
 
 function selectSystemFeature(type,name){
-  const def=NAV_CATEGORIES.find(d=>d.type===type || (d.kind==='airport' && ['터미널','그랩승차','택시승차'].includes(type)));
+  const def=NAV_CATEGORIES.find(d=>d.type===type || (d.kind==='airport' && ['터미널','그랩승차','택시승차','그린SM승차','버스승차'].includes(type)));
   state.navCategory=def?.id||null;
   state.selectedNavItem=name;
   state.cat=type==='쇼핑'?'shopping':'all';

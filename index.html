@@ -49,9 +49,10 @@
         <div class="personalPlaceTabs" role="group" aria-label="내 업체 목록" title="현재 기기·브라우저에 저장됩니다. 다른 회원의 목록에는 영향을 주지 않습니다.">
           <button type="button" data-personal-view="all" aria-pressed="true">전체</button>
           <button type="button" data-personal-view="favorites" aria-pressed="false">☆ 즐겨찾기</button>
-          <button type="button" data-personal-view="hidden" aria-pressed="false">숨긴 업체</button>
+          <button type="button" data-personal-view="hidden" aria-pressed="false">숨긴 업체 <b id="hiddenPlacesCount">0</b></button>
           <span class="personalLocalHint">이 기기에 저장</span>
         </div>
+        <p id="hiddenPlacesHelp" class="hiddenPlacesHelp" hidden>전체 지역의 숨긴 업체입니다. 카드의 눈 모양을 누르면 숨기기가 해제됩니다.</p>
         <div id="cats" class="row"></div>
         <div id="subs" class="row subs"></div>
         <div class="sort"><span id="count">0개 업체</span><select id="sort" aria-label="업체 정렬"><option value="newest">최근 등록순</option><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>

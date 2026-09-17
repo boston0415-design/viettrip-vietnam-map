@@ -6,6 +6,8 @@ function businessGlyphPath(category){
     spa:'M7 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM10 12h7l3 3H10M3 17h18M5 17v4m14-4v4M11 3l-1 3 2 3m5-6-1 3 2 3',
     cafe:'M4 5h12v9a5 5 0 0 1-10 0V5m10 1h2a3 3 0 0 1 0 6h-2M3 21h17',
     karaoke:'M12 2a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4ZM5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8M9 6h6M9 9h6',
+    exchange:'M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4M12 9v6',
+    bus:'M5 3h14v16H5V3Zm0 4h14M5 13h14M8 16h.01M16 16h.01M7 19v3m10-3v3',
     shopping:'M4 8h16l-1 13H5L4 8Zm4 0V6a4 4 0 0 1 8 0v2',
     market:'M3 10h18l-2-6H5l-2 6Zm2 0v11h14V10M9 21v-7h6v7M2 10c0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0',
     attraction:'M3 10h18L12 3 3 10Zm2 3v7m5-7v7m4-7v7m5-7v7M2 22h20',
@@ -21,12 +23,12 @@ function businessGlyphPath(category){
 }
 function businessGlyph(category){return `<svg class="businessGlyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${businessGlyphPath(category)}"/></svg>`}
 function roundMapIcon(category,color,memberBenefit=false){
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,8) scale(.667)" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<circle cx="26" cy="6" r="4" fill="#087f5b" stroke="white" stroke-width="1"/>':''}</svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,8) scale(.667)" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<rect x="18" y="0" width="14" height="14" rx="4" fill="#087f5b" stroke="white" stroke-width="1"/><text x="25" y="10.5" fill="white" font-family="Arial,sans-serif" font-size="11" font-weight="700" text-anchor="middle">%</text>':''}</svg>`;
   return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
 }
 function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,benefitText=''){
   const color=categoryRangeColor(category);
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42"><rect x="3" y="4" width="34" height="34" rx="10" fill="#173247" opacity=".18"/><path d="m16 34 4 6 4-6" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="2" width="34" height="34" rx="10" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,7)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<circle cx="34" cy="5" r="4" fill="#087f5b" stroke="white" stroke-width="1"/>':''}</svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42"><rect x="3" y="4" width="34" height="34" rx="10" fill="#173247" opacity=".18"/><path d="m16 34 4 6 4-6" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="2" width="34" height="34" rx="10" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,7)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<g aria-label="회원 할인·혜택"><rect x="23" y="0.5" width="16" height="16" rx="5" fill="#087f5b" stroke="white" stroke-width="1"/><text x="31" y="12" fill="white" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">%</text></g>':''}</svg>`;
   return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(40,42),anchor:new google.maps.Point(20,40)};
 }
 
@@ -261,9 +263,12 @@ function renderRatingFilterState(){
 }
 
 function items({ratingFilter=state.ratingFilter,forList=false}={}){
-  let arr=placesForCurrentCity()
+  const hiddenView=window.PersonalPlaces?.getView()==='hidden';
+  if(hiddenView&&!forList)return [];
+  let arr=(hiddenView?db().places:placesForCurrentCity())
     .filter(p=>CONFIG.categories[p.category] && p.subcategory!=='프라이빗 룸')
     .map(p=>({...p,...stats(p.id)}));
+  if(!hiddenView){
   arr=arr.filter(matchesNavigationScope);
   if(state.cat!=='all')arr=arr.filter(p=>p.category===state.cat);
   if(state.sub!=='all')arr=arr.filter(p=>normalizedRestaurantSub(p.subcategory)===state.sub || p.subcategory===state.sub);
@@ -271,6 +276,7 @@ function items({ratingFilter=state.ratingFilter,forList=false}={}){
   if(ratingFilter!=='all')arr=arr.filter(p=>matchesRatingFilter(p.rating,ratingFilter));
   if(state.benefitFilter!=='all')arr=arr.filter(p=>matchesBenefitFilter(p,state.benefitFilter));
   if(state.query){const q=state.query.toLowerCase();arr=arr.filter(p=>`${p.name} ${p.area} ${p.address} ${p.subcategory} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q))}
+  }
   if(window.PersonalPlaces)arr=window.PersonalPlaces.filter(arr,forList);
   if(state.sort==='newest')arr.sort((a,b)=>(Date.parse(b.createdAt)||0)-(Date.parse(a.createdAt)||0)||a.name.localeCompare(b.name,'ko'));
   else if(state.sort==='reviews')arr.sort((a,b)=>b.reviews.length-a.reviews.length);
@@ -538,11 +544,11 @@ function personalPlaceActionsHtml(p){
 function renderList(){
   const arr=items({forList:true});$('#count').textContent=state.sharedDbLoading && !arr.length?'업체 불러오는 중…':`${arr.length}개 업체`;
   $('#list').innerHTML=arr.length
-    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside"><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
+    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 ${p.reviews.length}개 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside"><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
     : state.sharedDbLoading
       ? '<div class="empty"><b>공용 업체 불러오는 중…</b><br>잠시만 기다려주세요.</div>'
       : window.PersonalPlaces?.getView()==='hidden'
-        ? '<div class="empty">현재 지역·분류에 숨긴 업체가 없습니다.<br>숨기기 해제 후 전체 목록에서 다시 볼 수 있습니다.</div>'
+        ? '<div class="empty">숨긴 업체가 없습니다.<br>숨긴 업체는 지역·업종과 관계없이 이곳에서 복구할 수 있습니다.</div>'
         : window.PersonalPlaces?.getView()==='favorites'
           ? '<div class="empty">현재 지역·분류에 즐겨찾기한 업체가 없습니다.<br>업체 카드의 ☆을 눌러 저장해 보세요.</div>'
           : '<div class="empty">현재 조건에 맞는 업체가 없습니다.<br>업종·평점·혜택 조건을 조정해 보세요.</div>';
@@ -552,6 +558,9 @@ function renderList(){
     selectPlace(el.dataset.id,true);
   });
   document.querySelectorAll('[data-personal-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.personalView===(window.PersonalPlaces?.getView()||'all'))));
+  const hiddenCount=(db().places||[]).filter(p=>window.PersonalPlaces?.isHidden(p.id)).length;
+  const countLabel=document.getElementById('hiddenPlacesCount');if(countLabel)countLabel.textContent=String(hiddenCount);
+  const hiddenHelp=document.getElementById('hiddenPlacesHelp');if(hiddenHelp)hiddenHelp.hidden=window.PersonalPlaces?.getView()!=='hidden';
   renderRatingFilterState();
   syncMobileListCount();
 }
