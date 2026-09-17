@@ -450,15 +450,6 @@ function createGolfMarker(g,location,clearExisting=true){
     icon:golfSvg(false),
   });
 
-  marker.addListener('mouseover',()=>{
-    marker.setIcon(golfSvg(true));
-  });
-
-  marker.addListener('mouseout',()=>{
-    marker.setIcon(golfSvg(false));
-    hideHover();
-  });
-
   bindMapFeatureInfo(marker,{...g,type:'골프장',...location},location);
 
   marker._golfName=g.name;

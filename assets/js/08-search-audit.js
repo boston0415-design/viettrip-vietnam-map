@@ -703,7 +703,7 @@ function showUserLocation(pos, autoZoom=true){
   if(!state.userInfo){
     state.userInfo=new google.maps.InfoWindow();
     for(const target of [state.userMarker,state.userAccuracyCircle]){
-      target.addListener('mouseover',()=>showPositionHover(state.userMarker.getPosition(),mapFeatureHtml(state.userLocationInfo)));
+      target.addListener('mouseover',()=>{if(supportsMapHover())showPositionHover(state.userMarker.getPosition(),mapFeatureHtml(state.userLocationInfo))});
       target.addListener('mouseout',hideHover);
       target.addListener('click',()=>showClickInfo(state.userMarker.getPosition(),mapFeatureHtml(state.userLocationInfo)));
     }

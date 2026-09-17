@@ -775,16 +775,6 @@ function createSelectedPoiMarker(p,location,clearExisting=true){
   });
 
   bindMapFeatureInfo(m,{...p,...location},location);
-  // Pointer highlighting is independent of the shared information popup.
-  m.addListener('mouseover',()=>{
-    m.setIcon(poiSvg(p.type,p.icon||'•',true));
-  });
-
-  m.addListener('mouseout',()=>{
-    m.setIcon(poiSvg(p.type,p.icon||'•',false));
-    hideHover();
-  });
-
   m._poiName=p.name;
   state.poiMarkers.push(m);
   return m;

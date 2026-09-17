@@ -258,8 +258,14 @@ function initMap(){
   const mapEl=$('#map');
   if(!mapEl)throw new Error('지도 영역을 찾지 못했습니다.');
   state.map=new google.maps.Map(mapEl,{center:CITY_DATA.hcmc.center,zoom:CITY_DATA.hcmc.zoom,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,zoomControl:false,gestureHandling:'greedy',scrollwheel:true,isFractionalZoomEnabled:true});
+  // Pointer previews never survive a map gesture; touch cards dismiss on pan/zoom.
+  for(const event of ['dragstart','zoom_changed'])state.map.addListener(event,()=>{
+    hideHover();
+    if(!supportsMapHover())closeSystemInfo();
+  });
   initAddressAutocomplete();
   state.map.addListener('click',e=>{
+    closeSystemInfo();
     // 업체 등록 모드에서는 기존 등록용 클릭 로직 사용.
     if(state.registerMode){
       registerMapClick(e);

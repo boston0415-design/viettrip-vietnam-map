@@ -1,0 +1,14 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=path.join(__dirname,'../assets/js');let timer,removed=0,added=0,iconChanges=0;
+const c=vm.createContext({console,assert,URL,Map,Set,setInterval(){},clearInterval(){},setTimeout:fn=>(timer=fn,1),clearTimeout:()=>timer=null});
+c.window=c;c.matchMedia=q=>({matches:q.includes('hover')});
+c.document={addEventListener(){},querySelector(){return {}},querySelectorAll(){return []},createElement(){return {style:{},offsetWidth:270,offsetHeight:100,setAttribute(){},remove(){removed++}}}};
+for(const f of fs.readdirSync(root).filter(f=>/^0[1-8]-/.test(f)).sort())vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),c);
+c.google={maps:{LatLng:class{constructor(p){Object.assign(this,p)}},OverlayView:class{getMap(){return this.map}setMap(map){this.map=map;if(map){this.onAdd();this.draw()}else this.onRemove()}getPanes(){return {floatPane:{appendChild(){added++}}}}getProjection(){return {fromLatLngToDivPixel:()=>({x:150,y:150}),fromLatLngToContainerPixel:()=>({x:150,y:150})}}}}};
+const run=s=>vm.runInContext(s,c);
+run("state.map={getDiv:()=>({clientWidth:600,clientHeight:400})};showPositionHover({lat:10,lng:106},'first');");assert.equal(added,1);
+run('hideHover(80)');assert(timer);run("showPositionHover({lat:10,lng:106},'second')");assert.equal(timer,null);assert.equal(added,1,'reuse one passive overlay');assert.equal(removed,0,'changing hovered item must not tear down the card');
+run('hideHover()');assert.equal(removed,1);
+run("window.matchMedia=q=>({matches:q.includes('max-width')});showPositionHover({lat:10,lng:106},'touch')");assert.equal(added,1,'no hover card on touch layout');
+const css=fs.readFileSync(path.join(__dirname,'../assets/css/mobile-access.css'),'utf8');assert(css.includes('.mapHoverCard,.mapHoverCard *{pointer-events:none!important}'));
+console.log('PASS passive hover overlay, stable reuse, cancelled delayed close, mobile hover suppression');
