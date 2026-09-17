@@ -38,12 +38,14 @@ async function fixture(mobile=true,{stale=false,denied=false}={}){
   run(script('panel-history.js'));
   await pause();
   const node=id=>w.document.getElementById(id);
-  const guarded=()=>w.history.state?.viettripPanelBack===true;
+  const guarded=()=>Boolean(w.history.state?.viettripPanelBack);
+  const activate=()=>w.document.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
+  let pushes=0;const push=w.history.pushState.bind(w.history);w.history.pushState=(...args)=>{pushes++;return push(...args)};
   const criteria=()=>run('JSON.stringify([state.city,state.cat,state.sub,state.ratingFilter,state.benefitFilter,state.query,state.markers,state.selectionOverlays])');
   const before=criteria();
-  const back=async()=>{w.history.back();await pause()};
-  const action=async code=>{run(code);await pause()};
-  return {dom,w,run,node,guarded,criteria,before,back,action};
+  const back=async()=>{const before=pushes;w.history.back();await pause();assert.equal(pushes,before,'Back must never reinsert entries: Chromium skips them')};
+  const action=async code=>{activate();run(code);await pause()};
+  return {dom,w,run,node,guarded,criteria,before,back,action,activate};
 }
 
 (async()=>{
@@ -72,7 +74,7 @@ async function fixture(mobile=true,{stale=false,denied=false}={}){
     node('transportGuideDialog').showModal();await pause();
     await back();assert(!node('transportGuideDialog').open);assert(guarded());
     assert.equal(node('areaLegendTitle').getAttribute('aria-expanded'),'true');
-    node('communityReviewsDialog').showModal();await pause();node('communityReviewsDialog').close();await pause();
+    f.activate();node('communityReviewsDialog').showModal();await pause();node('communityReviewsDialog').close();await pause();
     assert(guarded());await back();assert(!guarded());
 
     // Replacing filters with the region list still uses one entry.
@@ -106,7 +108,7 @@ async function fixture(mobile=true,{stale=false,denied=false}={}){
     // Close then immediately open another panel while history.back is pending.
     await action('setMobileLegendExpanded(true)');
     run('setMobileLegendExpanded(false)');await Promise.resolve();
-    run("$('#areaPanel').classList.add('show')");await pause();
+    f.activate();run("$('#areaPanel').classList.add('show')");await pause();await pause();
     assert(node('areaPanel').classList.contains('show'));assert(guarded());
     await back();assert(!node('areaPanel').classList.contains('show'));assert(!guarded());
 

@@ -1,5 +1,5 @@
-// One temporary history entry protects visible panels. It is removed when the
-// last panel closes; the map itself never blocks navigation away from the site.
+// Temporary entries correspond to visible panels, not filter choices. Closing
+// the last panel returns to the original page entry so Back can leave normally.
 (() => {
   function initPanelHistory(){
     const key='viettripPanelBack';
@@ -33,9 +33,14 @@
       add(node.id,node,()=>node.open,()=>node.close());
     });
 
+    const depthOf=value=>{
+      const saved=value?.[key];
+      if(saved===true)return 1; // Clean up entries from the first released version.
+      return Number.isInteger(saved?.depth) && saved.depth>0 ? saved.depth : 0;
+    };
     let layers=[];
-    let armed=history.state?.[key]===true;
-    let removing=false;
+    let depth=depthOf(history.state),capacity=depth;
+    let moving=false,canPush=true;
 
     function readLayers(){
       const visible=definitions.filter(panel=>panel.isOpen());
@@ -45,59 +50,67 @@
       return layers;
     }
 
-    function arm(){
-      if(armed)return;
-      try{
-        // Keep URL/query/hash and any unrelated history state exactly as they are.
-        history.pushState({...history.state,[key]:true},'');
-        armed=true;
-      }catch(error){console.warn('Panel back navigation unavailable',error)}
-    }
-
-    function removeGuard(){
-      if(removing || !armed)return;
-      removing=true;
-      history.back();
+    function moveTo(target){
+      if(moving || target===depth)return;
+      moving=true;
+      history.go(target-depth);
     }
 
     function sync(){
-      readLayers();
-      if(removing)return;
-      if(layers.length)arm();
-      else removeGuard();
+      const wanted=readLayers().length;
+      if(moving || wanted===depth)return;
+      if(wanted<depth){moveTo(wanted);return}
+      if(!canPush){
+        // An open action can race an X/Cancel history traversal. Reuse existing
+        // forward entries; never push from popstate (Chrome can skip those).
+        if(capacity>depth)moveTo(Math.min(wanted,capacity));
+        return;
+      }
+      try{
+        while(depth<wanted){
+          // Preserve URL/query/hash and unrelated state; store no form contents.
+          history.pushState({...history.state,[key]:{depth:depth+1}},'');
+          depth++;
+          capacity=depth;
+        }
+      }catch(error){console.warn('Panel back navigation unavailable',error)}
     }
 
     window.addEventListener('popstate',event=>{
-      const wasArmed=armed;
-      armed=event.state?.[key]===true;
-      if(removing){
-        // The X/Cancel/Escape action already closed the panel. Do not also
-        // dismiss another panel if one opened while history.back() was pending.
-        removing=false;
-        sync();
-        return;
-      }
-      if(wasArmed && !armed){
+      const previous=depth;
+      depth=depthOf(event.state);
+      canPush=false;
+      if(moving){
+        // X/Cancel/Escape already changed the UI. Don't dismiss a replacement
+        // panel which may have opened while this traversal was pending.
+        moving=false;
+      }else if(depth<previous){
         readLayers();
-        const top=layers[layers.length-1];
-        top?.close();
-        // Nested views use the same single entry, so repeated opens never leave
-        // invisible pages to step through. Each Back dismisses only the top view.
-        sync();
-      }else if(armed){
-        // Forward/reload may revisit an entry whose panel has already closed.
-        // Consume that stale entry without reopening forms or losing draft data.
-        sync();
+        while(layers.length>depth){
+          const top=layers[layers.length-1];
+          top.close();
+          readLayers();
+          if(layers.includes(top))break;
+        }
       }
+      // Forward/reload of a stale entry returns to the visible UI depth without
+      // reopening forms. All Back handling traverses existing history only.
+      sync();
     });
 
-    // Observe only app panel attributes, never the changing Google Maps DOM.
+    // Browser history manipulation protection requires a fresh user interaction
+    // before adding entries after Back/Forward. A new click/key enables that.
+    const interaction=()=>{canPush=true;sync()};
+    document.addEventListener('click',interaction,{capture:true,passive:true});
+    document.addEventListener('keydown',interaction,{capture:true,passive:true});
+
+    // Observe app panel attributes only, never the changing Google Maps DOM.
     const observer=new MutationObserver(sync);
     const nodes=new Set(definitions.map(panel=>panel.node));
     if(byId('areaLegendTitle'))nodes.add(byId('areaLegendTitle'));
     nodes.forEach(node=>observer.observe(node,{attributes:true,attributeFilter:['class','open','aria-expanded']}));
     window.addEventListener('resize',sync);
-    window.addEventListener('pageshow',()=>{armed=history.state?.[key]===true;sync()});
+    window.addEventListener('pageshow',()=>{depth=depthOf(history.state);capacity=Math.max(capacity,depth);sync()});
     sync();
   }
   // Loaded last so the existing Grab dialog has been created before observing it.
