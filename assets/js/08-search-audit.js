@@ -674,7 +674,7 @@ function showUserLocation(pos, autoZoom=true){
         fillColor:'#1a73e8',
         fillOpacity:1,
         strokeColor:'#ffffff',
-        strokeWeight:4
+        strokeWeight:1.5
       }
     });
   }else{
@@ -691,7 +691,7 @@ function showUserLocation(pos, autoZoom=true){
       strokeColor:'#1a73e8',
       strokeOpacity:.34,
       strokeWeight:1,
-      clickable:false,
+      clickable:true,
       zIndex:1
     });
   }else{
@@ -699,12 +699,14 @@ function showUserLocation(pos, autoZoom=true){
     state.userAccuracyCircle.setRadius(accuracy);
   }
 
+  state.userLocationInfo={name:'내 현재 위치',type:'브라우저 위치',description:`정확도 약 ±${accuracy}m. 파란 원은 위치 오차 범위입니다.`,...point};
   if(!state.userInfo){
     state.userInfo=new google.maps.InfoWindow();
-    state.userMarker.addListener('click',()=>{
-      state.userInfo.setContent(`<div style="font-weight:800">내 현재 위치</div><div style="font-size:12px;margin-top:3px;color:#5f6368">정확도 약 ±${accuracy}m</div>`);
-      state.userInfo.open({map:state.map,anchor:state.userMarker});
-    });
+    for(const target of [state.userMarker,state.userAccuracyCircle]){
+      target.addListener('mouseover',()=>showPositionHover(state.userMarker.getPosition(),mapFeatureHtml(state.userLocationInfo)));
+      target.addListener('mouseout',hideHover);
+      target.addListener('click',()=>showClickInfo(state.userMarker.getPosition(),mapFeatureHtml(state.userLocationInfo)));
+    }
   }
 
   if(autoZoom){

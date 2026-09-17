@@ -12,16 +12,7 @@ function renderMarkers(){
       zIndex:150,
       icon:businessMarkerIcon(p.category,p.subcategory,st.rating,!!p.memberBenefit,p.benefitText||'')
     });
-    m.addListener('mouseover',()=>{
-      const benefit=p.memberBenefit?`<div style="margin-top:5px;color:#0b8f52;font-size:11px;font-weight:800">회원혜택 · ${esc(p.benefitText||'카페 회원 전용 혜택')}</div>`:'';
-      showHover(m,infoHtml(
-        p.name,
-        `${catLabel(p.category)} · ${p.subcategory}${st.rating==null?'':` · ${st.rating.toFixed(1)}점`}`,
-        p.address||p.description||'',
-        benefit
-      ));
-    });
-    m.addListener('mouseout',hideHover);
+    bindMapFeatureInfo(m,{...p,type:`${catLabel(p.category)} · ${p.subcategory||''}${st.rating==null?'':` · ${st.rating.toFixed(1)}점`}`},{lat:Number(p.lat),lng:Number(p.lng)},null,{click:false});
     m.addListener('click',async ()=>{
       cancelPendingMapWork();
       await selectPlace(p.id,true,false);

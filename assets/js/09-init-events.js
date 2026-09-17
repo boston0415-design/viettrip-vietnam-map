@@ -226,6 +226,7 @@ async function handleGooglePoiClick(event){
     title:place.name||'선택한 업체',
     zIndex:9998
   });
+    bindMapFeatureInfo(state.searchMarker,{...state.searchCandidate,type:'검색한 장소'},pos);
 
   const existing=findRegisteredMatchForSearch(state.searchCandidate);
 

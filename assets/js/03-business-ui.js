@@ -1,12 +1,20 @@
 // One consistent outline icon family for business cards and map pins.
 function businessGlyphPath(category){
   const paths={
-    restaurant:'M5 3v7m3-7v7M3 6h7M6.5 10v11M17 3v18m0-18c-4 3-4 9 0 9',
-    stay:'M3 20V7h18v13M3 14h18M7 10h3m4 0h3M6 20v-3m12 3v-3',
+    restaurant:'M3 3v5a3 3 0 0 0 6 0V3M6 3v18M18 3v18m0-18c-4 2-5 9 0 9',
+    stay:'M3 19V7m18 12V7M3 16h18M3 11h18v5M6 11V8h4v3m4 0V8h4v3',
     spa:'M12 21C3 18 2 11 4 8c4 0 7 4 8 8 1-4 4-8 8-8 2 3 1 10-8 13ZM12 15c-4-4-4-8 0-12 4 4 4 8 0 12',
     cafe:'M4 5h12v9a5 5 0 0 1-10 0V5m10 1h2a3 3 0 0 1 0 6h-2M3 21h17',
     karaoke:'m9 14 5-5M6 17l-3 4m5-7-3 3 3 3 3-3m0-13a5 5 0 1 1 7 7l-7-7Z',
     shopping:'M4 8h16l-1 13H5L4 8Zm4 0V6a4 4 0 0 1 8 0v2',
+    market:'M3 10h18l-2-6H5l-2 6Zm2 0v11h14V10M9 21v-7h6v7M2 10c0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0',
+    attraction:'M3 10h18L12 3 3 10Zm2 3v7m5-7v7m4-7v7m5-7v7M2 22h20',
+    golf:'M7 20V3l12 4-12 5M4 21c-3 3 15 3 15 0',
+    airport:'m3 14 7-4V4c0-3 4-3 4 0v6l7 4v3l-7-2v4l3 2H7l3-2v-4l-7 2v-3Z',
+    taxi:'m4 9 2-5h12l2 5M3 9h18v9H3V9Zm2 9v3m14-3v3M6 13h2m8 0h2M10 2h4',
+    train:'M6 3h12v15H6V3Zm0 8h12M9 6h6M9 15h.01M15 15h.01M8 18l-3 4m11-4 3 4M7 21h10',
+    home:'m2 11 10-8 10 8M5 9v12h14V9m-9 12v-7h4v7',
+    hospital:'M8 3h8v5h5v8h-5v5H8v-5H3V8h5V3Z',
     bar:'M4 3h16l-8 10L4 3Zm8 10v8m-5 0h10'
   };
   return paths[category]||'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0ZM9 10a3 3 0 1 0 6 0 3 3 0 1 0-6 0';
@@ -22,50 +30,13 @@ function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,bene
 
   const score=r==null?'':r.toFixed(1);
 
-  const markerBadge = memberBenefit ? `
-      <g transform="translate(30,1)">
-        <path d="M3 3 H14.6 L18 6.4 V14.2 C18 15.2 17.2 16 16.2 16 H3.8 C2.8 16 2 15.2 2 14.2 V4.8 C2 3.8 2.8 3 3.8 3 Z"
-          fill="#f59e0b" stroke="#ffffff" stroke-width="2" />
-        <circle cx="13.9" cy="6.8" r="1.3" fill="#fff3df"/>
-        <path d="M6.1 12.9 L13.8 6.4" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round"/>
-        <circle cx="6.2" cy="7.5" r="1.3" fill="none" stroke="#ffffff" stroke-width="1.4"/>
-        <circle cx="13.7" cy="11.7" r="1.3" fill="none" stroke="#ffffff" stroke-width="1.4"/>
-      </g>` : '';
-
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="56" height="62" viewBox="0 0 56 62">
-    <defs>
-      <filter id="s" x="-40%" y="-40%" width="180%" height="180%">
-        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity=".28"/>
-      </filter>
-    </defs>
-
-    <g filter="url(#s)" transform="translate(2,4)">
-      <path d="M26 2C13.3 2 3 12.3 3 25c0 17.2 23 31 23 31s23-13.8 23-31C49 12.3 38.7 2 26 2z"
-        fill="${color}" stroke="#fff" stroke-width="3"/>
-
-      ${markerBadge}
-
-      <circle cx="26" cy="25" r="15.5" fill="rgba(255,255,255,.98)"/>
-      <g transform="translate(15,14) scale(.92)" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>
-
-      ${score?`
-        <rect x="31" y="39" rx="7" ry="7" width="20" height="14"
-          fill="#111827" stroke="#fff" stroke-width="1.5"/>
-        <text x="41" y="49"
-          text-anchor="middle"
-          font-size="8.5"
-          font-weight="700"
-          fill="#fff"
-          font-family="Arial,sans-serif">${score}</text>
-      `:''}
-    </g>
-  </svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="0 0 48 56"><path d="M24 3C13 3 5 11 5 22c0 12 19 26 19 26s19-14 19-26C43 11 35 3 24 3Z" fill="white" stroke="${color}" stroke-width="1.6"/><g transform="translate(13,11) scale(.92)" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(category)}"/></g>${memberBenefit?'<circle cx="39" cy="8" r="7" fill="#087f5b"/><text x="39" y="11" text-anchor="middle" font-size="9" fill="white">%</text>':''}${score?`<rect x="27" y="37" width="20" height="14" rx="7" fill="#173247"/><text x="37" y="47" text-anchor="middle" font-family="Arial" font-size="9" fill="white">${score}</text>`:''}</svg>`;
 
   return {
     url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),
-    scaledSize:new google.maps.Size(51,57),
-    anchor:new google.maps.Point(25.5,55),
-    labelOrigin:new google.maps.Point(26,29)
+    scaledSize:new google.maps.Size(44,51.333),
+    anchor:new google.maps.Point(22,44),
+    labelOrigin:new google.maps.Point(22,22)
   };
 }
 
@@ -506,6 +477,7 @@ function searchMap(){
       title:place.name,
       zIndex:9998
     });
+    bindMapFeatureInfo(state.searchMarker,{...state.searchCandidate,type:'검색한 장소'},pos);
 
     cancelPendingMapWork();
     focusLocationAtZoom(pos,17);

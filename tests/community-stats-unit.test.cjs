@@ -15,10 +15,10 @@ async function load({fail=false,blocked=false,host='viettrip-vietnam-map.pages.d
 }
 (async()=>{
  let result=await load();assert.equal(result.totalVisits.textContent,'1');assert.equal(result.totalPlaces.textContent,'1,234');assert.equal(result.totalReviews.textContent,'5,678');
- await load();assert.equal(visits.size,1,'reload uses same token');
- sessions.clear();result=await load();assert.equal(result.totalVisits.textContent,'2','new session counts');
- result=await load({blocked:true});assert.equal(result.totalVisits.textContent,'2','blocked storage never inflates');
- sessions.clear();await load({host:'preview.pages.dev'});assert.equal(visits.size,2,'previews excluded');
+ await load();assert.equal(visits.size,2,'reload is a new page view');
+ sessions.clear();result=await load();assert.equal(result.totalVisits.textContent,'3','new session counts');
+ result=await load({blocked:true});assert.equal(result.totalVisits.textContent,'4','blocked storage still counts page view');
+ sessions.clear();await load({host:'preview.pages.dev'});assert.equal(visits.size,4,'previews excluded');
  result=await load({fail:true});assert.equal(result.totalVisits.textContent,'—');assert.equal(result.totalPlaces.textContent,'—');
- console.log('PASS statistics: exact totals, reload deduplication, new session, blocked storage, previews, network failure');
+ console.log('PASS statistics: exact totals, reload increments, new session, blocked storage, previews, network failure');
 })().catch(e=>{console.error(e);process.exitCode=1});
