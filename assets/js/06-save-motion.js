@@ -665,8 +665,7 @@ function showCityRange(key,selectionKey=`city:${key}`){
 }
 
 function showBusinessRange(categoryId,subId='all'){
-  const key=`business:${state.city}:${categoryId}:${subId}`;
-  return toggleSelectionRange(key,()=>drawCityRange(state.city));
+  return focusBusinessCategory(categoryId,subId);
 }
 
 function showAreaRange(area){
@@ -696,7 +695,10 @@ function showTypeRanges(type){
   clearSelectionRanges();
   clearAreaLabels();
 
-  if(!areas.length){
+  const category=({'시장':'market','관광명소':'attraction'})[type];
+  const registered=category?items().filter(p=>p.category===category && validMapLocation(p)):[];
+  state.rangeSelectionKey=`type:${state.city}:${type}`;
+  if(!areas.length && !registered.length){
     setDbStatus('이 분류의 범위 정보가 아직 없습니다.');
     return false;
   }
@@ -713,7 +715,9 @@ function showTypeRanges(type){
     }
   });
 
+  if(category)extendRegisteredBounds(bounds,category);
   state.rangeSelectionKey=`type:${state.city}:${type}`;
+  refreshRegisteredCoverage();
   fitUnifiedBounds(bounds,{padding:82,maxZoom:16});
   return true;
 }
@@ -733,6 +737,8 @@ function jumpToPopularArea(name,openPanel=false){
   cancelPendingMapWork();
   const area=getPopularArea(name);
   if(!area || !state.map)return;
+
+  selectSystemFeature(normalizeAreaType(area),name);
 
   // 범위형 항목은 모든 도시에서 동일하게: 범위만 표시, 설명 팝업 없음.
   closeSystemInfo();
@@ -794,7 +800,7 @@ function createSelectedPoiMarker(p,location,clearExisting=true){
 }
 
 function resolvePoiLocation(p,done){
-  if(Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng))){
+  if(validMapLocation(p)){
     done({lat:Number(p.lat),lng:Number(p.lng)});
     return;
   }

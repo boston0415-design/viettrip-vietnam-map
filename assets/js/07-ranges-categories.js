@@ -149,7 +149,9 @@ function categoryRangeColor(categoryId){
     cafe:'#b7791f',
     shopping:'#db2777',
     bar:'#6366f1',
-    golf:'#15803d'
+    golf:'#15803d',
+    market:'#8b5cf6',
+    attraction:'#10b981'
   })[categoryId]||'#475569';
 }
 
@@ -161,7 +163,10 @@ function businessCircleRadius(categoryId){
     karaoke:120,
     cafe:100,
     shopping:130,
-    bar:120
+    bar:120,
+    market:130,
+    attraction:150,
+    golf:180
   })[categoryId]||110;
 }
 
@@ -321,27 +326,60 @@ async function showPointSet(points,typeForCoverage=null){
   state.rangeSelectionKey=`points:${state.city}:${typeForCoverage||'mixed'}`;
 }
 
-function addRegisteredBusinessCoverage(categoryId,subId='all'){
-  const color=categoryRangeColor(categoryId);
-  const radius=businessCircleRadius(categoryId);
+function matchesNavigationScope(p){
+  const def=navDef(state.navCategory);
+  if(!def)return true;
+  const category=def.kind==='business'?def.id:({shopping:'shopping','market-nav':'market','attraction-nav':'attraction','golf-nav':'golf'})[def.id];
+  // Infrastructure and named map features have no registered-business category.
+  if(!category)return false;
+  if(p.category!==category)return false;
+  const selected=state.selectedNavItem;
+  if(def.kind!=='business' && selected && !['all','__all__'].includes(selected)){
+    return normalizePlaceName(p.name||'')===normalizePlaceName(selected);
+  }
+  return true;
+}
 
-  placesForCurrentCity()
-    .filter(p=>
-      p.category===categoryId &&
-      (subId==='all'||normalizedRestaurantSub(p.subcategory)===subId||p.subcategory===subId) &&
-      (categoryId!=='restaurant'||state.restaurantTag==='all'||hasRestaurantTag(p,state.restaurantTag))
-    )
-    .forEach(p=>{
-      if(Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng))){
-        addSelectionCircle(
-          {lat:Number(p.lat),lng:Number(p.lng)},
-          radius,
-          color,
-          .065,
-          .68
-        );
-      }
-    });
+function selectSystemFeature(type,name){
+  const def=NAV_CATEGORIES.find(d=>d.type===type || (d.kind==='airport' && ['터미널','그랩승차','택시승차'].includes(type)));
+  state.navCategory=def?.id||null;
+  state.selectedNavItem=name;
+  state.cat=type==='쇼핑'?'shopping':'all';
+  state.sub='all';
+  state.areaType=def?.type||type;
+  resetIndependentBusinessFilters();
+  clearSelectionRanges();
+  clearSelectedSystemIcons();
+  renderAll();
+  renderHierarchyNav();
+}
+
+function refreshRegisteredCoverage(){
+  (state.selectionOverlays||[]).filter(o=>o._registeredCoverage).forEach(o=>o.setMap(null));
+  state.selectionOverlays=(state.selectionOverlays||[]).filter(o=>!o._registeredCoverage);
+  if(!state.map || !state.rangeSelectionKey)return;
+  const key=state.rangeSelectionKey;
+  if(!/^(business|shopping|golf|type):/.test(key))return;
+  const def=navDef(state.navCategory);
+  if(key.startsWith('type:') && !['market-nav','attraction-nav'].includes(def?.id))return;
+  if(key.startsWith('golf:') && !key.endsWith(':all'))return;
+  items().forEach(p=>{
+    const loc=validMapLocation(p);
+    if(!loc)return;
+    const circle=addSelectionCircle(loc,businessCircleRadius(p.category),categoryRangeColor(p.category),.065,.68);
+    if(circle)circle._registeredCoverage=true;
+  });
+}
+
+function extendRegisteredBounds(bounds,categoryId){
+  let count=0;
+  items().filter(p=>p.category===categoryId).forEach(p=>{
+    const loc=validMapLocation(p);
+    if(!loc)return;
+    extendBoundsByCircle(bounds,loc,businessCircleRadius(categoryId));
+    count++;
+  });
+  return count;
 }
 
 
@@ -359,7 +397,7 @@ async function showShoppingCategory(){
   renderAll();
 
   const systemPoints=currentPoints().filter(p=>p.type==='쇼핑');
-  const registered=placesForCurrentCity().filter(p=>p.category==='shopping');
+  const registered=items().filter(p=>p.category==='shopping');
 
   const token=(state.mapActionToken||0)+1;
   state.mapActionToken=token;
@@ -385,9 +423,10 @@ async function showShoppingCategory(){
   const radius=businessCircleRadius('shopping');
 
   registered.forEach(p=>{
-    if(Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng))){
+    if(validMapLocation(p)){
       const loc={lat:Number(p.lat),lng:Number(p.lng)};
-      addSelectionCircle(loc,radius,color,.065,.68);
+      const circle=addSelectionCircle(loc,radius,color,.065,.68);
+      if(circle)circle._registeredCoverage=true;
       extendBoundsByCircle(bounds,loc,radius);
       shown++;
     }
@@ -537,7 +576,8 @@ async function showGolfCategory(){
   if(state.clickInfo){state.clickInfo.close();state.clickInfo=null}
 
   const golf=currentGolf();
-  if(!golf.length){
+  state.rangeSelectionKey=`golf:${state.city}:all`;
+  if(!golf.length && !items().some(p=>p.category==='golf')){
     setDbStatus('이 지역의 골프장 정보가 아직 없습니다.');
     return;
   }
@@ -572,6 +612,9 @@ async function showGolfCategory(){
     shown++;
   });
 
+  shown+=extendRegisteredBounds(bounds,'golf');
+  state.rangeSelectionKey=`golf:${state.city}:all`;
+  refreshRegisteredCoverage();
   if(shown){
     fitUnifiedBounds(bounds,{padding:82,maxZoom:16});
     setDbStatus(
@@ -598,13 +641,11 @@ function focusBusinessCategory(categoryId,subId='all'){
 
   state.cat=categoryId;
   state.sub=subId;
+  state.rangeSelectionKey=`business:${state.city}:${categoryId}:${subId}:${categoryId==='restaurant'?state.restaurantTag:'all'}`;
   renderAll();
+  // renderAll builds coverage from the same filtered items; the loop below only fits bounds.
 
-  const places=placesForCurrentCity().filter(p=>
-    p.category===categoryId &&
-    (subId==='all' || normalizedRestaurantSub(p.subcategory)===subId || p.subcategory===subId) &&
-    (categoryId!=='restaurant' || state.restaurantTag==='all' || hasRestaurantTag(p,state.restaurantTag))
-  );
+  const places=items();
 
   if(!places.length){
     setDbStatus('이 분류에 등록된 업체가 아직 없습니다.');
@@ -617,9 +658,8 @@ function focusBusinessCategory(categoryId,subId='all'){
   let shown=0;
 
   places.forEach(p=>{
-    if(Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng))){
+    if(validMapLocation(p)){
       const loc={lat:Number(p.lat),lng:Number(p.lng)};
-      addSelectionCircle(loc,radius,color,.065,.68);
       extendBoundsByCircle(bounds,loc,radius);
       shown++;
     }
@@ -637,7 +677,7 @@ function focusBusinessCategory(categoryId,subId='all'){
 }
 
 function resolveGolfLocation(g,done){
-  if(Number.isFinite(Number(g.lat)) && Number.isFinite(Number(g.lng))){
+  if(validMapLocation(g)){
     done({lat:Number(g.lat),lng:Number(g.lng)});
     return;
   }
@@ -702,6 +742,8 @@ async function jumpToGolf(name){
     return;
   }
 
+  selectSystemFeature('골프장',name);
+
   clearSelectedSystemIcons();
   hideHover();
   if(state.clickInfo){state.clickInfo.close();state.clickInfo=null}
@@ -748,6 +790,8 @@ function jumpToPoi(name){
     setDbStatus('지도가 아직 준비되지 않았습니다.');
     return;
   }
+
+  selectSystemFeature(p.type,name);
 
   clearSelectedSystemIcons();
   closeSystemInfo();

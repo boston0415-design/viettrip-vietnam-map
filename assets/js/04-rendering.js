@@ -3,6 +3,7 @@ function renderMarkers(){
   clearPremiumEffects();
   if(!state.map)return;
   items().forEach(p=>{
+    if(!validMapLocation(p))return;
     const st=stats(p.id);
     const m=new google.maps.Marker({
       map:state.map,
@@ -392,7 +393,7 @@ function renderDetail(){
   if($('#adminDeleteBtn')) $('#adminDeleteBtn').onclick=()=>adminDeletePlace(p.id);
   if($('#clearDeleteRequestBtn')) $('#clearDeleteRequestBtn').onclick=()=>adminClearDeleteRequest(p.id);
 }
-function renderAll(){renderCats();renderList();renderMarkers();renderGolfCourses();renderPoiMarkers();renderDetail()}
+function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail()}
 async function selectPlace(id,pan=true,showInfo=false){
   closeSystemInfo();
   state.selected=id;
@@ -597,3 +598,4 @@ function getGooglePlaceDetails(placeId){
     });
   });
 }
+

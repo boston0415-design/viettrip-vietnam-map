@@ -186,6 +186,12 @@ const CITY_PLACE_ALIASES={
   muine:['무이네','mui ne','mũi né','phan thiet','phan thiết']
 };
 
+function validMapLocation(p){
+  if(p?.lat==null || p?.lng==null || String(p.lat).trim()==='' || String(p.lng).trim()==='')return null;
+  const lat=Number(p.lat),lng=Number(p.lng);
+  return Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180?{lat,lng}:null;
+}
+
 function geoDistanceMeters(a,b){
   const lat1=Number(a?.lat),lng1=Number(a?.lng),lat2=Number(b?.lat),lng2=Number(b?.lng);
   if(![lat1,lng1,lat2,lng2].every(Number.isFinite))return Infinity;
@@ -531,3 +537,4 @@ function findAddressLocation(){
     }
   });
 }
+

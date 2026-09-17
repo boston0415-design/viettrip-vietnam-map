@@ -298,6 +298,7 @@ function items(){
   let arr=placesForCurrentCity()
     .filter(p=>CONFIG.categories[p.category] && p.subcategory!=='프라이빗 룸')
     .map(p=>({...p,...stats(p.id)}));
+  arr=arr.filter(matchesNavigationScope);
   if(state.cat!=='all')arr=arr.filter(p=>p.category===state.cat);
   if(state.sub!=='all')arr=arr.filter(p=>normalizedRestaurantSub(p.subcategory)===state.sub || p.subcategory===state.sub);
   if(state.cat==='restaurant' && state.restaurantTag!=='all')arr=arr.filter(p=>hasRestaurantTag(p,state.restaurantTag));
@@ -525,10 +526,16 @@ function renderCats(){
   $('#cats').innerHTML=cats.map(([id,l])=>`<button class="chip ${state.cat===id?'active':''}" data-cat="${id}">${l}</button>`).join('');
   document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{
     resetIndependentBusinessFilters();
-    state.cat=b.dataset.cat;
-    state.sub='all';
-    renderAll();
-    if(state.cat==='golf')setTimeout(fitGolfBounds,0);
+    state.navCategory=null;
+    state.selectedNavItem=null;
+    if(b.dataset.cat==='all'){
+      cancelPendingMapWork();
+      clearSelectionRanges();
+      clearSelectedSystemIcons();
+      state.cat='all';state.sub='all';
+      renderAll();
+    }else focusBusinessCategory(b.dataset.cat,'all');
+    renderHierarchyNav();
   });
   if(state.cat==='all')$('#subs').innerHTML='';
   else{
@@ -537,8 +544,9 @@ function renderCats(){
     $('#subs').innerHTML=subs.map((s,i)=>`<button class="chip subchip ${state.sub===(i===0?'all':s)?'active':''}" data-sub="${i===0?'all':s}">${s}</button>`).join('');
     document.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{
       resetIndependentBusinessFilters();
-      state.sub=b.dataset.sub;
-      renderAll();
+      state.selectedNavItem=null;
+      focusBusinessCategory(state.cat,b.dataset.sub);
+      renderHierarchyNav();
     });
   }
 }
@@ -613,3 +621,4 @@ function startPremiumPulse(){
     });
   },90);
 }
+

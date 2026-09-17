@@ -179,6 +179,8 @@ function renderHierarchyNav(){
         state.cat='all';
         state.sub='all';
         state.areaType=def?.type||'all';
+        clearSelectedSystemIcons();
+        renderAll();
 
         if(def?.kind==='area'){
           if(state.clickInfo){
@@ -289,10 +291,11 @@ function renderHierarchyNav(){
     btn.addEventListener('click',()=>{
       cancelPendingMapWork();
       const value=btn.dataset.navArea;
-      const wasSelected=state.selectedNavItem===value;
-      state.selectedNavItem=wasSelected ? null : value;
+      state.selectedNavItem=value;
       renderHierarchyNav();
 
+      clearSelectionRanges();
+      renderAll();
       clearSelectedSystemIcons();
       jumpToPopularArea(value,false);
     });
@@ -325,6 +328,7 @@ function renderHierarchyNav(){
         clearSelectedSystemIcons();
       }
 
+      renderAll();
       jumpToPoi(pointName);
     });
   });
@@ -335,6 +339,7 @@ function renderHierarchyNav(){
       const golfName=btn.dataset.navGolf;
       state.selectedNavItem=golfName;
       renderHierarchyNav();
+      renderAll();
       setDbStatus(`${golfName} 선택 중…`);
       jumpToGolf(golfName);
     });
@@ -366,17 +371,18 @@ function fitSelectedCityView(key){
   if(!state.map || !CITY_DATA[key])return;
 
   const city=CITY_DATA[key];
-  const areas=(city.areas||[]);
-  const points=(city.points||[]);
+  const extra=EXTRA_DATA[key]||{};
+  const areas=[...(city.areas||[]),...(extra.zones||[])];
+  const points=extra.points||[];
   const golf=(city.golf||[]);
 
   const bounds=new google.maps.LatLngBounds();
   let hasGeometry=false;
 
   const extendPoint=(pt)=>{
-    const lat=Number(pt?.lat),lng=Number(pt?.lng);
-    if(Number.isFinite(lat)&&Number.isFinite(lng)){
-      bounds.extend({lat,lng});
+    const location=validMapLocation(pt);
+    if(location){
+      bounds.extend(location);
       hasGeometry=true;
     }
   };
@@ -385,6 +391,9 @@ function fitSelectedCityView(key){
 
   areas.forEach(a=>{
     if(a.center)extendPoint(a.center);
+    if(a.kind==='circle' && validMapLocation(a.center) && Number(a.radius)>0){
+      extendBoundsByCircle(bounds,a.center,a.radius);
+    }
     if(Array.isArray(a.path))a.path.forEach(extendPoint);
   });
 
@@ -451,7 +460,17 @@ function renderAreaList(){
   ).join('');
   document.querySelectorAll('[data-area-type]').forEach(btn=>{
     btn.addEventListener('click',()=>{
+      cancelPendingMapWork();
+      resetIndependentBusinessFilters();
       state.areaType=btn.dataset.areaType;
+      const def=NAV_CATEGORIES.find(d=>d.type===state.areaType);
+      state.navCategory=def?.id||null;
+      state.selectedNavItem=null;
+      state.cat='all';state.sub='all';
+      clearSelectedSystemIcons();
+      clearSelectionRanges();
+      renderAll();
+      renderHierarchyNav();
       if(state.clickInfo){
         state.clickInfo.close();
         state.clickInfo=null;
@@ -459,7 +478,7 @@ function renderAreaList(){
       $('#areaPanelTitle').textContent=`${currentCity().label} · ${AREA_TYPES.find(x=>x[0]===state.areaType)?.[1]||state.areaType}`;
       renderAreaList();
 
-      if(['거리','시장','관광명소'].includes(state.areaType)){
+      if(['거리','시장','관광명소','한인생활권'].includes(state.areaType)){
         clearSelectedSystemIcons();
         showTypeRanges(state.areaType);
       }else if(state.areaType==='골프장'){
@@ -493,7 +512,7 @@ function renderAreaList(){
   });
 
   currentPoints().forEach(p=>{
-    const airportFamily=['공항','그랩승차','택시승차','터미널'].includes(p.type);
+    const airportFamily=isAirportMainPoint(p)||isAirportTerminalPoint(p)||['그랩승차','택시승차'].includes(p.type);
     allRows.push({
       kind:'point',
       name:p.name,
