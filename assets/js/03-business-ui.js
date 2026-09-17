@@ -2,6 +2,7 @@
 // Vendored as paths: no icon font or remote requests. See assets/licenses/material-symbols-NOTICE.txt.
 // The massage symbol is a project-drawn single sole, using the same coordinate system.
 const MAP_SYMBOL_PATHS={
+  "directions_boat": "M158-200 82-468q-3-12 2.5-28t23.5-22l52-18v-184q0-33 23.5-56.5T240-800h120v-80q0-17 11.5-28.5T400-920h160q17 0 28.5 11.5T600-880v80h120q33 0 56.5 23.5T800-720v184l52 18q21 8 25 23.5t1 26.5l-76 268q-40 0-74-15.5T666-255q-11-11-26-11t-26 11q-28 24-62 39.5T480-200q-10 0-19-1t-18-3q-29-6-55-21t-48-35q-8-8-20.5-8t-20.5 8q-28 27-65 43.5T158-200ZM480-40q-41 0-81.5-10T320-80q-38 20-78 30t-82 10h-40q-17 0-28.5-11.5T80-80q0-17 11.5-28.5T120-120h40q36 0 72-10t67-29q10-6 21-6t21 6q22 14 50.5 23t54.5 12q8 1 17 1.5t17 .5q36 0 72-9t67-28q10-6 21-6t21 6q31 20 67 29.5t72 9.5h40q17 0 28.5 11.5T880-80q0 17-11.5 28.5T840-40h-40q-42 0-82-10t-78-30q-38 20-78.5 30T480-40ZM240-562l215-70q12-4 25-4t25 4l215 70v-158H240v158Z",
   "headphones": "M280-120h-80q-33 0-56.5-23.5T120-200v-280q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-480v280q0 33-23.5 56.5T760-120h-80q-33 0-56.5-23.5T600-200v-160q0-33 23.5-56.5T680-440h80v-40q0-117-81.5-198.5T480-760q-117 0-198.5 81.5T200-480v40h80q33 0 56.5 23.5T360-360v160q0 33-23.5 56.5T280-120Z",
   "restaurant": "M280-600v-240q0-17 11.5-28.5T320-880q17 0 28.5 11.5T360-840v240h40v-240q0-17 11.5-28.5T440-880q17 0 28.5 11.5T480-840v240q0 56-34.5 98T360-446v326q0 17-11.5 28.5T320-80q-17 0-28.5-11.5T280-120v-326q-51-14-85.5-56T160-600v-240q0-17 11.5-28.5T200-880q17 0 28.5 11.5T240-840v240h40Zm400 200h-80q-17 0-28.5-11.5T560-440v-240q0-70 51.5-135T718-880q18 0 30 14t12 33v713q0 17-11.5 28.5T720-80q-17 0-28.5-11.5T680-120v-280Z",
   "bed": "M80-240v-200q0-27 11-49t29-39v-112q0-50 35-85t85-35h160q23 0 43 8.5t37 23.5q17-15 37-23.5t43-8.5h160q50 0 85 35t35 85v112q18 17 29 39t11 49v200q0 17-11.5 28.5T840-200q-17 0-28.5-11.5T800-240v-40H160v40q0 17-11.5 28.5T120-200q-17 0-28.5-11.5T80-240Zm440-320h240v-80q0-17-11.5-28.5T720-680H560q-17 0-28.5 11.5T520-640v80Zm-320 0h240v-80q0-17-11.5-28.5T400-680H240q-17 0-28.5 11.5T200-640v80Z",
@@ -41,7 +42,7 @@ function businessSymbolKey(category,subcategory=''){
     if(/해변|beach/i.test(sub))return 'beach_access';
     if(/공원|park/i.test(sub))return 'park';
   }
-  return ({restaurant:'restaurant',stay:'bed',spa:'massage',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',train:'train',home:'home',hospital:'local_hospital'})[category]||'location_on';
+  return ({restaurant:'restaurant',stay:'bed',spa:'massage',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',boat:'directions_boat',train:'train',home:'home',hospital:'local_hospital'})[category]||'location_on';
 }
 
 function businessGlyphPath(category,subcategory=''){

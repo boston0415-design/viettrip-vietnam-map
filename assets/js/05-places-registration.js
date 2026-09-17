@@ -274,6 +274,8 @@ function poiColor(type){
     '택시승차':'#f59e0b',
     '그린SM승차':'#089b9a',
     '버스승차':'#334eb7',
+    '유람선·수상버스':'#087f9c',
+    '시티투어 버스':'#b45309',
     '전철역':'#6366f1',
     '기차역':'#4f46e5',
     '한인생활권':'#16a34a',
@@ -282,7 +284,7 @@ function poiColor(type){
   })[type]||'#475569';
 }
 function poiSvg(type,label,hover=false){
-  const categories={'공항':'airport','터미널':'airport','그랩승차':'taxi','택시승차':'taxi','그린SM승차':'taxi','버스승차':'bus','전철역':'train','기차역':'train','한인생활권':'home','병원':'hospital','쇼핑':'shopping'};
+  const categories={'공항':'airport','터미널':'airport','그랩승차':'taxi','택시승차':'taxi','그린SM승차':'taxi','버스승차':'bus','유람선·수상버스':'boat','시티투어 버스':'bus','전철역':'train','기차역':'train','한인생활권':'home','병원':'hospital','쇼핑':'shopping'};
   if(type==='그린SM승차'){
     const svg='<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="12.5" fill="#089b9a" stroke="white" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="700" font-size="12">SM</text></svg>';
     return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
@@ -292,11 +294,13 @@ function poiSvg(type,label,hover=false){
 
 // One information layout for registered places, system POIs and geographic ranges.
 function mapFeatureDirectionsHtml(feature){
+  const boarding=['유람선·수상버스','시티투어 버스'].includes(feature.type);
   const pickup=['그랩승차','택시승차','그린SM승차','버스승차'].includes(feature.type) || (feature.type==='공항' && /승차/.test(feature.name||''));
-  const url=businessDirectionsUrl(feature,{travelmode:pickup?'walking':undefined});
+  const url=businessDirectionsUrl(feature,{travelmode:(pickup||boarding)?'walking':undefined});
   if(!url)return '';
-  const label=pickup?'현재 위치에서 걸어가기':'현재 위치에서 길찾기';
-  return `<div class="mapDirectionsActions"><a class="mapDirectionsButton" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(feature.name||'선택한 위치')} ${label} · 구글 지도 새 창"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-8a4 4 0 0 1 4-4h10M14 3l5 5-5 5"/></svg>${label}</a>${pickup?'<p class="mapDirectionsNote">실제 승차 지점은 현장 표지와 호출 앱 안내를 확인하세요.</p>':''}</div>`;
+  const label=(pickup||boarding)?'현재 위치에서 걸어가기':'현재 위치에서 길찾기';
+  const note=boarding?'실제 탑승 지점은 예약 안내와 현장 표지를 확인하세요.':pickup?'실제 승차 지점은 현장 표지와 호출 앱 안내를 확인하세요.':'';
+  return `<div class="mapDirectionsActions"><a class="mapDirectionsButton" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(feature.name||'선택한 위치')} ${label} · 구글 지도 새 창"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-8a4 4 0 0 1 4-4h10M14 3l5 5-5 5"/></svg>${label}</a>${note?`<p class="mapDirectionsNote">${note}</p>`:''}</div>`;
 }
 function mapFeatureHtml(feature={},radius=null,{directions=false}={}){
   const name=feature.name||feature.label||'선택한 위치';

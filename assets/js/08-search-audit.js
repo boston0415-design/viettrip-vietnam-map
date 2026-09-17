@@ -493,7 +493,7 @@ function renderAreaList(){
         showAirportCategory();
       }else if(state.areaType==='전철역'){
         showMetroCategory();
-      }else if(['기차역','병원'].includes(state.areaType)){
+      }else if(def?.kind==='point'){
         showPointCategory(state.areaType);
       }else if(state.areaType==='all'){
         clearSelectedSystemIcons();
@@ -525,7 +525,7 @@ function renderAreaList(){
       type:airportFamily?'공항':p.type,
       actualType:p.type,
       desc:p.desc,
-      icon:p.icon||'•'
+      icon:p.type==='유람선·수상버스'?businessGlyph('boat'):p.type==='시티투어 버스'?businessGlyph('bus'):p.icon||'•'
     });
   });
 
@@ -541,7 +541,7 @@ function renderAreaList(){
 
   const filtered=state.areaType==='all'?allRows:allRows.filter(r=>r.type===state.areaType);
 
-  const order=['거리','시장','공항','전철역','기차역','한인생활권','병원','관광명소','골프장'];
+  const order=['거리','시장','공항','전철역','기차역','유람선·수상버스','시티투어 버스','한인생활권','병원','관광명소','골프장'];
   const sections=order.map(type=>[type,filtered.filter(r=>r.type===type)]).filter(([,rows])=>rows.length);
 
   $('#areaList').innerHTML=sections.length?sections.map(([type,rows])=>`

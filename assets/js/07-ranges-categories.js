@@ -190,7 +190,7 @@ function airportMainRadius(p){
 function pointCircleRadius(type,p=null){
   if(type==='공항') return airportMainRadius(p);
   if(type==='터미널') return 180;
-  if(['그랩승차','택시승차','그린SM승차','버스승차'].includes(type)) return 90;
+  if(['그랩승차','택시승차','그린SM승차','버스승차','유람선·수상버스','시티투어 버스'].includes(type)) return 90;
   if(type==='전철역') return 420;
   if(type==='기차역') return 220;
   if(type==='병원') return 170;

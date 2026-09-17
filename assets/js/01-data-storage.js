@@ -189,6 +189,10 @@ const EXTRA_DATA={
       {name:'2군 타오디엔 · 안푸',type:'한인생활권',desc:'타오디엔·안푸 중심의 외국인·한국인 생활권. 카페, 국제학교, 레스토랑, 아파트가 많음.',kind:'circle',center:{lat:10.80680,lng:106.73120},radius:1100,zoom:15,color:'#22c55e'}
     ],
     points:[
+      {name:'사이공 프린세스 · 디너 유람선 승선',type:'유람선·수상버스',lat:10.76742,lng:106.70766,address:'Saigon Port, 5 Nguyễn Tất Thành, Ho Chi Minh City, Vietnam',desc:'사이공강 디너 크루즈 Saigon Princess의 승선 항구입니다. 예약 확인서에서 날짜·집결시간·식사 포함 상품을 확인하고 항구 입구에서 승선 안내를 받으세요.',locationNote:'항구 주변 안내 위치입니다. 예약 사무실과 승선 항구는 다르므로 5 Nguyễn Tất Thành 주소를 확인하세요.',sourceUrl:'https://www.saigonprincess.com.vn/contact',sourceLabel:'Saigon Princess 공식 승선 항구 안내',verifiedOn:'2026-09-18'},
+      {name:'바익당 선착장 · 사이공 워터버스',type:'유람선·수상버스',address:'Saigon Waterbus Station, 10B Tôn Đức Thắng, Ho Chi Minh City, Vietnam',desc:'바익당(Bạch Đằng) 선착장에서 사이공 워터버스를 탈 수 있습니다. 출발·도착 선착장과 편도/돌아오는 편을 확인한 뒤 표를 구매하세요. 정기 수상버스이므로 식사가 포함된 디너 유람선과는 다른 상품입니다.',locationNote:'10B Tôn Đức Thắng의 Waterbus 매표·승선 안내를 찾으세요. 운항 여부와 시간표는 출발 전에 확인하세요.',sourceUrl:'https://saigonwaterbus.com/ben-tau-bach-dang',sourceLabel:'Saigon Waterbus 공식 선착장 안내',verifiedOn:'2026-09-18'},
+      {name:'시티투어 버스 · 중앙우체국 낮 출발',type:'시티투어 버스',lat:10.779487,lng:106.699794,address:'Saigon Central Post Office, Ho Chi Minh City, Vietnam',desc:'Ảnh Việt Hop On–Hop Off의 호치민 1회 순환 낮 투어 출발지입니다. 중앙우체국 앞에서 예약한 운영사와 표를 확인하세요. 1회 순환권과 자유 승하차권은 이용 방식이 다르며, 야간 투어 출발지는 응우옌후에 거리입니다.',locationNote:'출발 15분 전 도착을 권장합니다. 현장 통제 시 정류장이 바뀔 수 있으니 예약 안내를 우선하세요.',sourceUrl:'https://hopon-hopoff.vn/tour/1-round-ho-chi-minh-city-panoramic-bus-tour/',sourceLabel:'운영사 공식 출발지·이용 안내',verifiedOn:'2026-09-18'},
+      {name:'시티투어 버스 · 응우옌후에 야간 출발',type:'시티투어 버스',lat:10.7754487,lng:106.7025437,address:'92-96 Nguyễn Huệ, Ho Chi Minh City, Vietnam',desc:'Ảnh Việt Hop On–Hop Off의 호치민 1회 순환 야간 투어 출발지입니다. 92–96 Nguyễn Huệ 앞에서 예약한 버스와 표를 확인하세요. 낮 투어는 중앙우체국에서 출발하므로 예약한 상품의 집결지를 확인하세요.',locationNote:'출발 15분 전 도착을 권장합니다. 행사·보행자 거리 통제 시에는 운영사의 최종 집결 안내를 따르세요.',sourceUrl:'https://hopon-hopoff.vn/tour/1-round-ho-chi-minh-city-panoramic-bus-tour/',sourceLabel:'운영사 공식 출발지·이용 안내',verifiedOn:'2026-09-18'},
       {name:'사이공역',type:'기차역',lat:10.78255,lng:106.67795,address:'1 Nguyễn Thông, District 3, Ho Chi Minh City, Vietnam',icon:'R',desc:'호치민 도심의 주요 여객 철도역. 베트남 남북선 이용.'},
 
       {name:'LOTTE Mart District 7',type:'쇼핑',lat:10.74111,lng:106.70193,address:'469 Nguyễn Hữu Thọ, Tân Hưng, Ho Chi Minh City, Vietnam',icon:'🛒',desc:'7군의 대형 마트. 식품·생활용품·쇼핑을 한 번에 이용하기 좋은 곳.'},
@@ -235,6 +239,8 @@ const EXTRA_DATA={
     ],
     points:[
       {name:'하노이역',type:'기차역',lat:21.02466,lng:105.84118,address:'120 Lê Duẩn, Hoàn Kiếm, Hanoi, Vietnam',icon:'R',desc:'하노이 중심의 주요 철도역. 남북선과 북부 노선 이용.'},
+      {name:'시티투어 버스 · 호안끼엠 호수 출발',type:'시티투어 버스',address:'7 Đinh Tiên Hoàng, Hoàn Kiếm, Hanoi, Vietnam',desc:'Ảnh Việt Hop On–Hop Off의 하노이 시티투어 출발지입니다. 호안끼엠 호수 북쪽 동낀응이어툭 광장 인근, 7 Đinh Tiên Hoàng에서 예약한 버스를 확인하세요. 주로 평일에 이용하며 금요일 저녁·주말은 오페라하우스 출발 안내를 확인하세요.',locationNote:'보행자 거리 운영·행사에 따라 집결지가 달라질 수 있습니다. 예약 확인서의 장소와 탑승 시간을 먼저 확인하세요.',sourceUrl:'https://hopon-hopoff.vn/tour/1-round-hanoi-panoramic-bus-tour/',sourceLabel:'운영사 공식 출발지·이용 안내',verifiedOn:'2026-09-18'},
+      {name:'시티투어 버스 · 하노이 오페라하우스 출발',type:'시티투어 버스',address:'Hanoi Opera House, Tràng Tiền, Hanoi, Vietnam',desc:'Ảnh Việt Hop On–Hop Off의 하노이 시티투어 출발지입니다. 금요일 저녁·주말에는 호안끼엠 호수 대신 오페라하우스 앞 집결 안내를 확인하세요. 1회 순환권과 자유 승하차권은 서로 다른 상품이므로 표의 이용 조건을 확인하세요.',locationNote:'출발 15분 전 도착을 권장합니다. 정확한 정류장과 운행 여부는 예약 안내 및 현장 직원을 통해 확인하세요.',sourceUrl:'https://hopon-hopoff.vn/tour/1-round-hanoi-panoramic-bus-tour/',sourceLabel:'운영사 공식 출발지·이용 안내',verifiedOn:'2026-09-18'},
 
       {name:'노이바이 국제공항',type:'공항',lat:21.21871,lng:105.80417,icon:'✈',desc:'하노이 주요 공항.'},
       {name:'노이바이 T1 국내선',type:'터미널',lat:21.21457,lng:105.80268,icon:'T1',desc:'국내선 터미널.'},
@@ -336,7 +342,7 @@ const EXTRA_DATA={
 
 const AREA_TYPES=[
   ['all','전체'],['거리','거리'],['시장','시장'],['공항','공항·택시·터미널'],['전철역','전철'],
-  ['기차역','기차역'],['한인생활권','한인생활권'],['병원','병원'],['관광명소','관광명소'],['골프장','골프장']
+  ['기차역','기차역'],['유람선·수상버스','유람선·수상버스'],['시티투어 버스','시티투어 버스'],['한인생활권','한인생활권'],['병원','병원'],['관광명소','관광명소'],['골프장','골프장']
 ];
 
 const NAV_CATEGORIES=[
@@ -353,6 +359,8 @@ const NAV_CATEGORIES=[
   {id:'airport',label:'공항',kind:'airport',type:'공항'},
   {id:'metro',label:'전철',kind:'point',type:'전철역'},
   {id:'train',label:'기차역',kind:'point',type:'기차역'},
+  {id:'cruise',label:'유람선·수상버스',kind:'point',type:'유람선·수상버스'},
+  {id:'citytour',label:'시티투어 버스',kind:'point',type:'시티투어 버스'},
   {id:'korean-zone',label:'한인생활권',kind:'area',type:'한인생활권'},
   {id:'hospital',label:'병원',kind:'point',type:'병원'},
   {id:'attraction-nav',label:'관광명소',kind:'area',type:'관광명소'},

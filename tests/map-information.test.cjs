@@ -9,7 +9,7 @@ class Target{constructor(options){this.options=options;this.events={}}addListene
 google={maps:{Circle:Target,Marker:Target,Size:class{},Point:class{}}};state.map={};
 const pos={lat:10.77,lng:106.7};
 const routeFrom=html=>new URL(html.match(/class="mapDirectionsButton" href="([^"]+)"/)[1].replace(/&amp;/g,'&'));
-const isPickup=p=>['그랩승차','택시승차','그린SM승차','버스승차'].includes(p.type)||(p.type==='공항'&&/승차/.test(p.name));
+const isPickup=p=>['그랩승차','택시승차','그린SM승차','버스승차','유람선·수상버스','시티투어 버스'].includes(p.type)||(p.type==='공항'&&/승차/.test(p.name));
 let dismissals=0,registrations=0;closeSystemInfo=()=>{dismissals++};closeDetailPanel=()=>{};closeAreaPanel=()=>{};registerMapClick=()=>{registrations++};
 for(const city of Object.values(EXTRA_DATA))for(const p of city.points||[]){
  const marker=createSelectedPoiMarker(p,pos,false);
