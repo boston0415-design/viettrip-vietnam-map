@@ -2,7 +2,8 @@
 (()=>{
   const format=new Intl.NumberFormat('ko-KR');
   const endpoint=SUPABASE_URL+'/rest/v1/';
-  const storageKey='viettrip_visit_session_v1';
+  // A fresh document (including reload) is one visit; filter clicks are not visits.
+  let visitToken;
   async function request(path,options={}){
     const controller=new AbortController();
     const timer=setTimeout(()=>controller.abort(),8000);
@@ -20,12 +21,8 @@
   async function recordVisit(){
     // Count only the production domain; previews and local checks do not inflate totals.
     if(location.hostname!=='viettrip-vietnam-map.pages.dev')return;
-    let token;
-    try{
-      token=sessionStorage.getItem(storageKey);
-      if(!token){token=crypto.randomUUID();sessionStorage.setItem(storageKey,token)}
-    }catch{return} // If persistent session storage is blocked, don't count reloads repeatedly.
-    const response=await request('site_visits',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({id:token})});
+    visitToken ||= crypto.randomUUID();
+    const response=await request('site_visits',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({id:visitToken})});
     if(!response.ok&&response.status!==409)throw new Error('Visit not recorded');
   }
   async function visits(){

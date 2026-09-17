@@ -280,20 +280,32 @@ function poiColor(type){
   })[type]||'#475569';
 }
 function poiSvg(type,label,hover=false){
-  const base=poiColor(type);
-  const color=base;
-  const size=36;
-  const text=(label||'•').slice(0,4);
-  return {
-    url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 42 42">
-        <circle cx="21" cy="21" r="17" fill="${color}" stroke="${hover?'#111827':'white'}" stroke-width="${hover?3.8:3}"/>
-        <text x="21" y="25" text-anchor="middle" font-size="${text.length>2?8:(text.length>1?11:16)}" font-family="Arial,sans-serif" font-weight="800" fill="white">${text}</text>
-      </svg>`
-    ),
-    scaledSize:new google.maps.Size(size,size),
-    anchor:new google.maps.Point(size/2,size/2)
-  };
+  const color=poiColor(type);
+  const categories={'공항':'airport','터미널':'airport','그랩승차':'taxi','택시승차':'taxi','전철역':'train','기차역':'train','한인생활권':'home','병원':'hospital','쇼핑':'shopping'};
+  return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="${hover?'#f0f9ff':'#fff'}" stroke="${color}" stroke-width="1.6"/><g transform="translate(9,9) scale(.92)" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath(categories[type]||'attraction')}"/></g></svg>`),scaledSize:new google.maps.Size(40,40),anchor:new google.maps.Point(20,20)};
+}
+
+// One information layout for registered places, system POIs and geographic ranges.
+function mapFeatureHtml(feature={},radius=null){
+  const name=feature.name||feature.label||'선택한 위치';
+  const type=feature.type||(feature.category?catLabel(feature.category):'위치 정보');
+  const description=feature.description||feature.desc||'등록된 상세 설명이 없습니다.';
+  const address=feature.address||feature.formatted_address||'';
+  const pos=validMapLocation(feature.center||feature);
+  const locationText=address|| (pos?`좌표 ${pos.lat.toFixed(5)}, ${pos.lng.toFixed(5)} · 상세 주소 미등록`:'개별 도로명 주소가 없는 구역입니다.');
+  const rangeText=radius?`<p class="mapInfoRange">중심에서 반경 ${Math.round(radius).toLocaleString('ko-KR')}m의 주변 참고 범위입니다. 실제 부지·행정 경계가 아닙니다.</p>`:'';
+  const benefit=feature.memberBenefit?`<p class="mapInfoBenefit">회원 혜택 · ${esc(feature.benefitText||'상세 혜택은 업체에 확인해주세요.')}</p>`:'';
+  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small><p>${esc(description)}</p><p class="mapInfoAddress">${esc(locationText)}</p>${rangeText}${benefit}</section>`;
+}
+function showPositionHover(position,html){
+  const info=hoverInfo();info.setContent(html);info.setPosition(position);
+  info.open({map:state.map,shouldFocus:false});
+}
+function bindMapFeatureInfo(target,feature,position,radius=null,{click=true}={}){
+  const html=()=>mapFeatureHtml(feature,radius);
+  target.addListener('mouseover',event=>showPositionHover(event?.latLng||position,html()));
+  target.addListener('mouseout',hideHover);
+  if(click)target.addListener('click',event=>{hideHover();showClickInfo(event?.latLng||position,html());});
 }
 
 function hoverInfo(){
@@ -366,20 +378,7 @@ function renderPoiMarkers(){
 }
 
 function golfSvg(hover=false){
-  const size=40;
-  const green='#15803d';
-  return {
-    url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 48 48">
-        <circle cx="24" cy="24" r="20" fill="${green}" stroke="${hover?'#111827':'white'}" stroke-width="${hover?3.8:3}"/>
-        <path d="M18 34V12" stroke="white" stroke-width="3" stroke-linecap="round"/>
-        <path d="M19 13 L34 17 L19 22 Z" fill="white"/>
-        <ellipse cx="24" cy="36" rx="10" ry="3" fill="white" opacity=".9"/>
-      </svg>`
-    ),
-    scaledSize:new google.maps.Size(size,size),
-    anchor:new google.maps.Point(size/2,size/2)
-  };
+  return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="${hover?'#f0fdf4':'white'}" stroke="#15803d" stroke-width="1.6"/><g transform="translate(8,7)" fill="none" stroke="#15803d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${businessGlyphPath('golf')}"/></g></svg>`),scaledSize:new google.maps.Size(40,40),anchor:new google.maps.Point(20,20)};
 }
 
 function renderGolfCourses(){

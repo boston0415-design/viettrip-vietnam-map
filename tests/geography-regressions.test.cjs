@@ -25,8 +25,8 @@ for(const [city,data] of Object.entries(CITY_DATA)){
   const marker=drawAreaReference(area);
   assert.ok(marker instanceof TestCircle,area.name+' needs a geographic range');
   assert.equal(marker.options.radius,areaRangeRadius(area));
-  assert.equal(marker.options.strokeWeight,2);
-  assert.equal(marker.options.fillOpacity,.12);
+  assert.equal(marker.options.strokeWeight,1.25);
+  assert.equal(marker.options.fillOpacity,.08);
   checked++;
  }
  for(const point of [...(EXTRA_DATA[city]?.points||[]),...(data.golf||[])]){
@@ -54,8 +54,8 @@ for(const extra of Object.values(EXTRA_DATA)){
   const circle=addUnifiedPointRange(point.type,loc,point);
   assert.ok(circle instanceof TestCircle);
   assert.equal(circle.options.radius,pointCircleRadius(point.type,point));
-  assert.equal(circle.options.strokeWeight,2);
-  assert.equal(circle.options.fillOpacity,.12);
+  assert.equal(circle.options.strokeWeight,1.25);
+  assert.equal(circle.options.fillOpacity,.08);
   pointCases++;
  }
 }

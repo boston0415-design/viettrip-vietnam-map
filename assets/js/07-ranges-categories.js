@@ -203,7 +203,7 @@ function addUnifiedPointRange(type,location,p=null){
 }
 
 function addPointCoverageCircle(type,location,p=null){
-  return addSelectionCircle(location,pointCircleRadius(type,p),poiColor(type));
+  return addSelectionCircle(location,pointCircleRadius(type,p),poiColor(type),.08,.7,{...p,type,...location});
 }
 
 
@@ -300,7 +300,7 @@ function refreshRegisteredCoverage(){
   items().forEach(p=>{
     const loc=validMapLocation(p);
     if(!loc)return;
-    const circle=addSelectionCircle(loc,businessCircleRadius(p.category),categoryRangeColor(p.category),.065,.68);
+    const circle=addSelectionCircle(loc,businessCircleRadius(p.category),categoryRangeColor(p.category),.065,.68,p);
     if(circle)circle._registeredCoverage=true;
   });
 }
@@ -359,7 +359,7 @@ async function showShoppingCategory(){
   registered.forEach(p=>{
     if(validMapLocation(p)){
       const loc={lat:Number(p.lat),lng:Number(p.lng)};
-      const circle=addSelectionCircle(loc,radius,color,.065,.68);
+      const circle=addSelectionCircle(loc,radius,color,.065,.68,p);
       if(circle)circle._registeredCoverage=true;
       extendBoundsByCircle(bounds,loc,radius);
       shown++;
@@ -436,7 +436,7 @@ function showPointCategory(type){
 
 
 function addGolfRangeRing(location,g=null){
-  return addSelectionCircle(location,businessCircleRadius('golf'),categoryRangeColor('golf'));
+  return addSelectionCircle(location,businessCircleRadius('golf'),categoryRangeColor('golf'),.08,.7,{...g,type:'골프장',...location});
 }
 
 function createGolfMarker(g,location,clearExisting=true){
@@ -459,10 +459,7 @@ function createGolfMarker(g,location,clearExisting=true){
     hideHover();
   });
 
-  marker.addListener('click',async ()=>{
-    closeSystemInfo();
-    await focusRangeLocation(location,1);
-  });
+  bindMapFeatureInfo(marker,{...g,type:'골프장',...location},location);
 
   marker._golfName=g.name;
   state.golfMarkers.push(marker);

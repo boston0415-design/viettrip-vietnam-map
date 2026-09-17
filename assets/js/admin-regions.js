@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     const halo=new google.maps.Data(),layer=new google.maps.Data();
     try{
       halo.addGeoJson(feature);layer.addGeoJson(feature);
-      halo.setStyle({strokeColor:'#ffffff',strokeOpacity:1,strokeWeight:7,fillOpacity:0,clickable:false,zIndex:40});
-      layer.setStyle({strokeColor:'#c81e35',strokeOpacity:1,strokeWeight:3.5,fillColor:'#e11d48',fillOpacity:0.055,clickable:false,zIndex:41});
+      halo.setStyle({strokeColor:'#ffffff',strokeOpacity:1,strokeWeight:4,fillOpacity:0,clickable:false,zIndex:40});
+      layer.setStyle({strokeColor:'#c81e35',strokeOpacity:1,strokeWeight:2,fillColor:'#e11d48',fillOpacity:0.055,clickable:true,zIndex:41});
+      const boundaryInfo={name:feature.properties.label,type:'행정구역 경계',description:feature.properties.era==='2025'?'2025년 7월 개편 기준 시·성 경계입니다. 화면 표시를 위해 단순화한 참고 경계입니다.':'2020년 자료의 이전 행정구역입니다. 현재 행정구역과 다를 수 있습니다.'};
+      bindMapFeatureInfo(layer,boundaryInfo,null);
       const bounds=new google.maps.LatLngBounds();layer.forEach(f=>f.getGeometry().forEachLatLng(p=>bounds.extend(p)));
       let view=bounds;
       const box=feature.properties.viewBounds;

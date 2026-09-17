@@ -380,13 +380,21 @@ function clearAreaLabels(){
   state.areaLabels=[];
 }
 
-function makeAreaLabel(position,text){
+function makeAreaLabel(position,text,feature={}){
   class AreaLabel extends google.maps.OverlayView{
     constructor(pos,label){super();this.pos=pos;this.label=label;this.div=null}
     onAdd(){
       const div=document.createElement('div');
       div.className='area-label';
       div.textContent=this.label;
+      div.tabIndex=0;div.setAttribute('role','button');div.setAttribute('aria-label',`${this.label} 정보 보기`);
+      const html=()=>mapFeatureHtml(feature,areaRangeRadius(feature));
+      div.addEventListener('mouseenter',()=>showPositionHover(position,html()));
+      div.addEventListener('mouseleave',hideHover);
+      const open=event=>{event.stopPropagation();hideHover();showClickInfo(position,html());};
+      div.addEventListener('click',open);
+      div.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();open(event)}});
+
       this.div=div;
       this.getPanes().overlayMouseTarget.appendChild(div);
     }
@@ -596,7 +604,7 @@ function pathCenter(path){
   return {lat:c.lat(),lng:c.lng()};
 }
 
-function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,strokeOpacity=.75){
+function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,strokeOpacity=.75,feature={}){
   center=validMapLocation(center);
   radius=Number(radius);
   if(!state.map || !center || !Number.isFinite(radius) || radius<=0)return null;
@@ -605,24 +613,21 @@ function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,stroke
     center,
     radius,
     fillColor:color,
-    fillOpacity:.12,
+    fillOpacity,
     strokeColor:color,
-    strokeOpacity:.8,
-    strokeWeight:2,
+    strokeOpacity,
+    strokeWeight:1.25,
     clickable:true,
     zIndex:2
   });
 
-  circle.addListener('click',async ()=>{
-    closeSystemInfo();
-    await focusRangeLocation(circle.getCenter(),1);
-  });
+  bindMapFeatureInfo(circle,{...feature,center},center,radius);
 
   state.selectionOverlays.push(circle);
   return circle;
 }
 
-function addSelectionPath(path,color='#1a73e8'){
+function addSelectionPath(path,color='#1a73e8',feature={}){
   const line=new google.maps.Polyline({
     map:state.map,
     path,
@@ -634,10 +639,7 @@ function addSelectionPath(path,color='#1a73e8'){
     zIndex:2
   });
 
-  line.addListener('click',async ()=>{
-    closeSystemInfo();
-    await focusRangeLocation(pathCenter(path),1);
-  });
+  bindMapFeatureInfo(line,feature,pathCenter(path));
 
   state.selectionOverlays.push(line);
   return line;
@@ -655,7 +657,7 @@ function drawAreaReference(area,bounds=null){
   const center=validMapLocation(area?.center);
   if(!center)return null;
   const radius=areaRangeRadius(area);
-  const circle=addSelectionCircle(center,radius,area.color||'#1a73e8');
+  const circle=addSelectionCircle(center,radius,area.color||'#1a73e8',.08,.7,area);
   if(bounds)extendBoundsByCircle(bounds,center,radius);
   return circle;
 }
@@ -744,7 +746,7 @@ function jumpToPopularArea(name,openPanel=false){
   clearAreaLabels();
   if(!visible)return;
 
-  const label=makeAreaLabel(area.center,`${area.name} · 주변 ${areaRangeRadius(area)}m`);
+  const label=makeAreaLabel(area.center,`${area.name} · 주변 ${areaRangeRadius(area)}m`,area);
   label._areaName=area.name;
   state.areaLabels.push(label);
 }
@@ -772,8 +774,8 @@ function createSelectedPoiMarker(p,location,clearExisting=true){
     icon:poiSvg(p.type,p.icon||'•',false),
   });
 
-  // 시스템 장소는 전 도시/전 분류 동일:
-  // hover에서는 아이콘만 강조하고 설명창은 띄우지 않는다.
+  bindMapFeatureInfo(m,{...p,...location},location);
+  // Pointer highlighting is independent of the shared information popup.
   m.addListener('mouseover',()=>{
     m.setIcon(poiSvg(p.type,p.icon||'•',true));
   });
@@ -781,12 +783,6 @@ function createSelectedPoiMarker(p,location,clearExisting=true){
   m.addListener('mouseout',()=>{
     m.setIcon(poiSvg(p.type,p.icon||'•',false));
     hideHover();
-  });
-
-  // 클릭 = 기존 설명 닫기 → 부드러운 이동 → 부드러운 확대
-  m.addListener('click',async ()=>{
-    closeSystemInfo();
-    await focusRangeLocation(location,1);
   });
 
   m._poiName=p.name;
