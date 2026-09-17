@@ -1,0 +1,16 @@
+/* A separate, compact row keeps statistics out of the map controls. */
+.app{grid-template-rows:76px 28px minmax(0,1fr)}
+.communityStats{display:flex;align-items:center;justify-content:flex-end;gap:0;padding:0 16px;background:#fff;border-bottom:1px solid #e9edf2;color:#64748b;font-size:11px;line-height:1.2;white-space:nowrap;min-width:0}
+.communityStats>span{display:inline-flex;align-items:baseline;gap:5px}
+.communityStats>span+span{margin-left:14px;padding-left:14px;border-left:1px solid #e2e8f0}
+.communityStats b{color:#334155;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.communityStats small{font-size:10px;margin-left:-3px;color:#94a3b8}
+@media(max-width:900px){
+  .app{grid-template-rows:72px 28px minmax(0,1fr)!important}
+  .communityStats{justify-content:center;padding:0 6px;font-size:10px}
+  .communityStats>span{gap:4px}
+  .communityStats>span+span{margin-left:10px;padding-left:10px}
+  .communityStats b{font-size:11px}
+}
+@media(max-width:480px){.app{grid-template-rows:68px 28px minmax(0,1fr)!important}}
+@media(max-width:900px) and (max-height:600px){.app{grid-template-rows:56px 24px minmax(0,1fr)!important}}
