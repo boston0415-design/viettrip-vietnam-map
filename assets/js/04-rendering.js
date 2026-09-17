@@ -210,14 +210,15 @@ function encodeCopyValue(text){
 
 // Maps URLs use the device location in Google Maps when origin is omitted.
 // No Directions/Routes API call, stored origin, or background location tracking.
-function businessDirectionsUrl(place){
+function businessDirectionsUrl(place,{travelmode}={}){
   if(!place)return '';
   const present=value=>value!==null && value!==undefined && String(value).trim()!=='';
   const lat=Number(place.lat),lng=Number(place.lng);
   const hasCoordinates=present(place.lat)&&present(place.lng)&&Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180;
   const destination=hasCoordinates?`${lat},${lng}`:[place.name,place.address].filter(present).join(' ').trim().slice(0,200);
   if(!destination)return '';
-  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&dir_action=navigate`;
+  const mode=['walking','driving','transit','bicycling','two-wheeler'].includes(travelmode)?`&travelmode=${travelmode}`:'';
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&dir_action=navigate${mode}`;
 }
 
 function businessDirectionsLinkHtml(place,compact=false){

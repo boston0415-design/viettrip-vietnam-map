@@ -2,6 +2,11 @@
 .mapFeatureInfo{max-width:270px;min-width:180px;font:13px/1.6 system-ui,sans-serif;color:#334155;overflow-wrap:anywhere;padding:2px 0}
 .mapFeatureInfo>strong{display:block;font-size:15px;color:#173247;line-height:1.4}
 .mapFeatureInfo>small{display:block;color:#64748b;margin-top:4px}
+.mapDirectionsActions{margin-top:10px}
+.mapDirectionsButton{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;box-sizing:border-box;padding:9px 10px;border:1px solid #247f78;border-radius:9px;background:#247f78;color:#fff!important;text-decoration:none;font-size:12px;font-weight:650;line-height:1.4}
+.mapDirectionsButton svg{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mapDirectionsButton:hover{background:#1c6b65}.mapDirectionsButton:focus-visible{outline:2px solid #173247;outline-offset:2px}
+.mapFeatureInfo .mapDirectionsNote{font-size:11px;line-height:1.5;color:#64748b;margin-top:6px}
 .mapFeatureInfo p{margin:8px 0 0}.mapInfoAddress{border-top:1px solid #e2e8f0;padding-top:8px}.mapInfoRange{font-size:12px;color:#64748b}.mapInfoBenefit{color:#087f5b}
 .area-label{pointer-events:auto!important;cursor:pointer;max-width:260px;white-space:normal!important}
 .area-label:focus-visible{outline:2px solid #087f8c;outline-offset:3px}

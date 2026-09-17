@@ -291,7 +291,14 @@ function poiSvg(type,label,hover=false){
 }
 
 // One information layout for registered places, system POIs and geographic ranges.
-function mapFeatureHtml(feature={},radius=null){
+function mapFeatureDirectionsHtml(feature){
+  const pickup=['그랩승차','택시승차','그린SM승차','버스승차'].includes(feature.type) || (feature.type==='공항' && /승차/.test(feature.name||''));
+  const url=businessDirectionsUrl(feature,{travelmode:pickup?'walking':undefined});
+  if(!url)return '';
+  const label=pickup?'현재 위치에서 걸어가기':'현재 위치에서 길찾기';
+  return `<div class="mapDirectionsActions"><a class="mapDirectionsButton" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(feature.name||'선택한 위치')} ${label} · 구글 지도 새 창"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-8a4 4 0 0 1 4-4h10M14 3l5 5-5 5"/></svg>${label}</a>${pickup?'<p class="mapDirectionsNote">실제 승차 지점은 현장 표지와 호출 앱 안내를 확인하세요.</p>':''}</div>`;
+}
+function mapFeatureHtml(feature={},radius=null,{directions=false}={}){
   const name=feature.name||feature.label||'선택한 위치';
   const type=feature.type||(feature.category?catLabel(feature.category):'위치 정보');
   const description=feature.description||feature.desc||'';
@@ -300,7 +307,8 @@ function mapFeatureHtml(feature={},radius=null){
   let source='';
   try{const url=new URL(feature.sourceUrl);if(url.protocol==='https:')source=`<p><a href="${esc(url.href)}" target="_blank" rel="noopener noreferrer">${esc(feature.sourceLabel||'안내 원문')} ↗</a></p>`}catch{}
   const note=feature.locationNote?`<p class="mapInfoAddress">${esc(feature.locationNote)}</p>`:'';
-  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}${note}${source}</section>`;
+  const route=directions?mapFeatureDirectionsHtml(feature):'';
+  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}${note}${source}${route}</section>`;
 }
 function supportsMapHover(){
   return !isMobileMapLayout() && (!window.matchMedia || window.matchMedia('(hover: hover) and (pointer: fine)').matches);
@@ -342,7 +350,10 @@ function bindMapFeatureInfo(target,feature,position,radius=null,{click=true,back
       closeDetailPanel();closeAreaPanel();
       return;
     }
-    hideHover();showClickInfo(event?.latLng||position,html());
+    // Use the fixed marker position, not the pointer's offset inside its icon.
+    const destination=validMapLocation(position);
+    const routeFeature=destination?{...feature,...destination}:feature;
+    hideHover();showClickInfo(position,mapFeatureHtml(routeFeature,radius,{directions:true}));
   });
 }
 function showHover(marker,html){showPositionHover(marker.getPosition(),html)}

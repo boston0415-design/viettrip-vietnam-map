@@ -7,11 +7,16 @@ let hovered='',clicked='';showPositionHover=(position,html)=>{assert(position);h
 class Target{constructor(options){this.options=options;this.events={}}addListener(name,fn){(this.events[name]||=[]).push(fn)}setIcon(){}setMap(){}}
 google={maps:{Circle:Target,Marker:Target,Size:class{},Point:class{}}};state.map={};
 const pos={lat:10.77,lng:106.7};
+const routeFrom=html=>new URL(html.match(/class="mapDirectionsButton" href="([^"]+)"/)[1].replace(/&amp;/g,'&'));
+const isPickup=p=>['그랩승차','택시승차','그린SM승차','버스승차'].includes(p.type)||(p.type==='공항'&&/승차/.test(p.name));
 let dismissals=0,registrations=0;closeSystemInfo=()=>{dismissals++};closeDetailPanel=()=>{};closeAreaPanel=()=>{};registerMapClick=()=>{registrations++};
 for(const city of Object.values(EXTRA_DATA))for(const p of city.points||[]){
  const marker=createSelectedPoiMarker(p,pos,false);
- marker.events.mouseover.forEach(fn=>fn({latLng:pos}));assert(hovered.includes(esc(p.name)));
+ marker.events.mouseover.forEach(fn=>fn({latLng:pos}));assert(hovered.includes(esc(p.name)));assert(!hovered.includes('mapDirectionsButton'),'passive hover has no route control');
  marker.events.click.forEach(fn=>fn({latLng:pos}));assert(clicked.includes(esc(p.name)));
+ const route=routeFrom(clicked);assert.equal(route.searchParams.get('destination'),'10.77,106.7');assert(!route.searchParams.has('origin'));assert(!route.searchParams.has('key'));
+ assert.equal(route.searchParams.get('travelmode'),isPickup(p)?'walking':null);
+ assert(clicked.includes('target="_blank"'));assert(clicked.includes('rel="noopener noreferrer"'));
  const circle=addPointCoverageCircle(p.type,pos,p);clicked='';const before=dismissals;circle.events.click[0]({latLng:pos});assert.equal(clicked,'');assert.equal(dismissals,before+1);assert(state.selectionOverlays.includes(circle));circle.events.mouseover[0]({latLng:pos});assert(hovered.includes(esc(p.name)));
 }
 // Touch and narrow screens must not react to synthesized mouseover events.
@@ -19,6 +24,16 @@ window.matchMedia=q=>({matches:q.includes('max-width')});hovered='';
 const touch=createSelectedPoiMarker({name:'touch',type:'공항'},pos,false);
 touch.events.mouseover.forEach(fn=>fn({latLng:pos}));assert.equal(hovered,'');
 touch.events.click.forEach(fn=>fn({latLng:pos}));assert(clicked.includes('touch'));
+// Real airport targets retain their exact marker point even if the tap is offset.
+for(const type of ['그랩승차','택시승차','그린SM승차','버스승차']){
+ const p=EXTRA_DATA.hcmc.points.find(p=>p.type===type && p.name.includes('T2'));
+ assert(p,type);const target=createSelectedPoiMarker(p,{lat:p.lat,lng:p.lng},false);
+ hovered='';target.events.mouseover.forEach(fn=>fn({latLng:pos}));assert.equal(hovered,'');
+ target.events.click.forEach(fn=>fn({latLng:pos}));const route=routeFrom(clicked);
+ assert.equal(route.searchParams.get('destination'),p.lat+','+p.lng);assert.equal(route.searchParams.get('travelmode'),'walking');
+ assert(clicked.includes('현재 위치에서 걸어가기'));
+}
+assert.equal(mapFeatureDirectionsHtml({}),'');
 // A touch on a filled range closes information instead of opening another card.
 dismissals=0;registrations=0;
 closeSystemInfo=()=>{dismissals++};closeDetailPanel=()=>{};closeAreaPanel=()=>{};
