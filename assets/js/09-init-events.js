@@ -477,6 +477,7 @@ $('#savePlace').onclick=async e=>{
   }
 };
 $('#saveReview').onclick=saveReview;
+$('#pAddress').addEventListener('input',invalidateAddressLocation);
 $('#searchBtn').onclick=searchMap;
 $('#searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchMap();});
 $('#sort').onchange=e=>{state.sort=e.target.value;renderAll()};

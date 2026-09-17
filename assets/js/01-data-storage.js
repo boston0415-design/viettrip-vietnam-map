@@ -21,7 +21,7 @@ const CITY_DATA={
     areas:[
       {name:'여행자거리 · 부이비엔',type:'거리',desc:'부이비엔 워킹스트리트 중심. 바, 펍, 클럽이 밀집한 대표적인 밤거리.',kind:'circle',center:{lat:10.76742,lng:106.69399},radius:300,zoom:17,color:'#f59e0b'},
       {name:'일본인거리 · 재팬타운',type:'거리',desc:'레탄톤·타이반룽 일대. 일식당, 이자카야, 마사지 등이 밀집한 지역.',kind:'circle',center:{lat:10.77937,lng:106.70470},radius:230,zoom:18,color:'#ef4444'},
-      {name:'호치민광장 · 응우옌후에',type:'광장',desc:'응우옌후에 보행자거리와 시청 앞 광장. 카페와 야경 명소가 많은 중심지.',kind:'path',center:{lat:10.77435,lng:106.70305},path:[{lat:10.77660,lng:106.70096},{lat:10.77430,lng:106.70310},{lat:10.77265,lng:106.70465}],zoom:17,color:'#3b82f6'},
+      {name:'호치민광장 · 응우옌후에',type:'광장',desc:'응우옌후에 보행자거리와 시청 앞 광장. 카페와 야경 명소가 많은 중심지.',kind:'point',center:{lat:10.77435,lng:106.70305},zoom:17,color:'#3b82f6'},
       {name:'벤탄시장',type:'시장',desc:'기념품, 의류, 먹거리와 환전소가 모여 있는 대표 관광시장.',kind:'circle',center:{lat:10.77257,lng:106.69802},radius:190,zoom:18,color:'#8b5cf6'},
       {name:'빈떠이시장 · 쩌런',type:'시장',desc:'5군 차이나타운의 대표 시장. 로컬 분위기와 도매 상권을 보기 좋은 곳.',kind:'circle',center:{lat:10.75435,lng:106.65185},radius:220,zoom:17,color:'#8b5cf6'},
       {name:'떤딘시장',type:'시장',desc:'핑크성당 인근의 전통시장. 로컬 식재료와 원단 상점이 많은 시장.',kind:'circle',center:{lat:10.78918,lng:106.69056},radius:150,zoom:18,color:'#8b5cf6'},
@@ -48,7 +48,7 @@ const CITY_DATA={
       {name:'호안끼엠 호수',type:'명소',desc:'하노이 여행의 중심. 주말 보행자거리와 응옥썬 사원 접근이 편리함.',kind:'circle',center:{lat:21.02875,lng:105.85215},radius:430,zoom:16,color:'#3b82f6'},
       {name:'따히엔 맥주거리',type:'거리',desc:'올드쿼터의 대표적인 밤거리. 맥주와 길거리 음식점이 집중된 지역.',kind:'circle',center:{lat:21.03520,lng:105.85200},radius:150,zoom:18,color:'#ef4444'},
       {name:'동쑤언시장',type:'시장',desc:'하노이 구시가지의 대형 전통시장. 의류, 식품, 생활용품과 기념품 쇼핑.',kind:'circle',center:{lat:21.03855,lng:105.84945},radius:170,zoom:18,color:'#8b5cf6'},
-      {name:'올드쿼터 야시장',type:'야시장',desc:'주말 저녁 항다오에서 동쑤언시장 방향으로 이어지는 야시장 구간.',kind:'path',center:{lat:21.03415,lng:105.85040},path:[{lat:21.03120,lng:105.85170},{lat:21.03400,lng:105.85050},{lat:21.03830,lng:105.84940}],zoom:17,color:'#8b5cf6'},
+      {name:'올드쿼터 야시장',type:'야시장',desc:'주말 저녁 항다오에서 동쑤언시장 방향으로 이어지는 야시장 구간.',kind:'point',center:{lat:21.03415,lng:105.85040},zoom:17,color:'#8b5cf6'},
       {name:'서호 · 웨스트레이크',type:'호수',desc:'카페, 레스토랑, 호텔과 산책 코스가 많은 하노이 대표 호수 지역.',kind:'circle',center:{lat:21.06020,lng:105.81710},radius:900,zoom:15,color:'#06b6d4'}
     ],
     golf:[
@@ -78,7 +78,7 @@ const CITY_DATA={
   nhatrang:{
     label:'나트랑', center:{lat:12.2388,lng:109.1967}, zoom:13,
     areas:[
-      {name:'쩐푸 해변거리',type:'해변',desc:'나트랑 중심 해변과 호텔·식당이 길게 이어지는 핵심 관광 구역.',kind:'path',center:{lat:12.23850,lng:109.19660},path:[{lat:12.2500,lng:109.1970},{lat:12.2385,lng:109.1966},{lat:12.2255,lng:109.1975}],zoom:16,color:'#06b6d4'},
+      {name:'쩐푸 해변거리',type:'해변',desc:'나트랑 중심 해변과 호텔·식당이 길게 이어지는 핵심 관광 구역.',kind:'point',center:{lat:12.23850,lng:109.19660},zoom:16,color:'#06b6d4'},
       {name:'담시장',type:'시장',desc:'나트랑 대표 전통시장. 기념품, 커피, 건어물과 로컬 식품 쇼핑.',kind:'circle',center:{lat:12.25220,lng:109.19175},radius:190,zoom:18,color:'#8b5cf6'},
       {name:'나트랑 야시장',type:'야시장',desc:'쩐푸 해변 인근의 관광 야시장. 저녁 쇼핑과 간단한 먹거리에 편리.',kind:'circle',center:{lat:12.23820,lng:109.19615},radius:160,zoom:18,color:'#8b5cf6'},
       {name:'포나가르 참탑',type:'명소',desc:'나트랑의 대표 역사 유적과 전망 포인트.',kind:'circle',center:{lat:12.26505,lng:109.19515},radius:180,zoom:18,color:'#3b82f6'},
@@ -125,7 +125,7 @@ const CITY_DATA={
       {name:'호이안 올드타운',type:'구시가지',desc:'등불, 고택, 카페와 레스토랑이 밀집한 호이안 핵심 관광 구역.',kind:'circle',center:{lat:15.88010,lng:108.33800},radius:500,zoom:17,color:'#f59e0b'},
       {name:'호이안 중앙시장',type:'시장',desc:'올드타운 남쪽의 전통시장. 로컬 음식과 식재료를 보기 좋은 곳.',kind:'circle',center:{lat:15.87780,lng:108.33555},radius:150,zoom:18,color:'#8b5cf6'},
       {name:'호이안 야시장',type:'야시장',desc:'투본강 건너 안호이 지역의 야시장과 등불 상권.',kind:'circle',center:{lat:15.87675,lng:108.33330},radius:180,zoom:18,color:'#8b5cf6'},
-      {name:'일본교 · 내원교',type:'명소',desc:'호이안 올드타운을 상징하는 대표 랜드마크.',kind:'circle',center:{lat:15.87710,lng:108.32680},radius:120,zoom:19,color:'#3b82f6'},
+      {name:'일본교 · 내원교',type:'명소',desc:'호이안 올드타운을 상징하는 대표 랜드마크.',kind:'circle',center:{lat:15.8771241,lng:108.3260312},radius:120,zoom:19,color:'#3b82f6'},
       {name:'안방비치',type:'해변',desc:'호이안에서 접근하기 쉬운 대표 해변과 해변 레스토랑 구역.',kind:'circle',center:{lat:15.91400,lng:108.33900},radius:500,zoom:16,color:'#06b6d4'}
     ],
     golf:[
@@ -151,7 +151,7 @@ const CITY_DATA={
   muine:{
     label:'무이네', center:{lat:10.9330,lng:108.2870}, zoom:12,
     areas:[
-      {name:'함띠엔 · 무이네 여행자거리',type:'거리',desc:'리조트, 식당, 카페와 마사지가 이어지는 무이네 대표 여행자 상권.',kind:'path',center:{lat:10.9515,lng:108.2300},path:[{lat:10.9450,lng:108.2050},{lat:10.9515,lng:108.2300},{lat:10.9585,lng:108.2550}],zoom:15,color:'#f59e0b'},
+      {name:'함띠엔 · 무이네 여행자거리',type:'거리',desc:'리조트, 식당, 카페와 마사지가 이어지는 무이네 대표 여행자 상권. 참고 위치는 100 Nguyễn Đình Chiểu이며 거리 전체의 경계가 아닙니다.',kind:'point',center:{lat:10.953148,lng:108.215703},zoom:15,color:'#f59e0b'},
       {name:'무이네 어촌 · 피싱빌리지',type:'명소',desc:'어선과 해산물 시장 풍경을 볼 수 있는 무이네 대표 지역.',kind:'circle',center:{lat:10.93650,lng:108.27950},radius:500,zoom:16,color:'#3b82f6'},
       {name:'레드샌드듄',type:'명소',desc:'무이네 대표 사구 관광지. 일출·일몰 시간대 방문객이 많음.',kind:'circle',center:{lat:10.94865,lng:108.29630},radius:450,zoom:16,color:'#ef4444'},
       {name:'판티엣 중앙시장',type:'시장',desc:'판티엣 도심의 전통시장. 해산물과 로컬 식품 쇼핑에 이용.',kind:'circle',center:{lat:10.92880,lng:108.10450},radius:220,zoom:17,color:'#8b5cf6'}
@@ -358,3 +358,4 @@ const SUPABASE_HEADERS={
   'Authorization':`Bearer ${SUPABASE_ANON}`,
   'Content-Type':'application/json'
 };
+

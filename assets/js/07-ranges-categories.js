@@ -241,9 +241,7 @@ function addPointRangeHalo(type,location){
 
 
 function addUnifiedPointRange(type,location,p=null){
-  if(type==='공항'){
-    return addPointCoverageCircle(type,location,p);
-  }
+  // Airport/POI coordinates identify a point, not the property's boundary.
   return addPointRangeHalo(type,location);
 }
 

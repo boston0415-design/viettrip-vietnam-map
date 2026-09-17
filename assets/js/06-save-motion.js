@@ -1,14 +1,20 @@
 async function savePlace(){
   if(state.placeSaveInProgress)return;
+  setPlaceSaving(true);
+  try{
+    await savePlaceOnce();
+  }finally{
+    setPlaceSaving(false);
+  }
+}
+
+async function savePlaceOnce(){
 
   if(state.placePhotoProcessing){
     setPlaceSaveStatus('사진 처리 중입니다. 잠시 후 저장해주세요.',false,true);
     alert('사진 처리 중입니다. 잠시 후 다시 저장해주세요.');
     return;
   }
-
-  const saveBtn=$('#savePlace');
-  if(saveBtn)saveBtn.disabled=false;
 
   const name=$('#pName').value.trim();
   const loc=state.clickLatLng;
@@ -17,7 +23,7 @@ async function savePlace(){
     alert('업체명을 입력해주세요.');
     return;
   }
-  if(!loc || !Number.isFinite(Number(loc.lat)) || !Number.isFinite(Number(loc.lng))){
+  if(!validMapLocation(loc)){
     alert('지도에서 위치를 클릭하거나 주소 추천/주소 검색으로 위치를 먼저 선택해주세요.');
     return;
   }
@@ -283,8 +289,12 @@ function openReview(){
 }
 function renderStars(){$('#stars').innerHTML=[1,2,3,4,5].map(n=>`<button class="star ${n<=state.rating?'on':''}" data-star="${n}">★</button>`).join('');document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{state.rating=Number(b.dataset.star);renderStars()})}
 async function saveReview(){
+  if(state.reviewSaveInProgress)return;
   const nickname=$('#rName').value.trim(),text=$('#rText').value.trim();
   if(!nickname||!text){alert('닉네임과 후기를 입력하세요.');return}
+  const placeId=state.selected;
+  if(!placeId)return;
+  state.reviewSaveInProgress=true;
 
   const btn=$('#saveReview');
   if(btn)btn.disabled=true;
@@ -293,15 +303,15 @@ async function saveReview(){
   const now=new Date().toISOString();
   const x=db();
 
-  let existing=x.reviews.find(r=>r.placeId===state.selected && (r.createdBy||'')===deviceId);
+  let existing=x.reviews.find(r=>r.placeId===placeId && (r.createdBy||'')===deviceId);
   let reviewId=existing?.id || crypto.randomUUID();
 
   try{
-    const photoUrls=await uploadSelectedReviewPhotos(state.selected,reviewId);
+    const photoUrls=await uploadSelectedReviewPhotos(placeId,reviewId);
 
     const remoteId=await supaRpc('device_upsert_review',{
       p_review_id:reviewId,
-      p_place_id:state.selected,
+      p_place_id:placeId,
       p_device_id:deviceId,
       p_nickname:nickname,
       p_rating:Number(state.rating),
@@ -322,7 +332,7 @@ async function saveReview(){
     }else{
       existing={
         id:reviewId,
-        placeId:state.selected,
+        placeId,
         nickname,
         rating:state.rating,
         text,
@@ -337,8 +347,12 @@ async function saveReview(){
     $('#reviewModal').classList.remove('open');
     revokeReviewPreviewUrls();
 
-    const refreshed=await fetchSharedDb();
-    saveDb(refreshed);
+    try{
+      const refreshed=await fetchSharedDb();
+      saveDb(refreshed);
+    }catch(syncErr){
+      console.warn('Review saved; shared refresh deferred',syncErr);
+    }
     renderAll();
     if(state.selected)renderDetail();
 
@@ -348,6 +362,7 @@ async function saveReview(){
     alert('후기 또는 사진 저장 중 오류가 발생했습니다. 사진은 자동 압축 후 750KB 이하만 업로드됩니다.');
     setDbStatus('후기/사진 저장 오류');
   }finally{
+    state.reviewSaveInProgress=false;
     if(btn)btn.disabled=false;
   }
 }
@@ -616,7 +631,7 @@ function addSelectionPath(path,color='#1a73e8'){
     geodesic:true,
     strokeColor:color,
     strokeOpacity:.5,
-    strokeWeight:42,
+    strokeWeight:4,
     clickable:true,
     zIndex:2
   });
@@ -630,33 +645,35 @@ function addSelectionPath(path,color='#1a73e8'){
   return line;
 }
 
+// Curated centers/radii are navigation hints, not surveyed boundaries.
+// Only sourced, explicitly verified paths may be drawn as road geometry.
+function drawAreaReference(area,bounds=null){
+  const center=validMapLocation(area?.center);
+  if(!center)return null;
+  if(area.geometryVerified===true && area.geometrySource && Array.isArray(area.path) && area.path.length>1 && area.path.every(validMapLocation)){
+    const line=addSelectionPath(area.path,area.color);
+    if(bounds)area.path.forEach(p=>bounds.extend(p));
+    return line;
+  }
+  const marker=new google.maps.Marker({
+    map:state.map,position:center,title:`${area.name} · 참고 위치`,zIndex:30,
+    icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:area.color||'#1a73e8',fillOpacity:1,strokeColor:'#ffffff',strokeWeight:2}
+  });
+  marker.addListener('click',()=>jumpToPopularArea(area.name));
+  state.selectionOverlays.push(marker);
+  if(bounds){
+    const radius=Number(area.radius);
+    if(Number.isFinite(radius)&&radius>0)extendBoundsByCircle(bounds,center,radius);
+    else bounds.extend(center);
+  }
+  return marker;
+}
+
 function drawCityRange(key){
   const c=CITY_DATA[key];
   if(!c)return;
-  const cfg=CITY_RANGES[key]||{radius:10000,color:'#1a73e8'};
-  addSelectionCircle(c.center,cfg.radius,cfg.color,.08,.55);
-
-  (c.areas||[]).forEach(a=>{
-    if(a.kind==='circle'){
-      addSelectionCircle(a.center,a.radius,a.color||'#64748b',.05,.22);
-    }else if(a.path){
-      const line=new google.maps.Polyline({
-        map:state.map,
-        path:a.path,
-        geodesic:true,
-        strokeColor:a.color||'#64748b',
-        strokeOpacity:.18,
-        strokeWeight:24,
-        clickable:true,
-        zIndex:2
-      });
-      line.addListener('click',async ()=>{
-        closeSystemInfo();
-        await focusRangeLocation(pathCenter(a.path),1);
-      });
-      state.selectionOverlays.push(line);
-    }
-  });
+  [...(c.areas||[]),...(EXTRA_DATA[key]?.zones||[])].forEach(a=>drawAreaReference(a));
+  setDbStatus('주요 지역의 참고 위치 · 행정구역 경계가 아닙니다.',true);
 }
 
 function showCityRange(key,selectionKey=`city:${key}`){
@@ -675,15 +692,9 @@ function showAreaRange(area){
   return toggleSelectionRange(key,()=>{
     const bounds=makeBounds();
 
-    if(area.kind==='circle'){
-      addSelectionCircle(area.center,area.radius,area.color||'#1a73e8',.16,.85);
-      extendBoundsByCircle(bounds,area.center,area.radius);
-    }else if(area.path){
-      addSelectionPath(area.path,area.color||'#1a73e8');
-      (area.path||[]).forEach(pt=>bounds.extend(pt));
-    }
-
-    fitUnifiedBounds(bounds,{padding:90,maxZoom:16});
+    drawAreaReference(area,bounds);
+    fitUnifiedBounds(bounds,{padding:90,maxZoom:Math.min(16,area.zoom||16)});
+    setDbStatus(`${area.name} · 참고 위치 (실제 경계·도로 구간 아님)`,true);
   });
 }
 
@@ -705,20 +716,13 @@ function showTypeRanges(type){
 
   const bounds=makeBounds();
 
-  areas.forEach(a=>{
-    if(a.kind==='circle'){
-      addSelectionCircle(a.center,a.radius,a.color||'#1a73e8',.10,.62);
-      extendBoundsByCircle(bounds,a.center,a.radius);
-    }else if(a.path){
-      addSelectionPath(a.path,a.color||'#1a73e8');
-      (a.path||[]).forEach(pt=>bounds.extend(pt));
-    }
-  });
+  areas.forEach(a=>drawAreaReference(a,bounds));
 
   if(category)extendRegisteredBounds(bounds,category);
   state.rangeSelectionKey=`type:${state.city}:${type}`;
   refreshRegisteredCoverage();
   fitUnifiedBounds(bounds,{padding:82,maxZoom:16});
+  setDbStatus(`${type} · 참고 위치 표시 (실제 경계 아님)`,true);
   return true;
 }
 
@@ -749,7 +753,7 @@ function jumpToPopularArea(name,openPanel=false){
   clearAreaLabels();
   if(!visible)return;
 
-  const label=makeAreaLabel(area.center,area.name);
+  const label=makeAreaLabel(area.center,`${area.name} · 참고 위치`);
   label._areaName=area.name;
   state.areaLabels.push(label);
 }

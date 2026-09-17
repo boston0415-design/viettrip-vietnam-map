@@ -390,6 +390,14 @@ window.openRegisteredSearchResult=openRegisteredSearchResult;
 function searchMap(){
   cancelPendingMapWork();
   const searchActionToken=state.mapActionToken;
+  clearSelectionRanges();
+  clearAreaLabels();
+  clearSelectedSystemIcons();
+  state.selectedNavItem=null;
+  state.restaurantTag='all';
+  state.ratingFilter='all';
+  state.benefitFilter='all';
+  renderRatingFilterState();
 
   const q=$('#searchInput').value.trim();
 
@@ -621,4 +629,3 @@ function startPremiumPulse(){
     });
   },90);
 }
-

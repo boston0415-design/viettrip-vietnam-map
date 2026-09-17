@@ -210,10 +210,14 @@ function explicitPlaceCityKey(place){
   const hay=`${place?.area||''} ${place?.address||''}`.toLowerCase();
   if(!hay.trim())return null;
 
-  for(const [key,aliases] of Object.entries(CITY_PLACE_ALIASES)){
-    if(aliases.some(alias=>hay.includes(alias.toLowerCase())))return key;
-  }
-  return null;
+  const matches=Object.entries(CITY_PLACE_ALIASES)
+    .filter(([key,aliases])=>aliases.some(alias=>hay.includes(alias.toLowerCase())))
+    .map(([key])=>key);
+  const pos=validMapLocation(place);
+  if(pos)matches.sort((a,b)=>geoDistanceMeters(pos,CITY_DATA[a].center)-geoDistanceMeters(pos,CITY_DATA[b].center));
+  // A new province/city name can coexist with the more specific travel destination.
+  else if(matches.includes('hoian'))return 'hoian';
+  return matches[0]||null;
 }
 
 function nearestCityKeyForLatLng(lat,lng){
@@ -446,6 +450,14 @@ function businessNameFromGooglePlace(place){
 function setAddressLocation(place){
   if(!place || !place.geometry || !place.geometry.location)return false;
 
+  if(!isPreciseAddressResult(place)){
+    state.clickLatLng=null;
+    clearAddressSearchMarker();
+    $('#addressLookupStatus').textContent='도시·거리의 대략적인 위치만 찾았습니다. 건물 번호를 포함한 주소나 지도상의 업체를 선택해주세요.';
+    $('#selectedMapPlace').textContent='정확한 업체 위치를 다시 선택해주세요.';
+    return false;
+  }
+
   const loc=place.geometry.location;
   state.clickLatLng={lat:loc.lat(),lng:loc.lng()};
 
@@ -487,6 +499,21 @@ function setAddressLocation(place){
   return true;
 }
 
+function isPreciseAddressResult(place){
+  const types=place?.types||[];
+  return !place?.partial_match && types.some(t=>['street_address','premise','subpremise','establishment','point_of_interest'].includes(t));
+}
+
+function invalidateAddressLocation(){
+  state.addressLookupToken=(state.addressLookupToken||0)+1;
+  state.clickLatLng=null;
+  clearAddressSearchMarker();
+  $('#findAddressBtn').disabled=false;
+  $('#findAddressBtn').textContent='주소로 위치 찾기';
+  $('#addressLookupStatus').textContent='주소가 변경되었습니다. 위치를 다시 찾아주세요.';
+  $('#selectedMapPlace').textContent='정확한 업체 위치를 다시 선택해주세요.';
+}
+
 function initAddressAutocomplete(){
   if(state.addressAutocomplete || !google.maps.places || !google.maps.places.Autocomplete)return;
 
@@ -520,21 +547,24 @@ function findAddressLocation(){
   btn.textContent='찾는 중…';
   $('#addressLookupStatus').textContent='Google 지도에서 주소 위치를 찾고 있습니다.';
 
+  const requestId=state.addressLookupToken=(state.addressLookupToken||0)+1;
   const geocoder=new google.maps.Geocoder();
-  geocoder.geocode({address:address, region:'VN'},(results,status)=>{
+  geocoder.geocode({address:address, region:'VN',componentRestrictions:{country:'VN'}},(results,status)=>{
+    if(state.addressLookupToken!==requestId)return;
     btn.disabled=false;
     btn.textContent='주소로 위치 찾기';
+    if(!$('#placeModal').classList.contains('open') || $('#pAddress').value.trim()!==address)return;
 
     if(status==='OK' && results && results[0]){
       setAddressLocation({
         name:'',
         formatted_address:results[0].formatted_address || address,
         geometry:results[0].geometry,
-        types:['street_address']
+        types:results[0].types||[],
+        partial_match:results[0].partial_match
       });
     }else{
       $('#addressLookupStatus').textContent='주소 위치를 찾지 못했습니다. 베트남 도시명까지 함께 입력해보세요.';
     }
   });
 }
-
