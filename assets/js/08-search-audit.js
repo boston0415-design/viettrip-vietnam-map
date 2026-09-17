@@ -628,7 +628,10 @@ function setMobileLegendExpanded(expanded,{restoreFocus=false}={}){
   title?.setAttribute('aria-expanded',String(expanded));
   const label=title?.querySelector('.filterToggleLabel');
   if(label)label.textContent=expanded?'접기':'필터';
-  if(expanded)closeAreaPanel();
+  if(expanded){
+    closeAreaPanel();
+    if($('#detail')?.classList.contains('show'))closeDetailPanel();
+  }
   syncMapFilterSummary();
 }
 
@@ -645,6 +648,8 @@ function closeMobileBusinessList(){
 function openMobileBusinessList(){
   if(!isMobileMapLayout())return;
   collapseMobileLegend();
+  if(state.selected)closeDetailPanel();
+  closeAreaPanel();
   $('#businessSide')?.classList.add('mobileOpen');
   $('.mapwrap')?.classList.add('listOpen');
   refreshMapAfterMobileLayout();

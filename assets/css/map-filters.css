@@ -1,5 +1,5 @@
 /* A small persistent summary, with the full controls available on demand. */
-#areaLegend{display:flex;flex-direction:column;width:650px;max-width:calc(100% - 28px);max-height:calc(100% - 40px);padding:0;overflow:hidden;border:1px solid #dce6e2;border-radius:16px;background:#fff;box-shadow:0 5px 22px #23483d1c;color:#344d49}
+#areaLegend{display:flex;flex-direction:column;width:600px;max-width:calc(100% - 28px);max-height:min(400px,60%);padding:0;overflow:hidden;border:1px solid #dce6e2;border-radius:16px;background:#fff;box-shadow:0 5px 22px #23483d1c;color:#344d49}
 #areaLegend.mobileCollapsed{width:fit-content;max-width:min(560px,calc(100% - 28px));max-height:48px}
 #areaLegendTitle{display:flex;align-items:center;gap:9px;flex:0 0 46px;width:100%;min-width:0;min-height:46px;margin:0;padding:10px 14px;border:0;border-radius:0;background:#fff;text-align:left;font:600 12px/1.4 system-ui,sans-serif;color:#344d49;cursor:pointer}
 #areaLegendTitle:hover{background:#f5f9f6}
@@ -11,21 +11,21 @@
 .filterToggleLabel{flex:none;color:#247f78;font-size:11px;font-weight:650;padding-left:9px;border-left:1px solid #e1e9e5}
 .filterChevron{flex:none;font-size:17px;line-height:1;transform:rotate(180deg)}
 .mobileCollapsed .filterChevron{transform:none}
-#areaLegendBody{display:flex;flex-direction:column;min-height:0;overflow:hidden;border-top:1px solid #e9eeeb}
+#areaLegendBody{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden;border-top:1px solid #e9eeeb}
 #areaLegendBody[hidden]{display:none!important}
-.areaLegendOptions{min-height:0;max-height:min(320px,45vh);overflow:auto;overscroll-behavior:contain;padding:10px 13px;scrollbar-width:thin}
+.areaLegendOptions{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;padding:10px 13px;scrollbar-width:thin}
 .areaLegendOptions .travellerToolbar{flex-wrap:wrap}
 #areaLegend .mapFilterFooter{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;padding:9px 13px;border-top:1px solid #e9eeeb;background:#f8faf8}
 .mapFilterFooter>span{font-size:11px;color:#71817a}
 #closeMapFilters{flex:none;min-height:36px;padding:7px 15px;border:0;border-radius:9px;background:#247f78;color:#fff;font:600 12px/1.4 system-ui,sans-serif}
 @media(max-width:900px){
- #areaLegend{left:10px!important;right:10px!important;bottom:max(24px,calc(env(safe-area-inset-bottom) + 12px))!important;width:auto!important;max-width:none!important;max-height:calc(100% - 32px)!important;padding:0!important;overflow:hidden!important;background:#fff!important;border-radius:15px!important}
+ #areaLegend{left:10px!important;right:10px!important;bottom:max(24px,calc(env(safe-area-inset-bottom) + 12px))!important;width:auto!important;max-width:none!important;max-height:62%!important;padding:0!important;overflow:hidden!important;background:#fff!important;border-radius:15px!important}
  #areaLegend.mobileCollapsed{right:auto!important;width:fit-content!important;max-width:calc(100% - 20px)!important;max-height:48px!important}
  #areaLegend #areaLegendTitle{min-height:46px!important;padding:9px 12px!important;gap:8px;font-size:12px!important}
- .areaLegendOptions{max-height:44dvh;padding:8px 10px}
+ .areaLegendOptions{padding:8px 10px}
  #areaLegend .mapFilterFooter{padding:8px 10px;gap:7px}
  #areaLegend #closeMapFilters{min-height:42px!important;padding:9px 15px!important}
  .mapFilterFooter>span{font-size:10px}
 }
-@media(min-width:901px){#areaLegend{bottom:26px}.mapwrap.detailOpen #areaLegend{max-width:calc(100% - clamp(360px,34vw,440px))}}
-@media(max-height:500px){.areaLegendOptions{max-height:32dvh}}
+@media(min-width:901px){.app{min-height:0}#areaLegend{bottom:26px}.mapwrap.detailOpen #areaLegend{max-width:calc(100% - clamp(360px,34vw,440px))}}
+@media(max-width:900px) and (max-height:500px){#areaLegend:not(.mobileCollapsed){max-height:74%!important}}

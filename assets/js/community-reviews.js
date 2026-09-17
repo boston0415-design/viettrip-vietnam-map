@@ -46,6 +46,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(city&&city!==state.city)switchCity(city);
       closeMobileBusinessList();
       await selectPlace(id,true);
+      if(state.selected!==id)return;
+      setDetailExpanded(true);
       document.getElementById('detail')?.querySelector('.review')?.scrollIntoView({block:'nearest'});
     }catch{if(token===generation)status.textContent='업체를 불러오지 못했습니다. 잠시 후 다시 눌러주세요.'}
     finally{button.disabled=false}

@@ -333,7 +333,57 @@ function openOwnedPlaceEditor(placeId){
 window.openOwnedPlaceEditor=openOwnedPlaceEditor;
 
 
+// The mobile sheet starts with a summary; opening it never changes map filters.
+let detailExpanded=false;
+let detailPlaceId=null;
+let detailPositionFrame=0;
+
+function positionSelectedPlaceInView(){
+  const version=++detailPositionFrame;
+  requestAnimationFrame(()=>{
+    if(version!==detailPositionFrame || !state.map || !state.selected)return;
+    const place=db().places.find(p=>p.id===state.selected);
+    const panel=$('#detail'),mapElement=$('.mapwrap');
+    if(!place || !panel?.classList.contains('show') || !mapElement)return;
+    const mapRect=mapElement.getBoundingClientRect(),panelRect=panel.getBoundingClientRect();
+    if(!mapRect.width || !mapRect.height || !panelRect.height)return;
+    const position={lat:Number(place.lat),lng:Number(place.lng)};
+    if(!Number.isFinite(position.lat)||!Number.isFinite(position.lng))return;
+    // Pan into the visible part of the map, including phone landscape and desktop.
+    const sidePanel=panelRect.width<mapRect.width*.7;
+    const x=sidePanel?Math.max(0,(mapRect.right-panelRect.left)/2):0;
+    const y=sidePanel?0:Math.max(0,(mapRect.bottom-panelRect.top-40)/2);
+    state.map.setCenter(position);
+    if(typeof state.map.panBy==='function')state.map.panBy(Math.round(x),Math.round(y));
+  });
+}
+
+function syncDetailPanelLayout(){
+  const panel=$('#detail');
+  if(!panel?.classList.contains('show'))return;
+  const expanded=!isMobileMapLayout() || detailExpanded;
+  panel.classList.toggle('detailExpanded',expanded);
+  const body=$('#detailBody'),toggle=$('#detailExpandBtn');
+  if(body)body.hidden=!expanded;
+  if(toggle){
+    toggle.setAttribute('aria-expanded',String(expanded));
+    toggle.textContent=expanded?'지도 더 보기 ▾':'상세정보 펼치기 ▴';
+  }
+  $('.mapwrap')?.classList.add('detailOpen');
+}
+
+function setDetailExpanded(expanded){
+  detailExpanded=Boolean(expanded);
+  const body=$('#detailBody');
+  if(!detailExpanded && body?.contains(document.activeElement))$('#detailExpandBtn')?.focus({preventScroll:true});
+  syncDetailPanelLayout();
+  positionSelectedPlaceInView();
+}
+
 function closeDetailPanel(){
+  detailExpanded=false;
+  detailPlaceId=null;
+  detailPositionFrame++;
   state.selected=null;
   const d=$('#detail');
   if(d)d.classList.remove('show');
@@ -350,6 +400,7 @@ function renderDetail(){
     $('.mapwrap')?.classList.remove('detailOpen');
     return;
   }
+  if(detailPlaceId!==p.id){detailExpanded=false;detailPlaceId=p.id;d.scrollTop=0;}
   const st=stats(p.id);
   const owner=isOwnerPlace(p);
   const canEdit=owner||state.isAdmin;
@@ -367,7 +418,16 @@ function renderDetail(){
 
   d.classList.add('show');
   $('.mapwrap')?.classList.add('detailOpen');
-  d.innerHTML=`<div class="detailHeader"><div class="detailTitleWrap"><h2><button type="button" class="businessReviewName" data-place-reviews="${esc(p.id)}">${esc(p.name)}<span class="reviewNameHint">회원 후기 ${st.reviews.length}개 보기 ›</span></button></h2></div><button id="detailCloseBtn" class="detailClose" type="button" aria-label="상세 닫기">×</button></div>
+  d.innerHTML=`<div class="detailHeader"><div class="detailTitleWrap"><h2><button type="button" class="businessReviewName" data-place-reviews="${esc(p.id)}"><span class="detailName">${esc(p.name)}</span><span class="reviewNameHint">회원 후기 ${st.reviews.length}개 보기 ›</span></button></h2></div><button id="detailCloseBtn" class="detailClose" type="button" aria-label="상세 닫기">×</button></div>
+  <div class="detailSummary">
+    <div class="detailSummaryMeta"><span>${catLabel(p.category)}${p.subcategory?' · '+esc(p.subcategory):''}</span><span class="detailSummaryRating">${st.rating==null?'평가 없음':`★ ${st.rating.toFixed(1)} <small>(${st.count})</small>`}</span></div>
+    ${p.address?`<p class="detailSummaryAddress" title="${esc(p.address)}">${esc(p.address)}</p>`:''}
+  </div>
+  <div class="detailQuickActions">
+    <button type="button" id="detailExpandBtn" aria-expanded="false" aria-controls="detailBody">상세정보 펼치기 ▴</button>
+    <button type="button" class="grabButton" data-grab-place="${esc(p.id)}">그랩으로 이동</button>
+  </div>
+  <div id="detailBody" class="detailBody">
   <div class="copyRow">
     ${copyButtonHtml('업체명 복사',p.name)}
     ${p.address?copyButtonHtml('주소 복사',p.address):''}
@@ -375,8 +435,10 @@ function renderDetail(){
     ${p.address?copyButtonHtml('이름+주소 복사',combinedCopy):''}
   </div>
   ${(p.photoUrls||[]).length?`<div class="placePhotos">${p.photoUrls.slice(0,5).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="${esc(p.name)} 업체 사진"></a>`).join('')}</div>`:''}
-  <div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${owner?'<span class="badge">내가 등록</span>':''}${benefitInlineBadgeHtml(p)}${p.deleteRequested?'<span class="badge deleteRequest">삭제요청</span>':''}</div><div class="desc">${esc(p.address||'')}<br>${esc(p.description||'')}</div>${p.memberBenefit?`<div class="benefitRow"><strong>${benefitInfoLabel(p)}</strong><div class="benefitText">${esc(p.benefitText||'카페 회원 전용 혜택 제공')}</div></div>`:''}<div class="scorebox"><div><div class="scorebig">${st.rating==null?'—':st.rating.toFixed(1)}</div><div style="font-size:11px;color:#6b7280">우리 회원 평균</div></div><div style="font-size:12px;color:#6b7280">평가 ${st.count}개</div></div>${management}<button id="writeReview" class="btn primary">별점·후기 남기기</button><div style="margin-top:12px">${st.reviews.length?st.reviews.map(r=>`<div class="review"><div class="reviewtop"><span>${esc(r.nickname)}</span>${r.rating==null?'':`<span>★ ${r.rating}</span>`}</div><div class="reviewtxt">${esc(r.text)}</div>${normalizeCafeReviewUrl(r.cafeUrl)?`<a class="cafeOriginalLink" href="${esc(normalizeCafeReviewUrl(r.cafeUrl))}" target="_blank" rel="noopener noreferrer">카페 후기 원문 보기 ↗</a>`:''}${(r.photoUrls||[]).length?`<div class="reviewPhotos">${r.photoUrls.slice(0,3).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="회원 후기 사진"></a>`).join('')}</div>`:''}</div>`).join(''):'<div class="empty">아직 회원 후기가 없습니다.</div>'}</div>`;
+  <div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${owner?'<span class="badge">내가 등록</span>':''}${benefitInlineBadgeHtml(p)}${p.deleteRequested?'<span class="badge deleteRequest">삭제요청</span>':''}</div><div class="desc">${esc(p.address||'')}<br>${esc(p.description||'')}</div>${p.memberBenefit?`<div class="benefitRow"><strong>${benefitInfoLabel(p)}</strong><div class="benefitText">${esc(p.benefitText||'카페 회원 전용 혜택 제공')}</div></div>`:''}<div class="scorebox"><div><div class="scorebig">${st.rating==null?'—':st.rating.toFixed(1)}</div><div style="font-size:11px;color:#6b7280">우리 회원 평균</div></div><div style="font-size:12px;color:#6b7280">평가 ${st.count}개</div></div>${management}<button id="writeReview" class="btn primary">별점·후기 남기기</button><div style="margin-top:12px">${st.reviews.length?st.reviews.map(r=>`<div class="review"><div class="reviewtop"><span>${esc(r.nickname)}</span>${r.rating==null?'':`<span>★ ${r.rating}</span>`}</div><div class="reviewtxt">${esc(r.text)}</div>${normalizeCafeReviewUrl(r.cafeUrl)?`<a class="cafeOriginalLink" href="${esc(normalizeCafeReviewUrl(r.cafeUrl))}" target="_blank" rel="noopener noreferrer">카페 후기 원문 보기 ↗</a>`:''}${(r.photoUrls||[]).length?`<div class="reviewPhotos">${r.photoUrls.slice(0,3).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="회원 후기 사진"></a>`).join('')}</div>`:''}</div>`).join(''):'<div class="empty">아직 회원 후기가 없습니다.</div>'}</div></div>`;
 
+  syncDetailPanelLayout();
+  $('#detailExpandBtn').onclick=()=>setDetailExpanded(!detailExpanded);
   if($('#detailCloseBtn')) $('#detailCloseBtn').onclick=()=>closeDetailPanel();
   $('#writeReview').onclick=()=>openReview();
   if($('#editPlaceBtn')) $('#editPlaceBtn').onclick=()=>openEditPlace(p,state.isAdmin?'admin':'owner');
@@ -387,6 +449,9 @@ function renderDetail(){
 function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary()}
 async function selectPlace(id,pan=true,showInfo=false){
   closeSystemInfo();
+  closeAreaPanel();
+  setMobileLegendExpanded(false);
+  if(isMobileMapLayout())closeMobileBusinessList();
   state.selected=id;
   renderList();
   renderDetail();
@@ -399,6 +464,7 @@ async function selectPlace(id,pan=true,showInfo=false){
   if(pan){
     cancelPendingMapWork();
     await focusLocationAtZoom(pos,17);
+    if(state.selected===id)positionSelectedPlaceInView();
   }
   // 업체 선택 시에는 오른쪽 상세패널만 보여주고, 지도 팝업은 띄우지 않는다.
   // 중복 정보가 겹쳐 보이는 문제를 방지하기 위한 통일 동작이다.

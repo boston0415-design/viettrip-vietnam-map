@@ -477,9 +477,11 @@ document.querySelectorAll('.modalback').forEach(modal=>{
 window.addEventListener('resize',()=>{
   if(!isMobileMapLayout()){
     $('#businessSide')?.classList.remove('mobileOpen');
-    $('.mapwrap')?.classList.remove('listOpen','detailOpen');
+    $('.mapwrap')?.classList.remove('listOpen');
   }
   refreshMapAfterMobileLayout();
+  syncDetailPanelLayout();
+  if(state.selected)positionSelectedPlaceInView();
 });
 
 document.addEventListener('keydown',e=>{
@@ -489,8 +491,14 @@ document.addEventListener('keydown',e=>{
     e.stopPropagation();
     return;
   }
-  // Native dialogs manage their own Escape key; otherwise close only the filter menu.
+  // Native dialogs keep their own Escape behavior; then dismiss the visible map panel.
   if(document.querySelector('dialog[open]'))return;
+  if($('#detail')?.classList.contains('show')){
+    if(isMobileMapLayout() && detailExpanded)setDetailExpanded(false);
+    else closeDetailPanel();
+    e.preventDefault();
+    return;
+  }
   if($('#areaLegendTitle')?.getAttribute('aria-expanded')==='true'){
     setMobileLegendExpanded(false,{restoreFocus:true});
     e.preventDefault();
