@@ -275,7 +275,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
 function openReview(){
   const mine=db().reviews.find(r=>r.placeId===state.selected && (r.createdBy||'')===getDeviceId());
 
-  state.rating=mine?.rating||5;
+  state.rating=mine?.rating??null;
   state.reviewExistingPhotos=[...(mine?.photoUrls||[])].slice(0,3);
   state.reviewNewFiles=[];
 
@@ -287,11 +287,13 @@ function openReview(){
   renderReviewPhotoPreview();
   $('#reviewModal').classList.add('open');
 }
-function renderStars(){$('#stars').innerHTML=[1,2,3,4,5].map(n=>`<button class="star ${n<=state.rating?'on':''}" data-star="${n}">★</button>`).join('');document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{state.rating=Number(b.dataset.star);renderStars()})}
+function renderStars(){$('#stars').innerHTML=[1,2,3,4,5].map(n=>`<button type="button" class="star ${n<=state.rating?'on':''}" data-star="${n}" aria-label="${n}점" aria-pressed="${state.rating===n}">★</button>`).join('')+'<button type="button" id="skipReviewRating" class="btn">별점 선택 안 함</button>';document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{state.rating=Number(b.dataset.star);renderStars()});$('#skipReviewRating').onclick=()=>{state.rating=null;renderStars()}}
 async function saveReview(){
   if(state.reviewSaveInProgress)return;
-  const nickname=$('#rName').value.trim(),text=$('#rText').value.trim();
-  if(!nickname||!text){alert('닉네임과 후기를 입력하세요.');return}
+  const text=$('#rText').value.trim();
+  const nickname=$('#rName').value.trim();
+  if(state.rating==null&&!text){alert('별점을 선택하거나 후기를 입력하세요.');return}
+  if(text&&!nickname){alert('후기를 남길 닉네임을 입력하세요.');return}
   const placeId=state.selected;
   if(!placeId)return;
   state.reviewSaveInProgress=true;
@@ -314,7 +316,7 @@ async function saveReview(){
       p_place_id:placeId,
       p_device_id:deviceId,
       p_nickname:nickname,
-      p_rating:Number(state.rating),
+      p_rating:state.rating==null?null:Number(state.rating),
       p_body:text,
       p_photo_urls:photoUrls
     });
@@ -323,17 +325,17 @@ async function saveReview(){
 
     if(existing){
       existing.id=reviewId;
-      existing.nickname=nickname;
-      existing.rating=state.rating;
-      existing.text=text;
+      existing.nickname=nickname||existing.nickname||'회원';
+      existing.rating=state.rating??existing.rating;
+      existing.text=text||existing.text;
       existing.createdAt=now;
       existing.createdBy=deviceId;
-      existing.photoUrls=photoUrls;
+      if(text)existing.photoUrls=photoUrls;
     }else{
       existing={
         id:reviewId,
         placeId,
-        nickname,
+        nickname:nickname||'회원',
         rating:state.rating,
         text,
         createdAt:now,
@@ -356,7 +358,7 @@ async function saveReview(){
     renderAll();
     if(state.selected)renderDetail();
 
-    setDbStatus(`후기 저장 완료 · 사진 ${photoUrls.length}장`,true);
+    setDbStatus('별점·후기 저장 완료',true);
   }catch(err){
     console.error('review/photo save failed',err);
     alert('후기 또는 사진 저장 중 오류가 발생했습니다. 사진은 자동 압축 후 750KB 이하만 업로드됩니다.');

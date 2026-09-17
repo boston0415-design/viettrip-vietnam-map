@@ -130,10 +130,11 @@ function stats(placeId){
   const data=db();
   const place=data.places.find(p=>p.id===placeId);
   const rs=data.reviews.filter(r=>r.placeId===placeId);
-  const values=rs.map(r=>Number(r.rating)).filter(Number.isFinite);
-  if(place && Number.isFinite(Number(place.initialRating))) values.unshift(Number(place.initialRating));
-  if(!values.length)return {rating:null,count:0,reviews:[...rs].reverse()};
-  return {rating:values.reduce((a,b)=>a+b,0)/values.length,count:values.length,reviews:[...rs].reverse()};
+  const values=rs.filter(r=>r.rating!=null).map(r=>Number(r.rating)).filter(r=>Number.isFinite(r)&&r>=1&&r<=5);
+  if(place?.initialRating!=null && Number.isFinite(Number(place.initialRating))) values.unshift(Number(place.initialRating));
+  const reviews=rs.filter(r=>String(r.text||'').trim()).reverse();
+  if(!values.length)return {rating:null,count:0,reviews};
+  return {rating:values.reduce((a,b)=>a+b,0)/values.length,count:values.length,reviews};
 }
 
 function isBenefitPlace(place){

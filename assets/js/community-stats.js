@@ -35,6 +35,6 @@
   Promise.allSettled([
     visits(),
     count('places_public?select=id&limit=0','totalPlaces'),
-    count('reviews?select=id&limit=0','totalReviews')
+    count('reviews?select=id&body=not.is.null&body=neq.&limit=0','totalReviews')
   ]);
 })();
