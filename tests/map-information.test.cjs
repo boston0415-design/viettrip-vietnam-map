@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.join(__dirname,'../assets/js');
-const c=vm.createContext({console,assert,setTimeout,clearTimeout,setInterval,clearInterval,URL});c.window=c;c.matchMedia=q=>({matches:q.includes('hover')});c.document={addEventListener(){},querySelector(){return {}},querySelectorAll(){return []}};
+const c=vm.createContext({console,assert,setTimeout,clearTimeout,setInterval,clearInterval,URL,queueMicrotask,Event});c.window=c;c.dispatchEvent=()=>{};c.matchMedia=q=>({matches:q.includes('hover')});c.document={addEventListener(){},querySelector(){return {}},querySelectorAll(){return []}};
 for(const f of fs.readdirSync(root).filter(f=>/^0[1-8]-/.test(f)).sort())vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),c);
 vm.runInContext(`
 const actualShowClickInfo=showClickInfo;

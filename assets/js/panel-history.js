@@ -25,6 +25,7 @@
     });
     add('detail',detail,()=>detail.classList.contains('show'),closeDetailPanel);
     add('detail-expanded',detail,()=>mobile() && detail.classList.contains('show') && detail.classList.contains('detailExpanded'),()=>setDetailExpanded(false));
+    add('map-info',byId('map'),()=>Boolean(state.clickInfo),()=>closeSystemInfo());
     add('registration',byId('regHint'),()=>state.registerMode,cancelRegisterMode);
     document.querySelectorAll('.modalback').forEach(node=>{
       add(node.id,node,()=>node.classList.contains('open'),()=>closeModalById(node.id));
@@ -109,6 +110,7 @@
     const nodes=new Set(definitions.map(panel=>panel.node));
     if(byId('areaLegendTitle'))nodes.add(byId('areaLegendTitle'));
     nodes.forEach(node=>observer.observe(node,{attributes:true,attributeFilter:['class','open','aria-expanded']}));
+    window.addEventListener('viettrip:map-info-change',sync);
     window.addEventListener('resize',sync);
     window.addEventListener('pageshow',()=>{depth=depthOf(history.state);capacity=Math.max(capacity,depth);sync()});
     sync();

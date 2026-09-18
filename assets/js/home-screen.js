@@ -30,7 +30,8 @@
     dialog.querySelectorAll('[data-home-platform]').forEach(button=>button.addEventListener('click',()=>choosePlatform(button.dataset.homePlatform)));
     choosePlatform(platform);
     byId('homeScreenInApp').hidden=!inApp;
-    byId('homeScreenLink').value=new URL('/',location.href).href;
+    // Share the canonical public address, including when viewing a preview host.
+    byId('homeScreenLink').value='https://viettrip-vietnam-map.pages.dev/';
     barButton.addEventListener('click',()=>{
       sync();if(dialog.open)return;
       if(typeof dialog.showModal==='function')dialog.showModal();else dialog.setAttribute('open','');

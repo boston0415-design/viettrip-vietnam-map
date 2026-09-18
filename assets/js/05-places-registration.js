@@ -312,7 +312,9 @@ function mapFeatureHtml(feature={},radius=null,{directions=false}={}){
   try{const url=new URL(feature.sourceUrl);if(url.protocol==='https:')source=`<p><a href="${esc(url.href)}" target="_blank" rel="noopener noreferrer">${esc(feature.sourceLabel||'안내 원문')} ↗</a></p>`}catch{}
   const note=feature.locationNote?`<p class="mapInfoAddress">${esc(feature.locationNote)}</p>`:'';
   const route=directions?mapFeatureDirectionsHtml(feature):'';
-  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}${note}${source}${route}</section>`;
+  const booking=directions && typeof bookingLinkHtml==='function'?bookingLinkHtml(feature):'';
+  const bookingNote=booking && typeof bookingNoteHtml==='function'?bookingNoteHtml(feature):'';
+  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}${note}${source}${booking?`<div class="mapBookingAction">${booking}</div>${bookingNote}`:''}${route}</section>`;
 }
 function supportsMapHover(){
   return !isMobileMapLayout() && (!window.matchMedia || window.matchMedia('(hover: hover) and (pointer: fine)').matches);
@@ -395,27 +397,49 @@ function cancelPendingMapWork(){
 
 function closeSystemInfo(){
   if(state.clickInfo){
-    state.clickInfo.close();
+    const info=state.clickInfo;
     state.clickInfo=null;
+    info.close();
+    notifyMapInfoChange();
   }
   hideHover();
+}
+
+let mapInfoChangeQueued=false;
+function notifyMapInfoChange(){
+  // Coalesce close/open when changing markers: one visible card, one Back step.
+  if(mapInfoChangeQueued)return;
+  mapInfoChangeQueued=true;
+  queueMicrotask(()=>{
+    mapInfoChangeQueued=false;
+    window.dispatchEvent(new Event('viettrip:map-info-change'));
+  });
 }
 
 function showClickInfo(position,html,anchorMarker=null){
   if(state.clickInfo) state.clickInfo.close();
 
   // Clicked cards may include route controls; keep them inside the map on every screen.
-  state.clickInfo=new google.maps.InfoWindow({
+  const info=new google.maps.InfoWindow({
     content:html,
     disableAutoPan:false
   });
+  state.clickInfo=info;
+  const closed=()=>{
+    // An old card's delayed close must not clear its replacement.
+    if(state.clickInfo===info)state.clickInfo=null;
+    notifyMapInfoChange();
+  };
+  info.addListener?.('close',closed);
+  info.addListener?.('closeclick',closed);
 
   if(anchorMarker){
-    state.clickInfo.open({map:state.map,anchor:anchorMarker});
+    info.open({map:state.map,anchor:anchorMarker});
   }else{
-    state.clickInfo.setPosition(position);
-    state.clickInfo.open({map:state.map});
+    info.setPosition(position);
+    info.open({map:state.map});
   }
+  notifyMapInfoChange();
 }
 
 

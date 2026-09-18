@@ -27,7 +27,8 @@
 <link rel="stylesheet" href="./assets/css/header-layout.css?v=brand-centered3">
 <link rel="stylesheet" href="./assets/css/map-filters.css?v=area-directory1">
 <link rel="stylesheet" href="./assets/css/detail-layout.css?v=directions1">
-<link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-home1">
+<link rel="stylesheet" href="./assets/css/booking-links.css?v=20260918-booking1">
+<link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-booking-back1">
 <link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20260918-guide1">
 </head>
 <body>
@@ -266,6 +267,11 @@
     <button id="closeHomeScreen" type="button" aria-label="홈 화면 추가 안내 닫기">×</button>
   </div>
   <p id="homeScreenIntro" class="homeScreenIntro">홈 화면에 추가한 아이콘을 누르면 지도가 바로 열립니다. 인터넷에 연결하면 열 때와 화면으로 돌아올 때 업소·후기를 다시 불러옵니다.</p>
+  <dl class="homeScreenTrust" aria-label="이용 방식·권한·공식 주소">
+    <div><dt>이용 방식</dt><dd>브라우저의 홈 화면 추가 기능입니다. 별도 APK 파일을 받을 필요가 없고, 추가 없이도 웹에서 이용할 수 있어요.</dd></div>
+    <div><dt>권한</dt><dd>‘내 위치’를 누를 때 위치 권한을 확인합니다. 홈 화면 추가 자체는 연락처·문자 권한을 요청하지 않아요.</dd></div>
+    <div><dt>공식 주소</dt><dd><a href="https://viettrip-vietnam-map.pages.dev/" target="_blank" rel="noopener noreferrer">viettrip-vietnam-map.pages.dev</a><span>일상탈출 카페에 안내된 주소와 확인해 주세요.</span></dd></div>
+  </dl>
   <p id="homeScreenInApp" class="homeScreenNotice" hidden>카페·카카오톡 안에서는 추가 메뉴가 없을 수 있어요. 메뉴의 <strong>다른 브라우저로 열기</strong>를 누르거나, 아래 지도 주소를 복사해 Chrome 또는 Safari에서 열어주세요.</p>
   <button id="homeScreenInstall" class="homeScreenInstall" type="button" hidden>이 기기에 베트남맵 추가</button>
   <p id="homeScreenStatus" class="homeScreenStatus" role="status" aria-live="polite" hidden></p>
@@ -293,8 +299,9 @@
 <script src="./assets/js/02-services-media.js?v=20260918-naver-short1"></script>
 <script src="./assets/js/personal-places.js?v=20260918-personal1"></script>
 <script src="./assets/js/03-business-ui.js?v=20260918-tour-boarding1"></script>
-<script src="./assets/js/04-rendering.js?v=20260918-heritage1"></script>
-<script src="./assets/js/05-places-registration.js?v=20260918-tour-boarding1"></script>
+<script src="./assets/js/booking-links.js?v=20260918-booking1"></script>
+<script src="./assets/js/04-rendering.js?v=20260918-booking-back1"></script>
+<script src="./assets/js/05-places-registration.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260918-range-zoom1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-tour-boarding1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260918-tour-boarding1"></script>
@@ -302,12 +309,12 @@
 <script src="./assets/js/10-runtime-guard.js?v=20260918-feedback-links2"></script>
 <script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>
 <script src="./assets/js/list-layout.js?v=20260917-list1"></script>
-<script src="./assets/js/community-reviews.js?v=20260918-detail2"></script>
+<script src="./assets/js/community-reviews.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=polish1"></script>
-<script src="./assets/js/home-screen.js?v=20260918-home1"></script>
+<script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260918-guide1"></script>
-<script src="./assets/js/panel-history.js?v=20260918-back2"></script>
+<script src="./assets/js/panel-history.js?v=20260918-booking-back1"></script>
 </body>
 </html>

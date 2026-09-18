@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   more.addEventListener('click',load);
   document.querySelectorAll('.travellerDialog').forEach(d=>{
-    d.querySelector('[data-traveller-close]').addEventListener('click',()=>d.close());
+    d.querySelector('[data-traveller-close]')?.addEventListener('click',()=>d.close());
     d.addEventListener('click',event=>{if(event.target===d){const r=d.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)d.close()}});
   });
 });

@@ -62,7 +62,7 @@ async function fixture({ua='Mozilla/5.0 (Linux; Android 16) Chrome/150.0',standa
  const changing=await fixture();changing.mode();assert(changing.id('homeScreenBar').hidden);changing.cleanup();
  const ios=await fixture({ua:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit Safari/604.1'});
  assert(!ios.w.document.querySelector('[data-home-instructions="ios"]').hidden);assert(ios.id('homeScreenInstall').hidden);
- ios.id('copyHomeScreenLink').click();await wait();assert.equal(ios.copied[0],'https://example.test/');ios.cleanup();
+ ios.id('copyHomeScreenLink').click();await wait();assert.equal(ios.copied[0],'https://viettrip-vietnam-map.pages.dev/','share the official address even from a preview host');ios.cleanup();
  const cafe=await fixture({ua:'Mozilla/5.0 (Linux; Android 16) NAVER(inapp)'});assert(!cafe.id('homeScreenInApp').hidden);cafe.cleanup();
  const denied=await fixture({clipboard:false,insecure:true});assert.equal(denied.registered.length,0);denied.id('copyHomeScreenLink').click();await wait();assert.match(denied.id('homeScreenStatus').textContent,/길게 눌러/);assert.equal(denied.id('homeScreenLink').selectionStart,0);denied.cleanup();
  const unavailable=await fixture({workerFails:true});unavailable.id('openHomeScreen').click();assert(unavailable.id('homeScreenDialog').open);unavailable.cleanup();

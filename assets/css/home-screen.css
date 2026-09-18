@@ -20,6 +20,13 @@
 .homeScreenIdentity p{font-size:12px!important;color:#677f77}
 .homeScreenDialog .travellerDialogHead>button{width:40px;height:40px;color:#647c76}
 .homeScreenIntro{margin:0 0 14px;color:#48665f;font-size:13px;line-height:1.7}
+.homeScreenTrust{margin:0 0 16px;padding:12px;border:1px solid #dce9e2;border-radius:12px;background:#f6faf7}
+.homeScreenTrust>div{display:grid;grid-template-columns:60px minmax(0,1fr);gap:8px;margin-top:10px}
+.homeScreenTrust>div:first-child{margin-top:0}
+.homeScreenTrust dt{font-size:12px;font-weight:700;color:#285e53;line-height:1.65}
+.homeScreenTrust dd{margin:0;font-size:12px;line-height:1.65;color:#50665d;overflow-wrap:anywhere}
+.homeScreenTrust a{color:#216b60;text-underline-offset:3px}
+.homeScreenTrust dd span{display:block;font-size:11px;color:#718279;margin-top:2px}
 .homeScreenInstall{width:100%;min-height:46px;border:0;border-radius:12px;background:#247f78;color:#fff;font-size:14px;font-weight:650;cursor:pointer;margin-bottom:12px}
 .homeScreenInstall[hidden],.homeScreenNotice[hidden],.homeScreenStatus[hidden],.homeScreenPlatform[hidden]{display:none}
 .homeScreenInstall:disabled{opacity:.65;cursor:wait}

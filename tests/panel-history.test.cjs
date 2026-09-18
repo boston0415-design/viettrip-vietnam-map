@@ -23,7 +23,14 @@ async function fixture(mobile=true,{stale=false,denied=false}={}){
   for(const name of fs.readdirSync(path.join(root,'assets/js')).filter(name=>/^0[1-8]-/.test(name)).sort())run(script(name));
   run(`
     renderList=()=>{};renderCityControls=()=>{};renderAreaList=()=>{};syncMobileListCount=()=>{};
-    refreshMapAfterMobileLayout=()=>{};closeSystemInfo=()=>{};positionSelectedPlaceInView=()=>{};
+    refreshMapAfterMobileLayout=()=>{};positionSelectedPlaceInView=()=>{};hideHover=()=>{};
+    google={maps:{InfoWindow:class {
+      constructor(){this.events={};this.isOpen=false}
+      addListener(name,fn){(this.events[name]||=[]).push(fn)}
+      setPosition(){} open(){this.isOpen=true}
+      emit(name){(this.events[name]||[]).forEach(fn=>fn())}
+      close(){this.isOpen=false;this.emit('close')}
+    }}};
     isOwnerPlace=()=>false;clearAddressSearchMarker=()=>{};resetPlacePhotoDraftUi=()=>{};closeEditMode=()=>{};
     let reviewDraftResets=0;resetReviewDraftUi=()=>reviewDraftResets++;
     db=()=>({places:[{id:'a',name:'업체',category:'spa',subcategory:'발마사지',address:'주소',lat:10.77,lng:106.7}],reviews:[]});
@@ -112,6 +119,36 @@ async function fixture(mobile=true,{stale=false,denied=false}={}){
     assert(node('areaPanel').classList.contains('show'));assert(guarded());
     await back();assert(!node('areaPanel').classList.contains('show'));assert(!guarded());
 
+    // Google InfoWindow is a real app layer, including native close/X/Escape.
+    for(let i=0;i<6;i++){
+      await action("showClickInfo({lat:10.77,lng:106.7},'boarding')");
+      assert(guarded(),'map card must protect installed-app Back');
+      assert.equal(w.history.state.viettripPanelBack.depth,1);
+      if(i===0)await back();
+      else if(i===1)await action('closeSystemInfo()');
+      else if(i===2)await action("state.clickInfo.emit('closeclick')");
+      else if(i===3)await action('state.clickInfo.close()'); // Maps Escape
+      else if(i===4)await action('state.clickInfo.close();state.clickInfo=null'); // legacy callers
+      else {
+        run("const previousInfo=state.clickInfo;showClickInfo({lat:10.78,lng:106.71},'replacement');previousInfo.emit('close')");
+        await pause();assert(run('Boolean(state.clickInfo)'),'late close cannot erase replacement');
+        assert.equal(w.history.state.viettripPanelBack.depth,1);
+        await back();
+      }
+      assert(!run('Boolean(state.clickInfo)'));assert(!guarded());
+      assert.equal(w.location.href,url);assert.equal(f.criteria(),f.before);
+      assert.equal(w.history.length,initialLength+1,'map cards must not accumulate invisible history');
+    }
+    await action('setMobileLegendExpanded(true)');
+    await action("showClickInfo({lat:10.77,lng:106.7},'above filters')");
+    assert.equal(w.history.state.viettripPanelBack.depth,2);
+    await back();assert(!run('Boolean(state.clickInfo)'));
+    assert.equal(node('areaLegendTitle').getAttribute('aria-expanded'),'true');
+    await back();assert(!guarded());
+    await action("showClickInfo({lat:10.77,lng:106.7},'under install dialog')");
+    await action("document.getElementById('homeScreenDialog').showModal()");
+    await back();assert(!node('homeScreenDialog').open);assert(run('Boolean(state.clickInfo)'));
+    await back();assert(!guarded());
     assert.equal(f.criteria(),f.before);assert.equal(w.location.href,url);
     w.history.forward();await pause();await pause();assert(!guarded(),'stale forward entry is consumed');
     await back();assert.equal(w.location.pathname,'/previous','Back on the bare map leaves normally');

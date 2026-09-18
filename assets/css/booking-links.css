@@ -1,0 +1,13 @@
+.bookingButton{display:inline-flex;align-items:center;justify-content:center;gap:5px;box-sizing:border-box;min-height:44px;padding:8px 11px;border:1px solid #bfdacf;border-radius:10px;background:#edf7f1;color:#246855!important;font:600 12px/1.4 system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+.bookingButton svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.bookingButton:hover{background:#dfefe5;border-color:#8bb7a4}
+.bookingButton:focus-visible{outline:2px solid #247f78;outline-offset:3px}
+.bookingNote,.mapFeatureInfo .bookingNote{font-size:11px;line-height:1.5;color:#63766d;margin:6px 0 8px}
+.mapBookingAction{margin-top:10px}.mapBookingAction .bookingButton{width:100%}
+@media(max-width:900px){
+ #detail .detailQuickActions.hasBooking{grid-template-columns:repeat(4,minmax(0,1fr))}
+ #detail .detailQuickActions.hasBooking button,#detail .detailQuickActions.hasBooking a{font-size:11px;white-space:normal;text-align:center;line-height:1.3;padding:6px 3px}
+ #detail .detailQuickActions.hasBooking svg{display:none}
+ #detail .detailBody .bookingButton{display:none}
+ #detail .detailQuickActions .bookingButton{background:#edf7f1;border-color:#bfdacf}
+}

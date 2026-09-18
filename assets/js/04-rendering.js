@@ -434,6 +434,8 @@ function renderDetail(){
     : '';
 
   const combinedCopy=[p.name,p.address].filter(Boolean).join('\n');
+  const booking=typeof bookingLinkHtml==='function'?bookingLinkHtml(p):'';
+  const bookingNote=booking && typeof bookingNoteHtml==='function'?bookingNoteHtml(p):'';
 
   d.classList.add('show');
   $('.mapwrap')?.classList.add('detailOpen');
@@ -442,19 +444,22 @@ function renderDetail(){
     <div class="detailSummaryMeta"><span>${catLabel(p.category)}${p.subcategory?' · '+esc(p.subcategory):''}</span><span class="detailSummaryRating">${st.rating==null?'평가 없음':`★ ${st.rating.toFixed(1)} <small>(${st.count})</small>`}</span></div>
     ${p.address?`<p class="detailSummaryAddress" title="${esc(p.address)}">${esc(p.address)}</p>`:''}
   </div>
-  <div class="detailQuickActions">
+  <div class="detailQuickActions${booking?' hasBooking':''}">
     <button type="button" id="detailExpandBtn" aria-expanded="false" aria-controls="detailBody">상세보기 ▴</button>
     ${businessDirectionsLinkHtml(p,true)}
     <button type="button" class="grabButton" data-grab-place="${esc(p.id)}">그랩으로 이동</button>
+    ${booking}
   </div>
   <div id="detailBody" class="detailBody">
   <div class="copyRow">
     ${businessDirectionsLinkHtml(p)}
+    ${booking}
     ${copyButtonHtml('업체명 복사',p.name)}
     ${p.address?copyButtonHtml('주소 복사',p.address):''}
     <button type="button" class="copyBtn grabButton" data-grab-place="${esc(p.id)}">그랩으로 이동</button>
     ${p.address?copyButtonHtml('이름+주소 복사',combinedCopy):''}
   </div>
+  ${bookingNote}
   ${(p.photoUrls||[]).length?`<div class="placePhotos">${p.photoUrls.slice(0,5).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="${esc(p.name)} 업체 사진"></a>`).join('')}</div>`:''}
   <div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${owner?'<span class="badge">내가 등록</span>':''}${benefitInlineBadgeHtml(p)}${p.deleteRequested?'<span class="badge deleteRequest">삭제요청</span>':''}</div><div class="desc">${esc(p.address||'')}<br>${esc(p.description||'')}</div>${p.memberBenefit?`<div class="benefitRow"><strong>${benefitInfoLabel(p)}</strong><div class="benefitText">${esc(p.benefitText||'카페 회원 전용 혜택 제공')}</div></div>`:''}<div class="scorebox"><div><div class="scorebig">${st.rating==null?'—':st.rating.toFixed(1)}</div><div style="font-size:11px;color:#6b7280">우리 회원 평균</div></div><div style="font-size:12px;color:#6b7280">평가 ${st.count}개</div></div>${management}<button id="writeReview" class="btn primary">별점·후기 남기기</button><div style="margin-top:12px">${st.reviews.length?st.reviews.map(r=>`<div class="review"><div class="reviewtop"><span>${esc(r.nickname)}</span>${r.rating==null?'':`<span>★ ${r.rating}</span>`}</div><div class="reviewtxt">${esc(r.text)}</div>${normalizeCafeReviewUrl(r.cafeUrl)?`<a class="cafeOriginalLink" href="${esc(normalizeCafeReviewUrl(r.cafeUrl))}" target="_blank" rel="noopener noreferrer">카페 후기 원문 보기 ↗</a>`:''}${(r.photoUrls||[]).length?`<div class="reviewPhotos">${r.photoUrls.slice(0,3).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="회원 후기 사진"></a>`).join('')}</div>`:''}</div>`).join(''):'<div class="empty">아직 회원 후기가 없습니다.</div>'}</div></div>`;
 
