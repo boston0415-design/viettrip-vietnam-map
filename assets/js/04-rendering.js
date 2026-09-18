@@ -706,7 +706,8 @@ function openPlace(prefill={}){
     : REGISTRANT_NICKNAME_HELP;
   bindRememberedNicknameInput($('#pNickname'));
   $('#pName').value=prefill.name||'';
-  $('#pArea').value=prefill.area||currentCity().label||'';
+  const registrationCity=state.city==='all'?CITY_DATA[nearestCityKeyForLatLng(state.clickLatLng?.lat,state.clickLatLng?.lng)]:currentCity();
+  $('#pArea').value=prefill.area||registrationCity?.label||'';
   $('#pAddress').value=prefill.address||'';
   $('#pDesc').value=prefill.description||'';
   if($('#addressLookupStatus')) $('#addressLookupStatus').textContent=prefill.addressMode

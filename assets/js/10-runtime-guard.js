@@ -69,12 +69,12 @@
   }
   if(typeof placeInCity==='function'){
     placeInCity=function(place,cityKey=state.city){
-      return !!place && scopedPlaceCityKey(place)===cityKey;
+      return !!place && (cityKey==='all' || scopedPlaceCityKey(place)===cityKey);
     };
   }
   if(typeof placesForCurrentCity==='function'){
     placesForCurrentCity=function(){
-      return (db().places||[]).filter(p=>scopedPlaceCityKey(p)===state.city);
+      return (db().places||[]).filter(p=>placeInCity(p,state.city));
     };
   }
 

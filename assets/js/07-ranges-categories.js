@@ -39,7 +39,7 @@ function estimateBoundsZoom(bounds,padding=78,maxZoom=16){
   let target=Math.min(zoomX,zoomY,maxZoom);
   if(!Number.isFinite(target))target=maxZoom;
 
-  return Math.max(4,target);
+  return Math.max(state.city==='all'?0:4,target);
 }
 
 async function smoothFitBounds(bounds,{padding=78,maxZoom=16,duration=560}={}){

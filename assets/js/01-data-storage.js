@@ -24,6 +24,8 @@ const RESTAURANT_TAG_GROUPS=[
 ];
 const RESTAURANT_TAGS=RESTAURANT_TAG_GROUPS.flatMap(group=>group.tags);
 
+// A browsing scope, not a city used for classifying or saving places.
+const ALL_CITIES_VIEW={label:'전체',center:{lat:16,lng:106},zoom:5,areas:[],golf:[]};
 const CITY_DATA={
   hcmc:{
     label:'호치민', center:{lat:10.7769,lng:106.7009}, zoom:12,

@@ -445,6 +445,7 @@ function searchMap(){
     clearSearchMarker();
     renderAll();
     renderHierarchyNav();
+    if(state.city==='all')fitAllRegisteredPlacesView();
     return;
   }
 
@@ -452,7 +453,7 @@ function searchMap(){
   const all=db().places;
   const ql=q.toLowerCase();
   const matches=all.filter(p=>
-    `${p.name||''} ${p.area||''} ${p.address||''} ${p.subcategory||''}`.toLowerCase().includes(ql)
+    `${p.name||''} ${p.area||''} ${p.address||''} ${catLabel(p.category)} ${p.subcategory||''}`.toLowerCase().includes(ql)
   );
 
   if(matches.length){
@@ -465,7 +466,7 @@ function searchMap(){
     const p=matches[0];
     const matchedCity=placeCityKey(p);
 
-    if(matchedCity && CITY_DATA[matchedCity]){
+    if(state.city!=='all' && matchedCity && CITY_DATA[matchedCity]){
       state.city=matchedCity;
       state.areaType='all';
       renderCityControls();
@@ -477,12 +478,13 @@ function searchMap(){
     state.sub='all';
     state.navCategory=null;
     state.query=q;
-    state.selected=p.id;
+    state.selected=state.city==='all'?null:p.id;
     clearSearchMarker();
 
     renderAll();
     renderHierarchyNav();
-    selectPlace(p.id,true,true);
+    if(state.city==='all')fitAllRegisteredPlacesView();
+    else selectPlace(p.id,true,true);
     return;
   }
 
@@ -500,7 +502,7 @@ function searchMap(){
   }
 
   const service=new google.maps.places.PlacesService(state.map);
-  const city=currentCity()?.label || 'Vietnam';
+  const city=state.city==='all'?'Vietnam':currentCity()?.label || 'Vietnam';
   service.findPlaceFromQuery({
     query:`${q}, ${city}, Vietnam`,
     fields:['name','formatted_address','geometry','place_id','types']

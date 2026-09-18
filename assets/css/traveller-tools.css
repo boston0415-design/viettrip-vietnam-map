@@ -26,7 +26,7 @@
 .travellerToolbar button{border:1px solid #cbd5e1;background:#fff;color:#334155;padding:6px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer}
 .travellerToolbar button[aria-expanded=true]{color:#b91c1c;border-color:#b91c1c;background:#fff7f7}
 .adminRegionControls{padding:10px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:9px;margin-bottom:8px}
-.adminRegionControls[hidden]{display:none}
+.adminRegionControls[hidden],#cityInfoTools[hidden]{display:none}
 .adminRegionControls label{font-size:11px;font-weight:700}
 .adminSelectRow{display:flex;gap:6px;margin:5px 0}
 .adminSelectRow select{flex:1;min-width:0;max-width:100%;height:35px;border:1px solid #cbd5e1;border-radius:5px;background:#fff;font-size:12px}

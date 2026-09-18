@@ -170,7 +170,7 @@ function renderMapFilterRow(selector,label,choices){
 function renderHierarchyNav(){
   syncMapFilterSummary();
   renderMapFilterRow('#quickAreas','분류',
-    NAV_CATEGORIES.map(c=>
+    NAV_CATEGORIES.filter(c=>state.city!=='all' || c.kind==='business' || ['shopping','market-nav','attraction-nav','golf-nav','hospital','pharmacy'].includes(c.id)).map(c=>
       `<button type="button" aria-pressed="${state.navCategory===c.id?'true':'false'}" class="navCat ${state.navCategory===c.id?'active':''}" data-nav-cat="${c.id}">${c.label}</button>`
     ).join(''));
 
@@ -400,10 +400,12 @@ function renderCityControls(){
   const city=currentCity();
   $('#activeCityName').textContent=city.label;
   $('#areaPanelTitle').textContent=`${city.label} 주요정보`;
+  // Geographic guides need a specific city; the all-city scope is for registered places.
+  if($('#cityInfoTools'))$('#cityInfoTools').hidden=state.city==='all';
 
   renderMapFilterRow('#cityChips','도시',
-    Object.entries(CITY_DATA).map(([key,c])=>
-      `<button type="button" class="cityChip ${state.city===key?'active':''}" data-city="${key}">${c.label}</button>`
+    [['all',ALL_CITIES_VIEW],...Object.entries(CITY_DATA)].map(([key,c])=>
+      `<button type="button" aria-pressed="${state.city===key}" class="cityChip ${state.city===key?'active':''}" data-city="${key}">${c.label}</button>`
     ).join(''));
 
   document.querySelectorAll('[data-city]').forEach(btn=>{
@@ -417,6 +419,7 @@ function renderCityControls(){
 
 
 function fitSelectedCityView(key){
+  if(key==='all')return fitAllRegisteredPlacesView();
   if(!state.map || !CITY_DATA[key])return;
 
   const city=CITY_DATA[key];
@@ -456,8 +459,17 @@ function fitSelectedCityView(key){
   return focusRangeLocation(city.center,0);
 }
 
+function fitAllRegisteredPlacesView(){
+  if(!state.map)return;
+  const bounds=makeBounds();
+  const locations=items().map(validMapLocation).filter(Boolean);
+  // Empty results retain a useful country view without inventing a marker location.
+  (locations.length?locations:Object.values(CITY_DATA).map(c=>c.center)).forEach(p=>bounds.extend(p));
+  return fitUnifiedBounds(bounds,{padding:82,maxZoom:16});
+}
+
 function switchCity(key){
-  if(!CITY_DATA[key])return;
+  if(key!=='all' && !CITY_DATA[key])return;
   if(typeof resetAdministrativeRegions==='function')resetAdministrativeRegions();
 
   cancelPendingMapWork();
@@ -465,6 +477,7 @@ function switchCity(key){
   clearAreaLabels();
   clearSelectedSystemIcons();
   clearSelectionRanges();
+  closeAreaPanel();
 
   state.city=key;
   state.hospitalSpecialty='all';
@@ -490,8 +503,10 @@ function switchCity(key){
     }
     if(state.hoverInfo)state.hoverInfo.close();
 
-    fitSelectedCityView(key);
-    showCityRange(key,`city:${key}`);
+    if(key!=='all'){
+      fitSelectedCityView(key);
+      showCityRange(key,`city:${key}`);
+    }
   }
 
   // 도시를 바꿀 때 업체 목록·마커·상세까지 전부 새 도시 기준으로 다시 그림.
@@ -500,7 +515,11 @@ function switchCity(key){
   renderAll();
   renderAreaList();
   renderPopularAreas();
-  setDbStatus(`${c.label} 주요정보`,true);
+  if(key==='all'){
+    collapseMobileLegend();
+    fitSelectedCityView(key);
+  }
+  setDbStatus(key==='all'?`전체 도시 · 등록 업소 ${items().length}곳`:`${c.label} 주요정보`,true);
 }
 function renderAreaList(){
   const city=currentCity();
@@ -650,7 +669,7 @@ function mapFilterSummary(){
   if(state.ratingFilter && state.ratingFilter!=='all')parts.push(state.ratingFilter==='4.5'?'4.5★ 이상':`${state.ratingFilter}★`);
   if(state.benefitFilter && state.benefitFilter!=='all')parts.push('혜택업소');
   if(state.query)parts.push(`검색: ${state.query}`);
-  if(parts.length===1)parts.push('전체');
+  if(parts.length===1)parts.push(state.city==='all'?'등록 업소':'전체');
   return parts;
 }
 

@@ -130,7 +130,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
 
       state.selected=placeId;
       const updatedCity=nearestCityKeyForLatLng(loc.lat,loc.lng);
-      if(updatedCity && CITY_DATA[updatedCity]){
+      if(state.city!=='all' && updatedCity && CITY_DATA[updatedCity]){
         state.city=updatedCity;
         renderCityControls();
         renderAreaList();
@@ -212,7 +212,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
 
   const newPlace={
     id:newId,
-    cityKey:nearestCityKeyForLatLng(loc.lat,loc.lng)||state.city,
+    cityKey:nearestCityKeyForLatLng(loc.lat,loc.lng)||(state.city==='all'?null:state.city),
     name,
     registrantNickname,
     category:$('#pCat').value,
@@ -271,7 +271,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
   const savedPos={lat:Number(loc.lat),lng:Number(loc.lng)};
   const savedCity=placeCityKey(newPlace);
 
-  if(savedCity && CITY_DATA[savedCity]){
+  if(state.city!=='all' && savedCity && CITY_DATA[savedCity]){
     state.city=savedCity;
     renderCityControls();
     renderAreaList();

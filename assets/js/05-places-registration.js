@@ -245,14 +245,14 @@ function placeCityKey(place){
 }
 
 function placeInCity(place,cityKey=state.city){
-  return !!place && placeCityKey(place)===cityKey;
+  return !!place && (cityKey==='all' || placeCityKey(place)===cityKey);
 }
 
 function placesForCurrentCity(){
   return db().places.filter(p=>placeInCity(p,state.city));
 }
 
-function currentCity(){return CITY_DATA[state.city]||CITY_DATA.hcmc}
+function currentCity(){return state.city==='all'?ALL_CITIES_VIEW:CITY_DATA[state.city]||CITY_DATA.hcmc}
 function extraCity(){return EXTRA_DATA[state.city]||{zones:[],points:[]}}
 function currentAreas(){return [...(currentCity().areas||[]),...(extraCity().zones||[])]}
 function currentGolf(){return currentCity().golf||[]}
