@@ -561,6 +561,12 @@ function renderPlaceStars(){
 function inferCategory(name='',types=[]){
   const n=name.toLowerCase();
   const t=new Set(types||[]);
+  const officeType=Object.keys(PUBLIC_OFFICE_PLACE_TYPES).find(type=>t.has(type));
+  if(officeType){
+    const officeName=n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').normalize('NFC');
+    const immigration=['police','local_government_office'].includes(officeType) && /출입국|\bimmigration\b|\bxuat nhap canh\b/.test(officeName);
+    return ['public_office',immigration?'출입국관리':PUBLIC_OFFICE_PLACE_TYPES[officeType]];
+  }
   if(t.has('pharmacy')||t.has('drugstore')) return ['pharmacy','약국'];
   if(t.has('veterinary_care')) return ['hospital','동물병원'];
   if(t.has('dentist')) return ['hospital','치과'];

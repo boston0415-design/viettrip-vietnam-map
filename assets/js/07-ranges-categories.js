@@ -174,7 +174,8 @@ function categoryRangeColor(categoryId){
     market:'#8b5cf6',
     attraction:'#10b981',
     hospital:'#dc2626',
-    pharmacy:'#078966'
+    pharmacy:'#078966',
+    public_office:'#475569'
   })[categoryId]||'#475569';
 }
 

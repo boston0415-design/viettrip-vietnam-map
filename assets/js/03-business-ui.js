@@ -39,6 +39,7 @@ const MAP_SYMBOL_PATHS={
 
 function businessSymbolKey(category,subcategory=''){
   const sub=String(subcategory||'').trim();
+  if(category==='public_office')return 'account_balance';
   if(category==='bar'){
     if(!sub || /클럽|club|디스코/i.test(sub))return 'headphones';
     if(/펍|pub|beer|맥주/i.test(sub))return 'sports_bar';

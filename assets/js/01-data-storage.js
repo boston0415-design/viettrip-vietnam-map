@@ -13,8 +13,16 @@ const CONFIG={
     bar:{label:'클럽·바',subs:['클럽','루프탑 바','펍']},
     golf:{label:'골프장',subs:['골프장','실내 골프']},
     pharmacy:{label:'약국',subs:['약국']},
+    public_office:{label:'공공기관',subs:['대사관·영사관','출입국관리','경찰서','행정기관','우체국','기타 공공기관']},
     hospital:{label:'병원',subs:['종합병원·일반진료','피부과','내과','정형외과','치과','안과','이비인후과','산부인과','소아과','비뇨의학과','건강검진','응급실','동물병원']}
   }
+};
+
+// Google Places types used by registration and address/name validation.
+const PUBLIC_OFFICE_PLACE_TYPES={
+  embassy:'대사관·영사관',police:'경찰서',post_office:'우체국',
+  local_government_office:'행정기관',city_hall:'행정기관',
+  courthouse:'기타 공공기관',fire_station:'기타 공공기관'
 };
 
 const RESTAURANT_TAG_GROUPS=[
@@ -370,6 +378,7 @@ const NAV_CATEGORIES=[
   {id:'korean-zone',label:'한인생활권',kind:'area',type:'한인생활권'},
   {id:'hospital',label:'병원',kind:'point',type:'병원'},
   {id:'pharmacy',label:'약국',kind:'point',type:'약국'},
+  {id:'public_office',label:'공공기관',kind:'business'},
   {id:'attraction-nav',label:'관광명소',kind:'area',type:'관광명소'},
   {id:'golf-nav',label:'골프장',kind:'golf',type:'골프장'}
 ];
