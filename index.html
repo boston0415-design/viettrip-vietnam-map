@@ -28,6 +28,7 @@
 <link rel="stylesheet" href="./assets/css/map-filters.css?v=area-directory1">
 <link rel="stylesheet" href="./assets/css/detail-layout.css?v=directions1">
 <link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-home1">
+<link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20260918-guide1">
 </head>
 <body>
 <div class="app">
@@ -35,7 +36,7 @@
     <div class="brand">
       <div class="brandTitle"><span class="brandMark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><span>일상탈출 <em>베트남맵</em></span></div>
       <small>회원의 경험으로 함께 만드는 베트남 로컬지도</small>
-      <a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a>
+      <div class="brandLinks"><a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a><a id="mapGuideLink" class="mapGuideLink" href="./guide/">여행가이드 ↗</a></div>
     </div>
     <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" aria-label="업체명, 지역, 세부분류 검색" placeholder="업체명·지역·분류 검색"><button id="searchBtn">검색</button></div>
     <div class="actions">
@@ -108,6 +109,7 @@
         <div class="areaLegendOptions">
         <div id="cityChips" class="cityRow"></div>
         <div class="travellerToolbar">
+          <a id="relatedGuideLink" href="./guide/">이 분류 이용가이드 ↗</a>
           <button id="openTransportGuide" type="button">공항·교통 안내</button>
           <button id="openAdminRegions" type="button" aria-expanded="false" aria-controls="adminRegionControls">행정구역 경계</button>
           <button id="openAreaDirectory" type="button" aria-controls="areaPanel">지역 정보 목록</button>
@@ -305,6 +307,7 @@
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=polish1"></script>
 <script src="./assets/js/home-screen.js?v=20260918-home1"></script>
+<script src="./assets/js/guide-map-link.js?v=20260918-guide1"></script>
 <script src="./assets/js/panel-history.js?v=20260918-back2"></script>
 </body>
 </html>
