@@ -166,6 +166,274 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
       }
     ],
     "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "d1d8099f-8864-43ef-8025-7f77771b92d1",
+    "name": "Lousiane Brewhouse Nha Trang Restaurant & Craft Beer",
+    "category": "bar",
+    "address": "Lô 29 Trần Phú, Nha Trang, Khánh Hòa 650000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://louisianebrewhouse.com.vn/contact-us-reservations/",
+    "note": "Lô 29 Trần Phú 지점입니다. 방문 날짜·시간·인원을 알려 예약 가능 여부를 문의하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/lousianebrewhouserestaurantnhatrang"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "a3c685fa-2d7d-459c-a0bc-f5d6d3cac080",
+    "name": "MZ Club - Live Music",
+    "category": "bar",
+    "address": "56 Bùi Thị Xuân, Bến Thành, Hồ Chí Minh 71009 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://mzentertainment.vn/index.php",
+    "note": "56 Bùi Thị Xuân의 MZ Club 문의 채널입니다. 공연 일정과 테이블 예약 조건을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/MZClubSaigon"
+      },
+      {
+        "kind": "zalo",
+        "url": "https://zalo.me/0906025658"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "43394a14-497e-4ad9-8c91-062bd48f313a",
+    "name": "Sailing Club",
+    "category": "bar",
+    "address": "72 74 Trần Phú, Nha Trang, Khánh Hòa 570000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://sailingclubnhatrang.com/",
+    "note": "72–74 Trần Phú 지점의 공식 예약 Messenger입니다. 방문 일시·인원과 원하는 좌석을 문의하세요.",
+    "channels": [
+      {
+        "kind": "messenger",
+        "url": "https://m.me/sailingclubnhatrang"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "4dd4eb44-4e31-4ec3-b0c7-c5b68913cb29",
+    "name": "스카이라이트",
+    "category": "bar",
+    "address": "38 Trần Phú, Phường, Nha Trang, Khánh Hòa 650000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://skylightnhatrang.com/",
+    "note": "38 Trần Phú의 Skylight입니다. 루프톱 테이블 또는 Lá Kitchen 식사 중 원하는 이용 방식과 일정을 알려주세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/skylightnhatrang"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "6a01a7f0-3f2b-443b-92cb-468d085503aa",
+    "name": "East West Brewing – Sai Gon 🍺",
+    "category": "restaurant",
+    "address": "181 Lý Tự Trọng, Bến Thành, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://eastwestbrewing.vn/taproom/ho-chi-minh",
+    "note": "호치민 Downtown Saigon 지점의 공식 예약 안내에서 연결한 페이지입니다. 181 Lý Tự Trọng 지점으로 문의하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/eastwestbrewing.saigon/"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "8b625d7d-9da2-4aa0-ac03-43984b809ea4",
+    "name": "Sushi Hokkaido Sachi",
+    "category": "restaurant",
+    "address": "139 A-B Nguyễn Trãi, Bến Thành, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://sushihokkaidosachi.com.vn/location/",
+    "note": "공식 공통 페이지입니다. 139 A–B Nguyễn Trãi 지점을 지정하고 방문 시간·인원을 알려주세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/sushihokkaidosachi/"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "15eae798-a243-4241-a984-a885ae47d46e",
+    "name": "Yakiniku Yazawa Saigon",
+    "category": "restaurant",
+    "address": "219 Điện Biên Phủ, Xuân Hòa, Hồ Chí Minh 70000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://yazawameat.vn/",
+    "note": "219 Điện Biên Phủ의 Yakiniku Yazawa Saigon입니다. 방문 날짜·시간·인원을 알려 예약 가능 여부를 문의하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/yazawa.saigon/"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "2fd8c945-2e8f-4e7c-a31f-5cfa39c32e47",
+    "name": "꽌웃웃",
+    "category": "restaurant",
+    "address": "168 Võ Văn Kiệt, P, Bến Thành, Hồ Chí Minh 70000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://quanutut.com/",
+    "note": "공식 공통 페이지입니다. 168 Võ Văn Kiệt 지점을 지정하고 예약 가능 여부를 문의하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/quanutut"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "acbc3ab7-57bd-474a-86c3-9d62e97db797",
+    "name": "냐 항 응온",
+    "category": "restaurant",
+    "address": "160 Pasteur, Quận 1, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://nhahangngon.com.vn/",
+    "note": "160 Pasteur의 Ngon Sài Gòn 지점입니다. 다른 도시 지점과 혼동하지 않도록 주소와 방문 일정을 함께 알려주세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/Nhahang.QuanAnNgon/"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "87318604-17e7-47a8-b411-e8a66d641d55",
+    "name": "라 브라세리",
+    "category": "restaurant",
+    "address": "235 Nguyễn Văn Cừ, Nguyễn Cư Trinh, 1, Hotel Nikko Saigon, 235 Nguyễn Văn Cừ, Cầu Ông Lãnh, Hồ Chí Minh 70000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://hotelnikkosaigon.com.vn/",
+    "note": "Hotel Nikko Saigon의 공식 페이지입니다. 객실 대신 La Brasserie 식사 예약을 원한다고 적고 날짜·인원·식사 시간을 알려주세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/hotelnikkosaigonvn/"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "ac3d368a-ae8b-458d-b4ae-a2302a0e86d7",
+    "name": "벱메인 1- 레 탄 톤",
+    "category": "restaurant",
+    "address": "136/9 Lê Thánh Tôn, Bến Thành, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://bep.mein.vn/",
+    "note": "벱메인 1호점 · 136/9 Lê Thánh Tôn의 공식 예약 Messenger입니다. 방문 날짜·시간·인원을 알려주세요.",
+    "channels": [
+      {
+        "kind": "messenger",
+        "url": "https://m.me/bepmein"
+      },
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/bepmein"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "b4060ec5-a8a5-4566-ab5e-9bfca9701c22",
+    "name": "벱메인2- 응우옌 타이 빈",
+    "category": "restaurant",
+    "address": "165/50 Nguyễn Thái Bình, Bến Thành, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://bep.mein.vn/",
+    "note": "벱메인 2호점 · 165/50 Nguyễn Thái Bình의 공식 예약 Messenger입니다. 방문 날짜·시간·인원을 알려주세요.",
+    "channels": [
+      {
+        "kind": "messenger",
+        "url": "https://m.me/BepMeInNguyenThaiBinh"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "c445b290-232a-4252-8d91-97b5d864ffd0",
+    "name": "MIUMIU SPA 2",
+    "category": "spa",
+    "address": "2B Chu Mạnh Trinh, Sài Gòn, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://miumiuspa.com/",
+    "note": "Miu Miu 2 · 2B Chu Mạnh Trinh 지점을 지정하세요. 원하는 마사지·인원·시간과 당일 운영 여부를 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/miumiuspa.com.vn"
+      },
+      {
+        "kind": "whatsapp",
+        "url": "https://wa.me/84971769659"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "2e287163-0670-4370-a81a-f2904ff22bde",
+    "name": "Wink Saigon Centre, part of Unscripted by Hyatt",
+    "category": "stay",
+    "address": "75 Nguyễn Bỉnh Khiêm, Ward, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://wink-hotels.com/",
+    "note": "Wink Hotels 공식 공통 페이지입니다. Saigon Centre · 75 Nguyễn Bỉnh Khiêm을 지정하고 숙박 날짜·인원·객실을 문의하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/WinkHotels/"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "961940f4-eb4d-4b5d-9363-692b570fd591",
+    "name": "뉴월드 사이공 호텔",
+    "category": "stay",
+    "address": "76 Lê Lai, Bến Thành, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://saigon.newworldhotels.com/en/",
+    "note": "76 Lê Lai의 New World Saigon Hotel 공식 페이지입니다. 숙박 날짜·인원·객실과 예약 조건을 문의하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/Saigon.NewWorldHotel"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "5e376d45-d6ec-49fe-b36a-2d13f86b387f",
+    "name": "베이 호텔 호치민",
+    "category": "stay",
+    "address": "7 Ngô Văn Năm, Sài Gòn, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.bayhotelhcm.com/",
+    "note": "7 Ngô Văn Năm의 Bay Hotel Ho Chi Minh 공식 페이지입니다. 숙박 날짜·인원·객실과 예약 조건을 문의하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/bayhotelhochiminh/"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
   }
 ]);
 const VERIFIED_POINT_BOOKINGS=Object.freeze([
@@ -230,8 +498,8 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
 function bookingIdentity(value){return String(value||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase()}
 const BOOKING_CONTACT_TYPES=Object.freeze({
   zalo:{label:'Zalo로 문의',hosts:['zalo.me']},
-  messenger:{label:'Messenger로 문의',hosts:['m.me','www.messenger.com','messenger.com']},
-  facebook:{label:'Facebook 페이지',hosts:['www.facebook.com','facebook.com','m.facebook.com']},
+  messenger:{label:'메신저로 문의',hosts:['m.me','www.messenger.com','messenger.com']},
+  facebook:{label:'페이스북으로 문의',hosts:['www.facebook.com','facebook.com','m.facebook.com']},
   kakao:{label:'카카오톡으로 문의',hosts:['pf.kakao.com','open.kakao.com']},
   whatsapp:{label:'WhatsApp으로 문의',hosts:['wa.me','api.whatsapp.com']},
   phone:{label:'전화로 문의',hosts:[]}
@@ -280,7 +548,7 @@ function openBookingInquiry(id){
   dialog.querySelector('#bookingInquiryNote').textContent=booking.note;
   dialog.querySelector('#bookingInquiryChannels').innerHTML=channels.map(channel=>{
     const phone=channel.kind==='phone',label=BOOKING_CONTACT_TYPES[channel.kind].label;
-    const hint=phone?channel.display:channel.kind==='facebook'?'페이지에서 메시지 보내기':'앱 또는 웹으로 열기';
+    const hint=phone?channel.display:channel.kind==='facebook'?'페이지의 메시지 버튼으로 문의':'앱 또는 웹으로 열기';
     return `<div class="bookingContactRow"><a class="bookingContactLink" href="${esc(channel.url)}" ${phone?'':'target="_blank" rel="noopener noreferrer"'} aria-label="${esc(place.name)} ${esc(label)}${phone?'':' · 외부 서비스, 새 창'}"><span><strong>${esc(label)}</strong><small>${esc(hint||channel.url.slice(4))}</small></span><span class="bookingContactArrow" aria-hidden="true">↗</span></a>${phone?`<button type="button" class="bookingPhoneCopy" data-booking-phone="${esc(channel.url.slice(4))}" aria-label="${esc(channel.display||'전화번호')} 복사">번호 복사</button>`:''}</div>`;
   }).join('');
   const source=dialog.querySelector('#bookingInquirySource');

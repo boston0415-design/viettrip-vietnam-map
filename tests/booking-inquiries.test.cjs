@@ -18,7 +18,8 @@ async function check(mobile){
     db=()=>contactFixture;
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
-    assert.equal(VERIFIED_BUSINESS_CONTACTS.length,4);
+    assert.equal(new Set(VERIFIED_BUSINESS_CONTACTS.map(p=>p.id)).size,VERIFIED_BUSINESS_CONTACTS.length,'each verified branch has one contact entry');
+    assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);
       assert(entry.channels.every(validBookingContact));
@@ -69,18 +70,25 @@ async function check(mobile){
     assert.equal(dialog.querySelector('#bookingInquirySource').href,entry.sourceUrl);
     assert(dialog.querySelector('#bookingInquiryChecked').textContent.includes(entry.verifiedOn));
 
-    // Clipboard API success; no call/message/navigation is triggered.
-    let copied;Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:{writeText:async text=>{copied=text}}});
-    const copy=dialog.querySelector('[data-booking-phone]');copy.click();await pause();
-    assert.equal(copied,entry.channels.find(c=>c.kind==='phone').url.slice(4));
-    assert(dialog.querySelector('#bookingInquiryStatus').textContent.includes('복사했습니다'));
-    // Clipboard fallback must stay inside the native modal's focus boundary.
-    Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw Error('denied')}}});
-    w.document.execCommand=command=>{assert.equal(command,'copy');assert(dialog.contains(w.document.activeElement));return true};
-    copy.click();await pause();assert(dialog.querySelector('#bookingInquiryStatus').textContent.includes('복사했습니다'));
-    w.document.execCommand=()=>false;copy.click();await pause();
-    assert(dialog.querySelector('#bookingInquiryStatus').textContent.includes('복사하지 못했습니다'));
-    assert.equal(dialog.querySelectorAll('textarea').length,0);
+    const phone=entry.channels.find(c=>c.kind==='phone');
+    const copy=dialog.querySelector('[data-booking-phone]');
+    if(phone){
+      assert(copy);
+      // Clipboard API success; no call/message/navigation is triggered.
+      let copied;Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:{writeText:async text=>{copied=text}}});
+      copy.click();await pause();
+      assert.equal(copied,entry.channels.find(c=>c.kind==='phone').url.slice(4));
+      assert(dialog.querySelector('#bookingInquiryStatus').textContent.includes('복사했습니다'));
+      // Clipboard fallback must stay inside the native modal's focus boundary.
+      Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw Error('denied')}}});
+      w.document.execCommand=command=>{assert.equal(command,'copy');assert(dialog.contains(w.document.activeElement));return true};
+      copy.click();await pause();assert(dialog.querySelector('#bookingInquiryStatus').textContent.includes('복사했습니다'));
+      w.document.execCommand=()=>false;copy.click();await pause();
+      assert(dialog.querySelector('#bookingInquiryStatus').textContent.includes('복사하지 못했습니다'));
+      assert.equal(dialog.querySelectorAll('textarea').length,0);
+    }else{
+      assert.equal(copy,null,'social-only contacts do not show an empty phone action');
+    }
 
     w.history.back();await pause();assert(!dialog.open);
     assert(w.document.getElementById('detail').classList.contains('show'),'Back closes only the inquiry dialog');
@@ -107,5 +115,5 @@ async function check(mobile){
 
 (async()=>{
   await check(true);await check(false);
-  console.log('PASS 4 verified branch inquiry routes: compact/desktop actions, safe URLs, branch mismatch, current-data revalidation, clipboard success/fallback/failure, Back/X/Escape and preserved map criteria');
+  console.log('PASS all verified branch inquiry routes (including Facebook/Messenger-only contacts): compact/desktop actions, safe URLs, branch mismatch, current-data revalidation, clipboard success/fallback/failure, Back/X/Escape and preserved map criteria');
 })().catch(error=>{console.error(error);process.exitCode=1});
