@@ -139,6 +139,11 @@ function subItemsForNav(def){
       .map(a=>({label:a.name,kind:'area',value:a.name}));
   }
 
+  if(def.id==='pharmacy'){
+    return [...currentPoints().filter(p=>p.type==='약국').map(p=>({label:p.name,kind:'point',value:p.name,pointType:p.type})),
+      ...placesForCurrentCity().filter(p=>p.category==='pharmacy').map(p=>({label:p.name,kind:'member-point',value:p.id}))];
+  }
+
   if(def.kind==='point' || def.kind==='shopping'){
     return currentPoints()
       .filter(p=>p.type===def.type)
@@ -267,6 +272,9 @@ function renderHierarchyNav(){
       if(s.kind==='point-group'){
         return `<button type="button" aria-pressed="${state.selectedNavItem===s.value?'true':'false'}" class="navSub ${state.selectedNavItem===s.value?'active':''}" data-point-group="${s.value}">${s.label}</button>`;
       }
+      if(s.kind==='member-point'){
+        return `<button type="button" aria-pressed="${state.selected===s.value}" class="navSub ${state.selected===s.value?'active':''}" data-member-point="${esc(s.value)}">${esc(s.label)} · 회원 등록</button>`;
+      }
       if(s.kind==='point'){
         return `<button type="button" aria-pressed="${state.selectedNavItem===s.value?'true':'false'}" class="navSub ${s.pointType==='그랩승차'?'grabPickup':''} ${state.selectedNavItem===s.value?'active':''}" data-nav-point="${s.value}">${s.pointType==='그랩승차'?'G · ':''}${s.label}</button>`;
       }
@@ -293,6 +301,11 @@ function renderHierarchyNav(){
     $('#tagNav').classList.remove('show');
     $('#tagNav').innerHTML='';
   }
+
+  document.querySelectorAll('[data-member-point]').forEach(btn=>btn.addEventListener('click',()=>{
+    cancelPendingMapWork();state.selectedNavItem=null;selectPlace(btn.dataset.memberPoint,true,true);
+  }));
+  if(def.id==='pharmacy' && !subs.length)renderMapFilterRow('#subNav','약국 ›','<span class="filterEmpty">이 도시에는 등록된 약국이 없습니다.</span>');
 
   document.querySelectorAll('[data-hospital-sub]').forEach(btn=>btn.addEventListener('click',()=>selectHospitalSpecialty(btn.dataset.hospitalSub)));
   document.querySelectorAll('[data-hospital-place]').forEach(btn=>btn.addEventListener('click',()=>{
@@ -575,7 +588,7 @@ function renderAreaList(){
 
   const filtered=state.areaType==='all'?allRows:allRows.filter(r=>r.type===state.areaType);
 
-  const order=['거리','시장','공항','전철역','기차역','유람선·수상버스','시티투어 버스','한인생활권','병원','관광명소','골프장'];
+  const order=['거리','시장','공항','전철역','기차역','유람선·수상버스','시티투어 버스','한인생활권','병원','약국','관광명소','골프장'];
   const sections=order.map(type=>[type,filtered.filter(r=>r.type===type)]).filter(([,rows])=>rows.length);
 
   $('#areaList').innerHTML=sections.length?sections.map(([type,rows])=>`

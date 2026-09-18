@@ -561,20 +561,28 @@ function renderPlaceStars(){
 function inferCategory(name='',types=[]){
   const n=name.toLowerCase();
   const t=new Set(types||[]);
+  if(t.has('pharmacy')||t.has('drugstore')) return ['pharmacy','약국'];
   if(t.has('veterinary_care')) return ['hospital','동물병원'];
   if(t.has('dentist')) return ['hospital','치과'];
   if(t.has('hospital')||t.has('doctor')) return ['hospital','종합병원·일반진료'];
+  if(t.has('lodging')) return ['stay','호텔'];
+  if(t.has('spa')) return ['spa','스파'];
+  if(t.has('night_club')) return ['bar','클럽'];
   if(t.has('golf_course') || n.includes('golf')) return ['golf','골프장'];
+  if(t.has('supermarket')||t.has('grocery_store')) return ['shopping','마트'];
+  if(t.has('shopping_mall')) return ['shopping','쇼핑몰'];
+  if(t.has('fruit_and_vegetable_store')) return ['shopping','과일가게'];
+  if(t.has('juice_shop') || /\b(?:fruit|fruits|juice)\b|과일|주스/.test(n)) return ['cafe','과일·주스'];
+  if(t.has('bakery') || /\bbakery\b|베이커리|파리바게트/.test(n)) return ['cafe','베이커리'];
+  if(t.has('dessert_shop')||t.has('ice_cream_shop')) return ['cafe','디저트'];
   if(n.includes('market') || n.includes('chợ') || n.includes('cho ') || n.includes('night market')) return ['market',n.includes('night')?'야시장':'전통시장'];
   const heritageName=n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').normalize('NFC').trim().replace(/\s+/g,' ');
   // Match the palace's known names, without treating every hotel named "Palace" as a relic.
   const independencePalace=/^(?:통일궁|독립궁|(?:the )?(?:independence|reunification) palace|dinh doc lap)(?:$|\s*[（(])/.test(heritageName);
   if(t.has('historical_landmark') || t.has('historical_place') || independencePalace) return ['attraction','역사·문화유적'];
-  if(t.has('tourist_attraction') || t.has('park') || n.includes('beach') || n.includes('square')) return ['attraction',n.includes('beach')?'해변':'랜드마크'];
-  if(t.has('lodging')) return ['stay','호텔'];
-  if(t.has('spa')) return ['spa','스파'];
+  if(t.has('park')) return ['attraction','공원'];
+  if(t.has('tourist_attraction') || n.includes('beach') || n.includes('square')) return ['attraction',n.includes('beach')?'해변':'랜드마크'];
   if(t.has('cafe')) return ['cafe','카페'];
-  if(t.has('night_club')) return ['bar','클럽'];
   if(t.has('bar')) return ['bar','펍'];
   if(n.includes('karaoke') || n.includes('ktv')) return ['karaoke','한인 가라오케'];
   if(n.includes('japanese') || n.includes('yakiniku') || n.includes('sushi') || n.includes('ramen') || n.includes('izakaya')) return ['restaurant','일식'];

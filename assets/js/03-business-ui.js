@@ -2,6 +2,13 @@
 // Vendored as paths: no icon font or remote requests. See assets/licenses/material-symbols-NOTICE.txt.
 // The massage symbol is a project-drawn single sole, using the same coordinate system.
 const MAP_SYMBOL_PATHS={
+  "nutrition": "M480-120q-117 0-198.5-81.5T200-400q0-94 55.5-168.5T401-669q-33-8-57.5-28.5T304-747q-15-29-21-63t-2-69q41-5 78 5t67 32q30 22 49.5 53t23.5 70q13-31 31.5-58.5T572-828q11-11 28-11t28 11q11 11 11 28t-11 28q-22 22-39 48.5T564-667q88 28 142 101.5T760-400q0 117-81.5 198.5T480-120Z",
+  "cake": "M160-80q-17 0-28.5-11.5T120-120v-160q0-33 23.5-56.5T200-360h560q33 0 56.5 23.5T840-280v160q0 17-11.5 28.5T800-80H160Zm40-360v-120q0-33 23.5-56.5T280-640h160v-58q-18-12-29-29t-11-41q0-15 6-29.5t18-26.5l42-42q2-2 14-6 2 0 14 6l42 42q12 12 18 26.5t6 29.5q0 24-11 41t-29 29v58h160q33 0 56.5 23.5T760-560v120H200Z",
+  "bakery_dining": "m835-252-99-34 78-215 85 175q14 27-12 55t-52 19Zm-251-38 43-374q2-15 13.5-20.5t27.5-.5l100 37q14 6 18.5 18t-.5 26L673-290h-89Zm-296 0L175-604q-5-14-.5-26.5T193-648l100-37q14-6 26.5-.5T334-664l42 374h-88Zm-172 38q-26 8-47-19.5T62-326l86-175 77 215-109 34Zm320-38-48-430q-2-17 9.5-28.5T426-760h108q17 0 28.5 11.5T572-720l-48 430h-88Z",
+  "local_pharmacy": "M204-120q-42 0-65.5-33T128-225l72-215-72-215q-13-39 10.5-72t65.5-33h424l41-113q7-20 25.5-28.5T733-903q20 7 28.5 25.5T763-839l-29 79h22q42 0 65.5 33t10.5 72l-72 215 72 215q13 39-10.5 72T756-120H204Zm236-160h80v-120h120v-80H520v-120h-80v120H320v80h120v120Zm-236 80h552l-80-240 80-240H204l80 240-80 240Zm0 0 80-240-80-240h552l-80 240 80 240H204Z",
+  "pets": "M180-475q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29Zm180-160q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29Zm240 0q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29Zm180 160q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM266-75q-45 0-75.5-34.5T160-191q0-52 35.5-91t70.5-77q29-31 50-67.5t50-68.5q22-26 51-43t63-17q34 0 63 16t51 42q28 32 49.5 69t50.5 69q35 38 70.5 77t35.5 91q0 47-30.5 81.5T694-75q-54 0-107-9t-107-9q-54 0-107 9t-107 9Z",
+  "dentistry": "M680-875q66 0 113 47t47 113q0 11-1.5 29.5T834-643l-55 403q-5 38-34.5 62T677-154q-23 0-42.5-10T602-192L495-348q-2-4-6.5-5.5T479-355q-4 0-16 9L359-195q-14 20-34.5 30.5T281-154q-38 0-67-24.5T180-241l-54-402q-3-24-4.5-42.5T120-715q0-66 47-113t113-47q36 0 57.5 9.5T379-845q20 11 42.5 20.5T480-815q36 0 58.5-9.5T581-845q20-11 42-20.5t57-9.5Z",
+
   "directions_boat": "M158-200 82-468q-3-12 2.5-28t23.5-22l52-18v-184q0-33 23.5-56.5T240-800h120v-80q0-17 11.5-28.5T400-920h160q17 0 28.5 11.5T600-880v80h120q33 0 56.5 23.5T800-720v184l52 18q21 8 25 23.5t1 26.5l-76 268q-40 0-74-15.5T666-255q-11-11-26-11t-26 11q-28 24-62 39.5T480-200q-10 0-19-1t-18-3q-29-6-55-21t-48-35q-8-8-20.5-8t-20.5 8q-28 27-65 43.5T158-200ZM480-40q-41 0-81.5-10T320-80q-38 20-78 30t-82 10h-40q-17 0-28.5-11.5T80-80q0-17 11.5-28.5T120-120h40q36 0 72-10t67-29q10-6 21-6t21 6q22 14 50.5 23t54.5 12q8 1 17 1.5t17 .5q36 0 72-9t67-28q10-6 21-6t21 6q31 20 67 29.5t72 9.5h40q17 0 28.5 11.5T880-80q0 17-11.5 28.5T840-40h-40q-42 0-82-10t-78-30q-38 20-78.5 30T480-40ZM240-562l215-70q12-4 25-4t25 4l215 70v-158H240v158Z",
   "headphones": "M280-120h-80q-33 0-56.5-23.5T120-200v-280q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-480v280q0 33-23.5 56.5T760-120h-80q-33 0-56.5-23.5T600-200v-160q0-33 23.5-56.5T680-440h80v-40q0-117-81.5-198.5T480-760q-117 0-198.5 81.5T200-480v40h80q33 0 56.5 23.5T360-360v160q0 33-23.5 56.5T280-120Z",
   "restaurant": "M280-600v-240q0-17 11.5-28.5T320-880q17 0 28.5 11.5T360-840v240h40v-240q0-17 11.5-28.5T440-880q17 0 28.5 11.5T480-840v240q0 56-34.5 98T360-446v326q0 17-11.5 28.5T320-80q-17 0-28.5-11.5T280-120v-326q-51-14-85.5-56T160-600v-240q0-17 11.5-28.5T200-880q17 0 28.5 11.5T240-840v240h40Zm400 200h-80q-17 0-28.5-11.5T560-440v-240q0-70 51.5-135T718-880q18 0 30 14t12 33v713q0 17-11.5 28.5T720-80q-17 0-28.5-11.5T680-120v-280Z",
@@ -36,13 +43,23 @@ function businessSymbolKey(category,subcategory=''){
     if(/펍|pub|beer|맥주/i.test(sub))return 'sports_bar';
     return 'local_bar';
   }
-  if(category==='stay' && /아파트|apartment/i.test(sub))return 'apartment';
+  if(category==='cafe'){
+    if(/과일|주스|fruit|juice/i.test(sub))return 'nutrition';
+    if(/베이커리|bakery/i.test(sub))return 'bakery_dining';
+    if(/디저트|dessert/i.test(sub))return 'cake';
+  }
+  if(category==='shopping' && /과일|fruit/i.test(sub))return 'nutrition';
+  if(category==='hospital'){
+    if(/동물|veterinary/i.test(sub))return 'pets';
+    if(/치과|dent/i.test(sub))return 'dentistry';
+  }
+  if(category==='stay' && /아파트|레지던스|apartment|residence/i.test(sub))return 'apartment';
   if(category==='shopping' && /마트|market|grocery/i.test(sub))return 'shopping_cart';
   if(category==='attraction'){
     if(/해변|beach/i.test(sub))return 'beach_access';
     if(/공원|park/i.test(sub))return 'park';
   }
-  return ({restaurant:'restaurant',stay:'bed',spa:'massage',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',boat:'directions_boat',train:'train',home:'home',hospital:'local_hospital'})[category]||'location_on';
+  return ({restaurant:'restaurant',stay:'bed',spa:'massage',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',boat:'directions_boat',train:'train',home:'home',hospital:'local_hospital',pharmacy:'local_pharmacy'})[category]||'location_on';
 }
 
 function businessGlyphPath(category,subcategory=''){
@@ -60,9 +77,9 @@ function businessGlyph(category,subcategory=''){
 function mapIconColor(color){
   return ({'#f97316':'#d66019','#10b981':'#078966','#f59e0b':'#b7770c','#0ea5e9':'#0284c7'})[color]||color;
 }
-function roundMapIcon(category,color){
+function roundMapIcon(category,color,subcategory=''){
   color=mapIconColor(color);
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(5,5) scale(.917)" color="white">${businessGlyphContent(category)}</g></svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(5,5) scale(.917)" color="white">${businessGlyphContent(category,subcategory)}</g></svg>`;
   return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
 }
 function businessMarkerIcon(category,subcategory){

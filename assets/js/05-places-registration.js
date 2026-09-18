@@ -21,7 +21,7 @@ function isBusinessLikePlace(place){
   const accepted=[
     'establishment','point_of_interest','restaurant','food','cafe','bar',
     'night_club','lodging','spa','shopping_mall','store','supermarket',
-    'hospital','tourist_attraction','golf_course','gym','beauty_salon'
+    'hospital','pharmacy','drugstore','tourist_attraction','golf_course','gym','beauty_salon'
   ];
   return accepted.some(t=>types.has(t));
 }
@@ -280,16 +280,17 @@ function poiColor(type){
     '기차역':'#4f46e5',
     '한인생활권':'#16a34a',
     '병원':'#dc2626',
+    '약국':'#078966',
     '쇼핑':'#db2777'
   })[type]||'#475569';
 }
 function poiSvg(type,label,hover=false){
-  const categories={'공항':'airport','터미널':'airport','그랩승차':'taxi','택시승차':'taxi','그린SM승차':'taxi','버스승차':'bus','유람선·수상버스':'boat','시티투어 버스':'bus','전철역':'train','기차역':'train','한인생활권':'home','병원':'hospital','쇼핑':'shopping'};
+  const categories={'공항':'airport','터미널':'airport','그랩승차':'taxi','택시승차':'taxi','그린SM승차':'taxi','버스승차':'bus','유람선·수상버스':'boat','시티투어 버스':'bus','전철역':'train','기차역':'train','한인생활권':'home','병원':'hospital','약국':'pharmacy','쇼핑':'shopping'};
   if(type==='그린SM승차'){
     const svg='<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="12.5" fill="#089b9a" stroke="white" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="700" font-size="12">SM</text></svg>';
     return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
   }
-  return roundMapIcon(categories[type]||'attraction',poiColor(type));
+  return roundMapIcon(categories[type]||'attraction',poiColor(type),type==='병원' && label==='🐾'?'동물병원':'');
 }
 
 // One information layout for registered places, system POIs and geographic ranges.
@@ -497,7 +498,7 @@ function isLikelyAddressName(name,address='',types=[]){
   const businessTypes=new Set([
     'establishment','point_of_interest','restaurant','food','cafe',
     'bar','lodging','spa','shopping_mall','store','supermarket',
-    'hospital','night_club','tourist_attraction'
+    'hospital','pharmacy','drugstore','night_club','tourist_attraction'
   ]);
 
   if((types||[]).some(t=>businessTypes.has(t)))return false;

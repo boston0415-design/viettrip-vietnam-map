@@ -4,13 +4,14 @@ const CONFIG={
     spa:{label:'마사지',subs:['마사지','발마사지','스파']},
     stay:{label:'숙소',subs:['호텔','레지던스','서비스드 아파트','아파트']},
     karaoke:{label:'가라오케',subs:['한인 가라오케','로컬 KTV']},
-    cafe:{label:'카페',subs:['카페','디저트']},
+    cafe:{label:'카페',subs:['카페','과일·주스','베이커리','디저트']},
     exchange:{label:'환전소',subs:['환전소·금은방','은행','공항 환전']},
-    shopping:{label:'쇼핑',subs:['마트','쇼핑몰','백화점','아울렛']},
+    shopping:{label:'쇼핑',subs:['마트','쇼핑몰','백화점','아울렛','과일가게']},
     market:{label:'시장',subs:['전통시장','야시장']},
     attraction:{label:'관광명소',subs:['광장·거리','해변','랜드마크','역사·문화유적','공원']},
     bar:{label:'클럽·바',subs:['클럽','루프탑 바','펍']},
     golf:{label:'골프장',subs:['골프장','실내 골프']},
+    pharmacy:{label:'약국',subs:['약국']},
     hospital:{label:'병원',subs:['종합병원·일반진료','피부과','내과','정형외과','치과','안과','이비인후과','산부인과','소아과','비뇨의학과','건강검진','응급실','동물병원']}
   }
 };
@@ -343,7 +344,7 @@ const EXTRA_DATA={
 
 const AREA_TYPES=[
   ['all','전체'],['거리','거리'],['시장','시장'],['공항','공항·택시·터미널'],['전철역','전철'],
-  ['기차역','기차역'],['유람선·수상버스','유람선·수상버스'],['시티투어 버스','시티투어 버스'],['한인생활권','한인생활권'],['병원','병원'],['관광명소','관광명소'],['골프장','골프장']
+  ['기차역','기차역'],['유람선·수상버스','유람선·수상버스'],['시티투어 버스','시티투어 버스'],['한인생활권','한인생활권'],['병원','병원'],['약국','약국'],['관광명소','관광명소'],['골프장','골프장']
 ];
 
 const NAV_CATEGORIES=[
@@ -364,6 +365,7 @@ const NAV_CATEGORIES=[
   {id:'citytour',label:'시티투어 버스',kind:'point',type:'시티투어 버스'},
   {id:'korean-zone',label:'한인생활권',kind:'area',type:'한인생활권'},
   {id:'hospital',label:'병원',kind:'point',type:'병원'},
+  {id:'pharmacy',label:'약국',kind:'point',type:'약국'},
   {id:'attraction-nav',label:'관광명소',kind:'area',type:'관광명소'},
   {id:'golf-nav',label:'골프장',kind:'golf',type:'골프장'}
 ];
