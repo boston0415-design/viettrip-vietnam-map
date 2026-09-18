@@ -29,6 +29,7 @@
 <link rel="stylesheet" href="./assets/css/booking-links.css?v=20260918-inquiries1">
 <link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-vm1">
 <link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20260918-vm1">
+<link rel="stylesheet" href="./assets/css/nearby-businesses.css?v=20260918-nearby1">
 </head>
 <body>
 <div class="app">
@@ -82,7 +83,7 @@
         <p id="hiddenPlacesHelp" class="hiddenPlacesHelp" hidden>전체 지역의 숨긴 업체입니다. 카드의 눈 모양을 누르면 숨기기가 해제됩니다.</p>
         <div id="cats" class="row"></div>
         <div id="subs" class="row subs"></div>
-        <div class="sort"><span id="count">0개 업체</span><select id="sort" aria-label="업체 정렬"><option value="newest">최근 등록순</option><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
+        <div class="sort"><span id="count">0개 업체</span><select id="sort" aria-label="업체 정렬"><option id="nearbyDistanceSort" value="distance" hidden disabled>가까운 순</option><option value="newest">최근 등록순</option><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
       </div>
       <div id="list" class="list"></div>
     </aside>
@@ -101,6 +102,19 @@
       <button id="mobileListBtn" class="mobileListBtn" type="button">업체 목록 <span id="mobileListCount">0</span></button>
       <div id="regHint" class="regHint">등록할 업체 아이콘을 지도에서 클릭하세요</div>
       <div class="areaLegend mobileCollapsed" id="areaLegend">
+        <section class="nearbyTools" aria-label="주변 업소 찾기">
+          <div class="nearbyActions"><strong class="nearbyLabel">주변 업소 찾기</strong>
+            <button id="nearbyCurrent" type="button" aria-pressed="false">현재 위치</button>
+            <button id="nearbyStay" type="button" aria-haspopup="dialog" aria-controls="nearbyStayDialog" aria-pressed="false">숙소 지정</button>
+          </div>
+          <div id="nearbySelection" class="nearbySelection" hidden>
+            <button id="nearbyOrigin" type="button" title="기준 위치로 이동"></button>
+            <select id="nearbyRadius" aria-label="주변 검색 반경"><option value="500">반경 500m</option><option value="1000" selected>반경 1km</option><option value="3000">반경 3km</option><option value="5000">반경 5km</option></select>
+            <button id="nearbyClear" type="button">해제</button>
+            <span class="nearbyHint">직선거리 기준 · 등록 업소만 표시 · 아래 필터에서 업종 선택</span>
+          </div>
+          <p id="nearbyMessage" role="status" hidden></p>
+        </section>
         <button id="areaLegendTitle" class="areaTitle" type="button" aria-expanded="false" aria-controls="areaLegendBody" aria-label="지도 필터 열기">
           <svg class="filterGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="white"/><circle cx="15" cy="17" r="2" fill="white"/></svg>
           <span class="filterSummary"><span id="activeCityName">호치민</span><span id="filterSelectionSummary"> · 전체</span></span>
@@ -310,19 +324,28 @@
   <p class="homeScreenFineprint">홈 화면 추가는 무료입니다. 지도 이용에는 인터넷 연결이 필요합니다.</p>
 </dialog>
 
+<dialog id="nearbyStayDialog" class="travellerDialog" aria-labelledby="nearbyStayTitle">
+  <div class="travellerDialogHead"><div><h2 id="nearbyStayTitle">숙소 주변 업소 찾기</h2><p>숙소를 정하면 가까운 업소부터 보여드려요.</p></div><button id="nearbyStayClose" type="button" aria-label="숙소 지정 닫기">×</button></div>
+  <div id="nearbySavedStay" hidden><p>최근 지정한 숙소</p><button id="nearbyUseSaved" class="nearbyStayResult" type="button"><strong id="nearbySavedName"></strong><span id="nearbySavedAddress"></span><small>이 숙소 주변 다시 찾기</small></button><button id="nearbyForgetStay" type="button">기억한 숙소 삭제</button></div>
+  <form id="nearbyStayForm"><label for="nearbyStayQuery">숙소 이름 또는 주소</label><div class="nearbySearchRow"><input id="nearbyStayQuery" type="search" maxlength="200" placeholder="예: 롯데호텔 사이공, 숙소 도로명 주소" autocomplete="off"><button id="nearbyStaySearch" class="btn primary" type="submit">검색</button></div></form>
+  <p id="nearbyStayStatus" role="status"></p><div id="nearbyStayResults" class="nearbyStayResults"></div>
+  <p id="nearbyGoogleCredit" hidden><span translate="no">Google Maps</span></p>
+  <p class="nearbyRememberNote">선택한 숙소는 이 기기·브라우저에 30일 동안 기억합니다. 다른 회원에게 공개되지 않으며 언제든 삭제할 수 있습니다.</p>
+</dialog>
+
 <script src="./assets/js/01-data-storage.js?v=20260918-public-office1"></script>
 <script src="./assets/js/hospital-directory.js?v=20260918-hospital-registration1"></script>
 <script src="./assets/js/pharmacy-directory.js?v=20260918-icons-pharmacy1"></script>
 <script src="./assets/js/02-services-media.js?v=20260918-barber-salon-icons1"></script>
 <script src="./assets/js/personal-places.js?v=20260918-personal1"></script>
-<script src="./assets/js/03-business-ui.js?v=20260918-barber-salon-icons1"></script>
+<script src="./assets/js/03-business-ui.js?v=20260918-nearby1"></script>
 <script src="./assets/js/booking-links.js?v=20260918-routes1"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
-<script src="./assets/js/04-rendering.js?v=20260918-public-office1"></script>
+<script src="./assets/js/04-rendering.js?v=20260918-nearby1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260918-all-cities1"></script>
-<script src="./assets/js/07-ranges-categories.js?v=20260918-public-office1"></script>
-<script src="./assets/js/08-search-audit.js?v=20260918-all-cities1"></script>
+<script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
+<script src="./assets/js/08-search-audit.js?v=20260918-nearby1"></script>
 <script src="./assets/js/09-init-events.js?v=20260918-admin-session1"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260918-all-cities1"></script>
 <script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>
@@ -335,6 +358,7 @@
 <script src="./assets/js/interface-polish.js?v=polish1"></script>
 <script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260918-map-visibility1"></script>
+<script src="./assets/js/nearby-businesses.js?v=20260918-nearby1"></script>
 <script src="./assets/js/panel-history.js?v=20260918-booking-back1"></script>
 </body>
 </html>

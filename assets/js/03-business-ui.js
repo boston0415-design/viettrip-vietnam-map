@@ -343,8 +343,13 @@ function items({ratingFilter=state.ratingFilter,forList=false}={}){
   if(state.benefitFilter!=='all')arr=arr.filter(p=>matchesBenefitFilter(p,state.benefitFilter));
   if(state.query){const q=state.query.toLowerCase();arr=arr.filter(p=>`${p.name} ${p.area} ${p.address} ${catLabel(p.category)} ${p.subcategory} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q))}
   }
+  if(state.nearby&&!hiddenView){
+    arr=arr.map(p=>({...p,distanceMeters:validMapLocation(p)?geoDistanceMeters(state.nearby,p):Infinity}))
+      .filter(p=>p.distanceMeters<=state.nearby.radius);
+  }
   if(window.PersonalPlaces)arr=window.PersonalPlaces.filter(arr,forList);
-  if(state.sort==='newest')arr.sort((a,b)=>(Date.parse(b.createdAt)||0)-(Date.parse(a.createdAt)||0)||a.name.localeCompare(b.name,'ko'));
+  if(state.sort==='distance'&&state.nearby&&!hiddenView)arr.sort((a,b)=>a.distanceMeters-b.distanceMeters||String(a.name).localeCompare(String(b.name),'ko'));
+  else if(state.sort==='newest')arr.sort((a,b)=>(Date.parse(b.createdAt)||0)-(Date.parse(a.createdAt)||0)||a.name.localeCompare(b.name,'ko'));
   else if(state.sort==='reviews')arr.sort((a,b)=>b.reviews.length-a.reviews.length);
   else if(state.sort==='name')arr.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   else arr.sort((a,b)=>(b.rating??-1)-(a.rating??-1)||b.count-a.count);
@@ -428,6 +433,7 @@ function openRegisteredSearchResult(placeId){
 window.openRegisteredSearchResult=openRegisteredSearchResult;
 
 function searchMap(){
+  if(window.NearbyBusinesses?.active()){window.NearbyBusinesses.search($('#searchInput').value);return}
   cancelPendingMapWork();
   const searchActionToken=state.mapActionToken;
   clearSelectionRanges();
@@ -612,14 +618,14 @@ function personalPlaceActionsHtml(p){
 function renderList(){
   const arr=items({forList:true});$('#count').textContent=state.sharedDbLoading && !arr.length?'업체 불러오는 중…':`${arr.length}개 업체`;
   $('#list').innerHTML=arr.length
-    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 ${p.reviews.length}개 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside"><div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
+    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 ${p.reviews.length}개 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside">${Number.isFinite(p.distanceMeters)?`<span class="nearbyDistance">직선 ${window.NearbyBusinesses.distanceLabel(p.distanceMeters)}</span>`:''}<div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
     : state.sharedDbLoading
       ? '<div class="empty"><b>공용 업체 불러오는 중…</b><br>잠시만 기다려주세요.</div>'
       : window.PersonalPlaces?.getView()==='hidden'
         ? '<div class="empty">숨긴 업체가 없습니다.<br>숨긴 업체는 지역·업종과 관계없이 이곳에서 복구할 수 있습니다.</div>'
         : window.PersonalPlaces?.getView()==='favorites'
           ? '<div class="empty">현재 지역·분류에 즐겨찾기한 업체가 없습니다.<br>업체 카드의 ☆을 눌러 저장해 보세요.</div>'
-          : '<div class="empty">현재 조건에 맞는 업체가 없습니다.<br>업종·평점·혜택 조건을 조정해 보세요.</div>';
+          : state.nearby?'<div class="empty">이 반경과 조건에 맞는 등록 업소가 없습니다.<br>반경을 넓히거나 업종·평점·혜택 조건을 조정해 보세요.</div>':'<div class="empty">현재 조건에 맞는 업체가 없습니다.<br>업종·평점·혜택 조건을 조정해 보세요.</div>';
   document.querySelectorAll('[data-id]').forEach(el=>el.onclick=(event)=>{
     if(event.target.closest('[data-place-reviews],[data-personal-action]'))return;
     closeMobileBusinessList();

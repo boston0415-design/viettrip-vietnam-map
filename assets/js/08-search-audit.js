@@ -168,6 +168,7 @@ function renderMapFilterRow(selector,label,choices){
 }
 
 function renderHierarchyNav(){
+  if(window.NearbyBusinesses?.renderNavigation())return;
   syncMapFilterSummary();
   renderMapFilterRow('#quickAreas','분류',
     NAV_CATEGORIES.filter(c=>state.city!=='all' || c.kind==='business' || ['shopping','market-nav','attraction-nav','golf-nav','hospital','pharmacy'].includes(c.id)).map(c=>
@@ -470,6 +471,7 @@ function fitAllRegisteredPlacesView(){
 
 function switchCity(key){
   if(key!=='all' && !CITY_DATA[key])return;
+  window.NearbyBusinesses?.clear({refresh:false});
   if(typeof resetAdministrativeRegions==='function')resetAdministrativeRegions();
 
   cancelPendingMapWork();
@@ -653,7 +655,7 @@ function refreshMapAfterMobileLayout(){
 
 function mapFilterSummary(){
   const def=navDef(state.navCategory);
-  const parts=[currentCity().label];
+  const parts=[state.nearby?'주변':currentCity().label];
   const category=def?.label || CONFIG.categories[state.cat]?.label;
   if(category)parts.push(category);
   if(def?.id==='hospital' && typeof hospitalSpecialty==='function' && hospitalSpecialty()!=='all')parts.push(hospitalSpecialty());

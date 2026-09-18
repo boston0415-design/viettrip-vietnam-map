@@ -1,0 +1,53 @@
+/* Persistent origin controls live above the filter disclosure in both layouts. */
+#areaLegend.hasNearbyTools.mobileCollapsed{width:360px;max-width:calc(100% - 28px);max-height:none!important;height:auto}
+.nearbyTools{flex:none;padding:9px 12px;border-bottom:1px solid #e2ebe6;background:#f6faf8}
+.nearbyActions{display:flex;align-items:center;gap:6px}
+#areaLegend .nearbyLabel{flex:1;min-width:0;margin:0;font-size:12px;color:#244a4c}
+.nearbyTools button,.nearbyTools select{font:600 12px/1.4 system-ui,sans-serif;cursor:pointer;color:#285653;border:1px solid #cddfd7;background:#fff;border-radius:8px;min-height:38px;padding:7px 10px}
+.nearbyActions button{display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+.nearbyActions svg{width:15px;height:15px;flex:none}
+.nearbyTools button[aria-pressed=true]{color:#fff;background:#247f78;border-color:#247f78}
+.nearbyTools button:disabled{opacity:.6;cursor:wait}
+.nearbySelection{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:5px;margin-top:7px}
+.nearbyTools [hidden]{display:none!important}
+#nearbyOrigin{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;padding-inline:4px;border:0;background:none}
+#nearbyRadius{width:auto;max-width:100px;margin:0}
+#nearbyClear{padding-inline:8px;font-size:11px;border-color:transparent;background:transparent;color:#64748b}
+.nearbyHint{grid-column:1/-1;color:#63776d;font-size:10px;line-height:1.5}
+#nearbyMessage{font-size:11px;line-height:1.6;color:#8a4c16;margin:7px 0 0;max-width:350px}
+.nearbyDistance{font-size:12px;font-weight:700;color:#247f78;white-space:nowrap}
+#nearbyStayDialog{max-width:560px}
+#nearbyStayDialog .travellerDialogHead>button{width:44px;height:44px}
+.nearbySearchRow{display:flex;gap:8px;margin-top:7px}
+#nearbyStayQuery{flex:1;min-width:0;border:1px solid #cbd5e1;border-radius:9px;padding:11px;font:inherit;font-size:16px}
+#nearbyStaySearch{min-height:44px;flex:none}
+#nearbyStayStatus,.nearbyRememberNote{font-size:12px;color:#64748b;line-height:1.6}
+.nearbyStayResults{display:grid;gap:8px}
+.nearbyStayResult{display:grid;gap:5px;width:100%;padding:13px;text-align:left;background:#fff;border:1px solid #dde7e1;border-radius:10px;cursor:pointer;font:inherit}
+.nearbyStayResult:hover{background:#f4faf7;border-color:#247f78}
+.nearbyStayResult strong{font-size:14px;color:#244a4c;overflow-wrap:anywhere}
+.nearbyStayResult span{font-size:12px;color:#64748b;overflow-wrap:anywhere}
+.nearbyStayResult small{font-size:11px;color:#247f78}
+#nearbySavedStay{margin-bottom:18px;padding:12px;background:#f3f8f5;border-radius:10px}
+#nearbySavedStay[hidden],#nearbyGoogleCredit[hidden]{display:none}
+#nearbySavedStay>p{margin:0 0 8px;font-size:12px;color:#64748b}
+#nearbySavedStay .nearbyStayResult{border:0;background:transparent;padding:5px 0 10px}
+#nearbyForgetStay{min-height:36px;border:0;background:transparent;color:#64748b;text-decoration:underline;font-size:11px;padding:3px 0;cursor:pointer}
+#nearbyGoogleCredit{font-family:Arial,sans-serif;font-size:12px;text-align:right;color:#5e5e5e;white-space:nowrap;font-weight:400;letter-spacing:normal;margin:12px 0}
+.nearbyTools button:focus-visible,.nearbyTools select:focus-visible,#nearbyStayDialog button:focus-visible{outline:2px solid #247f78;outline-offset:2px}
+@media(max-width:900px){
+ #areaLegend.hasNearbyTools.mobileCollapsed{right:10px!important;width:auto!important;max-width:none!important;max-height:none!important}
+ .nearbyTools{padding:7px 10px}
+ .nearbyTools button,.nearbyTools select{min-height:44px}
+ #nearbyStayDialog{max-height:85dvh}
+ #areaLegend .nearbyLabel{font-size:11px}
+ .nearbyActions button{padding-inline:9px}
+}
+@media(max-width:360px){.nearbyActions svg{display:none}.nearbyActions button{font-size:11px;padding-inline:7px}}
+@media(max-width:900px) and (max-height:500px){
+ .nearbyTools{padding-block:4px}.nearbyActions{gap:4px}.nearbySelection{margin-top:3px}.nearbyHint{display:none}
+ #areaLegend.hasNearbyTools:not(.mobileCollapsed){height:calc(100% - 35px);max-height:calc(100% - 35px)!important}
+ #areaLegend.hasNearbyTools.mobileCollapsed{max-height:calc(100% - 35px)!important;overflow-y:auto!important}
+}
+
+.nearbyProviderCredit{font-size:11px;color:#64748b;padding:0 12px;overflow-wrap:anywhere}

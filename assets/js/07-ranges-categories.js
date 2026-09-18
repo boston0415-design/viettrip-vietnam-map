@@ -8,6 +8,13 @@ function rangeViewportPadding(padding=78){
   const legendRect=$('#areaLegend')?.getBoundingClientRect?.();
   if(mapRect && legendRect && legendRect.width>0 && legendRect.height>0 && legendRect.top<mapRect.bottom && legendRect.bottom>mapRect.top){
     result.bottom=Math.max(result.bottom,Math.min(Math.max(0,mapRect.height-80),mapRect.bottom-legendRect.top+16));
+    if(state.nearby){
+      // The origin/radius rows are taller than the old disclosure, particularly
+      // in landscape. Fit to the actual unobscured area instead of an 80px floor.
+      const available=Math.max(0,legendRect.top-mapRect.top);
+      result.top=Math.min(result.top,Math.max(6,available*.15));
+      result.bottom=Math.max(result.bottom,Math.min(mapRect.height-result.top-16,mapRect.bottom-legendRect.top+8));
+    }
   }
   return result;
 }
@@ -98,6 +105,7 @@ async function smoothFitBounds(bounds,{padding=78,maxZoom=16,duration=560}={}){
 }
 
 function fitUnifiedBounds(bounds,{padding=78,maxZoom=16}={}){
+  if(state.nearby)extendBoundsByCircle(bounds,state.nearby,state.nearby.radius);
   return smoothFitBounds(bounds,{padding,maxZoom,duration:560});
 }
 
@@ -312,7 +320,7 @@ function selectSystemFeature(type,name){
 function refreshRegisteredCoverage(){
   (state.selectionOverlays||[]).filter(o=>o._registeredCoverage).forEach(o=>o.setMap(null));
   state.selectionOverlays=(state.selectionOverlays||[]).filter(o=>!o._registeredCoverage);
-  if(!state.map || !state.rangeSelectionKey)return;
+  if(!state.map || !state.rangeSelectionKey || state.nearby)return;
   const key=state.rangeSelectionKey;
   const pointCategory=key.startsWith(`points:${state.city}:`)?registeredCategoryForPoint(key.split(':')[2]):null;
   if(!/^(business|shopping|golf|type):/.test(key)&&!pointCategory)return;
