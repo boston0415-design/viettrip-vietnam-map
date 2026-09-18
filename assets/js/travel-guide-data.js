@@ -8,7 +8,7 @@ window.VietGuideData={
     {id:'transport',name:'공항·교통',icon:'bus',note:'승차장 · 이동 방법'},
     {id:'stay',name:'숙소·예약',icon:'bed',note:'숙소 선택 · 문의'},
     {id:'explore',name:'먹고 즐기기',icon:'compass',note:'식당 · 유람선 · 투어'},
-    {id:'benefit',name:'회원 혜택',icon:'percent',note:'제휴 업소 · 이용 조건'},
+    {id:'benefit',name:'회원 혜택',icon:'percent',note:'혜택업소 · 이용 조건'},
     {id:'daily',name:'생활·도움',icon:'chat',note:'환전 · 베트남어 · 도움'}
   ],
   sources:{
@@ -48,11 +48,11 @@ window.VietGuideData={
       {title:'예약 전에 물어볼 내용',body:'숙박 날짜, 인원, 침실 수, 체크인 시간, 총 결제금액, 보증금, 취소 조건을 확인하세요. 사진의 객실과 실제 배정 객실이 같은지, 아파트라면 해당 숙박의 체크인·출입 가능 여부도 확인합니다.'},
       {title:'카페 숙소 문의하기',body:'아래 문의 양식을 복사해 날짜와 인원을 채운 뒤 일상탈출 카페의 숙소 안내·예약 게시판에서 문의하세요. 이 페이지에서 예약이 확정되거나 결제가 진행되지는 않습니다.'}
     ],notice:'숙소 가격과 회원 혜택은 예약 날짜·객실·이용 조건에 따라 달라집니다. 확정 답변을 받은 후 예약하세요.',actions:[{label:'회원 등록 숙소 보기',category:'stay'},{label:'혜택 있는 숙소',category:'stay',benefit:true}],template:'stay',cafe:true},
-    {id:'member-benefits',topic:'benefit',icon:'percent',title:'회원 혜택, 이용 전에 확인하세요',summary:'% 표시가 있는 업소를 모아 보고 혜택 조건을 확인하세요.',tags:['할인','혜택','제휴','페이백','쿠폰','회원'],sections:[
-      {title:'% 혜택업소를 확인하세요',body:'아래 지도 버튼은 회원 혜택이 등록된 업소만 보여줍니다. 업소 상세에서 혜택 설명과 주소·후기를 함께 확인하세요.'},
+    {id:'member-benefits',topic:'benefit',icon:'percent',title:'회원 혜택, 이용 전에 확인하세요',summary:'혜택업소 필터로 업소를 모아 보고 상세 화면에서 이용 조건을 확인하세요.',tags:['할인','혜택','페이백','쿠폰','회원'],sections:[
+      {title:'혜택업소를 확인하세요',body:'아래 지도 버튼은 회원 혜택이 등록된 업소만 보여줍니다. 업소 상세에서 혜택 설명과 주소·후기를 함께 확인하세요.'},
       {title:'미리 확인할 이용 조건',body:'카페 닉네임이나 회원 등급 확인이 필요한지, 사전 예약이 필요한지, 적용 날짜·인원·중복 할인 조건이 있는지 물어보세요.'},
       {title:'예약 시 적용 여부를 확인하세요',body:'혜택 표시만으로 할인이 확정되지는 않습니다. 방문 전에 적용 조건을 확인하고, 예약 담당자의 답변을 보관하면 이용할 때 확인하기 편합니다.'}
-    ],actions:[{label:'할인·혜택업소 지도',benefit:true},{label:'혜택 있는 숙소',category:'stay',benefit:true}],cafe:true},
+    ],actions:[{label:'혜택업소 지도',benefit:true},{label:'혜택 있는 숙소',category:'stay',benefit:true}],cafe:true},
     {id:'before-flight',topic:'prepare',icon:'passport',title:'출발 전, 이것부터 준비하세요',summary:'여권·입국 조건·항공편·숙소 확인서를 한 번에 점검하세요.',tags:['입국','비자','여권','항공권','준비물','출국'],sources:['visa','tourism'],sections:[
       {title:'본인에게 적용되는 입국 조건',body:'국적·여권 종류·체류 목적과 기간에 따라 필요한 서류가 달라집니다. 항공권 결제 전과 출발 전에 베트남 출입국 당국 및 이용 항공사의 안내를 확인하세요.'},
       {title:'전자비자가 필요하다면',body:'베트남 출입국국이 공지한 공식 신청 주소는 evisa.gov.vn과 thithucdientu.gov.vn입니다. 신청 전 주소를 확인하고 여권 정보·입출국 정보를 꼼꼼히 대조하세요. 심사 결과는 공식 사이트에서 확인합니다.'},

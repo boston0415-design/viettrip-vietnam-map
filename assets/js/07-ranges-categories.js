@@ -1,9 +1,13 @@
 function rangeViewportPadding(padding=78){
   const result={top:padding,bottom:padding,left:padding,right:padding};
   const mapRect=state.map?.getDiv?.()?.getBoundingClientRect?.();
+  if(mapRect && (mapRect.width<=600 || isMobileMapLayout())){
+    result.left=result.right=Math.min(padding,24);
+    result.top=Math.min(padding,mapRect.height<320?24:64);
+  }
   const legendRect=$('#areaLegend')?.getBoundingClientRect?.();
   if(mapRect && legendRect && legendRect.width>0 && legendRect.height>0 && legendRect.top<mapRect.bottom && legendRect.bottom>mapRect.top){
-    result.bottom=Math.max(padding,Math.min(mapRect.height-140,mapRect.bottom-legendRect.top+16));
+    result.bottom=Math.max(result.bottom,Math.min(Math.max(0,mapRect.height-80),mapRect.bottom-legendRect.top+16));
   }
   return result;
 }
@@ -16,8 +20,8 @@ function estimateBoundsZoom(bounds,padding=78,maxZoom=16){
   const div=state.map.getDiv();
 
   const inset=rangeViewportPadding(padding);
-  const width=Math.max(140,(div?.clientWidth||800)-inset.left-inset.right);
-  const height=Math.max(140,(div?.clientHeight||600)-inset.top-inset.bottom);
+  const width=Math.max(1,(div?.clientWidth||800)-inset.left-inset.right);
+  const height=Math.max(1,(div?.clientHeight||600)-inset.top-inset.bottom);
 
   let lngDiff=ne.lng()-sw.lng();
   if(lngDiff<0)lngDiff+=360;
@@ -174,7 +178,7 @@ function categoryRangeColor(categoryId){
 
 function businessCircleRadius(categoryId){
   // One radius policy per place type, shared by registered and built-in places.
-  return ({shopping:180,market:250,attraction:300,golf:700})[categoryId]||150;
+  return ({shopping:180,market:350,attraction:300,golf:700})[categoryId]||150;
 }
 
 function airportMainRadius(p){
@@ -311,7 +315,8 @@ function refreshRegisteredCoverage(){
     if(hospitalScope&&p.category!=='hospital')return;
     const loc=validMapLocation(p);
     if(!loc)return;
-    const circle=addSelectionCircle(loc,businessCircleRadius(p.category),categoryRangeColor(p.category),.065,.68,p);
+    const market=p.category==='market';
+    const circle=addSelectionCircle(loc,businessCircleRadius(p.category),categoryRangeColor(p.category),market ? .14 : .065,market ? .9 : .68,p,{persistent:market,strokeWeight:market?2.5:1.25});
     if(circle)circle._registeredCoverage=true;
   });
 }

@@ -408,11 +408,15 @@ function makeAreaLabel(position,text,feature={}){
       const div=document.createElement('div');
       div.className='area-label';
       div.textContent=this.label;
-      div.tabIndex=0;div.setAttribute('role','button');div.setAttribute('aria-label',`${this.label} 정보 보기`);
+      div.tabIndex=0;div.setAttribute('role','button');div.setAttribute('aria-label',`${this.label} ${feature.center&&feature.type?'범위':'정보'} 보기`);
       const html=()=>mapFeatureHtml(feature,areaRangeRadius(feature));
       div.addEventListener('mouseenter',()=>showPositionHover(position,html()));
       div.addEventListener('mouseleave',hideHover);
-      const open=event=>{event.stopPropagation();hideHover();showClickInfo(position,html());};
+      const open=event=>{
+        event.stopPropagation();hideHover();
+        if(feature.center&&feature.type){jumpToPopularArea(feature.name);return}
+        showClickInfo(position,html());
+      };
       div.addEventListener('click',open);
       div.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();open(event)}});
 
@@ -422,7 +426,7 @@ function makeAreaLabel(position,text,feature={}){
     }
     updateZoomAppearance(){
       if(!this.div)return;
-      const style=referenceRangeZoomStyle({strokeOpacity:1});
+      const style=referenceRangeZoomStyle({strokeOpacity:1,persistent:!!(feature.center&&feature.type)});
       this.div.style.display=style.visible?'':'none';
       this.div.style.opacity=String(style.strokeOpacity);
     }
@@ -639,6 +643,12 @@ function pathCenter(path){
 function referenceRangeZoomStyle(base,zoom=state.map?.getZoom?.()){
   const value=Number(zoom);
   const z=Number.isFinite(value)?value:15;
+  // Explicitly selected areas remain recognizable at street zoom; only their fill softens.
+  if(base.persistent){
+    const style={visible:true,clickable:true,strokeOpacity:base.strokeOpacity};
+    if(base.fillOpacity!=null)style.fillOpacity=base.fillOpacity*Math.max(.35,Math.min(1,(19-z)/3));
+    return style;
+  }
   const outline=Math.max(0,Math.min(1,(17-z)/2));
   const style={visible:outline>0,clickable:outline>0,strokeOpacity:base.strokeOpacity*outline};
   if(base.fillOpacity!=null)style.fillOpacity=base.fillOpacity*Math.max(0,Math.min(1,16-z));
@@ -652,18 +662,19 @@ function refreshReferenceRangeVisibility(){
   (state.areaLabels||[]).forEach(label=>label.updateZoomAppearance?.());
 }
 
-function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,strokeOpacity=.75,feature={}){
+function addSelectionCircle(center,radius,color='#1a73e8',fillOpacity=.12,strokeOpacity=.75,feature={},presentation={}){
   center=validMapLocation(center);
   radius=Number(radius);
   if(!state.map || !center || !Number.isFinite(radius) || radius<=0)return null;
   const baseStyle={fillOpacity,strokeOpacity};
+  if(presentation.persistent)baseStyle.persistent=true;
   const circle=new google.maps.Circle({
     map:state.map,
     center,
     radius,
     fillColor:color,
     strokeColor:color,
-    strokeWeight:1.25,
+    strokeWeight:presentation.strokeWeight||1.25,
     ...referenceRangeZoomStyle(baseStyle),
     zIndex:2
   });
@@ -696,17 +707,20 @@ function addSelectionPath(path,color='#1a73e8',feature={}){
 
 function areaRangeRadius(area){
   const radius=Number(area?.radius);
+  // A market's reference circle includes the surrounding walking/shopping area.
+  if(normalizeAreaType(area||{})==='시장')return Math.max(350,Number.isFinite(radius)?radius:0);
   if(Number.isFinite(radius)&&radius>0)return radius;
   return ({'거리':500,'야시장':250,'해변':500,'광장':250})[area?.type]||300;
 }
 
 // All ranges are geographic circles measured in meters, never pixel-sized rings.
 // They indicate nearby areas, not surveyed property/administrative boundaries.
-function drawAreaReference(area,bounds=null){
+function drawAreaReference(area,bounds=null,{selected=false}={}){
   const center=validMapLocation(area?.center);
   if(!center)return null;
   const radius=areaRangeRadius(area);
-  const circle=addSelectionCircle(center,radius,area.color||'#1a73e8',.08,.7,area);
+  const color=normalizeAreaType(area)==='한인생활권'?'#16803c':area.color||'#1a73e8';
+  const circle=addSelectionCircle(center,radius,color,selected ? .14 : .08,selected ? .9 : .7,area,{persistent:selected,strokeWeight:selected?2.5:1.25});
   if(bounds)extendBoundsByCircle(bounds,center,radius);
   return circle;
 }
@@ -729,24 +743,27 @@ function showBusinessRange(categoryId,subId='all'){
 
 function showAreaRange(area){
   if(!state.map || !area)return false;
+  collapseMobileLegend();
   const key=`area:${state.city}:${area.name}`;
 
   return toggleSelectionRange(key,()=>{
     const bounds=makeBounds();
 
-    drawAreaReference(area,bounds);
-    fitUnifiedBounds(bounds,{padding:90,maxZoom:Math.min(16,area.zoom||16)});
-    setDbStatus(`${area.name} · 주변 반경 ${areaRangeRadius(area)}m`,true);
+    drawAreaReference(area,bounds,{selected:true});
+    fitUnifiedBounds(bounds,{padding:64,maxZoom:16.5});
+    setDbStatus(`${area.name} · 주변 탐색 범위 (행정·시설 경계 아님)`,true);
   });
 }
 
 function showTypeRanges(type){
   cancelPendingMapWork();
   if(!state.map)return false;
+  collapseMobileLegend();
   const areas=currentAreas().filter(a=>normalizeAreaType(a)===type);
 
   clearSelectionRanges();
   clearAreaLabels();
+  clearSelectedSystemIcons();
 
   const category=({'시장':'market','관광명소':'attraction'})[type];
   const registered=category?items().filter(p=>p.category===category && validMapLocation(p)):[];
@@ -758,13 +775,25 @@ function showTypeRanges(type){
 
   const bounds=makeBounds();
 
-  areas.forEach(a=>drawAreaReference(a,bounds));
+  areas.forEach(a=>{
+    drawAreaReference(a,bounds,{selected:true});
+    if(type==='한인생활권'){
+      const label=makeAreaLabel(a.center,a.name,a);
+      label._areaName=a.name;
+      state.areaLabels.push(label);
+    }else{
+      const marker=new google.maps.Marker({map:state.map,position:a.center,title:a.name,zIndex:75,icon:roundMapIcon(type==='시장'?'market':'attraction',a.color||'#16803c')});
+      bindMapFeatureInfo(marker,a,a.center,areaRangeRadius(a),{click:false});
+      marker.addListener('click',()=>jumpToPopularArea(a.name));
+      state.poiMarkers.push(marker);
+    }
+  });
 
   if(category)extendRegisteredBounds(bounds,category);
   state.rangeSelectionKey=`type:${state.city}:${type}`;
   refreshRegisteredCoverage();
-  fitUnifiedBounds(bounds,{padding:82,maxZoom:16});
-  setDbStatus(`${type} · 주변 범위 표시`,true);
+  fitUnifiedBounds(bounds,{padding:64,maxZoom:16.5});
+  setDbStatus(`${type} · 주변 탐색 범위 (행정·시설 경계 아님)`,true);
   return true;
 }
 
@@ -795,7 +824,7 @@ function jumpToPopularArea(name,openPanel=false){
   clearAreaLabels();
   if(!visible)return;
 
-  const label=makeAreaLabel(area.center,`${area.name} · 주변 ${areaRangeRadius(area)}m`,area);
+  const label=makeAreaLabel(area.center,area.name,area);
   label._areaName=area.name;
   state.areaLabels.push(label);
 }

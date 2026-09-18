@@ -10,7 +10,7 @@ function renderMarkers(){
       position:{lat:Number(p.lat),lng:Number(p.lng)},
       title:`${p.name}${st.rating==null?'':` · ${st.rating.toFixed(1)}점`}`,
       zIndex:150,
-      icon:businessMarkerIcon(p.category,p.subcategory,st.rating,!!p.memberBenefit,p.benefitText||'')
+      icon:businessMarkerIcon(p.category,p.subcategory)
     });
     bindMapFeatureInfo(m,{...p,type:`${catLabel(p.category)} · ${p.subcategory||''}${st.rating==null?'':` · ${st.rating.toFixed(1)}점`}`},{lat:Number(p.lat),lng:Number(p.lng)},null,{click:false});
     m.addListener('click',async ()=>{

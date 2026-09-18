@@ -635,7 +635,7 @@ function mapFilterSummary(){
   }
   if(state.restaurantTag && state.restaurantTag!=='all')parts.push(state.restaurantTag);
   if(state.ratingFilter && state.ratingFilter!=='all')parts.push(state.ratingFilter==='4.5'?'4.5★ 이상':`${state.ratingFilter}★`);
-  if(state.benefitFilter && state.benefitFilter!=='all')parts.push('% 혜택');
+  if(state.benefitFilter && state.benefitFilter!=='all')parts.push('혜택업소');
   if(state.query)parts.push(`검색: ${state.query}`);
   if(parts.length===1)parts.push('전체');
   return parts;

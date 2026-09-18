@@ -25,7 +25,7 @@ state.markers=[fixtureMarker];state.selectionOverlays=[fixtureMarker];
 const before=JSON.stringify(state);
 bindAreaNavigation();
 assert.equal(JSON.stringify(state),before);
-assert.equal(mapFilterSummary().join(' · '),'호치민 · 가라오케 · 로컬 KTV · 4★ · % 혜택');
+assert.equal(mapFilterSummary().join(' · '),'호치민 · 가라오케 · 로컬 KTV · 4★ · 혜택업소');
 `);
 const title=nodes.get('#areaLegendTitle'),body=nodes.get('#areaLegendBody'),legend=nodes.get('#areaLegend');
 assert.equal(body.hidden,true);assert.equal(title.attrs['aria-expanded'],'false');

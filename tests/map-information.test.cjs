@@ -57,7 +57,7 @@ assert(!mapFeatureHtml(bad).includes('<script>'));assert(mapFeatureHtml(bad).inc
 assert(mapFeatureHtml(bad).includes('&lt;img'));assert(!mapFeatureHtml({name:'주소 없음',...pos}).includes('상세 주소 미등록'));
 for(const category of Object.keys(CONFIG.categories))assert(businessGlyphPath(category)!==businessGlyphPath('unknown'),category+' needs a recognizable symbol');
 assert(mapFeatureHtml({name:'unsafe',sourceUrl:'javascript:alert(1)'}).includes('unsafe'));assert(!mapFeatureHtml({sourceUrl:'javascript:alert(1)'}).includes('href'));
-const discount=decodeURIComponent(businessMarkerIcon('stay','호텔',4,true).url.split(',')[1]);assert(discount.includes('>%</text>'));
+const discount=decodeURIComponent(businessMarkerIcon('stay','호텔',4,true).url.split(',')[1]);assert(!discount.includes('>%</text>'));assert.equal(discount,decodeURIComponent(businessMarkerIcon('stay','호텔',4,false).url.split(',')[1]));
 state.city='hcmc';assert.equal(airportGroupPoints('green').length,3);assert.equal(airportGroupPoints('bus').length,3);assert(airportGroupPoints('all').some(p=>p.type==='버스승차'));
 const pin=businessMarkerIcon('stay','호텔',4.5);const svg=decodeURIComponent(pin.url.split(',')[1]);assert(svg.includes('stroke-width="1.5"'));assert(svg.includes('<rect'));assert(!svg.includes('4.5'));
 const systemSvg=decodeURIComponent(poiSvg('공항').url.split(',')[1]);assert(systemSvg.includes('<circle'));assert(!systemSvg.includes('<rect'));

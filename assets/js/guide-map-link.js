@@ -42,7 +42,7 @@
         if(panel==='reviews')document.getElementById('openCommunityReviews')?.click();
         done=true;
         const label=NAV_CATEGORIES.find(c=>c.id===category)?.label;
-        message.textContent=[CITY_DATA[city].label,label,benefit?'할인·혜택업소':null].filter(Boolean).join(' · ')+' 지도를 열었어요.';
+        message.textContent=[CITY_DATA[city].label,label,benefit?'혜택업소':null].filter(Boolean).join(' · ')+' 지도를 열었어요.';
         if(result[1].status==='rejected')message.textContent+=' 업체 정보를 갱신하지 못했어요. 연결 후 새로고침해주세요.';
         else setTimeout(()=>{box.hidden=true},4500);
       }catch{if(!canceled){message.textContent='지도를 연결하지 못했어요. 인터넷 연결을 확인하고 다시 눌러주세요.';retry.hidden=false}}

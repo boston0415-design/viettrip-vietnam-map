@@ -60,14 +60,14 @@ function businessGlyph(category,subcategory=''){
 function mapIconColor(color){
   return ({'#f97316':'#d66019','#10b981':'#078966','#f59e0b':'#b7770c','#0ea5e9':'#0284c7'})[color]||color;
 }
-function roundMapIcon(category,color,memberBenefit=false){
+function roundMapIcon(category,color){
   color=mapIconColor(color);
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(5,5) scale(.917)" color="white">${businessGlyphContent(category)}</g>${memberBenefit?'<rect x="18" y="0" width="14" height="14" rx="4" fill="#087f5b" stroke="white" stroke-width="1"/><text x="25" y="10.5" fill="white" font-family="Arial,sans-serif" font-size="11" font-weight="700" text-anchor="middle">%</text>':''}</svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12.5" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(5,5) scale(.917)" color="white">${businessGlyphContent(category)}</g></svg>`;
   return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,32),anchor:new google.maps.Point(16,16)};
 }
-function businessMarkerIcon(category,subcategory,rating,memberBenefit=false,benefitText=''){
+function businessMarkerIcon(category,subcategory){
   const color=mapIconColor(categoryRangeColor(category));
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42"><rect x="3" y="4" width="34" height="34" rx="10" fill="#173247" opacity=".12"/><path d="m16 34 4 6 4-6" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="2" width="34" height="34" rx="10" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,7)" color="white">${businessGlyphContent(category,subcategory)}</g>${memberBenefit?'<g aria-label="회원 할인·혜택"><rect x="23" y="0.5" width="16" height="16" rx="5" fill="#087f5b" stroke="white" stroke-width="1"/><text x="31" y="12" fill="white" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">%</text></g>':''}</svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="42" viewBox="0 0 40 42"><rect x="3" y="4" width="34" height="34" rx="10" fill="#173247" opacity=".12"/><path d="m16 34 4 6 4-6" fill="${color}" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="2" width="34" height="34" rx="10" fill="${color}" stroke="white" stroke-width="1.5"/><g transform="translate(8,7)" color="white">${businessGlyphContent(category,subcategory)}</g></svg>`;
   return {url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),scaledSize:new google.maps.Size(32,34),anchor:new google.maps.Point(16,32)};
 }
 
