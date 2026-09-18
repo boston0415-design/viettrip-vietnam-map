@@ -14,6 +14,7 @@ function renderMarkers(){
     });
     bindMapFeatureInfo(m,{...p,type:`${catLabel(p.category)} · ${p.subcategory||''}${st.rating==null?'':` · ${st.rating.toFixed(1)}점`}`},{lat:Number(p.lat),lng:Number(p.lng)},null,{click:false});
     m.addListener('click',async ()=>{
+      if(window.NearbyBusinesses?.handleMapClick({latLng:{lat:Number(p.lat),lng:Number(p.lng)}}))return;
       cancelPendingMapWork();
       await selectPlace(p.id,true,false);
     });

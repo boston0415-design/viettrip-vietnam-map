@@ -6,7 +6,9 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
   const dom=new JSDOM(read('index.html'),{url:'https://viettrip-vietnam-map.pages.dev/',runScripts:'outside-only'});
   const w=dom.window,run=s=>vm.runInContext(s,dom.getInternalVMContext());w.assert=assert;w.matchMedia=q=>({matches:q.includes('max-width')?mobile:!mobile});
   w.localStorage.setItem('viettrip_nearby_stay_v1',JSON.stringify({name:'이전에 지정한 숙소',address:'기억한 주소',lat:10.77,lng:106.7,expiresAt:Date.now()+(mobile?-1000:86400000)}));
-  w.setTimeout=()=>0;w.clearTimeout=()=>{};w.setInterval=()=>0;w.requestAnimationFrame=()=>0;
+  let timerId=0;const timers=new Map();
+  w.setTimeout=(fn,delay)=>{timers.set(++timerId,{fn,delay});return timerId};w.clearTimeout=id=>timers.delete(id);
+  w.firePositionDeadline=()=>{const found=[...timers].find(([,t])=>t.delay===16000);assert(found,'position deadline exists');timers.delete(found[0]);found[1].fn()};w.setInterval=()=>0;w.requestAnimationFrame=()=>0;
   w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','')};w.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open');this.dispatchEvent(new w.Event('close'))};
   try{
    for(const name of fs.readdirSync(path.join(root,'assets/js')).filter(n=>/^0[1-8]-/.test(n)).sort())run(read('assets/js/'+name));
@@ -56,9 +58,31 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
     window.PersonalPlaces.setView('all');window.PersonalPlaces.toggleHidden('near');renderAll();
     // Current location never overwrites a remembered stay; permission errors retain the old scope.
     $('#nearbyCurrent').click();assert($('#nearbyCurrent').disabled);geoRequests.at(-1).error({code:1});assert($('#nearbyMessage').textContent.includes('권한'));assert(!$('#nearbyCurrent').disabled);assert.equal(state.nearby.kind,'stay');
-    $('#locBtn').click();geoRequests.at(-1).success({coords:{latitude:origin.lat,longitude:origin.lng,accuracy:15}});assert.equal(state.nearby.kind,'current');assert.equal(localStorage.getItem('viettrip_nearby_stay_v1'),stored);
-    $('#nearbyCurrent').click();const staleLocation=geoRequests.at(-1);$('#nearbyStay').click();staleLocation.success({coords:{latitude:21,longitude:105,accuracy:20}});assert.equal(state.nearby.lat,origin.lat,'late GPS cannot replace a newer action');
+    $('#locBtn').click();geoRequests.at(-1).success({timestamp:Date.now(),coords:{latitude:origin.lat,longitude:origin.lng,accuracy:15}});assert.equal(state.nearby.kind,'current');assert.equal(localStorage.getItem('viettrip_nearby_stay_v1'),stored);
+    $('#nearbyCurrent').click();const staleLocation=geoRequests.at(-1);$('#nearbyStay').click();staleLocation.success({timestamp:Date.now(),coords:{latitude:21,longitude:105,accuracy:20}});assert.equal(state.nearby.lat,origin.lat,'late GPS cannot replace a newer action');
     assert.equal($('#nearbySavedName').textContent,'테스트 숙소');$('#nearbyUseSaved').click();assert.equal(state.nearby.kind,'stay');
+    // Fresh repeated readings must beat the first coarse result, without moving prematurely.
+    let watches=[],stoppedWatches=[];
+    navigator.geolocation.watchPosition=(success,error,options)=>{const id=watches.length;watches.push({success,error,options});return id};
+    navigator.geolocation.clearWatch=id=>stoppedWatches.push(id);
+    const fix=(watch,lat,lng,accuracy,timestamp=Date.now())=>watch.success({timestamp,coords:{latitude:lat,longitude:lng,accuracy}});
+    $('#nearbyCurrent').click();let watch=watches.at(-1);assert.equal(watch.options.maximumAge,0);assert(watch.options.enableHighAccuracy);
+    fix(watch,21,105,5000);assert.equal(state.nearby.kind,'stay');assert.equal(state.nearby.lat,origin.lat);assert($('#nearbyMessage').textContent.includes('확인 중'));
+    fix(watch,21,105,10,Date.now()-30000);assert.equal(state.nearby.lat,origin.lat,'cached precise-looking result is ignored');
+    fix(watch,origin.lat,origin.lng,20);assert.equal(state.nearby.kind,'current');assert.equal(state.nearby.accuracy,20);assert(stoppedWatches.includes(0),'watch ID zero is cleaned up');assert($('#nearbyAccuracy').textContent.includes('20m'));assert(!$('#nearbyCurrent').disabled);
+    $('#nearbyCurrent').click();watch=watches.at(-1);fix(watch,21,105,2000);firePositionDeadline();assert.equal(state.nearby.lat,origin.lat);assert($('#nearbyMessage').textContent.includes('적용하지 않았습니다'));assert(stoppedWatches.includes(1));
+    $('#nearbyCurrent').click();watch=watches.at(-1);fix(watch,10.772,106.7,150);fix(watch,10.773,106.7,280);assert.equal(state.nearby.lat,origin.lat);firePositionDeadline();assert.equal(state.nearby.lat,10.772);assert.equal(state.nearby.accuracy,150,'best eligible sample is chosen at deadline');
+    $('#nearbyCurrent').click();watch=watches.at(-1);fix(watch,21,105,NaN);fix(watch,21,105,-1);fix(watch,21,105,null);firePositionDeadline();assert.equal(state.nearby.lat,10.772);assert(!$('#nearbyCurrent').disabled);
+    $('#nearbyCurrent').click();watch=watches.at(-1);watch.error({code:1});assert($('#nearbyMessage').textContent.includes('권한'));assert(stoppedWatches.includes(4));
+    // Manual correction needs an explicit map point and confirmation, cancels GPS, and is private.
+    $('#nearbyCurrent').click();watch=watches.at(-1);$('#nearbyPick').click();assert(nearby.isPicking());assert($('#nearbyPickConfirm').disabled);assert(stoppedWatches.includes(5));
+    fix(watch,21,105,10);assert.equal(state.nearby.lat,10.772,'late GPS cannot replace a manual pick');
+    let suppressed=0;assert(nearby.handleMapClick({placeId:'poi',latLng:{lat:()=>10.774,lng:()=>106.7},stop(){suppressed++}}));assert.equal(suppressed,1);assert(!$('#nearbyPickConfirm').disabled);assert.equal(state.nearby.lat,10.772,'preview does not change the origin');
+    $('#nearbyPickCancel').click();assert(!nearby.isPicking());assert.equal(state.nearby.lat,10.772);assert($('#nearbyPickControls').hidden);
+    $('#nearbyPick').click();nearby.handleMapClick({latLng:{lat:10.774,lng:106.7}});$('#nearbyPickConfirm').click();assert.equal(state.nearby.kind,'manual');assert.equal(state.nearby.lat,10.774);assert(!nearby.isPicking());assert($('#nearbyAccuracy').hidden);assert.equal(localStorage.getItem('viettrip_nearby_stay_v1'),stored);
+    $('#nearbyPick').click();switchCity('hcmc');assert(!nearby.isPicking());assert($('#nearbyPickControls').hidden);
+    $('#nearbyStay').click();$('#nearbyUseSaved').click();state.cat='restaurant';state.sub='한식';
+
     // Explicit search only; input changes/closing invalidate asynchronous results.
     $('#nearbyStay').click();$('#nearbyStayQuery').value='테스트 다른 호텔';$('#nearbyStayQuery').dispatchEvent(new Event('input'));assert.equal(searches.length,0);
     $('#nearbyStayForm').dispatchEvent(new Event('submit',{cancelable:true}));assert.equal(searches.length,1);assert.deepEqual(searches[0].request.fields,['name','formatted_address','geometry']);

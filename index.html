@@ -29,7 +29,7 @@
 <link rel="stylesheet" href="./assets/css/booking-links.css?v=20260918-inquiries1">
 <link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-vm1">
 <link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20260918-vm1">
-<link rel="stylesheet" href="./assets/css/nearby-businesses.css?v=20260918-nearby1">
+<link rel="stylesheet" href="./assets/css/nearby-businesses.css?v=20260918-location2">
 </head>
 <body>
 <div class="app">
@@ -103,9 +103,10 @@
       <div id="regHint" class="regHint">등록할 업체 아이콘을 지도에서 클릭하세요</div>
       <div class="areaLegend mobileCollapsed" id="areaLegend">
         <section class="nearbyTools" aria-label="주변 업소 찾기">
-          <div class="nearbyActions"><strong class="nearbyLabel">주변 업소 찾기</strong>
+          <div class="nearbyActions"><strong class="nearbyLabel">주변 찾기</strong>
             <button id="nearbyCurrent" type="button" aria-pressed="false">현재 위치</button>
             <button id="nearbyStay" type="button" aria-haspopup="dialog" aria-controls="nearbyStayDialog" aria-pressed="false">숙소 지정</button>
+            <button id="nearbyPick" type="button" aria-controls="nearbyPickControls" aria-pressed="false">지도 지정</button>
           </div>
           <div id="nearbySelection" class="nearbySelection" hidden>
             <button id="nearbyOrigin" type="button" title="기준 위치로 이동"></button>
@@ -113,6 +114,10 @@
             <button id="nearbyClear" type="button">해제</button>
             <span class="nearbyHint">직선거리 기준 · 등록 업소만 표시 · 아래 필터에서 업종 선택</span>
           </div>
+          <div id="nearbyPickControls" class="nearbyPickControls" hidden>
+            <p id="nearbyPickHint" role="status"></p><div><button id="nearbyPickConfirm" type="button" disabled>이 위치 사용</button><button id="nearbyPickCancel" type="button">취소</button></div>
+          </div>
+          <p id="nearbyAccuracy" class="nearbyAccuracy" hidden></p>
           <p id="nearbyMessage" role="status" hidden></p>
         </section>
         <button id="areaLegendTitle" class="areaTitle" type="button" aria-expanded="false" aria-controls="areaLegendBody" aria-label="지도 필터 열기">
@@ -341,12 +346,12 @@
 <script src="./assets/js/03-business-ui.js?v=20260918-nearby1"></script>
 <script src="./assets/js/booking-links.js?v=20260918-routes1"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
-<script src="./assets/js/04-rendering.js?v=20260918-nearby1"></script>
+<script src="./assets/js/04-rendering.js?v=20260918-location2"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260918-all-cities1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260918-nearby1"></script>
-<script src="./assets/js/09-init-events.js?v=20260918-admin-session1"></script>
+<script src="./assets/js/09-init-events.js?v=20260918-location2"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260918-all-cities1"></script>
 <script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>
 <script defer src="./assets/vendor/realtime-2.116.0.min.js"></script>
@@ -358,7 +363,7 @@
 <script src="./assets/js/interface-polish.js?v=polish1"></script>
 <script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260918-map-visibility1"></script>
-<script src="./assets/js/nearby-businesses.js?v=20260918-nearby1"></script>
-<script src="./assets/js/panel-history.js?v=20260918-booking-back1"></script>
+<script src="./assets/js/nearby-businesses.js?v=20260918-location2"></script>
+<script src="./assets/js/panel-history.js?v=20260918-location2"></script>
 </body>
 </html>

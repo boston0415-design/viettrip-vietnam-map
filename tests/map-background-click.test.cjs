@@ -9,7 +9,7 @@ const start=source.indexOf("state.map.addListener('click',e=>{");
 const end=source.indexOf('\n  renderPopularAreas();',start);
 assert(start>=0&&end>start,'capture the real map click listener');
 
-const context=vm.createContext({console,assert,Map,Set,URL,setTimeout:()=>0,clearTimeout(){},setInterval(){},clearInterval(){}});
+const context=vm.createContext({console,assert,Map,Set,URL,queueMicrotask:()=>{},setTimeout:()=>0,clearTimeout(){},setInterval(){},clearInterval(){}});
 context.window=context;
 const classes=new Set(['mobileCollapsed']),attributes={};
 const legend={classList:{remove:k=>classes.delete(k),contains:k=>classes.has(k),toggle(k,on){on?classes.add(k):classes.delete(k)}}};
@@ -63,5 +63,7 @@ state.registerMode=false;
 let stopped=0;
 const poi={placeId:'google-place',latLng:{lat:10,lng:106},stop(){stopped++}};click(poi);
 assert.equal(poiEvent,poi);assert.equal(stopped,1);assert.equal(detailCloses,3);
+let picked=null;window.NearbyBusinesses={handleMapClick:e=>{picked=e;return true}};
+const manual={latLng:{lat:10,lng:106},placeId:'manual-poi'};click(manual);assert.equal(picked,manual);assert.equal(poiEvent,poi,'manual selection bypasses Google detail requests');
 console.log('PASS background taps preserve icons, ranges and filters; cards dismiss; registration and Google POI clicks remain intact');
 `);

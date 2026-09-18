@@ -11,6 +11,7 @@
     const add=(id,node,isOpen,close)=>{if(node)definitions.push({id,node,isOpen,close})};
     const legend=byId('areaLegend'),list=byId('businessSide'),detail=byId('detail');
 
+    add('nearby-pick',byId('nearbyPickControls'),()=>Boolean(window.NearbyBusinesses?.isPicking()),()=>window.NearbyBusinesses.cancelPick());
     add('filters',legend,()=>byId('areaLegendTitle')?.getAttribute('aria-expanded')==='true',
       ()=>setMobileLegendExpanded(false,{restoreFocus:true}));
     add('areas',byId('areaPanel'),()=>byId('areaPanel').classList.contains('show'),()=>{
@@ -109,7 +110,7 @@
     const observer=new MutationObserver(sync);
     const nodes=new Set(definitions.map(panel=>panel.node));
     if(byId('areaLegendTitle'))nodes.add(byId('areaLegendTitle'));
-    nodes.forEach(node=>observer.observe(node,{attributes:true,attributeFilter:['class','open','aria-expanded']}));
+    nodes.forEach(node=>observer.observe(node,{attributes:true,attributeFilter:['class','open','aria-expanded','hidden']}));
     window.addEventListener('viettrip:map-info-change',sync);
     window.addEventListener('resize',sync);
     window.addEventListener('pageshow',()=>{depth=depthOf(history.state);capacity=Math.max(capacity,depth);sync()});

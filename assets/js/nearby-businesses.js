@@ -2,7 +2,8 @@
 (() => {
   const storageKey='viettrip_nearby_stay_v1',radii=[500,1000,3000,5000];
   let savedStay=null,previousCity='hcmc',previousSort='newest',locationToken=0,searchToken=0;
-  let circle=null,marker=null,overlayKey='',locationTimer=null,searchTimer=null;
+  let circle=null,marker=null,overlayKey='',locationTimer=null,searchTimer=null,locationWatchId=null;
+  let picking=false,pickedPoint=null,pickMarker=null,oldCursor='';
   const byId=id=>document.getElementById(id);
   const active=()=>Boolean(state.nearby);
   const distanceLabel=m=>m<1000?`${Math.round(m)}m`:`${(m/1000).toFixed(1).replace(/\.0$/,'')}km`;
@@ -22,6 +23,7 @@
   }
   function cancelLocation(){
     locationToken++;clearTimeout(locationTimer);
+    if(locationWatchId!==null){navigator.geolocation?.clearWatch?.(locationWatchId);locationWatchId=null}
     byId('nearbyCurrent').disabled=false;
     byId('nearbyCurrent').textContent='현재 위치';
     byId('locBtn').disabled=false;
@@ -41,6 +43,9 @@
     byId('nearbySelection').hidden=!origin;
     byId('nearbyCurrent').setAttribute('aria-pressed',String(origin?.kind==='current'));
     byId('nearbyStay').setAttribute('aria-pressed',String(origin?.kind==='stay'));
+    byId('nearbyPick').setAttribute('aria-pressed',String(picking||origin?.kind==='manual'));
+    byId('nearbyAccuracy').hidden=!(origin?.kind==='current'&&Number.isFinite(origin.accuracy));
+    byId('nearbyAccuracy').textContent=origin?.kind==='current'&&Number.isFinite(origin.accuracy)?`기기 추정 오차 약 ±${distanceLabel(origin.accuracy)} · 위치가 다르면 지도 지정`:'';
     const distanceOption=byId('nearbyDistanceSort');
     distanceOption.hidden=!origin;distanceOption.disabled=!origin;
     if(origin){
@@ -66,12 +71,13 @@
   }
   function apply(place,kind='stay'){
     const clean=cleanPlace(place);if(!clean)return false;
-    cancelLocation();cancelSearch();message();
+    cancelLocation();cancelSearch();cancelPick();message();
     if(!active()){previousCity=state.city;previousSort=state.sort}
     const def=navDef(state.navCategory);
     const category=def?.kind==='business'?def.id:({shopping:'shopping','market-nav':'market','attraction-nav':'attraction','golf-nav':'golf',hospital:'hospital',pharmacy:'pharmacy'})[def?.id];
     if(category)state.cat=category;
     state.nearby={...clean,kind,radius:state.nearby?.radius||1000};
+    if(kind==='current'&&Number.isFinite(place.accuracy))state.nearby.accuracy=place.accuracy;
     state.city='all';state.sort='distance';byId('sort').value='distance';
     state.navCategory=null;state.selectedNavItem=null;state.hospitalSpecialty='all';state.selected=null;state.areaType='all';
     state.query='';byId('searchInput').value='';
@@ -91,7 +97,7 @@
     catch{message('숙소 위치를 이번 화면에 적용했습니다. 이 브라우저에서는 기억할 수 없습니다.')}
   }
   function clear({refresh=true}={}){
-    cancelLocation();cancelSearch();message();
+    cancelLocation();cancelSearch();cancelPick();message();
     if(active()){state.city=previousCity;state.sort=previousSort;byId('sort').value=previousSort}
     state.nearby=null;clearOverlays();sync();
     if(refresh){cancelPendingMapWork();renderCityControls();renderAll();fitSelectedCityView(state.city)}
@@ -102,23 +108,74 @@
     renderAll();fit();
   }
   function current(){
-    cancelLocation();message();
-    if(!navigator.geolocation?.getCurrentPosition){message('현재 위치를 사용할 수 없습니다. 숙소 지정으로 찾아주세요.');return}
-    const token=locationToken;
+    cancelPick();cancelLocation();message();
+    const geo=navigator.geolocation;
+    if(!geo?.watchPosition&&!geo?.getCurrentPosition){message('현재 위치를 사용할 수 없습니다. 지도 지정 또는 숙소 지정으로 찾아주세요.');return}
+    const token=locationToken,started=Date.now();
+    let best=null;
     byId('nearbyCurrent').disabled=true;byId('nearbyCurrent').textContent='위치 확인 중';byId('locBtn').disabled=true;
-    const fail=error=>{
+    message('기기의 최신 위치를 확인하고 있습니다…');
+    const finish=error=>{
       if(token!==locationToken)return;
+      // These are app acceptance limits, not a guarantee of physical accuracy.
+      if(error?.code!==1&&best&&best.accuracy<=200){
+        apply({...best,name:'현재 위치'},'current');
+        return;
+      }
       cancelLocation();
-      message(error?.code===1?'위치 권한이 꺼져 있습니다. 브라우저에서 허용하거나 숙소를 지정해주세요.':error?.code===3?'위치 확인 시간이 초과되었습니다. 다시 시도하거나 숙소를 지정해주세요.':'현재 위치를 확인하지 못했습니다. 위치 서비스를 켜거나 숙소를 지정해주세요.');
+      message(error?.code===1?'위치 권한이 꺼져 있습니다. 브라우저에서 허용하거나 지도·숙소를 지정해주세요.':best
+        ?`기기 추정 오차가 약 ±${distanceLabel(best.accuracy)}여서 적용하지 않았습니다. 지도 지정 또는 숙소 지정으로 위치를 골라주세요.`
+        :'정확한 현재 위치를 확인하지 못했습니다. 다시 시도하거나 지도 지정·숙소 지정을 이용해주세요.');
     };
-    locationTimer=setTimeout(()=>fail({code:3}),13000);
-    try{navigator.geolocation.getCurrentPosition(position=>{
+    const receive=position=>{
       if(token!==locationToken)return;
-      const p=position.coords;
-      if(!apply({name:'현재 위치',lat:p.latitude,lng:p.longitude},'current')){fail({code:2});return}
-      const accuracy=Number(p.accuracy);
-      if(Number.isFinite(accuracy)&&accuracy>200)message(`현재 위치 오차 약 ±${distanceLabel(accuracy)} · 정확하지 않으면 숙소를 지정해주세요.`);
-    },fail,{enableHighAccuracy:true,timeout:10000,maximumAge:30000})}catch{fail({code:2})}
+      const coords=position?.coords,point=validMapLocation({lat:coords?.latitude,lng:coords?.longitude});
+      const accuracy=Number(coords?.accuracy),timestamp=Number(position?.timestamp);
+      if(!point||!Number.isFinite(accuracy)||accuracy<=0||!Number.isFinite(timestamp)||timestamp<started-1000||timestamp>Date.now()+1000)return;
+      if(!best||accuracy<best.accuracy)best={...point,accuracy:Math.ceil(accuracy)};
+      if(best.accuracy<=50){finish();return}
+      message(`위치를 더 정확하게 확인 중… 현재 추정 오차 약 ±${distanceLabel(best.accuracy)}`);
+    };
+    const fail=error=>{if(error?.code===1)finish(error)};
+    locationTimer=setTimeout(()=>finish(),16000);
+    const options={enableHighAccuracy:true,timeout:12000,maximumAge:0};
+    try{
+      if(geo.watchPosition){
+        const id=geo.watchPosition(receive,fail,options);
+        // A synchronous callback is allowed by test doubles/host wrappers.
+        if(token!==locationToken)geo.clearWatch?.(id);else locationWatchId=id;
+      }else geo.getCurrentPosition(receive,error=>finish(error),options);
+    }catch{finish()}
+  }
+  function cancelPick(){
+    const wasPicking=picking;
+    picking=false;pickedPoint=null;pickMarker?.setMap(null);pickMarker=null;
+    if(wasPicking)state.map?.setOptions?.({draggableCursor:oldCursor});
+    byId('nearbyPickControls').hidden=true;byId('nearbyPickConfirm').disabled=true;
+    byId('nearbyPick').setAttribute('aria-pressed',String(state.nearby?.kind==='manual'));
+  }
+  function startPick(){
+    if(picking){cancelPick();return}
+    cancelLocation();cancelSearch();message();
+    if(!state.map){message('지도가 준비된 뒤 지도 지정을 눌러주세요.');return}
+    if(state.registerMode)cancelRegisterMode();
+    cancelPendingMapWork();closeSystemInfo();closeDetailPanel();closeAreaPanel();closeMobileBusinessList();setMobileLegendExpanded(false);
+    oldCursor=state.map.get?.('draggableCursor')||'';state.map.setOptions?.({draggableCursor:'crosshair'});
+    picking=true;pickedPoint=null;
+    byId('nearbyPickControls').hidden=false;byId('nearbyPickConfirm').disabled=true;byId('nearbyPick').setAttribute('aria-pressed','true');
+    byId('nearbyPickHint').textContent='현재 있는 곳을 지도에서 누른 뒤 ‘이 위치 사용’을 눌러주세요.';
+  }
+  function handleMapClick(event){
+    if(!picking)return false;
+    event?.stop?.();
+    const location=event?.latLng;
+    const point=validMapLocation({lat:typeof location?.lat==='function'?location.lat():location?.lat,lng:typeof location?.lng==='function'?location.lng():location?.lng});
+    if(!point)return true;
+    pickedPoint=point;pickMarker?.setMap(null);
+    pickMarker=new google.maps.Marker({map:state.map,position:point,title:'직접 지정할 위치',zIndex:10001});
+    byId('nearbyPickConfirm').disabled=false;
+    byId('nearbyPickHint').textContent='표시된 핀을 확인해주세요. 다른 곳을 누르면 위치를 바꿀 수 있습니다.';
+    return true;
   }
   const normalized=text=>String(text||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase();
   function localStays(query){
@@ -151,7 +208,7 @@
     byId('nearbyGoogleCredit').hidden=true;
   }
   function openStay(){
-    cancelLocation();message();
+    cancelPick();cancelLocation();message();
     if(!active())previousCity=state.city;
     const dialog=byId('nearbyStayDialog');
     if(savedStay?.expiresAt<=Date.now()){savedStay=null;try{localStorage.removeItem(storageKey)}catch{}}
@@ -216,7 +273,11 @@
     }));
     return true;
   }
-  window.NearbyBusinesses={active,apply,clear,setRadius,fit,sync,current,search,renderNavigation,distanceLabel};
+  window.NearbyBusinesses={active,apply,clear,setRadius,fit,sync,current,search,renderNavigation,distanceLabel,handleMapClick,cancelPick,isPicking:()=>picking};
+  byId('nearbyPick').addEventListener('click',startPick);
+  byId('nearbyPickCancel').addEventListener('click',cancelPick);
+  byId('nearbyPickConfirm').addEventListener('click',()=>{if(pickedPoint)apply({...pickedPoint,name:'직접 지정한 위치'},'manual')});
+  window.addEventListener('pagehide',()=>{cancelLocation();cancelPick()});
   byId('nearbyCurrent').addEventListener('click',current);
   byId('locBtn').onclick=current;
   byId('nearbyStay').addEventListener('click',openStay);

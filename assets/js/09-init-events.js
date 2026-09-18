@@ -266,6 +266,7 @@ function initMap(){
   });
   initAddressAutocomplete();
   state.map.addListener('click',e=>{
+    if(window.NearbyBusinesses?.handleMapClick(e))return;
     setMobileLegendExpanded(false);
     closeSystemInfo();
     // 업체 등록 모드에서는 기존 등록용 클릭 로직 사용.
@@ -486,6 +487,7 @@ window.addEventListener('resize',()=>{
 
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
+  if(window.NearbyBusinesses?.isPicking()){window.NearbyBusinesses.cancelPick();e.preventDefault();return}
   if(closeTopModalOrRegisterMode()){
     e.preventDefault();
     e.stopPropagation();
