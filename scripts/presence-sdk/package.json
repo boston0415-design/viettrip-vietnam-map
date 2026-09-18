@@ -1,0 +1,13 @@
+{
+  "name": "viettrip-presence-sdk",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned browser-only Realtime client for anonymous online counts",
+  "scripts": {
+    "build": "node build.cjs"
+  },
+  "dependencies": {
+    "@supabase/realtime-js": "2.116.0",
+    "esbuild": "0.25.12"
+  }
+}
