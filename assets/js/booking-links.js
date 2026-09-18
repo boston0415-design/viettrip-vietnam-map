@@ -75,6 +75,15 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 ]);
 const VERIFIED_POINT_BOOKINGS=Object.freeze([
   {
+    "name": "사이공역",
+    "type": "기차역",
+    "sourceUrl": "https://vr.com.vn/",
+    "url": "https://dsvn.vn/",
+    "label": "기차표 예약",
+    "note": "베트남철도 공식 예매: 출발역 Sài Gòn을 선택하고 도착역·날짜·좌석을 확인하세요. 잔여석·요금·결제 가능 여부는 예약 사이트에서 확인됩니다.",
+    "verifiedOn": "2026-09-18"
+  },
+  {
     "name": "사이공 프린세스 · 디너 유람선 승선",
     "type": "유람선·수상버스",
     "sourceUrl": "https://www.saigonprincess.com.vn/contact",
@@ -135,7 +144,8 @@ function verifiedBookingFor(feature={}){
 function bookingLinkHtml(feature){
   const booking=verifiedBookingFor(feature);
   if(!booking)return '';
-  return `<a class="bookingButton" href="${esc(booking.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(feature.name)} 예약하기 · 외부 예약 페이지, 새 창" title="${esc(booking.note)}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4m8-4v4M4 10h16m-12 5 3 3 5-5"/></svg><span>예약하기 ↗</span></a>`;
+  const label=booking.label||'예약하기';
+  return `<a class="bookingButton" href="${esc(booking.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(feature.name)} ${esc(label)} · 외부 예약 페이지, 새 창" title="${esc(booking.note)}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4m8-4v4M4 10h16m-12 5 3 3 5-5"/></svg><span>${esc(label)} ↗</span></a>`;
 }
 function bookingNoteHtml(feature){
   const booking=verifiedBookingFor(feature);

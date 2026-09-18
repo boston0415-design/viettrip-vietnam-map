@@ -44,7 +44,16 @@ run(`
     assert(!mapFeatureHtml(p).includes('bookingButton'),'hover stays passive');
     assert.equal(verifiedBookingFor({...p,sourceUrl:'https://unverified.test'}),null);
   }
-  assert.equal(VERIFIED_POINT_BOOKINGS.length,6);
+  assert.equal(VERIFIED_POINT_BOOKINGS.length,7);
+  const station=points.find(p=>p.name==='사이공역');
+  let stationLocation;resolvePoiLocation(station,location=>{stationLocation=location});
+  const stationCard=document.createElement('div');stationCard.innerHTML=mapFeatureHtml({...station,...stationLocation},null,{directions:true});
+  assert.equal(stationCard.querySelector('.bookingButton').href,'https://dsvn.vn/');
+  assert(stationCard.querySelector('.bookingButton').textContent.includes('기차표 예약'));
+  assert(stationCard.querySelector('.bookingNote').textContent.includes('Sài Gòn'));
+  const stationRoute=new URL(stationCard.querySelector('.mapDirectionsButton').href);
+  assert.equal(stationRoute.searchParams.get('destination'),'10.781213,106.677198','directions use the corrected station pin');
+  assert(!stationRoute.searchParams.has('origin'),'Google Maps obtains the current location');
   assert.equal(saved,JSON.stringify([state.cat,state.sub,state.ratingFilter,state.query,state.markers]));
 `);
 const scriptUrls=[...w.document.scripts].map(s=>s.src);
@@ -53,4 +62,4 @@ const trust=w.document.querySelector('.homeScreenTrust');
 assert.deepEqual([...trust.querySelectorAll('dt')].map(n=>n.textContent),['이용 방식','권한','공식 주소']);
 assert.equal(trust.querySelector('a').href,'https://viettrip-vietnam-map.pages.dev/');
 dom.window.close();
-console.log('PASS verified reservations for 7 businesses and 6 boarding points; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');
+console.log('PASS verified reservations for 7 businesses and 7 points, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');
