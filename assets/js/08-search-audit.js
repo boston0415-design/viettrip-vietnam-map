@@ -152,13 +152,22 @@ function subItemsForNav(def){
   return [];
 }
 
+// Keep each label outside its horizontal rail, and retain the rail position on selection.
+function renderMapFilterRow(selector,label,choices){
+  const row=$(selector);
+  const previous=row.querySelector?.('.filterChoices');
+  const scrollLeft=previous?.getAttribute('aria-label')===label?previous.scrollLeft:0;
+  row.innerHTML=`<span class="quickLabel">${esc(label)}</span><div class="filterChoices" role="group" aria-label="${esc(label)}">${choices}</div>`;
+  const rail=row.querySelector?.('.filterChoices');
+  if(rail)rail.scrollLeft=scrollLeft;
+}
+
 function renderHierarchyNav(){
   syncMapFilterSummary();
-  $('#quickAreas').innerHTML=
-    `<span class="quickLabel">분류</span>`+
+  renderMapFilterRow('#quickAreas','분류',
     NAV_CATEGORIES.map(c=>
       `<button type="button" aria-pressed="${state.navCategory===c.id?'true':'false'}" class="navCat ${state.navCategory===c.id?'active':''}" data-nav-cat="${c.id}">${c.label}</button>`
-    ).join('');
+    ).join(''));
 
   document.querySelectorAll('[data-nav-cat]').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -234,8 +243,7 @@ function renderHierarchyNav(){
     : '';
 
   $('#subNav').classList.add('show');
-  $('#subNav').innerHTML=
-    `<span class="quickLabel">${def.label} ›</span>`+
+  renderMapFilterRow('#subNav',`${def.label} ›`,
     allButton+
     subs.map(s=>{
       if(s.kind==='hospital-sub'){
@@ -263,25 +271,24 @@ function renderHierarchyNav(){
         return `<button type="button" aria-pressed="${state.selectedNavItem===s.value?'true':'false'}" class="navSub ${s.pointType==='그랩승차'?'grabPickup':''} ${state.selectedNavItem===s.value?'active':''}" data-nav-point="${s.value}">${s.pointType==='그랩승차'?'G · ':''}${s.label}</button>`;
       }
       return `<button type="button" aria-pressed="${state.selectedNavItem===s.value?'true':'false'}" class="navSub ${state.selectedNavItem===s.value?'active':''}" data-nav-golf="${s.value}">${s.label}</button>`;
-    }).join('');
+    }).join(''));
 
 
   if(def.id==='restaurant'){
     $('#tagNav').classList.add('show');
-    $('#tagNav').innerHTML=
-      `<span class="quickLabel">특징 ›</span>`+
+    renderMapFilterRow('#tagNav','특징 ›',
       `<button type="button" aria-pressed="${state.restaurantTag==='all'?'true':'false'}" class="navSub ${state.restaurantTag==='all'?'active':''}" data-restaurant-tag="all">전체</button>`+
       RESTAURANT_TAGS.map(tag=>
         `<button type="button" aria-pressed="${state.restaurantTag===tag?'true':'false'}" class="navSub ${state.restaurantTag===tag?'active':''}" data-restaurant-tag="${tag}">${tag}</button>`
-      ).join('');
+      ).join(''));
   }else if(def.id==='hospital' && typeof hospitalPoints==='function'){
     $('#tagNav').classList.add('show');
     const points=hospitalPoints();
     const members=registeredHospitals();
-    $('#tagNav').innerHTML=`<span class="quickLabel">병원 ›</span>`+(points.length||members.length?
+    renderMapFilterRow('#tagNav','병원 ›',points.length||members.length?
       points.map(p=>`<button type="button" aria-pressed="${state.selectedNavItem===p.name}" class="navSub ${state.selectedNavItem===p.name?'active':''}" data-nav-point="${esc(p.name)}">${esc(p.name)}</button>`).join('')+
       members.map(p=>`<button type="button" aria-pressed="${state.selected===p.id}" class="navSub ${state.selected===p.id?'active':''}" data-hospital-place="${esc(p.id)}">${esc(p.name)} · 회원 등록</button>`).join('')
-      :'<span class="quickLabel">이 도시에는 확인된 해당 진료과가 없습니다.</span>');
+      :'<span class="filterEmpty">이 도시에는 확인된 해당 진료과가 없습니다.</span>');
   }else{
     $('#tagNav').classList.remove('show');
     $('#tagNav').innerHTML='';
@@ -381,11 +388,10 @@ function renderCityControls(){
   $('#activeCityName').textContent=city.label;
   $('#areaPanelTitle').textContent=`${city.label} 주요정보`;
 
-  $('#cityChips').innerHTML=
-    `<span class="quickLabel">대분류</span>`+
+  renderMapFilterRow('#cityChips','도시',
     Object.entries(CITY_DATA).map(([key,c])=>
       `<button type="button" class="cityChip ${state.city===key?'active':''}" data-city="${key}">${c.label}</button>`
-    ).join('');
+    ).join(''));
 
   document.querySelectorAll('[data-city]').forEach(btn=>{
     btn.addEventListener('click',()=>{

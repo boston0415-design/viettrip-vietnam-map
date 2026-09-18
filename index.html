@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="./assets/css/interface-polish.css?v=20260918-feedback-links2">
 <link rel="stylesheet" href="./assets/css/mobile-access.css?v=poi-directions1">
 <link rel="stylesheet" href="./assets/css/header-layout.css?v=20260918-vm1">
-<link rel="stylesheet" href="./assets/css/map-filters.css?v=area-directory1">
+<link rel="stylesheet" href="./assets/css/map-filters.css?v=mobile-filter-rails1">
 <link rel="stylesheet" href="./assets/css/detail-layout.css?v=20260918-registrant1">
 <link rel="stylesheet" href="./assets/css/place-photos.css?v=20260918-photos1">
 <link rel="stylesheet" href="./assets/css/booking-links.css?v=20260918-inquiries1">
@@ -122,17 +122,20 @@
         <div id="quickAreas" class="areaLegendRow"></div><div id="subNav" class="areaLegendRow subNav"></div><div id="tagNav" class="areaLegendRow subNav restaurantTagNav"></div>
         <div class="areaLegendRow ratingLegend">
           <span class="quickLabel">회원평점</span>
+          <div class="filterChoices" role="group" aria-label="회원평점">
           <button type="button" class="ratingFilterBtn" data-rating-filter="1"><i class="areaSwatch" style="background:#dc2626"></i>1★</button>
           <button type="button" class="ratingFilterBtn" data-rating-filter="2"><i class="areaSwatch" style="background:#f97316"></i>2★</button>
           <button type="button" class="ratingFilterBtn" data-rating-filter="3"><i class="areaSwatch" style="background:#eab308"></i>3★</button>
           <button type="button" class="ratingFilterBtn" data-rating-filter="4"><i class="areaSwatch" style="background:#16a34a"></i>4★</button>
           <button type="button" class="ratingFilterBtn" data-rating-filter="4.5"><i class="areaSwatch" style="background:#d4a017"></i>4.5+</button>
           <button type="button" class="ratingFilterBtn" data-rating-filter="5"><i class="areaSwatch" style="background:#c28d00"></i>5★</button>
+          </div>
         </div>
         <div class="areaLegendRow benefitLegend">
           <span class="quickLabel">혜택업소</span>
+          <div class="filterChoices" role="group" aria-label="혜택업소">
           <button type="button" class="benefitFilterBtn" data-benefit-filter="benefit"><span class="benefitMark">%</span>혜택업소</button>
-
+          </div>
         </div>
         </div>
         <div class="mapFilterFooter"><span>선택한 조건으로 지도를 표시합니다</span><button id="closeMapFilters" type="button">지도 보기</button></div>
@@ -317,7 +320,7 @@
 <script src="./assets/js/05-places-registration.js?v=20260918-hospitals1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260918-admin-session1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-hospital-registration1"></script>
-<script src="./assets/js/08-search-audit.js?v=20260918-hospital-registration1"></script>
+<script src="./assets/js/08-search-audit.js?v=20260918-mobile-filter-rails1"></script>
 <script src="./assets/js/09-init-events.js?v=20260918-admin-session1"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260918-feedback-links2"></script>
 <script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>

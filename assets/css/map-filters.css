@@ -11,24 +11,39 @@
 .filterToggleLabel{flex:none;color:#247f78;font-size:11px;font-weight:650;padding-left:9px;border-left:1px solid #e1e9e5}
 .filterChevron{flex:none;font-size:17px;line-height:1;transform:rotate(180deg)}
 .mobileCollapsed .filterChevron{transform:none}
-#areaLegendBody{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden;border-top:1px solid #e9eeeb}
+#areaLegendBody{display:grid;grid-template-rows:minmax(0,1fr) auto;flex:1 1 auto;min-height:0;overflow:hidden;border-top:1px solid #e9eeeb}
 #areaLegendBody[hidden]{display:none!important}
-.areaLegendOptions{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;padding:10px 13px;scrollbar-width:thin}
+.areaLegendOptions{min-width:0;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;padding:10px 13px;scrollbar-width:thin;scroll-padding-block:10px}
 .areaLegendOptions .travellerToolbar{flex-wrap:wrap}
+.filterChoices{display:flex;flex:1 1 0;min-width:0;align-items:center;flex-wrap:wrap;gap:5px}
+.cityRow .filterChoices{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+.filterEmpty{font-size:11px;color:#71817a;line-height:1.5;white-space:normal}
+#areaLegend .subNav:not(.show){display:none!important}
 #areaLegend .mapFilterFooter{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;padding:9px 13px;border-top:1px solid #e9eeeb;background:#f8faf8}
 .mapFilterFooter>span{font-size:11px;color:#71817a}
 #closeMapFilters{flex:none;min-height:36px;padding:7px 15px;border:0;border-radius:9px;background:#247f78;color:#fff;font:600 12px/1.4 system-ui,sans-serif}
 @media(max-width:900px){
- #areaLegend{left:10px!important;right:10px!important;bottom:max(24px,calc(env(safe-area-inset-bottom) + 12px))!important;width:auto!important;max-width:none!important;max-height:62%!important;padding:0!important;overflow:hidden!important;background:#fff!important;border-radius:15px!important}
- #areaLegend.mobileCollapsed{right:auto!important;width:fit-content!important;max-width:calc(100% - 20px)!important;max-height:48px!important}
+ #areaLegend{left:10px!important;right:10px!important;bottom:max(24px,calc(env(safe-area-inset-bottom) + 12px))!important;width:auto!important;max-width:none!important;height:min(460px,calc(100% - 80px));max-height:calc(100% - 80px)!important;padding:0!important;overflow:hidden!important;background:#fff!important;border-radius:15px!important}
+ #areaLegend.mobileCollapsed{right:auto!important;width:fit-content!important;max-width:calc(100% - 20px)!important;height:auto;max-height:48px!important}
  #areaLegend #areaLegendTitle{min-height:46px!important;padding:9px 12px!important;gap:8px;font-size:12px!important}
- .areaLegendOptions{padding:8px 10px}
+ .areaLegendOptions{padding:4px 10px 12px;scrollbar-gutter:stable}
+ #areaLegend .cityRow,#areaLegend .areaLegendRow{display:grid!important;grid-template-columns:54px minmax(0,1fr);align-items:start;gap:6px!important;margin:0!important;padding:6px 0!important;overflow:visible!important}
+ #areaLegend .quickLabel{display:flex;align-items:center;min-height:44px;min-width:0;margin:0;white-space:normal!important;line-height:1.4;overflow-wrap:anywhere}
+ #areaLegend .filterChoices{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;padding:2px 1px 5px;scroll-padding-inline:4px;scrollbar-width:thin;scrollbar-color:#bdcec8 transparent}
+ #areaLegend .filterChoices::-webkit-scrollbar{height:3px}
+ #areaLegend .filterChoices::-webkit-scrollbar-thumb{background:#bdcec8;border-radius:4px}
+ #areaLegend .filterChoices>button{min-height:44px!important}
+ #areaLegend .ratingLegend .filterChoices,#areaLegend .benefitLegend .filterChoices{flex-wrap:wrap;overflow:visible}
+ #areaLegend #tagNav{max-height:none}
+ #areaLegend .subNav:not(.show){display:none!important}
+ #areaLegend .travellerToolbar{margin:4px 0 7px;gap:5px}
+ #areaLegend .travellerToolbar button{flex:1 1 auto}
  #areaLegend .mapFilterFooter{padding:8px 10px;gap:7px}
  #areaLegend #closeMapFilters{min-height:42px!important;padding:9px 15px!important}
  .mapFilterFooter>span{font-size:10px}
 }
 @media(min-width:901px){.app{min-height:0}#areaLegend{bottom:26px}.mapwrap.detailOpen #areaLegend{max-width:calc(100% - clamp(360px,34vw,440px))}}
-@media(max-width:900px) and (max-height:500px){#areaLegend:not(.mobileCollapsed){max-height:74%!important}}
+@media(max-width:900px) and (max-height:500px){#areaLegend:not(.mobileCollapsed){height:calc(100% - 40px);max-height:calc(100% - 40px)!important}.mapFilterFooter>span{display:none}#areaLegend .mapFilterFooter{justify-content:flex-end;padding-block:4px}}
 
 /* Keep the directory heading and categories in view while its entries scroll. */
 #areaPanel{display:none;flex-direction:column;box-sizing:border-box;max-height:min(480px,calc(100% - 108px));overflow:hidden}
