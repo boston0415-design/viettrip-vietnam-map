@@ -164,6 +164,7 @@ function categoryRangeColor(categoryId){
     stay:'#2563eb',
     restaurant:'#f97316',
     spa:'#ec4899',
+    barber:'#0284c7',
     karaoke:'#8b5cf6',
     cafe:'#b7791f',
     shopping:'#db2777',

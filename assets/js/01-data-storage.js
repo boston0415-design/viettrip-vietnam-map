@@ -2,6 +2,7 @@ const CONFIG={
   categories:{
     restaurant:{label:'식당',subs:['한식','일식','베트남','중식','대만','태국','인도','네팔','싱가포르','말레이시아','인도네시아','필리핀','이탈리아','프랑스','스페인','그리스','미국','멕시코','터키','중동','양식','퓨전','다국적','기타']},
     spa:{label:'마사지',subs:['마사지','발마사지','스파']},
+    barber:{label:'이발소',subs:['이발소','미용실']},
     stay:{label:'숙소',subs:['호텔','레지던스','서비스드 아파트','아파트']},
     karaoke:{label:'가라오케',subs:['한인 가라오케','로컬 KTV']},
     cafe:{label:'카페',subs:['카페','과일·주스','베이커리','디저트']},
@@ -351,6 +352,7 @@ const NAV_CATEGORIES=[
   {id:'stay',label:'숙소',kind:'business'},
   {id:'restaurant',label:'식당',kind:'business'},
   {id:'spa',label:'마사지',kind:'business'},
+  {id:'barber',label:'이발소',kind:'business'},
   {id:'karaoke',label:'가라오케',kind:'business'},
   {id:'cafe',label:'카페',kind:'business'},
   {id:'exchange',label:'환전소',kind:'business'},

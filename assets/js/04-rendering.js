@@ -566,6 +566,9 @@ function inferCategory(name='',types=[]){
   if(t.has('dentist')) return ['hospital','치과'];
   if(t.has('hospital')||t.has('doctor')) return ['hospital','종합병원·일반진료'];
   if(t.has('lodging')) return ['stay','호텔'];
+  const hairName=n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').normalize('NFC');
+  if(t.has('barber_shop') || /이발소|\bbarber(?:shop|s)?\b|\b(?:hot|cat) toc\b/.test(hairName)) return ['barber','이발소'];
+  if(t.has('hair_salon') || t.has('hair_care') || /미용실|\bhair[ -]?salon\b/.test(hairName)) return ['barber','미용실'];
   if(t.has('spa')) return ['spa','스파'];
   if(t.has('night_club')) return ['bar','클럽'];
   if(t.has('golf_course') || n.includes('golf')) return ['golf','골프장'];

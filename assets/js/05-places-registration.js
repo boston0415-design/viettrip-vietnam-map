@@ -21,7 +21,7 @@ function isBusinessLikePlace(place){
   const accepted=[
     'establishment','point_of_interest','restaurant','food','cafe','bar',
     'night_club','lodging','spa','shopping_mall','store','supermarket',
-    'hospital','pharmacy','drugstore','tourist_attraction','golf_course','gym','beauty_salon'
+    'hospital','pharmacy','drugstore','tourist_attraction','golf_course','gym','beauty_salon','barber_shop','hair_salon','hair_care'
   ];
   return accepted.some(t=>types.has(t));
 }
@@ -498,7 +498,7 @@ function isLikelyAddressName(name,address='',types=[]){
   const businessTypes=new Set([
     'establishment','point_of_interest','restaurant','food','cafe',
     'bar','lodging','spa','shopping_mall','store','supermarket',
-    'hospital','pharmacy','drugstore','night_club','tourist_attraction'
+    'hospital','pharmacy','drugstore','night_club','tourist_attraction','barber_shop','hair_salon','hair_care'
   ]);
 
   if((types||[]).some(t=>businessTypes.has(t)))return false;

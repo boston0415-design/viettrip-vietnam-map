@@ -2,6 +2,7 @@
 // Vendored as paths: no icon font or remote requests. See assets/licenses/material-symbols-NOTICE.txt.
 // The massage and cherries symbols are project-drawn, using the same coordinate system.
 const MAP_SYMBOL_PATHS={
+  "content_cut": "m480-400-94 94q8 15 11 32t3 34q0 66-47 113T240-80q-66 0-113-47T80-240q0-66 47-113t113-47q17 0 34 3t32 11l94-94-94-94q-15 8-32 11t-34 3q-66 0-113-47T80-720q0-66 47-113t113-47q66 0 113 47t47 113q0 17-3 34t-11 32l438 438q27 27 12 61.5T783-120q-11 0-21.5-4.5T743-137L480-400Zm120-120-80-80 223-223q8-8 18.5-12.5T783-840q38 0 52.5 35T823-743L600-520ZM240-640q33 0 56.5-23.5T320-720q0-33-23.5-56.5T240-800q-33 0-56.5 23.5T160-720q0 33 23.5 56.5T240-640Zm240 180q8 0 14-6t6-14q0-8-6-14t-14-6q-8 0-14 6t-6 14q0 8 6 14t14 6ZM240-160q33 0 56.5-23.5T320-240q0-33-23.5-56.5T240-320q-33 0-56.5 23.5T160-240q0 33 23.5 56.5T240-160Z",
   "cherries": "M538-823C538-671 425-518 291-400L251-445C365-550 478-677 478-823ZM554-866C654-763 769-576 775-411L716-408C711-549 608-728 512-829ZM514-827C573-936 738-909 808-800C690-736 576-747 514-827ZM450-300A180 180 0 1 1 90-300A180 180 0 1 1 450-300ZM870-240A160 160 0 1 1 550-240A160 160 0 1 1 870-240Z",
   "cake": "M160-80q-17 0-28.5-11.5T120-120v-160q0-33 23.5-56.5T200-360h560q33 0 56.5 23.5T840-280v160q0 17-11.5 28.5T800-80H160Zm40-360v-120q0-33 23.5-56.5T280-640h160v-58q-18-12-29-29t-11-41q0-15 6-29.5t18-26.5l42-42q2-2 14-6 2 0 14 6l42 42q12 12 18 26.5t6 29.5q0 24-11 41t-29 29v58h160q33 0 56.5 23.5T760-560v120H200Z",
   "bakery_dining": "m835-252-99-34 78-215 85 175q14 27-12 55t-52 19Zm-251-38 43-374q2-15 13.5-20.5t27.5-.5l100 37q14 6 18.5 18t-.5 26L673-290h-89Zm-296 0L175-604q-5-14-.5-26.5T193-648l100-37q14-6 26.5-.5T334-664l42 374h-88Zm-172 38q-26 8-47-19.5T62-326l86-175 77 215-109 34Zm320-38-48-430q-2-17 9.5-28.5T426-760h108q17 0 28.5 11.5T572-720l-48 430h-88Z",
@@ -59,7 +60,7 @@ function businessSymbolKey(category,subcategory=''){
     if(/해변|beach/i.test(sub))return 'beach_access';
     if(/공원|park/i.test(sub))return 'park';
   }
-  return ({restaurant:'restaurant',stay:'bed',spa:'massage',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',boat:'directions_boat',train:'train',home:'home',hospital:'local_hospital',pharmacy:'local_pharmacy'})[category]||'location_on';
+  return ({restaurant:'restaurant',stay:'bed',spa:'massage',barber:'content_cut',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',boat:'directions_boat',train:'train',home:'home',hospital:'local_hospital',pharmacy:'local_pharmacy'})[category]||'location_on';
 }
 
 function businessGlyphPath(category,subcategory=''){
@@ -333,7 +334,7 @@ function items({ratingFilter=state.ratingFilter,forList=false}={}){
   if(state.cat==='restaurant' && state.restaurantTag!=='all')arr=arr.filter(p=>hasRestaurantTag(p,state.restaurantTag));
   if(ratingFilter!=='all')arr=arr.filter(p=>matchesRatingFilter(p.rating,ratingFilter));
   if(state.benefitFilter!=='all')arr=arr.filter(p=>matchesBenefitFilter(p,state.benefitFilter));
-  if(state.query){const q=state.query.toLowerCase();arr=arr.filter(p=>`${p.name} ${p.area} ${p.address} ${p.subcategory} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q))}
+  if(state.query){const q=state.query.toLowerCase();arr=arr.filter(p=>`${p.name} ${p.area} ${p.address} ${catLabel(p.category)} ${p.subcategory} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q))}
   }
   if(window.PersonalPlaces)arr=window.PersonalPlaces.filter(arr,forList);
   if(state.sort==='newest')arr.sort((a,b)=>(Date.parse(b.createdAt)||0)-(Date.parse(a.createdAt)||0)||a.name.localeCompare(b.name,'ko'));

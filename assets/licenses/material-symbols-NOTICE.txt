@@ -4,7 +4,7 @@ Licensed under the Apache License, Version 2.0 (see Apache-2.0.txt).
 Source: https://github.com/google/material-design-icons
 
 Vendored fill=1, weight=400, 24px SVG paths:
-headphones, restaurant, bed, local_cafe, mic, attach_money, shopping_bag, storefront, account_balance, golf_course, local_bar, sports_bar, shopping_cart, apartment, beach_access, park, flight, local_taxi, directions_bus, directions_boat, train, home, local_hospital, location_on, cake, bakery_dining, local_pharmacy, pets, dentistry
+headphones, restaurant, bed, local_cafe, mic, attach_money, shopping_bag, storefront, account_balance, golf_course, local_bar, sports_bar, shopping_cart, apartment, beach_access, park, flight, local_taxi, directions_bus, directions_boat, train, home, local_hospital, location_on, cake, bakery_dining, local_pharmacy, pets, dentistry, content_cut
 
 Paths are unchanged; SVG viewBox coordinates are transformed into a 24-unit viewBox.
 Colors, marker frames, and icon-to-category/subcategory mappings are project-specific.
