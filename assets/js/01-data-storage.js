@@ -4,7 +4,7 @@ const CONFIG={
     spa:{label:'마사지',subs:['마사지','발마사지','스파']},
     barber:{label:'이발소',subs:['이발소','미용실']},
     stay:{label:'숙소',subs:['호텔','레지던스','서비스드 아파트','아파트']},
-    karaoke:{label:'가라오케',subs:['한인 가라오케','로컬 KTV']},
+    karaoke:{label:'가라오케',subs:['한인 가라오케','일본 가라오케','중국 가라오케','로컬 KTV']},
     cafe:{label:'카페',subs:['카페','과일·주스','베이커리','디저트']},
     exchange:{label:'환전소',subs:['환전소·금은방','은행','공항 환전']},
     shopping:{label:'쇼핑',subs:['마트','쇼핑몰','백화점','아울렛','과일가게']},
