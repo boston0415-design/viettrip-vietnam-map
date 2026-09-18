@@ -10,6 +10,35 @@ function validRegistrantNickname(value){
   const nickname=normalizedRegistrantNickname(value);
   return nickname.length>0 && [...nickname].length<=30 && !/[\u0000-\u001f\u007f]/.test(nickname);
 }
+const REMEMBERED_NICKNAME_KEY='viettrip_member_nickname_v1';
+const REGISTRANT_NICKNAME_HELP='업체 상세에 공개됩니다. 이 브라우저에 기억해 다음 등록·후기에 자동 입력합니다.';
+function rememberMemberNickname(value){
+  const nickname=normalizedRegistrantNickname(value);
+  if(!validRegistrantNickname(nickname))return;
+  safeStorageSet(REMEMBERED_NICKNAME_KEY,nickname);
+}
+function rememberedMemberNickname(){
+  const saved=safeStorageGet(REMEMBERED_NICKNAME_KEY);
+  if(validRegistrantNickname(saved))return normalizedRegistrantNickname(saved);
+  // Upgrade existing users from their own records only, never an admin's edited record.
+  const data=db();
+  const candidates=[
+    ...(data.places||[]).filter(isOwnerPlace).map(p=>({nickname:p.registrantNickname,createdAt:p.createdAt})),
+    ...(data.reviews||[]).filter(r=>isOwnReview(r) && r.nickname!=='회원').map(r=>({nickname:r.nickname,createdAt:r.createdAt}))
+  ].filter(r=>validRegistrantNickname(r.nickname)).sort((a,b)=>normalizeReviewTime(b.createdAt)-normalizeReviewTime(a.createdAt));
+  const nickname=candidates[0]?.nickname||'';
+  rememberMemberNickname(nickname);
+  return normalizedRegistrantNickname(nickname);
+}
+function bindRememberedNicknameInput(input){
+  if(!input || input.dataset.remembersNickname)return;
+  input.dataset.remembersNickname='true';
+  const remember=event=>{
+    if(event.isComposing || input.readOnly)return;
+    rememberMemberNickname(input.value);
+  };
+  ['input','change','compositionend'].forEach(type=>input.addEventListener(type,remember));
+}
 function placeToRemote(p){
   return {
     id:p.id,

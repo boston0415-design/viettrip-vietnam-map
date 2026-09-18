@@ -28,7 +28,10 @@ async function savePlaceOnce(){
     return;
   }
   $('#pNickname').removeAttribute('aria-invalid');
-  if(!state.editPlaceId)$('#pNicknameHelp').textContent='업체 상세에 등록자로 공개됩니다. 30자 이내로 입력해 주세요.';
+  if(!state.editPlaceId){
+    rememberMemberNickname(registrantNickname);
+    $('#pNicknameHelp').textContent=REGISTRANT_NICKNAME_HELP;
+  }
 
   if(!name){
     alert('업체명을 입력해주세요.');
@@ -293,7 +296,8 @@ function openReview(){
   state.reviewExistingPhotos=[...(mine?.photoUrls||[])].slice(0,3);
   state.reviewNewFiles=[];
 
-  $('#rName').value=mine?.nickname||$('#rName').value||'';
+  $('#rName').value=mine?.nickname||rememberedMemberNickname();
+  bindRememberedNicknameInput($('#rName'));
   $('#rText').value=mine?.text||'';
   $('#rCafeUrl').value=mine?.cafeUrl||'';
   $('#reviewCafeLink').open=!!mine?.cafeUrl;
@@ -325,6 +329,7 @@ async function saveReview(){
   const x=db();
 
   let existing=x.reviews.find(r=>r.placeId===placeId && isOwnReview(r));
+  if(!existing || nickname!==existing.nickname)rememberMemberNickname(nickname);
   let reviewId=existing?.id || crypto.randomUUID();
 
   try{

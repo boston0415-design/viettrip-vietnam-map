@@ -68,7 +68,7 @@ for(const name of fs.readdirSync(path.join(root,'assets/js')).filter(name=>/^0[1
   await savePlaceOnce();assert.equal(place.registrantNickname,'','legacy edits work without fabricated attribution');
   renderDetail();assert(!$('#detail .placeRegistrant'));
   closeEditMode();openPlace({name:'다음 업체',latLng:{lat:10.78,lng:106.71}});
-  assert(form.required);assert(!form.readOnly);assert.equal(form.value,'','new registration does not inherit another registrant');
+  assert(form.required);assert(!form.readOnly);assert.equal(form.value,'카페회원','new registration remembers the user, not the record edited by an admin');
  })()`);
  dom.window.close();
  console.log('PASS new nickname validation, draft preservation, save/public-read roundtrip, legacy compatibility, safe detail rendering, mobile summary and unchanged owner/admin attribution');

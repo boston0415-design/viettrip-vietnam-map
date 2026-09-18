@@ -626,6 +626,7 @@ function closeModalById(id){
   modal.classList.remove('open');
 
   if(id==='placeModal'){
+    if(!state.editPlaceId)rememberMemberNickname($('#pNickname').value);
     clearAddressSearchMarker();
     resetPlacePhotoDraftUi();
     closeEditMode();
@@ -691,7 +692,7 @@ function openPlace(prefill={}){
   }
 
   const editing=Boolean(state.editPlaceId);
-  $('#pNickname').value=editing?(prefill.registrantNickname||''):'';
+  $('#pNickname').value=editing?(prefill.registrantNickname||''):rememberedMemberNickname();
   $('#pNickname').required=!editing;
   $('#pNickname').readOnly=editing;
   $('#pNickname').placeholder=editing?'닉네임 미등록':'카페에서 사용하는 닉네임을 적어주세요';
@@ -699,7 +700,8 @@ function openPlace(prefill={}){
   $('#pNicknameLabel').textContent=editing?'등록자 닉네임':'등록자 닉네임 · 필수';
   $('#pNicknameHelp').textContent=editing
     ? (prefill.registrantNickname?'등록 당시 닉네임입니다. 업체 정보를 수정해도 유지됩니다.':'기존 등록에는 닉네임이 저장되지 않았습니다.')
-    : '업체 상세에 등록자로 공개됩니다. 30자 이내로 입력해 주세요.';
+    : REGISTRANT_NICKNAME_HELP;
+  bindRememberedNicknameInput($('#pNickname'));
   $('#pName').value=prefill.name||'';
   $('#pArea').value=prefill.area||currentCity().label||'';
   $('#pAddress').value=prefill.address||'';
