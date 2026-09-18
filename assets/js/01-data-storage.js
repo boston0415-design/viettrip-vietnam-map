@@ -10,7 +10,8 @@ const CONFIG={
     market:{label:'시장',subs:['전통시장','야시장']},
     attraction:{label:'관광명소',subs:['광장·거리','해변','랜드마크','역사·문화유적','공원']},
     bar:{label:'클럽·바',subs:['클럽','루프탑 바','펍']},
-    golf:{label:'골프장',subs:['골프장','실내 골프']}
+    golf:{label:'골프장',subs:['골프장','실내 골프']},
+    hospital:{label:'병원',subs:['종합병원·일반진료','피부과','내과','정형외과','치과','안과','이비인후과','산부인과','소아과','비뇨의학과','건강검진','응급실','동물병원']}
   }
 };
 
@@ -378,4 +379,3 @@ const SUPABASE_HEADERS={
   'Authorization':`Bearer ${SUPABASE_ANON}`,
   'Content-Type':'application/json'
 };
-

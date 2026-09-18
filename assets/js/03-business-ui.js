@@ -105,7 +105,7 @@ function renderRestaurantTagChoices(selected=[]){
 
   const isRestaurant=$('#pCat')?.value==='restaurant';
   field.classList.toggle('hiddenField',!isRestaurant);
-  if($('#pSubLabel'))$('#pSubLabel').textContent=isRestaurant?'나라별 음식':'세부분류';
+  if($('#pSubLabel'))$('#pSubLabel').textContent=isRestaurant?'나라별 음식':$('#pCat')?.value==='hospital'?'진료과':'세부분류';
 
   if(!isRestaurant){
     box.innerHTML='';

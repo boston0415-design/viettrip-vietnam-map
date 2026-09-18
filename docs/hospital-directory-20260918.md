@@ -16,3 +16,9 @@ Each verified location includes its official source, 2026-09-18 check date, cont
 - ADI individual branches, hours and emergency status: https://www.theanimaldoctors.org/location/ ; international telephone: https://www.theanimaldoctors.org/faq/ . One Verandah is not marked 24/7. The shared international telephone is explicitly a central inquiry route, not a branch-specific line.
 
 No photographs were copied or uploaded in this change. Existing member uploads and live attributed Google galleries are preserved. `tests/hospital-directory.test.cjs` checks specialty overlap, empty results, city isolation, synchronized filters and contact identity.
+
+## Registration correction
+
+The original directory update did not add hospitals to the separate registration category configuration. Hospital is now available in the registration/edit dropdown, with the same 13 specialties as the directory and a “진료과” label. Restaurant-only controls are hidden for hospitals. Google hospital/doctor, dentist, and veterinary place types preselect the appropriate registration group.
+
+Member-registered hospitals keep the existing place/review/edit model. They appear in hospital specialty counts, the member list, navigation shortcuts, and map markers/coverage, including cities or specialties without a built-in hospital. Member shortcuts are explicitly labeled; they are not assigned official provider verification or language support. Tests cover the rendered selects, all specialty save/reload paths, edit prefill, city isolation and registered-only map bounds. The SQL validation uses the anonymous registration and owner-edit paths and rolls back all fixtures; no schema change is needed.

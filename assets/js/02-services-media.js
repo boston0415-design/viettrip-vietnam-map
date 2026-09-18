@@ -1132,5 +1132,6 @@ function categoryIcon(category,subcategory=''){
   if(category==='attraction') return '📍';
   if(category==='bar') return '🍸';
   if(category==='golf') return '⛳';
+  if(category==='hospital') return sub==='동물병원'?'🐾':'🏥';
   return '📌';
 }

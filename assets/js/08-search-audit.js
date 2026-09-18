@@ -240,7 +240,7 @@ function renderHierarchyNav(){
     subs.map(s=>{
       if(s.kind==='hospital-sub'){
         const active=hospitalSpecialty()===s.value;
-        const count=hospitalPoints(s.value).length;
+        const count=hospitalPoints(s.value).length+registeredHospitals(s.value).length;
         return `<button type="button" aria-pressed="${active}" class="navSub ${active?'active':''}" data-hospital-sub="${esc(s.value)}">${esc(s.label)} (${count})</button>`;
       }
       if(s.kind==='business-sub'){
@@ -277,13 +277,22 @@ function renderHierarchyNav(){
   }else if(def.id==='hospital' && typeof hospitalPoints==='function'){
     $('#tagNav').classList.add('show');
     const points=hospitalPoints();
-    $('#tagNav').innerHTML=`<span class="quickLabel">병원 ›</span>`+(points.length?points.map(p=>`<button type="button" aria-pressed="${state.selectedNavItem===p.name}" class="navSub ${state.selectedNavItem===p.name?'active':''}" data-nav-point="${esc(p.name)}">${esc(p.name)}</button>`).join(''):'<span class="quickLabel">이 도시에는 확인된 해당 진료과가 없습니다.</span>');
+    const members=registeredHospitals();
+    $('#tagNav').innerHTML=`<span class="quickLabel">병원 ›</span>`+(points.length||members.length?
+      points.map(p=>`<button type="button" aria-pressed="${state.selectedNavItem===p.name}" class="navSub ${state.selectedNavItem===p.name?'active':''}" data-nav-point="${esc(p.name)}">${esc(p.name)}</button>`).join('')+
+      members.map(p=>`<button type="button" aria-pressed="${state.selected===p.id}" class="navSub ${state.selected===p.id?'active':''}" data-hospital-place="${esc(p.id)}">${esc(p.name)} · 회원 등록</button>`).join('')
+      :'<span class="quickLabel">이 도시에는 확인된 해당 진료과가 없습니다.</span>');
   }else{
     $('#tagNav').classList.remove('show');
     $('#tagNav').innerHTML='';
   }
 
   document.querySelectorAll('[data-hospital-sub]').forEach(btn=>btn.addEventListener('click',()=>selectHospitalSpecialty(btn.dataset.hospitalSub)));
+  document.querySelectorAll('[data-hospital-place]').forEach(btn=>btn.addEventListener('click',()=>{
+    cancelPendingMapWork();
+    state.selectedNavItem=null;
+    selectPlace(btn.dataset.hospitalPlace,true,true);
+  }));
 
   document.querySelectorAll('[data-business-sub]').forEach(btn=>{
     btn.addEventListener('click',()=>{

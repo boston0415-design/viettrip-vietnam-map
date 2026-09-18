@@ -1,5 +1,5 @@
 // Official provider directories checked on 2026-09-18. No Google content is stored.
-const HOSPITAL_SPECIALTIES=['종합병원·일반진료','피부과','내과','정형외과','치과','안과','이비인후과','산부인과','소아과','비뇨의학과','건강검진','응급실','동물병원'];
+const HOSPITAL_SPECIALTIES=CONFIG.categories.hospital.subs;
 const HOSPITAL_DIRECTORY=[
   {city:'hcmc',name:'FV Hospital',address:'6 Nguyen Luong Bang St., Tan My Ward, Ho Chi Minh City',
     specialties:['종합병원·일반진료','피부과','내과','정형외과','치과','안과','이비인후과','산부인과','소아과','비뇨의학과','건강검진','응급실'],
@@ -52,6 +52,9 @@ function hospitalSpecialty(){
 }
 function hospitalPoints(specialty=hospitalSpecialty()){
   return currentPoints().filter(p=>p.type==='병원' && (specialty==='all' || (p.specialties||[]).includes(specialty)));
+}
+function registeredHospitals(specialty=hospitalSpecialty()){
+  return placesForCurrentCity().filter(p=>p.category==='hospital' && (specialty==='all'||p.subcategory===specialty));
 }
 function selectHospitalSpecialty(specialty){
   cancelPendingMapWork();

@@ -561,6 +561,9 @@ function renderPlaceStars(){
 function inferCategory(name='',types=[]){
   const n=name.toLowerCase();
   const t=new Set(types||[]);
+  if(t.has('veterinary_care')) return ['hospital','동물병원'];
+  if(t.has('dentist')) return ['hospital','치과'];
+  if(t.has('hospital')||t.has('doctor')) return ['hospital','종합병원·일반진료'];
   if(t.has('golf_course') || n.includes('golf')) return ['golf','골프장'];
   if(n.includes('market') || n.includes('chợ') || n.includes('cho ') || n.includes('night market')) return ['market',n.includes('night')?'야시장':'전통시장'];
   const heritageName=n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').normalize('NFC').trim().replace(/\s+/g,' ');

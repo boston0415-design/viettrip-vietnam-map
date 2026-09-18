@@ -167,7 +167,8 @@ function categoryRangeColor(categoryId){
     bar:'#6366f1',
     golf:'#15803d',
     market:'#8b5cf6',
-    attraction:'#10b981'
+    attraction:'#10b981',
+    hospital:'#dc2626'
   })[categoryId]||'#475569';
 }
 
@@ -223,7 +224,7 @@ async function showPointSet(points,typeForCoverage=null){
   clearSelectedSystemIcons();
   if(state.clickInfo){state.clickInfo.close();state.clickInfo=null}
 
-  if(!points.length)return;
+  if(!points.length && !(typeForCoverage==='병원' && items().some(p=>p.category==='hospital')))return;
 
   const token=(state.mapActionToken||0)+1;
   state.mapActionToken=token;
@@ -252,6 +253,12 @@ async function showPointSet(points,typeForCoverage=null){
     shown++;
   });
 
+  if(typeForCoverage==='병원'){
+    state.rangeSelectionKey=`points:${state.city}:병원`;
+    refreshRegisteredCoverage();
+    shown+=extendRegisteredBounds(bounds,'hospital');
+  }
+
   if(shown){
     fitUnifiedBounds(bounds,{padding:82,maxZoom:16});
     const label=typeForCoverage||points[0]?.type||'위치';
@@ -264,10 +271,11 @@ async function showPointSet(points,typeForCoverage=null){
 function matchesNavigationScope(p){
   const def=navDef(state.navCategory);
   if(!def)return true;
-  const category=def.kind==='business'?def.id:({shopping:'shopping','market-nav':'market','attraction-nav':'attraction','golf-nav':'golf'})[def.id];
+  const category=def.kind==='business'?def.id:({shopping:'shopping','market-nav':'market','attraction-nav':'attraction','golf-nav':'golf',hospital:'hospital'})[def.id];
   // Infrastructure and named map features have no registered-business category.
   if(!category)return false;
   if(p.category!==category)return false;
+  if(def.id==='hospital' && typeof hospitalSpecialty==='function' && hospitalSpecialty()!=='all' && p.subcategory!==hospitalSpecialty())return false;
   const selected=state.selectedNavItem;
   if(def.kind!=='business' && selected && !['all','__all__'].includes(selected)){
     return normalizePlaceName(p.name||'')===normalizePlaceName(selected);
@@ -294,11 +302,13 @@ function refreshRegisteredCoverage(){
   state.selectionOverlays=(state.selectionOverlays||[]).filter(o=>!o._registeredCoverage);
   if(!state.map || !state.rangeSelectionKey)return;
   const key=state.rangeSelectionKey;
-  if(!/^(business|shopping|golf|type):/.test(key))return;
+  const hospitalScope=key===`points:${state.city}:병원`;
+  if(!/^(business|shopping|golf|type):/.test(key)&&!hospitalScope)return;
   const def=navDef(state.navCategory);
   if(key.startsWith('type:') && !['market-nav','attraction-nav'].includes(def?.id))return;
   if(key.startsWith('golf:') && !key.endsWith(':all'))return;
   items().forEach(p=>{
+    if(hospitalScope&&p.category!=='hospital')return;
     const loc=validMapLocation(p);
     if(!loc)return;
     const circle=addSelectionCircle(loc,businessCircleRadius(p.category),categoryRangeColor(p.category),.065,.68,p);
@@ -426,7 +436,7 @@ async function showMetroCategory(){
 }
 function showPointCategory(type){
   const points=type==='병원' && typeof hospitalPoints==='function'?hospitalPoints():currentPoints().filter(p=>p.type===type);
-  if(!points.length){
+  if(!points.length && !(type==='병원' && items().some(p=>p.category==='hospital'))){
     clearSelectionRanges();
     clearSelectedSystemIcons();
     setDbStatus(`${type==='병원' && typeof hospitalSpecialty==='function' && hospitalSpecialty()!=='all'?hospitalSpecialty():type} 정보가 아직 등록되지 않았습니다.`);
