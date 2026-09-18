@@ -35,8 +35,16 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
     assert.equal($('#subNav [data-business-sub="미용실"]').textContent,'미용실');
     $('#subNav [data-business-sub="미용실"]').click();assert.equal(items().length,1);assert.equal(items()[0].subcategory,'미용실');
     renderList();assert(!$('#list').textContent.includes('마사지'));assert($('#list').textContent.includes('미용실'));
-    assert(markers.length);assert(markers.every(m=>decodeURIComponent(m.icon.url).includes(MAP_SYMBOL_PATHS.content_cut)));
-    assert(businessGlyph('barber','이발소').includes(MAP_SYMBOL_PATHS.content_cut));
+    assert(markers.length);assert(markers.every(m=>decodeURIComponent(m.icon.url).includes(MAP_SYMBOL_PATHS.barber_pole)));
+    for(const sub of ['이발소','미용실']){
+      const glyph=businessGlyph('barber',sub),marker=decodeURIComponent(businessMarkerIcon('barber',sub).url);
+      for(const output of [glyph,marker]){
+        assert(output.includes('data-symbol="barber-pole"'));
+        for(const color of ['#fff','#e53935','#2563eb'])assert(output.includes(color));
+        assert(!output.includes(MAP_SYMBOL_PATHS.content_cut));
+      }
+      assert.equal(categoryIcon('barber',sub),'💈');
+    }
     for(const [name,types,expected] of [
       ['Barber Shop',['barber_shop'],['barber','이발소']],['우리 이발소',['spa'],['barber','이발소']],
       ['Hớt Tóc Anh',['hair_care'],['barber','이발소']],['Salon',['hair_salon'],['barber','미용실']],
@@ -48,5 +56,5 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
    })()`);
   }finally{dom.window.close()}
  }
- console.log('PASS desktop/mobile barber registration, subtype edit, city/category search, navigation clicks, list/map scissors and import classification');
+ console.log('PASS desktop/mobile barber registration, subtype edit, search, navigation, shared red/white/blue barber poles and import classification');
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -1,7 +1,8 @@
 // Google Material Symbols Rounded, fill 1, 24px; Apache-2.0.
 // Vendored as paths: no icon font or remote requests. See assets/licenses/material-symbols-NOTICE.txt.
-// The massage and cherries symbols are project-drawn, using the same coordinate system.
+// The massage, cherries and barber pole symbols are project-drawn.
 const MAP_SYMBOL_PATHS={
+  "barber_pole": "M360-800H600Q680-800 680-720V-240Q680-160 600-160H360Q280-160 280-240V-720Q280-800 360-800Z",
   "content_cut": "m480-400-94 94q8 15 11 32t3 34q0 66-47 113T240-80q-66 0-113-47T80-240q0-66 47-113t113-47q17 0 34 3t32 11l94-94-94-94q-15 8-32 11t-34 3q-66 0-113-47T80-720q0-66 47-113t113-47q66 0 113 47t47 113q0 17-3 34t-11 32l438 438q27 27 12 61.5T783-120q-11 0-21.5-4.5T743-137L480-400Zm120-120-80-80 223-223q8-8 18.5-12.5T783-840q38 0 52.5 35T823-743L600-520ZM240-640q33 0 56.5-23.5T320-720q0-33-23.5-56.5T240-800q-33 0-56.5 23.5T160-720q0 33 23.5 56.5T240-640Zm240 180q8 0 14-6t6-14q0-8-6-14t-14-6q-8 0-14 6t-6 14q0 8 6 14t14 6ZM240-160q33 0 56.5-23.5T320-240q0-33-23.5-56.5T240-320q-33 0-56.5 23.5T160-240q0 33 23.5 56.5T240-160Z",
   "cherries": "M538-823C538-671 425-518 291-400L251-445C365-550 478-677 478-823ZM554-866C654-763 769-576 775-411L716-408C711-549 608-728 512-829ZM514-827C573-936 738-909 808-800C690-736 576-747 514-827ZM450-300A180 180 0 1 1 90-300A180 180 0 1 1 450-300ZM870-240A160 160 0 1 1 550-240A160 160 0 1 1 870-240Z",
   "cake": "M160-80q-17 0-28.5-11.5T120-120v-160q0-33 23.5-56.5T200-360h560q33 0 56.5 23.5T840-280v160q0 17-11.5 28.5T800-80H160Zm40-360v-120q0-33 23.5-56.5T280-640h160v-58q-18-12-29-29t-11-41q0-15 6-29.5t18-26.5l42-42q2-2 14-6 2 0 14 6l42 42q12 12 18 26.5t6 29.5q0 24-11 41t-29 29v58h160q33 0 56.5 23.5T760-560v120H200Z",
@@ -39,6 +40,7 @@ const MAP_SYMBOL_PATHS={
 
 function businessSymbolKey(category,subcategory=''){
   const sub=String(subcategory||'').trim();
+  if(category==='barber')return 'barber_pole';
   if(category==='public_office')return 'account_balance';
   if(category==='bar'){
     if(!sub || /클럽|club|디스코/i.test(sub))return 'headphones';
@@ -61,7 +63,7 @@ function businessSymbolKey(category,subcategory=''){
     if(/해변|beach/i.test(sub))return 'beach_access';
     if(/공원|park/i.test(sub))return 'park';
   }
-  return ({restaurant:'restaurant',stay:'bed',spa:'massage',barber:'content_cut',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',boat:'directions_boat',train:'train',home:'home',hospital:'local_hospital',pharmacy:'local_pharmacy'})[category]||'location_on';
+  return ({restaurant:'restaurant',stay:'bed',spa:'massage',cafe:'local_cafe',karaoke:'mic',exchange:'attach_money',shopping:'shopping_bag',market:'storefront',attraction:'account_balance',golf:'golf_course',airport:'flight',taxi:'local_taxi',bus:'directions_bus',boat:'directions_boat',train:'train',home:'home',hospital:'local_hospital',pharmacy:'local_pharmacy'})[category]||'location_on';
 }
 
 function businessGlyphPath(category,subcategory=''){
@@ -70,6 +72,10 @@ function businessGlyphPath(category,subcategory=''){
 }
 function businessGlyphContent(category,subcategory=''){
   const key=businessSymbolKey(category,subcategory);
+  if(key==='barber_pole'){
+    // A nested viewport clips the stripes without duplicate SVG IDs in list badges.
+    return `<g data-symbol="barber-pole"><path transform="translate(0 24) scale(.025)" fill="#fff" stroke="#64748b" stroke-width="20" d="${MAP_SYMBOL_PATHS.barber_pole}"/><svg x="8" y="5" width="8" height="14" viewBox="0 0 8 14" overflow="hidden"><path fill="#e53935" d="M0 2 8-3v3L0 5Zm0 12 8-5v3l-8 5Z"/><path fill="#2563eb" d="m0 8 8-5v3l-8 5Z"/></svg><path d="M8 5v14" stroke="#fff" stroke-opacity=".6"/><g fill="#e2e8f0" stroke="#64748b" stroke-width=".5"><circle cx="12" cy="1.3" r="1"/><circle cx="12" cy="22.7" r="1"/><rect x="6" y="2" width="12" height="2.5" rx="1"/><rect x="6" y="19.5" width="12" height="2.5" rx="1"/></g></g>`;
+  }
   return '<path transform="translate(0 24) scale(.025)" fill="currentColor" d="'+MAP_SYMBOL_PATHS[key]+'"/>';
 }
 function businessGlyph(category,subcategory=''){

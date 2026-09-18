@@ -8,4 +8,4 @@ headphones, restaurant, bed, local_cafe, mic, attach_money, shopping_bag, storef
 
 Paths are unchanged; SVG viewBox coordinates are transformed into a 24-unit viewBox.
 Colors, marker frames, and icon-to-category/subcategory mappings are project-specific.
-The massage sole and cherries silhouettes are original project-specific paths, not Google Material Symbols.
+The massage sole, cherries silhouettes and colored barber pole are original project-specific drawings, not Google Material Symbols.
