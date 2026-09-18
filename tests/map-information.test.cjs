@@ -36,7 +36,7 @@ for(const type of ['그랩승차','택시승차','그린SM승차','버스승차'
 }
 assert.equal(mapFeatureDirectionsHtml({}),'');
 // Clicking a route card allows Google Maps to keep its controls in view on PC and phone.
-let infoOptions,infoPosition,infoOpened=0;
+let infoOptions,infoPosition,infoOpened=0;setMobileLegendExpanded=()=>{};
 google.maps.InfoWindow=class{constructor(options){infoOptions=options}setPosition(position){infoPosition=position}open(){infoOpened++}close(){}};
 for(const mobile of [false,true]){
  window.matchMedia=q=>({matches:mobile?q.includes('max-width'):q.includes('hover')});

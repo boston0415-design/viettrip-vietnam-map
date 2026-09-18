@@ -5,10 +5,6 @@
     const city=typeof state!=='undefined'&&CITY_DATA[state.city]?state.city:'hcmc';
     const url=new URL('/guide/',location.origin);url.searchParams.set('city',city);
     document.getElementById('mapGuideLink')?.setAttribute('href',url.pathname+url.search);
-    const related={airport:city==='hcmc'?'airport-arrival':'airport-options',exchange:'exchange',stay:'stay-choice',restaurant:'food-reviews',cafe:'food-reviews',cruise:city==='hcmc'?'river-trip':null,citytour:['hcmc','hanoi'].includes(city)?'city-bus':null,hospital:'help'};
-    const article=state.benefitFilter==='benefit'?'member-benefits':related[state.navCategory||state.cat];
-    if(article)url.searchParams.set('read',article);
-    document.getElementById('relatedGuideLink')?.setAttribute('href',url.pathname+url.search);
   }
   document.addEventListener('DOMContentLoaded',()=>{
     syncGuideLinks();

@@ -631,6 +631,7 @@ function setMobileLegendExpanded(expanded,{restoreFocus=false}={}){
   const label=title?.querySelector('.filterToggleLabel');
   if(label)label.textContent=expanded?'접기':'필터';
   if(expanded){
+    closeSystemInfo();
     closeAreaPanel();
     if($('#detail')?.classList.contains('show'))closeDetailPanel();
   }

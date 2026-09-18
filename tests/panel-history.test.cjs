@@ -140,10 +140,17 @@ async function fixture(mobile=true,{stale=false,denied=false}={}){
       assert.equal(w.history.length,initialLength+1,'map cards must not accumulate invisible history');
     }
     await action('setMobileLegendExpanded(true)');
-    await action("showClickInfo({lat:10.77,lng:106.7},'above filters')");
-    assert.equal(w.history.state.viettripPanelBack.depth,2);
+    await action("showClickInfo({lat:10.77,lng:106.7},'replaces filters')");
+    assert.equal(node('areaLegendTitle').getAttribute('aria-expanded'),'false');
+    assert(node('areaLegendBody').hidden,'expanded filters cannot cover the new card');
+    assert.equal(w.history.state.viettripPanelBack.depth,1,'replacing filters keeps one Back step');
     await back();assert(!run('Boolean(state.clickInfo)'));
+    assert(!guarded());
+    await action("showClickInfo({lat:10.77,lng:106.7},'before reopening filters')");
+    await action('setMobileLegendExpanded(true)');
+    assert(!run('Boolean(state.clickInfo)'),'reopening filters closes the old card');
     assert.equal(node('areaLegendTitle').getAttribute('aria-expanded'),'true');
+    assert.equal(w.history.state.viettripPanelBack.depth,1);
     await back();assert(!guarded());
     await action("showClickInfo({lat:10.77,lng:106.7},'under install dialog')");
     await action("document.getElementById('homeScreenDialog').showModal()");

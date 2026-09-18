@@ -417,6 +417,9 @@ function notifyMapInfoChange(){
 }
 
 function showClickInfo(position,html,anchorMarker=null){
+  // The filter drawer sits above Google Maps. Collapse it before opening a card
+  // so the card's text and actions remain available on both phone and desktop.
+  setMobileLegendExpanded(false);
   if(state.clickInfo) state.clickInfo.close();
 
   // Clicked cards may include route controls; keep them inside the map on every screen.

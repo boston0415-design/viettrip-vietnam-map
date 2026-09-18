@@ -4,8 +4,7 @@
 .top .brandLinks .cafeAddress{display:none}
 .top .mapGuideLink{color:#247f78;font-size:12px;font-weight:650;line-height:1.5;border-left:1px solid #dce6e0;padding:2px 0 2px 11px;white-space:nowrap;text-decoration:none}
 .top .mapGuideLink:hover{text-decoration:underline;text-underline-offset:3px}
-.top .mapGuideLink:focus-visible,.travellerToolbar a:focus-visible{outline:2px solid #247f78;outline-offset:3px}
-.travellerToolbar a{display:inline-flex;align-items:center;min-height:30px;padding:6px 9px;border:1px solid #ccd9df;border-radius:8px;background:#fff;color:#36565b;font-size:11px;text-decoration:none}
+.top .mapGuideLink:focus-visible{outline:2px solid #247f78;outline-offset:3px}
 .guideMapNotice{position:absolute;z-index:110;top:55px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;width:max-content;max-width:calc(100% - 24px);padding:10px 12px;background:#fff;border:1px solid #d4e1d7;border-radius:12px;box-shadow:0 3px 15px #28483915;font:12px/1.6 system-ui,sans-serif;color:#426352}
 .guideMapNotice[hidden],.guideMapNotice button[hidden]{display:none}
 .guideMapNotice button{flex-shrink:0;min-height:32px;padding:5px 8px;border:1px solid #d4e1d7;background:#f1f7f0;border-radius:7px;color:#2d7464;font-size:11px;cursor:pointer}
