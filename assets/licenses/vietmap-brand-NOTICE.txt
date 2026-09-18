@@ -1,0 +1,15 @@
+Vietmap Brand (title-only font subset)
+
+Derived from NAVER NanumSquare Neo ExtraBold, designed by Sandoll.
+Original copyright: Copyright © 2022 NAVER Corp. All rights reserved.
+Font Designed by Sandoll Inc.
+License: SIL Open Font License 1.1; see NanumSquareNeo-OFL.txt.
+
+Official source: https://campaign.naver.com/nanumsquare_neo/
+Download: https://campaign.naver.com/nanumsquare_neo/download/NaverNanumSquareNeo.zip
+License notice: https://help.naver.com/service/30016/contents/18088
+Retrieved: 2026-09-18
+
+Modifications: only the characters in “일상탈출 베트남맵VM” are retained.
+The font family is renamed to Vietmap Brand to respect the reserved font names.
+This subset is used only for the fixed map title, not for member-authored text.

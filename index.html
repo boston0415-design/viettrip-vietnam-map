@@ -11,12 +11,10 @@
 <meta name="apple-mobile-web-app-title" content="베트남맵">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" type="image/svg+xml" href="./assets/icons/vietmap.svg">
-<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/vietmap-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/vietmap-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&amp;display=swap&amp;text=%EC%9D%BC%EC%83%81%ED%83%88%EC%B6%9C%20%EB%B2%A0%ED%8A%B8%EB%82%A8%EB%A7%B5">
+<link rel="icon" type="image/svg+xml" href="./assets/icons/vietmap.svg?v=20260918-vm1">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/vietmap-192.png?v=20260918-vm1">
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/vietmap-180.png?v=20260918-vm1">
+<link rel="preload" href="./assets/fonts/vietmap-brand-extrabold.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="./assets/css/base.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/responsive.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/community-stats.css?v=20260918-stats-align1">
@@ -24,18 +22,18 @@
 <link rel="stylesheet" href="./assets/css/traveller-tools.css?v=20260918-stats-align1">
 <link rel="stylesheet" href="./assets/css/interface-polish.css?v=20260918-feedback-links2">
 <link rel="stylesheet" href="./assets/css/mobile-access.css?v=poi-directions1">
-<link rel="stylesheet" href="./assets/css/header-layout.css?v=brand-centered3">
+<link rel="stylesheet" href="./assets/css/header-layout.css?v=20260918-vm1">
 <link rel="stylesheet" href="./assets/css/map-filters.css?v=area-directory1">
 <link rel="stylesheet" href="./assets/css/detail-layout.css?v=20260918-registrant1">
 <link rel="stylesheet" href="./assets/css/booking-links.css?v=20260918-inquiries1">
-<link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-booking-back1">
-<link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20260918-popup-overlap1">
+<link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-vm1">
+<link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20260918-vm1">
 </head>
 <body>
 <div class="app">
   <header class="top">
     <div class="brand">
-      <div class="brandTitle"><span class="brandMark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><span>일상탈출 <em>베트남맵</em></span></div>
+      <div class="brandTitle"><span class="brandMark" aria-hidden="true"><img src="./assets/icons/vietmap.svg?v=20260918-vm1" width="44" height="44" alt=""></span><span>일상탈출 <em>베트남맵</em></span></div>
       <small>회원의 경험으로 함께 만드는 베트남 로컬지도</small>
       <div class="brandLinks"><a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a><a id="mapGuideLink" class="mapGuideLink" href="./guide/">여행가이드 ↗</a></div>
     </div>
@@ -48,7 +46,7 @@
   </header>
   <div class="mapUtilityBar">
   <div class="appInstallBar" id="homeScreenBar">
-    <img src="./assets/icons/vietmap-192.png" alt="" width="28" height="28">
+    <img src="./assets/icons/vietmap-192.png?v=20260918-vm1" alt="" width="28" height="28">
     <div class="appInstallCopy"><strong>홈 화면에서 지도를 바로 열어요</strong><span>아이콘 하나로 지도·회원 후기까지</span></div>
     <button id="openHomeScreen" class="appInstallButton" type="button" aria-haspopup="dialog" aria-controls="homeScreenDialog">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m-4-4 4 4 4-4M5 15v5h14v-5"/></svg>홈 화면에 추가
@@ -275,7 +273,7 @@
 
 <dialog id="homeScreenDialog" class="travellerDialog homeScreenDialog" aria-labelledby="homeScreenTitle" aria-describedby="homeScreenIntro">
   <div class="travellerDialogHead">
-    <div class="homeScreenIdentity"><img src="./assets/icons/vietmap-192.png" alt="베트남맵 홈 화면 아이콘" width="62" height="62"><div><h2 id="homeScreenTitle">베트남맵을 홈 화면에</h2><p>일상탈출 · 언제든, 한 번에</p></div></div>
+    <div class="homeScreenIdentity"><img src="./assets/icons/vietmap-192.png?v=20260918-vm1" alt="베트남맵 홈 화면 아이콘" width="62" height="62"><div><h2 id="homeScreenTitle">베트남맵을 홈 화면에</h2><p>일상탈출 · 언제든, 한 번에</p></div></div>
     <button id="closeHomeScreen" type="button" aria-label="홈 화면 추가 안내 닫기">×</button>
   </div>
   <p id="homeScreenIntro" class="homeScreenIntro">홈 화면에 추가한 아이콘을 누르면 지도가 바로 열립니다. 인터넷에 연결하면 열 때와 화면으로 돌아올 때 업소·후기를 다시 불러옵니다.</p>

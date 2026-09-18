@@ -12,6 +12,6 @@ const source=await readFile(new URL('vietmap.svg',base));
 for(const size of [180,192,512]){
   await sharp(source).resize(size,size).png().toFile(new URL(`vietmap-${size}.png`,base).pathname);
 }
-// Full-bleed background; the pin fits within the central 80% maskable safe zone.
+// Full-bleed background; the VM lettering fits inside the central 80%-diameter safe circle.
 await writeFile(new URL('vietmap-maskable-512.png',base),await readFile(new URL('vietmap-512.png',base)));
 console.log('Rendered 180px Apple touch icon, 192/512px app icons and maskable icon.');

@@ -80,7 +80,7 @@ async function fixture({ua='Mozilla/5.0 (Linux; Android 16) Chrome/150.0',standa
  const manifest=JSON.parse(read('manifest.webmanifest'));
  assert.equal(manifest.start_url,'/');assert.equal(manifest.id,'/');assert.equal(manifest.scope,'/');assert.equal(manifest.display,'standalone');assert.equal(manifest.prefer_related_applications,false);
  for(const icon of manifest.icons){
-  const png=fs.readFileSync(path.join(root,icon.src));assert.equal(png.toString('hex',0,8),'89504e470d0a1a0a');
+  const png=fs.readFileSync(path.join(root,new URL(icon.src,'https://example.test').pathname));assert.equal(png.toString('hex',0,8),'89504e470d0a1a0a');
   assert.equal(icon.sizes,png.readUInt32BE(16)+'x'+png.readUInt32BE(20));
  }
  for(const required of [192,512])assert(manifest.icons.some(icon=>icon.sizes===required+'x'+required));

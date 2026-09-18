@@ -1,5 +1,5 @@
 /* Existing header dimensions and search placement stay unchanged. */
-.top .brandLinks{display:flex;align-items:center;gap:11px;margin-left:46px;min-width:0}
+.top .brandLinks{display:flex;align-items:center;gap:11px;margin-left:56px;min-width:0}
 .top .brandLinks .cafeLink{margin:0!important;max-width:none;flex-shrink:0}
 .top .brandLinks .cafeAddress{display:none}
 .top .mapGuideLink{color:#247f78;font-size:12px;font-weight:650;line-height:1.5;border-left:1px solid #dce6e0;padding:2px 0 2px 11px;white-space:nowrap;text-decoration:none}
@@ -9,6 +9,8 @@
 .guideMapNotice[hidden],.guideMapNotice button[hidden]{display:none}
 .guideMapNotice button{flex-shrink:0;min-height:32px;padding:5px 8px;border:1px solid #d4e1d7;background:#f1f7f0;border-radius:7px;color:#2d7464;font-size:11px;cursor:pointer}
 .guideMapNotice button:last-child{border:0;background:transparent;font-size:20px;padding:0 6px}
-@media(min-width:901px) and (max-width:1199px){.top .brandLinks{margin-left:38px;gap:8px}.top .mapGuideLink{font-size:11px;padding-left:8px}}
-@media(max-width:900px){.top .brandLinks{margin:1px 0 0 31px;gap:8px}.top .brandLinks .cafeLink{font-size:10px!important}.top .mapGuideLink{font-size:10px;padding:2px 0 2px 8px}.guideMapNotice{font-size:11px}}
+@media(min-width:901px) and (max-width:1199px){.top .brandLinks{margin-left:46px;gap:8px}.top .mapGuideLink{font-size:11px;padding-left:8px}}
+@media(max-width:900px){.top .brandLinks{margin:2px 0 0 37px;gap:8px}.top .brandLinks .cafeLink{font-size:11px!important}.top .mapGuideLink{font-size:11px;padding:2px 0 2px 8px}.guideMapNotice{font-size:11px}}
 @media(max-width:380px){.top .brandLinks{margin-left:0;gap:6px}.top .mapGuideLink{padding-left:6px}}
+
+@media(min-width:600px) and (max-width:900px) and (max-height:500px){.top .brandLinks{margin-left:34px}}
