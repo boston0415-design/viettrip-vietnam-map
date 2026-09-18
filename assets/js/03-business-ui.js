@@ -1,8 +1,8 @@
 // Google Material Symbols Rounded, fill 1, 24px; Apache-2.0.
 // Vendored as paths: no icon font or remote requests. See assets/licenses/material-symbols-NOTICE.txt.
-// The massage symbol is a project-drawn single sole, using the same coordinate system.
+// The massage and cherries symbols are project-drawn, using the same coordinate system.
 const MAP_SYMBOL_PATHS={
-  "nutrition": "M480-120q-117 0-198.5-81.5T200-400q0-94 55.5-168.5T401-669q-33-8-57.5-28.5T304-747q-15-29-21-63t-2-69q41-5 78 5t67 32q30 22 49.5 53t23.5 70q13-31 31.5-58.5T572-828q11-11 28-11t28 11q11 11 11 28t-11 28q-22 22-39 48.5T564-667q88 28 142 101.5T760-400q0 117-81.5 198.5T480-120Z",
+  "cherries": "M538-823C538-671 425-518 291-400L251-445C365-550 478-677 478-823ZM554-866C654-763 769-576 775-411L716-408C711-549 608-728 512-829ZM514-827C573-936 738-909 808-800C690-736 576-747 514-827ZM450-300A180 180 0 1 1 90-300A180 180 0 1 1 450-300ZM870-240A160 160 0 1 1 550-240A160 160 0 1 1 870-240Z",
   "cake": "M160-80q-17 0-28.5-11.5T120-120v-160q0-33 23.5-56.5T200-360h560q33 0 56.5 23.5T840-280v160q0 17-11.5 28.5T800-80H160Zm40-360v-120q0-33 23.5-56.5T280-640h160v-58q-18-12-29-29t-11-41q0-15 6-29.5t18-26.5l42-42q2-2 14-6 2 0 14 6l42 42q12 12 18 26.5t6 29.5q0 24-11 41t-29 29v58h160q33 0 56.5 23.5T760-560v120H200Z",
   "bakery_dining": "m835-252-99-34 78-215 85 175q14 27-12 55t-52 19Zm-251-38 43-374q2-15 13.5-20.5t27.5-.5l100 37q14 6 18.5 18t-.5 26L673-290h-89Zm-296 0L175-604q-5-14-.5-26.5T193-648l100-37q14-6 26.5-.5T334-664l42 374h-88Zm-172 38q-26 8-47-19.5T62-326l86-175 77 215-109 34Zm320-38-48-430q-2-17 9.5-28.5T426-760h108q17 0 28.5 11.5T572-720l-48 430h-88Z",
   "local_pharmacy": "M204-120q-42 0-65.5-33T128-225l72-215-72-215q-13-39 10.5-72t65.5-33h424l41-113q7-20 25.5-28.5T733-903q20 7 28.5 25.5T763-839l-29 79h22q42 0 65.5 33t10.5 72l-72 215 72 215q13 39-10.5 72T756-120H204Zm236-160h80v-120h120v-80H520v-120h-80v120H320v80h120v120Zm-236 80h552l-80-240 80-240H204l80 240-80 240Zm0 0 80-240-80-240h552l-80 240 80 240H204Z",
@@ -44,11 +44,11 @@ function businessSymbolKey(category,subcategory=''){
     return 'local_bar';
   }
   if(category==='cafe'){
-    if(/과일|주스|fruit|juice/i.test(sub))return 'nutrition';
+    if(/과일|주스|fruit|juice/i.test(sub))return 'cherries';
     if(/베이커리|bakery/i.test(sub))return 'bakery_dining';
     if(/디저트|dessert/i.test(sub))return 'cake';
   }
-  if(category==='shopping' && /과일|fruit/i.test(sub))return 'nutrition';
+  if(category==='shopping' && /과일|fruit/i.test(sub))return 'cherries';
   if(category==='hospital'){
     if(/동물|veterinary/i.test(sub))return 'pets';
     if(/치과|dent/i.test(sub))return 'dentistry';

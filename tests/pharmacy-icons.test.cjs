@@ -7,7 +7,7 @@ w.assert=assert;w.matchMedia=()=>({matches:false});
 for(const m of read('index.html').matchAll(/<script src="\.\/(assets\/js\/(?:0[1-8]-[^?]+|(?:hospital|pharmacy)-directory\.js))\?/g))run(read(m[1]));
 (async()=>{
  await run(`(async()=>{
-  const symbolCases=[['cafe','과일·주스','nutrition'],['shopping','과일가게','nutrition'],['cafe','베이커리','bakery_dining'],['cafe','디저트','cake'],['cafe','카페','local_cafe'],['hospital','동물병원','pets'],['hospital','치과','dentistry'],['hospital','내과','local_hospital'],['pharmacy','약국','local_pharmacy'],['stay','레지던스','apartment']];
+  const symbolCases=[['cafe','과일·주스','cherries'],['shopping','과일가게','cherries'],['cafe','베이커리','bakery_dining'],['cafe','디저트','cake'],['cafe','카페','local_cafe'],['hospital','동물병원','pets'],['hospital','치과','dentistry'],['hospital','내과','local_hospital'],['pharmacy','약국','local_pharmacy'],['stay','레지던스','apartment']];
   google={maps:{Size:class{},Point:class{}}};
   for(const [category,sub,key] of symbolCases){
    assert.equal(businessSymbolKey(category,sub),key);
