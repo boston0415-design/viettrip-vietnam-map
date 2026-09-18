@@ -1149,7 +1149,7 @@ function categoryIcon(category,subcategory=''){
   }
   if(category==='restaurant') return '🍽️';
   if(category==='spa') return '💆';
-  if(category==='barber') return '💈';
+  if(category==='barber') return sub.trim()==='미용실'?'✂️':'💈';
   if(category==='karaoke') return '🎤';
   if(category==='cafe') return '☕';
   if(category==='shopping'){

@@ -40,7 +40,7 @@ const MAP_SYMBOL_PATHS={
 
 function businessSymbolKey(category,subcategory=''){
   const sub=String(subcategory||'').trim();
-  if(category==='barber')return 'barber_pole';
+  if(category==='barber')return sub==='미용실'?'content_cut':'barber_pole';
   if(category==='public_office')return 'account_balance';
   if(category==='bar'){
     if(!sub || /클럽|club|디스코/i.test(sub))return 'headphones';
