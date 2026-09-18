@@ -73,6 +73,101 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "verifiedOn": "2026-09-18"
   }
 ]);
+// Contact channels are copied from the operator site, never inferred from a phone/name.
+const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
+  {
+    "id": "4150f0a4-0dc5-4454-8b8e-e32c1c4fc092",
+    "name": "골든로터스 힐링 월드",
+    "category": "spa",
+    "address": "16A Đ. Số 10, An Khánh, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://goldenlotus.world/en/branches",
+    "note": "16A Street No. 10 지점의 스파 문의 채널입니다. 원하는 이용권·서비스와 방문 일정을 알려주세요.",
+    "channels": [
+      {
+        "kind": "zalo",
+        "url": "https://zalo.me/2553481319661089451"
+      },
+      {
+        "kind": "messenger",
+        "url": "https://m.me/JjimJilBangQ3"
+      },
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/JjimJilBangQ3"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842838239000",
+        "display": "+84 28 3823 9000"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "264290b4-1b37-4f6d-bde8-79b54ec467a1",
+    "name": "골든로터스 스파 & 마사지 클럽",
+    "category": "spa",
+    "address": "15 Thái Văn Lung, Sài Gòn, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://saigonwellness.vn/",
+    "note": "15 Thái Văn Lung 지점입니다. 당일 예약은 전화 문의를 권장합니다.",
+    "channels": [
+      {
+        "kind": "kakao",
+        "url": "https://pf.kakao.com/_xeMGXT/chat"
+      },
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/GoldenLotusSpaSaiGon"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842838221515",
+        "display": "+84 28 3822 1515"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "29a25657-68f0-437a-adcf-ffaff2d56f1a",
+    "name": "아일라스파 사이공",
+    "category": "spa",
+    "address": "141-143 Lê Thị Riêng, Bến Thành, Hồ Chí Minh 10000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://aylaspa.com/",
+    "note": "Ayla Spa Central Saigon · 141–143 Lê Thị Riêng 지점을 지정해 문의하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/aylaspasaigon/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84888545767",
+        "display": "+84 888 545 767"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  },
+  {
+    "id": "ab1794e5-1897-4a13-920d-688b6cdffaa7",
+    "name": "템플리프 사우나 & 스파",
+    "category": "spa",
+    "address": "32 Thái Văn Lung, Sài Gòn, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://templeleafsauna.com/bookingonline.html",
+    "note": "32 Thái Văn Lung 지점입니다. 원하는 서비스와 예약 가능 시간을 전화로 확인하세요.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+842862913656",
+        "display": "+84 28 6291 3656"
+      }
+    ],
+    "verifiedOn": "2026-09-18"
+  }
+]);
 const VERIFIED_POINT_BOOKINGS=Object.freeze([
   {
     "name": "사이공역",
@@ -133,22 +228,97 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
   }
 ]);
 function bookingIdentity(value){return String(value||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase()}
+const BOOKING_CONTACT_TYPES=Object.freeze({
+  zalo:{label:'Zalo로 문의',hosts:['zalo.me']},
+  messenger:{label:'Messenger로 문의',hosts:['m.me','www.messenger.com','messenger.com']},
+  facebook:{label:'Facebook 페이지',hosts:['www.facebook.com','facebook.com','m.facebook.com']},
+  kakao:{label:'카카오톡으로 문의',hosts:['pf.kakao.com','open.kakao.com']},
+  whatsapp:{label:'WhatsApp으로 문의',hosts:['wa.me','api.whatsapp.com']},
+  phone:{label:'전화로 문의',hosts:[]}
+});
+function validBookingContact(channel){
+  if(!channel || !BOOKING_CONTACT_TYPES[channel.kind])return false;
+  if(channel.kind==='phone')return /^tel:\+[1-9]\d{7,14}$/.test(channel.url||'');
+  try{
+    const url=new URL(channel.url);
+    return url.protocol==='https:' && !url.username && !url.password && !url.port &&
+      BOOKING_CONTACT_TYPES[channel.kind].hosts.includes(url.hostname) && url.pathname.length>1;
+  }catch{return false}
+}
 function verifiedBookingFor(feature={}){
-  const business=VERIFIED_BUSINESS_BOOKINGS.find(entry=>
+  const business=[...VERIFIED_BUSINESS_BOOKINGS,...VERIFIED_BUSINESS_CONTACTS].find(entry=>
     entry.id===feature.id &&
     ['name','category','address'].every(key=>bookingIdentity(entry[key])===bookingIdentity(feature[key])));
-  if(business)return business;
+  if(business)return business.mode==='inquiry' && !business.channels.some(validBookingContact)?null:business;
   return VERIFIED_POINT_BOOKINGS.find(entry=>
     entry.name===feature.name && entry.type===feature.type && entry.sourceUrl===feature.sourceUrl)||null;
 }
 function bookingLinkHtml(feature){
   const booking=verifiedBookingFor(feature);
   if(!booking)return '';
+  if(booking.mode==='inquiry')return `<button type="button" class="bookingButton" data-booking-inquiry="${esc(booking.id)}" aria-haspopup="dialog" aria-controls="bookingInquiryDialog" aria-label="${esc(feature.name)} 예약 문의 방법 보기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 1-8 8H5l-3 3V11a9 9 0 0 1 18 0Z"/><path d="M7 10h8M7 14h5"/></svg><span>예약 문의</span></button>`;
   const label=booking.label||'예약하기';
   return `<a class="bookingButton" href="${esc(booking.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(feature.name)} ${esc(label)} · 외부 예약 페이지, 새 창" title="${esc(booking.note)}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4m8-4v4M4 10h16m-12 5 3 3 5-5"/></svg><span>${esc(label)} ↗</span></a>`;
 }
 function bookingNoteHtml(feature){
   const booking=verifiedBookingFor(feature);
+  if(booking?.mode==='inquiry')return '<p class="bookingNote">업소에 직접 예약을 문의할 수 있습니다. 확정 여부는 업소 답변으로 확인하세요.</p>';
   return booking?`<p class="bookingNote">외부 예약 페이지로 연결됩니다. ${esc(booking.note)}</p>`:'';
 }
 
+function openBookingInquiry(id){
+  // Revalidate current public data when opening: stale rendered buttons must not
+  // route a renamed/moved/deleted place to another branch's contact account.
+  const place=typeof db==='function'?db().places.find(p=>p.id===id):null;
+  const booking=place && verifiedBookingFor(place);
+  const dialog=document.getElementById('bookingInquiryDialog');
+  if(!dialog || booking?.mode!=='inquiry')return false;
+  const channels=booking.channels.filter(validBookingContact);
+  if(!channels.length)return false;
+  dialog.querySelector('#bookingInquiryPlace').textContent=place.name;
+  dialog.querySelector('#bookingInquiryAddress').textContent=place.address;
+  dialog.querySelector('#bookingInquiryNote').textContent=booking.note;
+  dialog.querySelector('#bookingInquiryChannels').innerHTML=channels.map(channel=>{
+    const phone=channel.kind==='phone',label=BOOKING_CONTACT_TYPES[channel.kind].label;
+    const hint=phone?channel.display:channel.kind==='facebook'?'페이지에서 메시지 보내기':'앱 또는 웹으로 열기';
+    return `<div class="bookingContactRow"><a class="bookingContactLink" href="${esc(channel.url)}" ${phone?'':'target="_blank" rel="noopener noreferrer"'} aria-label="${esc(place.name)} ${esc(label)}${phone?'':' · 외부 서비스, 새 창'}"><span><strong>${esc(label)}</strong><small>${esc(hint||channel.url.slice(4))}</small></span><span class="bookingContactArrow" aria-hidden="true">↗</span></a>${phone?`<button type="button" class="bookingPhoneCopy" data-booking-phone="${esc(channel.url.slice(4))}" aria-label="${esc(channel.display||'전화번호')} 복사">번호 복사</button>`:''}</div>`;
+  }).join('');
+  const source=dialog.querySelector('#bookingInquirySource');
+  source.href=booking.sourceUrl;
+  dialog.querySelector('#bookingInquiryChecked').textContent=`${booking.verifiedOn} 확인`;
+  dialog.querySelector('#bookingInquiryStatus').textContent='';
+  if(!dialog.open)dialog.showModal();
+  return true;
+}
+
+async function copyBookingPhone(button){
+  const dialog=button.closest('#bookingInquiryDialog'),number=button.dataset.bookingPhone;
+  if(!dialog || !/^\+[1-9]\d{7,14}$/.test(number||''))return;
+  let copied=false;
+  try{await navigator.clipboard.writeText(number);copied=true}catch{}
+  if(!copied){
+    // Native modal focus is confined to the top layer, so place the fallback
+    // inside this dialog rather than the document body.
+    const input=document.createElement('textarea');input.value=number;
+    input.readOnly=true;input.setAttribute('aria-label','복사할 전화번호');
+    input.style.cssText='position:absolute;left:0;top:0;width:1px;height:1px;opacity:0';
+    dialog.append(input);input.focus({preventScroll:true});input.select();input.setSelectionRange(0,number.length);
+    try{copied=Boolean(document.execCommand('copy'))}catch{}
+    input.remove();button.focus({preventScroll:true});
+  }
+  dialog.querySelector('#bookingInquiryStatus').textContent=copied?'전화번호를 복사했습니다.':'복사하지 못했습니다. 표시된 전화번호를 길게 눌러 복사해 주세요.';
+}
+
+document.addEventListener('click',event=>{
+  const target=event.target instanceof Element?event.target:null;
+  const trigger=target?.closest('[data-booking-inquiry]');
+  if(trigger){
+    if(!openBookingInquiry(trigger.dataset.bookingInquiry)){
+      trigger.textContent='연락처 확인 필요';trigger.disabled=true;
+    }
+    return;
+  }
+  const copy=target?.closest('[data-booking-phone]');
+  if(copy){copyBookingPhone(copy);return}
+  if(target?.closest('#closeBookingInquiry'))document.getElementById('bookingInquiryDialog')?.close();
+});

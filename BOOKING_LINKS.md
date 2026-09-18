@@ -24,6 +24,40 @@ No reservations, payments, or personal details are submitted by the map.
 - Ho Chi Minh City day and night departure points: https://hopon-hopoff.vn/tour/1-round-ho-chi-minh-city-panoramic-bus-tour/
 - Hanoi lake and Opera House departure points: https://hopon-hopoff.vn/tour/1-round-hanoi-panoramic-bus-tour/
 
+## Reservation inquiries — checked 2026-09-18
+
+The separate **예약 문의** action opens a native dialog above the map/detail sheet.
+It lists the operator's published channels and branch address. Sending an inquiry
+is not a confirmed booking; the customer must receive the operator's confirmation.
+Opening this dialog sends no message, initiates no call and makes no database write.
+
+| Registered branch | Verified inquiry routes | Official source |
+| --- | --- | --- |
+| Golden Lotus Healing World, 16A Street No. 10 | Zalo `2553481319661089451`; Messenger `JjimJilBangQ3`; Facebook `JjimJilBangQ3`; +84 28 3823 9000 | https://goldenlotus.world/en/branches |
+| Golden Lotus Spa & Massage Club, 15 Thái Văn Lung | KakaoTalk `_xeMGXT/chat`; Facebook `GoldenLotusSpaSaiGon`; +84 28 3822 1515 | https://saigonwellness.vn/ (footer address and contact links) |
+| Ayla Spa Central Saigon, 141–143 Lê Thị Riêng | Facebook `aylaspasaigon`; +84 888 545 767 | https://aylaspa.com/ (Central Saigon address/hotline and linked Facebook) |
+| Temple Leaf Spa & Sauna, 32 Thái Văn Lung | +84 28 6291 3656 | https://templeleafsauna.com/bookingonline.html (branch footer) |
+
+These are four verified branches, not blanket coverage of all 88 registered places.
+Golden Lotus's gym Messenger account is excluded. Ayla's contact-us page also lists
+Hanoi and Royal Saigon branches: those branch-specific chat links are not assigned
+to Central Saigon. Temple Leaf's older social-media phone numbers are not substituted
+for the number on the operator's current site. No Zalo/WhatsApp/Messenger address is
+constructed from a phone number or a guessed page name.
+
+Each contact entry records an exact business identity, source and checked date.
+Its action revalidates current place data before opening; changed/deleted businesses
+cannot use a stale button. Contact URLs require HTTPS and an exact platform host,
+or an international `tel:` number. New channels must be operator-verified before
+adding to this catalogue. The supported route types also allow verified WhatsApp
+links; none is guessed for these four branches. Platform login/app installation may
+be required. Calls/messages, delivery and actual availability were not tested.
+
+The inquiry dialog follows existing panel history (Back closes the top panel) and
+supports X/Escape. Phone copying falls back inside the modal's focus boundary.
+The existing seven direct business reservations and seven transport bookings remain
+direct links. The map stores no chat credentials and submits no member contact data.
+
 ## Location review — 2026-09-18
 
 The 98 system points in `EXTRA_DATA` were checked for missing/non-numeric coordinates
@@ -47,7 +81,7 @@ offsets and airport pickup lanes require place-specific verification.
 
 ## Maintenance
 
-`assets/js/booking-links.js` holds the checked URLs, source, date, and branch notes.
+`assets/js/booking-links.js` holds the checked URLs, contact channels, source, date, and branch notes.
 Business links require the stored public ID, name, category and address to match.
 Changing a business identity suspends its link pending another verification.
 System points require an exact name, type and source URL match. Similar names and
