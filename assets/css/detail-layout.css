@@ -41,3 +41,7 @@
  #detail{left:auto!important;right:10px!important;top:10px!important;bottom:auto!important;width:300px!important;max-height:calc(100% - 40px)!important}
  #detail.detailExpanded{max-height:calc(100% - 40px)!important}
 }
+.placeRegistrant{margin:0 0 10px;font-size:12px;line-height:1.5;color:#64748b;overflow-wrap:anywhere}
+.placeRegistrant span{margin-left:5px;color:#40594f;font-weight:600}
+#pNickname[readonly]{background:#f6f8f7;color:#63766d}
+#pNickname[aria-invalid="true"]{border-color:#be4545}

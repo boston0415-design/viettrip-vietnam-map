@@ -17,7 +17,18 @@ async function savePlaceOnce(){
   }
 
   const name=$('#pName').value.trim();
+  const registrantNickname=normalizedRegistrantNickname($('#pNickname').value);
   const loc=state.clickLatLng;
+
+  if(!state.editPlaceId && !validRegistrantNickname(registrantNickname)){
+    $('#pNickname').setAttribute('aria-invalid','true');
+    $('#pNicknameHelp').textContent='등록자 닉네임을 1~30자로 입력해주세요. 업체 상세에 공개됩니다.';
+    $('#pNickname').focus();
+    setPlaceSaveStatus('등록자 닉네임을 1~30자로 입력해주세요.',false,true);
+    return;
+  }
+  $('#pNickname').removeAttribute('aria-invalid');
+  if(!state.editPlaceId)$('#pNicknameHelp').textContent='업체 상세에 등록자로 공개됩니다. 30자 이내로 입력해 주세요.';
 
   if(!name){
     alert('업체명을 입력해주세요.');
@@ -198,6 +209,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
     id:newId,
     cityKey:nearestCityKeyForLatLng(loc.lat,loc.lng)||state.city,
     name,
+    registrantNickname,
     category:$('#pCat').value,
     subcategory:$('#pSub').value,
     area:$('#pArea').value.trim(),

@@ -108,6 +108,7 @@ function openEditPlace(place,mode){
 
   openPlace({
     name:place.name,
+    registrantNickname:place.registrantNickname,
     category:place.category,
     subcategory:place.subcategory,
     area:place.area,
@@ -460,6 +461,7 @@ function renderDetail(){
     ${p.address?copyButtonHtml('이름+주소 복사',combinedCopy):''}
   </div>
   ${bookingNote}
+  ${p.registrantNickname?`<p class="placeRegistrant">등록자 <span>${esc(p.registrantNickname)}</span></p>`:''}
   ${(p.photoUrls||[]).length?`<div class="placePhotos">${p.photoUrls.slice(0,5).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="${esc(p.name)} 업체 사진"></a>`).join('')}</div>`:''}
   <div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${owner?'<span class="badge">내가 등록</span>':''}${benefitInlineBadgeHtml(p)}${p.deleteRequested?'<span class="badge deleteRequest">삭제요청</span>':''}</div><div class="desc">${esc(p.address||'')}<br>${esc(p.description||'')}</div>${p.memberBenefit?`<div class="benefitRow"><strong>${benefitInfoLabel(p)}</strong><div class="benefitText">${esc(p.benefitText||'카페 회원 전용 혜택 제공')}</div></div>`:''}<div class="scorebox"><div><div class="scorebig">${st.rating==null?'—':st.rating.toFixed(1)}</div><div style="font-size:11px;color:#6b7280">우리 회원 평균</div></div><div style="font-size:12px;color:#6b7280">평가 ${st.count}개</div></div>${management}<button id="writeReview" class="btn primary">별점·후기 남기기</button><div style="margin-top:12px">${st.reviews.length?st.reviews.map(r=>`<div class="review"><div class="reviewtop"><span>${esc(r.nickname)}</span>${r.rating==null?'':`<span>★ ${r.rating}</span>`}</div><div class="reviewtxt">${esc(r.text)}</div>${normalizeCafeReviewUrl(r.cafeUrl)?`<a class="cafeOriginalLink" href="${esc(normalizeCafeReviewUrl(r.cafeUrl))}" target="_blank" rel="noopener noreferrer">카페 후기 원문 보기 ↗</a>`:''}${(r.photoUrls||[]).length?`<div class="reviewPhotos">${r.photoUrls.slice(0,3).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="회원 후기 사진"></a>`).join('')}</div>`:''}</div>`).join(''):'<div class="empty">아직 회원 후기가 없습니다.</div>'}</div></div>`;
 
@@ -627,6 +629,16 @@ function openPlace(prefill={}){
     state.clickLatLng = typeof pos.lat==='function' ? {lat:pos.lat(),lng:pos.lng()} : {lat:Number(pos.lat),lng:Number(pos.lng)};
   }
 
+  const editing=Boolean(state.editPlaceId);
+  $('#pNickname').value=editing?(prefill.registrantNickname||''):'';
+  $('#pNickname').required=!editing;
+  $('#pNickname').readOnly=editing;
+  $('#pNickname').placeholder=editing?'닉네임 미등록':'카페에서 사용하는 닉네임을 적어주세요';
+  $('#pNickname').removeAttribute('aria-invalid');
+  $('#pNicknameLabel').textContent=editing?'등록자 닉네임':'등록자 닉네임 · 필수';
+  $('#pNicknameHelp').textContent=editing
+    ? (prefill.registrantNickname?'등록 당시 닉네임입니다. 업체 정보를 수정해도 유지됩니다.':'기존 등록에는 닉네임이 저장되지 않았습니다.')
+    : '업체 상세에 등록자로 공개됩니다. 30자 이내로 입력해 주세요.';
   $('#pName').value=prefill.name||'';
   $('#pArea').value=prefill.area||currentCity().label||'';
   $('#pAddress').value=prefill.address||'';

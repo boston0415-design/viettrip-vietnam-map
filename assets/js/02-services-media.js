@@ -5,11 +5,17 @@ function setDbStatus(text,ok=false){
   el.style.color=ok?'#0b8f52':'#64748b';
 }
 
+function normalizedRegistrantNickname(value){return String(value||'').trim()}
+function validRegistrantNickname(value){
+  const nickname=normalizedRegistrantNickname(value);
+  return nickname.length>0 && [...nickname].length<=30 && !/[\u0000-\u001f\u007f]/.test(nickname);
+}
 function placeToRemote(p){
   return {
     id:p.id,
     client_id:p.id,
     name:p.name,
+    registrant_nickname:normalizedRegistrantNickname(p.registrantNickname)||null,
     category:p.category,
     subcategory:p.subcategory||null,
     area:p.area||null,
@@ -110,6 +116,7 @@ function remotePlaceToLocal(p){
   return {
     id:p.id,
     name:p.name,
+    registrantNickname:p.registrant_nickname||'',
     category:p.category,
     subcategory:p.subcategory||'',
     area:p.area||'',
