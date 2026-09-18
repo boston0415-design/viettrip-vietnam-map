@@ -1,4 +1,4 @@
-.statsReviewButton{display:inline-flex;align-items:baseline;gap:5px;padding:3px 1px;border:0;background:transparent;color:#475569;font:inherit;cursor:pointer}
+.statsReviewButton{display:inline-flex;align-items:center;gap:inherit;padding:3px 1px;border:0;background:transparent;color:#475569;font:inherit;cursor:pointer}
 .statsReviewButton:hover{color:#1d4ed8;text-decoration:underline;text-underline-offset:3px}
 .statsReviewButton:focus-visible,.travellerToolbar button:focus-visible{outline:2px solid #2563eb;outline-offset:2px;border-radius:5px}
 .travellerDialog{box-sizing:border-box;width:min(640px,calc(100% - 24px));max-height:86dvh;margin:auto;border:1px solid #e2e8f0;border-radius:18px;padding:24px;background:#fff;color:#172033;box-shadow:0 24px 80px #0f172a30;overflow:auto}

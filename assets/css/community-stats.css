@@ -1,8 +1,9 @@
 /* A separate, compact row keeps statistics out of the map controls. */
 .app{grid-template-rows:76px 28px minmax(0,1fr)}
 .communityStats{display:flex;align-items:center;justify-content:flex-end;gap:0;padding:0 16px;background:#fff;border-bottom:1px solid #e9edf2;color:#64748b;font-size:11px;line-height:1.2;white-space:nowrap;min-width:0}
-.communityStats>span{display:inline-flex;align-items:baseline;gap:5px}
-.communityStats>span+span{margin-left:14px;padding-left:14px;border-left:1px solid #e2e8f0}
+.communityStats>span{position:relative;display:inline-flex;align-items:center;gap:5px}
+.communityStats>span+span{margin-left:14px;padding-left:14px}
+.communityStats>span+span::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:1px;height:12px;background:#e2e8f0;pointer-events:none}
 .communityStats b{color:#334155;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
 .communityStats small{font-size:10px;margin-left:-3px;color:#94a3b8}
 @media(max-width:900px){
