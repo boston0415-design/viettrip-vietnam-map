@@ -500,6 +500,7 @@ const BOOKING_CONTACT_TYPES=Object.freeze({
   zalo:{label:'Zalo로 문의',hosts:['zalo.me']},
   messenger:{label:'메신저로 문의',hosts:['m.me','www.messenger.com','messenger.com']},
   facebook:{label:'페이스북으로 문의',hosts:['www.facebook.com','facebook.com','m.facebook.com']},
+  tiktok:{label:'틱톡 예약 안내',hosts:['www.tiktok.com','tiktok.com']},
   kakao:{label:'카카오톡으로 문의',hosts:['pf.kakao.com','open.kakao.com']},
   whatsapp:{label:'WhatsApp으로 문의',hosts:['wa.me','api.whatsapp.com']},
   phone:{label:'전화로 문의',hosts:[]}
@@ -509,8 +510,13 @@ function validBookingContact(channel){
   if(channel.kind==='phone')return /^tel:\+[1-9]\d{7,14}$/.test(channel.url||'');
   try{
     const url=new URL(channel.url);
-    return url.protocol==='https:' && !url.username && !url.password && !url.port &&
+    const allowed=url.protocol==='https:' && !url.username && !url.password && !url.port &&
       BOOKING_CONTACT_TYPES[channel.kind].hosts.includes(url.hostname) && url.pathname.length>1;
+    if(!allowed)return false;
+    // Curate canonical operator profiles; short links and arbitrary videos are not
+    // reservation destinations. The operator must publish a booking inquiry route.
+    if(channel.kind==='tiktok')return /^\/@[A-Za-z0-9._]+\/?$/.test(url.pathname) && !url.search && !url.hash;
+    return true;
   }catch{return false}
 }
 function verifiedBookingFor(feature={}){
@@ -548,7 +554,7 @@ function openBookingInquiry(id){
   dialog.querySelector('#bookingInquiryNote').textContent=booking.note;
   dialog.querySelector('#bookingInquiryChannels').innerHTML=channels.map(channel=>{
     const phone=channel.kind==='phone',label=BOOKING_CONTACT_TYPES[channel.kind].label;
-    const hint=phone?channel.display:channel.kind==='facebook'?'페이지의 메시지 버튼으로 문의':'앱 또는 웹으로 열기';
+    const hint=phone?channel.display:channel.kind==='facebook'?'페이지의 메시지 버튼으로 문의':channel.kind==='tiktok'?'공식 프로필에서 예약 안내 확인':'앱 또는 웹으로 열기';
     return `<div class="bookingContactRow"><a class="bookingContactLink" href="${esc(channel.url)}" ${phone?'':'target="_blank" rel="noopener noreferrer"'} aria-label="${esc(place.name)} ${esc(label)}${phone?'':' · 외부 서비스, 새 창'}"><span><strong>${esc(label)}</strong><small>${esc(hint||channel.url.slice(4))}</small></span><span class="bookingContactArrow" aria-hidden="true">↗</span></a>${phone?`<button type="button" class="bookingPhoneCopy" data-booking-phone="${esc(channel.url.slice(4))}" aria-label="${esc(channel.display||'전화번호')} 복사">번호 복사</button>`:''}</div>`;
   }).join('');
   const source=dialog.querySelector('#bookingInquirySource');

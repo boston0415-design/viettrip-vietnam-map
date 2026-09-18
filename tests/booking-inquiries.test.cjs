@@ -35,8 +35,15 @@ async function check(mobile){
       {kind:'kakao',url:'http://pf.kakao.com/test'},
       {kind:'phone',url:'tel:+842838239000;ext=123'},
       {kind:'phone',url:'tel:*123#'},
+      {kind:'tiktok',url:'https://www.tiktok.com.evil.test/@venue'},
+      {kind:'tiktok',url:'https://www.tiktok.com/@venue/video/123'},
+      {kind:'tiktok',url:'https://www.tiktok.com/@venue?redirect=https://evil.test'},
+      {kind:'tiktok',url:'https://vm.tiktok.com/shortlink/'},
+      {kind:'tiktok',url:'https://www.tiktok.com/login'},
       {kind:'unknown',url:'https://example.test/booking'}
     ])assert(!validBookingContact(bad),'invalid route rejected: '+bad.url);
+    assert(validBookingContact({kind:'tiktok',url:'https://www.tiktok.com/@example.venue_1'}));
+    assert(validBookingContact({kind:'tiktok',url:'https://tiktok.com/@example_venue/'}));
     assert(validBookingContact({kind:'whatsapp',url:'https://wa.me/84888545767'}));
     assert(!openBookingInquiry('unregistered'));
   `);
@@ -103,6 +110,24 @@ async function check(mobile){
     assert.equal(run('JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter])'),run('savedCriteria'));
     await action('closeDetailPanel()');
   }
+  // A future verified TikTok contact uses the same inquiry UI, without claiming
+  // every operator profile can receive a DM. This fixture never enters production data.
+  await action('state.selected=contactFixture.places[0].id;renderDetail()');
+  run(`
+    const originalChannels=VERIFIED_BUSINESS_CONTACTS[0].channels;
+    VERIFIED_BUSINESS_CONTACTS[0].channels=[{kind:'tiktok',url:'https://www.tiktok.com/@example.venue_1'}];
+  `);
+  w.document.querySelector('#detail [data-booking-inquiry]').click();await pause();
+  assert(dialog.open);
+  const tiktok=dialog.querySelector('.bookingContactLink');
+  assert.equal(tiktok.href,'https://www.tiktok.com/@example.venue_1');
+  assert(tiktok.textContent.includes('틱톡 예약 안내'));
+  assert(tiktok.textContent.includes('공식 프로필에서 예약 안내 확인'));
+  assert.equal(tiktok.target,'_blank');assert.equal(tiktok.rel,'noopener noreferrer');
+  assert(!dialog.querySelector('[data-booking-phone]'));
+  w.history.back();await pause();assert(!dialog.open);
+  run('VERIFIED_BUSINESS_CONTACTS[0].channels=originalChannels');
+  await action('closeDetailPanel()');
   // Already-rendered actions are checked against live data at the moment of use.
   await action('state.selected=contactFixture.places[0].id;renderDetail()');
   run("contactFixture.places[0].address='moved'");
