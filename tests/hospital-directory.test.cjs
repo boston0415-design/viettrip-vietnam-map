@@ -1,0 +1,42 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=path.join(__dirname,'../assets/js'),nodes=new Map();
+const node=selector=>{if(!nodes.has(selector))nodes.set(selector,{innerHTML:'',textContent:'',value:'',classList:{add(){},remove(){},toggle(){}},addEventListener(){}});return nodes.get(selector)};
+const c=vm.createContext({console,assert,URL,Map,Set,Promise,setTimeout:()=>0,clearTimeout(){},setInterval:()=>0,clearInterval(){}});
+c.window=c;c.document={addEventListener(){},querySelector:node,querySelectorAll:()=>[]};
+for(const file of fs.readdirSync(root).filter(f=>/^0[1-8]-/.test(f)).sort())vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),c,{filename:file});
+vm.runInContext(fs.readFileSync(path.join(root,'hospital-directory.js'),'utf8'),c);
+vm.runInContext(`
+assert.equal(HOSPITAL_DIRECTORY.length,15);
+assert.equal(new Set(HOSPITAL_DIRECTORY.map(p=>p.city+'|'+p.name)).size,15);
+for(const r of HOSPITAL_DIRECTORY){
+ assert(CITY_DATA[r.city]);assert(r.specialties.length);assert(r.specialties.every(s=>HOSPITAL_SPECIALTIES.includes(s)));
+ assert.equal(new URL(r.sourceUrl).protocol,'https:');assert(/^\\+\\d{9,14}$/.test(r.phone));
+ assert.equal(EXTRA_DATA[r.city].points.filter(p=>p.name===r.name).length,1);
+}
+state.city='hcmc';state.navCategory='hospital';state.areaType='병원';
+assert.equal(hospitalPoints('피부과').length,1);assert.equal(hospitalPoints('동물병원').length,3);
+assert(hospitalPoints('피부과').some(p=>p.name==='FV Hospital'));
+assert(hospitalPoints('내과').some(p=>p.name==='FV Hospital'));
+assert(!hospitalPoints('응급실').some(p=>p.specialties.includes('동물병원')));
+assert.equal(hospitalPoints('피부과').some(p=>p.name.includes('Vinmec')),false,'no inferred branch specialties');
+syncMapFilterSummary=()=>{};
+state.hospitalSpecialty='동물병원';renderHierarchyNav();renderAreaList();
+assert($('#subNav').innerHTML.includes('동물병원 (3)'));
+assert($('#tagNav').innerHTML.includes('One Verandah'));
+assert(!$('#tagNav').innerHTML.includes('FV Hospital'));
+assert(!$('#areaList').innerHTML.includes('FV Hospital'));
+assert(mapFilterSummary().includes('동물병원'));
+let shown=[];showPointSet=(points,type)=>{shown=points;assert.equal(type,'병원')};
+showPointCategory('병원');assert.equal(shown.length,3);
+const fv=EXTRA_DATA.hcmc.points.find(p=>p.name==='FV Hospital');
+const html=mapFeatureHtml(fv,null,{directions:true});assert(html.includes('tel:+842835113333'));assert(html.includes('/en/make-an-appointment/'));
+assert(!hospitalInfoHtml({...fv,address:'moved'}, {actions:true}).includes('href='));
+const ov=EXTRA_DATA.hcmc.points.find(p=>p.name.includes('One Verandah'));assert(ov.desc.includes('24시간 응급 지점이 아닙니다'));
+state.city='hanoi';assert.equal(hospitalPoints('동물병원').length,1);
+state.city='vungtau';assert(hospitalPoints('정형외과').every(p=>p.city==='vungtau'));
+state.city='muine';assert.equal(hospitalPoints('피부과').length,0);renderHierarchyNav();assert($('#tagNav').innerHTML.includes('확인된 해당 진료과가 없습니다'));
+state.city='hcmc';renderAll=()=>{};cancelPendingMapWork=()=>{};resetIndependentBusinessFilters=()=>{};
+selectHospitalSpecialty('피부과');assert.equal(shown.length,1);assert.equal(state.selectedNavItem,null);assert.equal(hospitalSpecialty(),'피부과');
+selectHospitalSpecialty('unknown');assert.equal(hospitalSpecialty(),'all');assert.equal(shown.length,hospitalPoints('all').length);
+console.log('PASS 15 verified providers, multi-specialty filters, city isolation, list/marker agreement, veterinary emergency separation, contacts and unknown state');
+`,c);

@@ -425,11 +425,11 @@ async function showMetroCategory(){
   state.rangeSelectionKey=`metro:${state.city}:all`;
 }
 function showPointCategory(type){
-  const points=currentPoints().filter(p=>p.type===type);
+  const points=type==='병원' && typeof hospitalPoints==='function'?hospitalPoints():currentPoints().filter(p=>p.type===type);
   if(!points.length){
     clearSelectionRanges();
     clearSelectedSystemIcons();
-    setDbStatus(`${type} 정보가 아직 등록되지 않았습니다.`);
+    setDbStatus(`${type==='병원' && typeof hospitalSpecialty==='function' && hospitalSpecialty()!=='all'?hospitalSpecialty():type} 정보가 아직 등록되지 않았습니다.`);
     return;
   }
   showPointSet(points,type);

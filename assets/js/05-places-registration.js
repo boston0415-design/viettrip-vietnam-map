@@ -311,10 +311,11 @@ function mapFeatureHtml(feature={},radius=null,{directions=false}={}){
   let source='';
   try{const url=new URL(feature.sourceUrl);if(url.protocol==='https:')source=`<p><a href="${esc(url.href)}" target="_blank" rel="noopener noreferrer">${esc(feature.sourceLabel||'안내 원문')} ↗</a></p>`}catch{}
   const note=feature.locationNote?`<p class="mapInfoAddress">${esc(feature.locationNote)}</p>`:'';
+  const healthcare=typeof hospitalInfoHtml==='function'?hospitalInfoHtml(feature,{actions:directions}):'';
   const route=directions?mapFeatureDirectionsHtml(feature):'';
   const booking=directions && typeof bookingLinkHtml==='function'?bookingLinkHtml(feature):'';
   const bookingNote=booking && typeof bookingNoteHtml==='function'?bookingNoteHtml(feature):'';
-  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}${note}${source}${booking?`<div class="mapBookingAction">${booking}</div>${bookingNote}`:''}${route}</section>`;
+  return `<section class="mapFeatureInfo"><strong>${esc(name)}</strong><small>${esc(type)}</small>${description?`<p>${esc(description)}</p>`:''}${address?`<p class="mapInfoAddress">${esc(address)}</p>`:''}${benefit}${note}${source}${healthcare}${booking?`<div class="mapBookingAction">${booking}</div>${bookingNote}`:''}${route}</section>`;
 }
 function supportsMapHover(){
   return !isMobileMapLayout() && (!window.matchMedia || window.matchMedia('(hover: hover) and (pointer: fine)').matches);

@@ -124,6 +124,10 @@ function subItemsForNav(def){
     ];
   }
 
+  if(def.id==='hospital' && typeof HOSPITAL_SPECIALTIES!=='undefined'){
+    return [{label:'전체',kind:'hospital-sub',value:'all'},...HOSPITAL_SPECIALTIES.map(s=>({label:s,kind:'hospital-sub',value:s}))];
+  }
+
   if(def.kind==='business'){
     const cfg=CONFIG.categories[def.id];
     return cfg ? cfg.subs.map(s=>({label:s,kind:'business-sub',value:s})) : [];
@@ -162,6 +166,7 @@ function renderHierarchyNav(){
       resetIndependentBusinessFilters();
       const id=btn.dataset.navCat;
       state.navCategory=id;
+      state.hospitalSpecialty='all';
       state.selectedNavItem=null;
       state.restaurantTag='all';
       const def=navDef(id);
@@ -233,6 +238,11 @@ function renderHierarchyNav(){
     `<span class="quickLabel">${def.label} ›</span>`+
     allButton+
     subs.map(s=>{
+      if(s.kind==='hospital-sub'){
+        const active=hospitalSpecialty()===s.value;
+        const count=hospitalPoints(s.value).length;
+        return `<button type="button" aria-pressed="${active}" class="navSub ${active?'active':''}" data-hospital-sub="${esc(s.value)}">${esc(s.label)} (${count})</button>`;
+      }
       if(s.kind==='business-sub'){
         const shoppingExamples={
           '마트':'마트 · 롯데마트 등',
@@ -264,10 +274,16 @@ function renderHierarchyNav(){
       RESTAURANT_TAGS.map(tag=>
         `<button type="button" aria-pressed="${state.restaurantTag===tag?'true':'false'}" class="navSub ${state.restaurantTag===tag?'active':''}" data-restaurant-tag="${tag}">${tag}</button>`
       ).join('');
+  }else if(def.id==='hospital' && typeof hospitalPoints==='function'){
+    $('#tagNav').classList.add('show');
+    const points=hospitalPoints();
+    $('#tagNav').innerHTML=`<span class="quickLabel">병원 ›</span>`+(points.length?points.map(p=>`<button type="button" aria-pressed="${state.selectedNavItem===p.name}" class="navSub ${state.selectedNavItem===p.name?'active':''}" data-nav-point="${esc(p.name)}">${esc(p.name)}</button>`).join(''):'<span class="quickLabel">이 도시에는 확인된 해당 진료과가 없습니다.</span>');
   }else{
     $('#tagNav').classList.remove('show');
     $('#tagNav').innerHTML='';
   }
+
+  document.querySelectorAll('[data-hospital-sub]').forEach(btn=>btn.addEventListener('click',()=>selectHospitalSpecialty(btn.dataset.hospitalSub)));
 
   document.querySelectorAll('[data-business-sub]').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -423,6 +439,7 @@ function switchCity(key){
   clearSelectionRanges();
 
   state.city=key;
+  state.hospitalSpecialty='all';
   state.navCategory=null;
   state.selectedNavItem=null;
   state.areaType='all';
@@ -470,6 +487,7 @@ function renderAreaList(){
       cancelPendingMapWork();
       resetIndependentBusinessFilters();
       state.areaType=btn.dataset.areaType;
+      state.hospitalSpecialty='all';
       const def=NAV_CATEGORIES.find(d=>d.type===state.areaType);
       state.navCategory=def?.id||null;
       state.selectedNavItem=null;
@@ -518,13 +536,14 @@ function renderAreaList(){
   });
 
   currentPoints().forEach(p=>{
+    if(p.type==='병원' && state.areaType==='병원' && typeof hospitalPoints==='function' && !hospitalPoints().includes(p))return;
     const airportFamily=isAirportMainPoint(p)||isAirportTerminalPoint(p)||['그랩승차','택시승차','그린SM승차','버스승차'].includes(p.type);
     allRows.push({
       kind:'point',
       name:p.name,
       type:airportFamily?'공항':p.type,
       actualType:p.type,
-      desc:p.desc,
+      desc:p.type==='병원' && p.specialties?`${p.specialties.join(' · ')} · ${p.desc}`:p.desc,
       icon:p.type==='유람선·수상버스'?businessGlyph('boat'):p.type==='시티투어 버스'?businessGlyph('bus'):p.icon||'•'
     });
   });
@@ -590,6 +609,7 @@ function mapFilterSummary(){
   const parts=[currentCity().label];
   const category=def?.label || CONFIG.categories[state.cat]?.label;
   if(category)parts.push(category);
+  if(def?.id==='hospital' && typeof hospitalSpecialty==='function' && hospitalSpecialty()!=='all')parts.push(hospitalSpecialty());
   if(state.sub && state.sub!=='all')parts.push(state.sub);
   const item=state.selectedNavItem;
   if(item && !['all','__all__',state.sub].includes(item)){
