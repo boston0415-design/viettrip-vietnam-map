@@ -1,0 +1,9 @@
+# Persistent administrator login
+
+The existing server-verified administrator credential is now retained in this site's localStorage until explicit logout. Verified legacy sessionStorage entries migrate automatically. No timer or browser-close logout is imposed. The administrator button explicitly says “관리자 로그아웃”. This retains the existing shared-key authorization model; it does not introduce Supabase Auth users, new permissions, or a client-side authorization flag that bypasses the server.
+
+Startup verification runs independently of Google Maps. Network failures retain the credential and retry when the browser comes online or the page becomes visible. A failed or rejected write retains the login and edit draft; an explicit false response from the server's credential verification removes the invalid credential. Late verification responses cannot undo logout. Logout clears credential material from localStorage, sessionStorage and memory and propagates to other updated tabs. An empty persistent value prevents older sessionStorage entries from restoring a logged-out session.
+
+Persistence is limited to the same browser profile and origin. Clearing site data, private browsing, or blocked browser storage can prevent persistence. The saved credential remains sensitive: use a trusted personal browser and log out on shared devices. Existing database authorization checks remain mandatory for all privileged writes.
+
+Validation: `node tests/admin-session.test.cjs` covers browser restart, migration, logout synchronization, invalid credentials, transient network failures and retry, logout/verification races, edit failure preservation, and unavailable storage. A read-only live `admin_verify` check rejects a fabricated test credential. No administrator password is read from production or embedded in source/tests.

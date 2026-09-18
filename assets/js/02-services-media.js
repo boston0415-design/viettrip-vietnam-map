@@ -286,8 +286,15 @@ function isOwnerPlace(p){
 
   return isLocallyOwnedPlace(p.id);
 }
+const ADMIN_KEY_STORAGE_KEY='viettrip_admin_key_v1';
 function adminKey(){
-  return safeSessionGet('viettrip_admin_key_v1')||'';
+  const saved=safeStorageGet(ADMIN_KEY_STORAGE_KEY);
+  // An empty persistent value records logout, including for older open tabs.
+  return saved!==null?saved:(safeSessionGet(ADMIN_KEY_STORAGE_KEY)||'');
+}
+function saveAdminKey(key){
+  safeStorageSet(ADMIN_KEY_STORAGE_KEY,key);
+  safeSessionRemove(ADMIN_KEY_STORAGE_KEY);
 }
 
 
@@ -394,16 +401,20 @@ async function updateExistingPlaceWithFallback(placeId,current,patch){
     const key=adminKey();
     if(key){
       try{
-        if(await verifyAdminKey(key)){
+        const verified=await verifyAdminKey(key);
+        if(verified===null)return {ok:false,reason:'connection'};
+        if(verified===true){
           const ok=await supaRpc('admin_update_place',{
             p_admin_key:key,
             p_place_id:placeId,
             p_patch:patch
           });
           if(ok===true)return {ok:true,mode:'admin'};
+          return {ok:false,reason:'admin_save'};
         }
       }catch(err){
         console.warn('admin update failed',err);
+        return {ok:false,reason:'connection'};
       }
     }
 

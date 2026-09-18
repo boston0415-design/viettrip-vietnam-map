@@ -94,6 +94,11 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
       const result=await updateExistingPlaceWithFallback(placeId,current,patch);
 
       if(!result.ok){
+        if(result.reason==='connection'||result.reason==='admin_save'){
+          setPlaceSaveStatus('수정 내용을 저장하지 못했습니다. 연결 상태를 확인한 뒤 다시 저장해 주세요.',false,true);
+          alert('저장하지 못했습니다. 관리자 로그인과 입력한 내용은 유지됩니다. 다시 저장해 주세요.');
+          return;
+        }
         setPlaceSaveStatus(
           result.reason==='admin'
             ? '관리자 인증이 만료되었거나 수정 권한을 확인하지 못했습니다.'
@@ -103,10 +108,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
         );
 
         if(result.reason==='admin'){
-          state.isAdmin=false;
-          safeSessionRemove('viettrip_admin_key_v1');
-          $('#adminBtn').textContent='관리자';
-          $('#adminBtn').classList.remove('adminOn');
+          clearAdminSession();
         }
 
         alert(

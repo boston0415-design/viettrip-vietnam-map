@@ -31,22 +31,33 @@ async function verifyAdminKey(key){
     return ok===true;
   }catch(err){
     console.error('admin verify failed',err);
-    return false;
+    return null;
   }
 }
 
+let adminSessionRevision=0;
+function syncAdminButton(){
+  const button=$('#adminBtn');
+  if(!button)return;
+  button.textContent=state.isAdmin||adminKey()?'관리자 로그아웃':'관리자';
+  button.classList.toggle('adminOn',state.isAdmin);
+}
+function clearAdminSession(){
+  adminSessionRevision++;
+  saveAdminKey('');
+  state.isAdmin=false;
+  syncAdminButton();
+  renderDetail();
+}
+
 async function toggleAdminMode(){
-  if(state.isAdmin){
-    state.isAdmin=false;
-    safeSessionRemove('viettrip_admin_key_v1');
-    $('#adminBtn').textContent='관리자';
-    $('#adminBtn').classList.remove('adminOn');
-    renderDetail();
+  if(state.isAdmin||adminKey()){
+    clearAdminSession();
     return;
   }
 
   $('#adminPassword').value='';
-  $('#adminLoginStatus').textContent='비밀번호만 입력하면 관리자 모드로 전환됩니다.';
+  $('#adminLoginStatus').textContent='로그아웃하기 전까지 이 브라우저에서 로그인을 유지합니다.';
   $('#adminLoginStatus').style.color='#64748b';
   $('#adminLoginModal').classList.add('open');
   setTimeout(()=>$('#adminPassword')?.focus(),60);
@@ -66,8 +77,16 @@ async function submitAdminPassword(){
   $('#adminLoginStatus').textContent='확인 중…';
   $('#adminLoginStatus').style.color='#64748b';
 
+  const revision=++adminSessionRevision;
   const ok=await verifyAdminKey(key);
   $('#adminLoginSubmit').disabled=false;
+  if(revision!==adminSessionRevision)return;
+
+  if(ok===null){
+    $('#adminLoginStatus').textContent='서버에 연결하지 못했습니다. 연결 후 다시 확인해 주세요.';
+    $('#adminLoginStatus').style.color='#dc2626';
+    return;
+  }
 
   if(!ok){
     $('#adminLoginStatus').textContent='비밀번호가 올바르지 않습니다.';
@@ -77,27 +96,54 @@ async function submitAdminPassword(){
     return;
   }
 
-  safeSessionSet('viettrip_admin_key_v1',key);
+  saveAdminKey(key);
+  input.value='';
   state.isAdmin=true;
-  $('#adminBtn').textContent='관리자 ON';
-  $('#adminBtn').classList.add('adminOn');
+  syncAdminButton();
   $('#adminLoginModal').classList.remove('open');
   renderDetail();
 }
 
 async function restoreAdminSession(){
+  const revision=++adminSessionRevision;
   const key=adminKey();
-  if(!key)return;
-  if(await verifyAdminKey(key)){
-    state.isAdmin=true;
-    if($('#adminBtn')){
-      $('#adminBtn').textContent='관리자 ON';
-      $('#adminBtn').classList.add('adminOn');
-    }
+  syncAdminButton();
+  if(!key){
+    state.isAdmin=false;
+    syncAdminButton();
     renderDetail();
-  }else{
-    safeSessionRemove('viettrip_admin_key_v1');
+    return;
   }
+  const ok=await verifyAdminKey(key);
+  // A late verification must never undo logout or a newer login in another tab.
+  if(revision!==adminSessionRevision||key!==adminKey())return;
+  if(ok===true){
+    saveAdminKey(key);
+    state.isAdmin=true;
+    syncAdminButton();
+    renderDetail();
+  }else if(ok===false){
+    clearAdminSession();
+  }
+}
+
+function bindAdminSessionEvents(){
+  window.addEventListener('storage',event=>{
+    if(event.key!==ADMIN_KEY_STORAGE_KEY&&event.key!==null)return;
+    memoryStorage.delete(ADMIN_KEY_STORAGE_KEY);
+    safeSessionRemove(ADMIN_KEY_STORAGE_KEY);
+    state.isAdmin=false;
+    syncAdminButton();
+    renderDetail();
+    restoreAdminSession();
+  });
+  const retry=()=>{
+    if(!state.isAdmin&&adminKey())restoreAdminSession();
+  };
+  window.addEventListener('online',retry);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')retry();
+  });
 }
 
 function openEditPlace(place,mode){

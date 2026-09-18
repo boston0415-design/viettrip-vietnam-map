@@ -297,7 +297,6 @@ function initMap(){
   // 공용 DB는 페이지 시작과 동시에 별도로 불러온다.
   // 지도 초기화가 느린 모바일에서도 저장 업체가 먼저 보이도록 지도와 분리.
   initDeviceHash();
-  restoreAdminSession();
   renderAll();
   setMapLoadState('ready');
   setTimeout(refreshMapAfterMobileLayout,80);
@@ -517,5 +516,7 @@ renderCats();
 renderList();
 
 // 모바일/PC 모두 공용 DB를 먼저 읽는다. Google Maps 로딩과 독립적이다.
+bindAdminSessionEvents();
+restoreAdminSession();
 bootstrapSharedDb().catch(()=>{});
 loadGoogle().catch(()=>{});
