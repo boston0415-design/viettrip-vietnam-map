@@ -43,21 +43,26 @@
       handle.title='위아래로 끌어서 크기 조절 · 방향키로도 조절';
       handle.innerHTML='<span aria-hidden="true"></span>';
       p.prepend(handle);
-      handle.addEventListener('pointerdown',e=>{
+      for(const grip of [handle,p.querySelector('.detailHeader')].filter(Boolean)){
+      let suppressClickUntil=0;
+      grip.addEventListener('click',e=>{if(Date.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation()}},true);
+      grip.addEventListener('pointerdown',e=>{
+        if(e.target.closest('.detailClose'))return;
         if(!e.isPrimary||e.button!==0)return;
         const rect=p.getBoundingClientRect();
         bottom=null;
-        drag={id:e.pointerId,y:e.clientY,height:rect.height,handle,moved:false};
-        handle.setPointerCapture(e.pointerId);e.preventDefault();
+        drag={id:e.pointerId,y:e.clientY,height:rect.height,handle:grip,moved:false};
       });
-      handle.addEventListener('pointermove',e=>{
+      grip.addEventListener('pointermove',e=>{
         if(!drag||drag.id!==e.pointerId)return;
         const delta=drag.y-e.clientY;
         if(!drag.moved&&Math.abs(delta)<4)return;
-        drag.moved=true;p.classList.add('detailDragging');
+        if(!drag.moved)grip.setPointerCapture(e.pointerId);
+        drag.moved=true;suppressClickUntil=Date.now()+500;p.classList.add('detailDragging');
         apply(drag.height+delta);e.preventDefault();
       });
-      ['pointerup','pointercancel','lostpointercapture'].forEach(type=>handle.addEventListener(type,finish));
+      ['pointerup','pointercancel','lostpointercapture'].forEach(type=>grip.addEventListener(type,finish));
+      }
       handle.addEventListener('keydown',e=>{
         const b=bounds(),current=height??p.getBoundingClientRect().height;
         const next={ArrowUp:current+40,ArrowDown:current-40,Home:b.min,End:b.max}[e.key];

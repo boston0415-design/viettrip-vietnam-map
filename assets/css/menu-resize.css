@@ -1,0 +1,14 @@
+#detail .detailHeader,.menuResizeHeader{touch-action:none;cursor:ns-resize;user-select:none}
+.detailResizeHandle,.menuResizeGrip{min-height:36px}
+.menuResizeGrip{display:flex;align-items:center;justify-content:center;flex:0 0 36px;touch-action:none;cursor:ns-resize;user-select:none;border-radius:8px}
+.menuResizeGrip span{width:52px;height:5px;background:#b6c8c1;border-radius:999px}
+.menuResizeGrip:focus-visible{outline:2px solid #247f78}
+.menuResizable.menuSized{height:var(--menu-height)!important;max-height:var(--menu-height)!important;min-height:0!important;overflow:auto;overscroll-behavior:contain}
+#businessSide.menuSized{align-self:end;overflow:auto}
+#businessSide.menuSized .list{flex:1 0 120px}
+#areaLegend.menuSized:not(.mobileCollapsed){height:var(--menu-height)!important;max-height:var(--menu-height)!important}
+.menuDragging{transition:none!important;user-select:none}
+#areaLegend.mobileCollapsed>.menuResizeGrip{display:none}
+#areaLegend.menuSized.mobileCollapsed{height:auto!important;max-height:52px!important}
+.benefitTabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.benefitTabs button{min-width:0;white-space:nowrap}

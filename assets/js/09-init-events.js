@@ -364,7 +364,7 @@ document.querySelectorAll('[data-benefit-filter]').forEach(btn=>{
 
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const matchedCount=benefitFilterPlaces(value).length;
-    const label='혜택업소';
+    const label=value==='recommended'?'강추업소':'혜택업소';
     setDbStatus(`${label} ${matchedCount}곳 찾는 중…`);
     await focusBenefitFilterResults(value);
   });

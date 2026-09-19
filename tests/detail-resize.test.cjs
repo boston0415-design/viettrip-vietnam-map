@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
 const {JSDOM}=require(process.env.JSDOM_PATH||'jsdom');
 for(const mobile of [true,false]){
- const dom=new JSDOM('<div class="mapwrap"><div id="detail" class="show"><div id="detailBody"></div></div></div>',{runScripts:'outside-only'});
+ const dom=new JSDOM('<div class="mapwrap"><div id="detail" class="show"><div class="detailHeader"><button class="businessReviewName">업소 이름</button><button class="detailClose">닫기</button></div><div id="detailBody"></div></div></div>',{runScripts:'outside-only'});
  const w=dom.window,p=w.document.getElementById('detail'),map=w.document.querySelector('.mapwrap');
  let mapHeight=700;
  map.getBoundingClientRect=()=>({height:mapHeight,bottom:mapHeight});
@@ -24,6 +24,13 @@ for(const mobile of [true,false]){
  mapHeight=350;w.dispatchEvent(new w.Event('resize'));assert.equal(p.style.getPropertyValue('--sheet-height'),'314px');
  pointer('pointerdown',200);pointer('pointermove',180);pointer('pointercancel',180);assert.equal(p.classList.contains('detailDragging'),false);
  w.DetailSheetResize.reset();assert.equal(p.style.getPropertyValue('--sheet-height'),'');assert.equal(p.classList.contains('detailResized'),false);
+ const title=p.querySelector('.businessReviewName');let clicks=0;title.addEventListener('click',()=>clicks++);
+ title.click();assert.equal(clicks,1);
+ for(const [type,y] of [['pointerdown',200],['pointermove',150],['pointerup',150]]){
+   const e=new w.Event(type,{bubbles:true,cancelable:true});Object.assign(e,{pointerId:2,clientY:y,button:0,isPrimary:true});title.dispatchEvent(e);
+ }
+ assert.equal(p.style.getPropertyValue('--sheet-height'),'270px');
+ title.click();assert.equal(clicks,1);
  dom.window.close();
 }
 console.log('PASS touch/mouse drag, height limits, keyboard, resize, cancel and reset');

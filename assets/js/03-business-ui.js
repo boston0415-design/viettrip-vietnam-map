@@ -183,6 +183,7 @@ function isBenefitPlace(place){
 function matchesBenefitFilter(place,filter){
   if(filter==='all')return true;
   if(filter==='benefit')return isBenefitPlace(place);
+  if(filter==='recommended')return !!place.tags?.includes('강추업소')||db().reviews.some(r=>r.placeId===place.id&&r.recommended);
   return true;
 }
 function benefitBadgeText(place){
@@ -229,7 +230,7 @@ async function focusBenefitFilterResults(filter=state.benefitFilter){
 
   const visible=benefitFilterPlaces(filter);
   closeSystemInfo();
-  const filterLabel='혜택업소';
+  const filterLabel=filter==='recommended'?'강추업소':'혜택업소';
 
   if(!visible.length){
     fitSelectedCityView(state.city);

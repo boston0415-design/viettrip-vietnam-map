@@ -25,10 +25,14 @@ for(const mobile of [false,true]){
  assert.equal(fixture.reviews.length,1);assert.equal(fixture.reviews[0].recommended,true);
  assert.match(recommendationBadges(fixture.places[0]),/등록자 강추/);
  assert.match(recommendationBadges(fixture.places[0]),/회원 강추 1명/);
+ assert.equal(matchesBenefitFilter({...fixture.places[0],tags:[]},'recommended'),true);
+ assert.equal(matchesBenefitFilter({id:'not-recommended',tags:[]},'recommended'),false);
  openReview();assert.equal($('#rRecommended').checked,true);
  $('#rRecommended').checked=false;await saveReview();
  assert.equal(sent.args.p_recommended,false);assert.equal(fixture.reviews.length,1);
  assert.doesNotMatch(recommendationBadges(fixture.places[0]),/회원 강추/);
+ assert.equal(matchesBenefitFilter(fixture.places[0],'recommended'),true);
+ assert.equal(matchesBenefitFilter({...fixture.places[0],tags:[]},'recommended'),false);
  assert.equal(remoteReviewToLocal({recommended:true}).recommended,true);
  items=()=>[{...fixture.places[0],rating:4,count:1,reviews:fixture.reviews}];
  renderList();
