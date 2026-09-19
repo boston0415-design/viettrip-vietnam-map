@@ -44,6 +44,15 @@
        grip.setAttribute('role','separator');grip.setAttribute('aria-orientation','horizontal');grip.setAttribute('aria-label','메뉴 높이 조절');
        grip.innerHTML='<span aria-hidden="true"></span>';p.prepend(grip);p.classList.add('menuResizable');records.set(p,{grip});
        bind(p,grip,true);
+       window.BodySheetDrag?.bind(p,{
+         bounds:()=>limits(p),
+         start(){
+           if(p.id==='areaLegend'&&p.classList.contains('mobileCollapsed'))document.getElementById('areaLegendTitle').click();
+           p.classList.add('menuDragging');
+         },
+         size:value=>size(p,value),
+         end:()=>p.classList.remove('menuDragging')
+       });
        grip.addEventListener('keydown',e=>{
          const b=limits(p),h=p.getBoundingClientRect().height,next={ArrowUp:h+40,ArrowDown:h-40,Home:b.min,End:b.max}[e.key];
          if(next===undefined)return;e.preventDefault();

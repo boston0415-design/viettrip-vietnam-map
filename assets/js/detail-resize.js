@@ -26,6 +26,7 @@
     if(old.moved)positionSelectedPlaceInView();
   }
   function reset(){
+    window.BodySheetDrag?.cancel(panel());
     finish();height=null;bottom=null;
     const p=panel();if(!p)return;
     p.classList.remove('detailResized');
@@ -33,6 +34,12 @@
   }
   function sync(){
     const p=panel();if(!p?.classList.contains('show'))return;
+    window.BodySheetDrag?.bind(p,{
+      bounds,
+      start(){bottom=null;p.classList.add('detailDragging')},
+      size:apply,
+      end(){p.classList.remove('detailDragging');positionSelectedPlaceInView()}
+    });
     let handle=p.querySelector('.detailResizeHandle');
     if(!handle){
       if(drag)finish();
