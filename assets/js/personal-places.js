@@ -52,6 +52,14 @@
       const button=event.target.closest('[data-personal-action]');if(!button)return;
       event.stopPropagation();
       const id=button.dataset.placeId,action=button.dataset.personalAction;
+      if(action==='recommend'){
+        if(!db().places.some(p=>p.id===id))return;
+        state.selected=id;
+        openReview();
+        document.getElementById('rRecommended').checked=true;
+        document.getElementById('rRecommended').focus({preventScroll:true});
+        return;
+      }
       const result=action==='favorite'?window.PersonalPlaces.toggleFavorite(id):window.PersonalPlaces.toggleHidden(id);
       if(!result.changed)return;
       refresh(id,action);

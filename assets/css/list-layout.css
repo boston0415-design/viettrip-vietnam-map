@@ -39,3 +39,7 @@
 #hiddenPlacesCount{display:inline-block;min-width:15px;margin-left:2px;color:#087883;font-variant-numeric:tabular-nums}
 .hiddenPlacesHelp{margin:4px 0 6px;padding:7px 9px;background:#f0f7f8;border-radius:7px;font-size:11px;color:#365d63;line-height:1.45}
 .hiddenPlacesHelp[hidden]{display:none}
+.cardPersonalActions .cardRecommend{width:auto;min-width:64px;min-height:36px;padding:6px 8px;font-size:12px;font-weight:700;color:#805200;background:#fff5df;white-space:nowrap}
+.side .cardPersonalActions{position:static;gap:2px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.side .card .badges,.side .card .meta{padding-right:0}
+@media(max-width:900px){.cardPersonalActions button{min-height:40px}.cardPersonalActions .cardRecommend{min-height:40px}}
