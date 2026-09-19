@@ -399,6 +399,12 @@ function renderHierarchyNav(){
 
 function renderCityControls(){
   const city=currentCity();
+  const listCity=document.getElementById('listCity');
+  if(listCity){
+    listCity.innerHTML=[['all',ALL_CITIES_VIEW],...Object.entries(CITY_DATA)].map(([key,c])=>`<option value="${key}">${esc(c.label)}</option>`).join('');
+    listCity.value=state.city;
+    listCity.onchange=()=>switchCity(listCity.value);
+  }
   $('#activeCityName').textContent=city.label;
   $('#areaPanelTitle').textContent=`${city.label} 주요정보`;
   // Geographic guides need a specific city; the all-city scope is for registered places.
