@@ -34,6 +34,19 @@ for(const mobile of [false,true]){
  renderList();
  assert.equal(document.querySelector('.businessRegion').textContent,'호치민 · 7군');
  assert.match(document.querySelector('#list').textContent,/등록자 강추/);
+ fixture.reviews=[];fixture.places[0].initialRating=4;
+ fixture.places[0].registrantNickname='등록자';
+ isOwnerPlace=p=>p?.id==='test';
+ openReview();
+ assert.equal(state.rating,4);
+ assert.equal($('#rName').value,'등록자');
+ assert.equal($('#rRecommended').checked,true);
+ assert.equal($('#reviewModal h3').textContent,'내 별점·후기 수정');
+ $('#rText').value='방문 후기';await saveReview();
+ assert.equal(fixture.places[0].initialRating,null);
+ assert.equal(stats('test').count,1);
+ assert.equal(stats('test').rating,4);
+ assert.equal(fixture.places[0].tags.includes('강추업소'),false);
  })()`);
  dom.window.close();
 }

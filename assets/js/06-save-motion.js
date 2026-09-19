@@ -291,15 +291,20 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
 }
 function openReview(){
   const mine=db().reviews.find(r=>r.placeId===state.selected && isOwnReview(r));
+  const place=db().places.find(p=>p.id===state.selected);
+  const owner=isOwnerPlace(place);
+  const editing=!!mine||owner;
+  $('#reviewModal h3').textContent=editing?'내 별점·후기 수정':'별점·후기 남기기';
+  $('#saveReview').textContent=editing?'수정 저장':'저장';
 
-  state.rating=mine?.rating??null;
+  state.rating=mine?.rating??(owner?place.initialRating:null)??null;
   state.reviewExistingPhotos=[...(mine?.photoUrls||[])].slice(0,3);
   state.reviewNewFiles=[];
 
-  $('#rName').value=mine?.nickname||rememberedMemberNickname();
+  $('#rName').value=mine?.nickname||(owner?place.registrantNickname:'')||rememberedMemberNickname();
   bindRememberedNicknameInput($('#rName'));
   $('#rText').value=mine?.text||'';
-  $('#rRecommended').checked=!!mine?.recommended;
+  $('#rRecommended').checked=mine?!!mine.recommended:!!(owner&&place.tags?.includes('강추업소'));
   $('#rCafeUrl').value=mine?.cafeUrl||'';
   $('#reviewCafeLink').open=!!mine?.cafeUrl;
   if($('#rPhotos'))$('#rPhotos').value='';
@@ -374,6 +379,12 @@ async function saveReview(){
     }
 
     existing.recommended=$('#rRecommended').checked;
+    const ownPlace=x.places.find(p=>p.id===placeId);
+    if(isOwnerPlace(ownPlace)){
+      if(existing.rating==null)existing.rating=ownPlace.initialRating??null;
+      ownPlace.initialRating=null;
+      ownPlace.tags=(ownPlace.tags||[]).filter(t=>t!=='강추업소');
+    }
     saveDb(dedupeDbData(x));
     $('#reviewModal').classList.remove('open');
     revokeReviewPreviewUrls();
