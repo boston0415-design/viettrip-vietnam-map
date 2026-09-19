@@ -197,15 +197,17 @@
 <div id="adminLoginModal" class="modalback">
   <div class="modal" style="max-width:360px">
     <h3>관리자 로그인</h3>
+    <form id="adminCredentialsForm" autocomplete="off">
     <div class="field">
       <label>비밀번호</label>
-      <input id="adminPassword" type="password" inputmode="numeric" autocomplete="current-password" placeholder="관리자 비밀번호">
+      <input id="adminPassword" name="admin-password" disabled type="password" inputmode="numeric" autocomplete="current-password" placeholder="관리자 비밀번호">
       <div id="adminLoginStatus" class="inlineHelp">로그아웃하기 전까지 이 브라우저에서 로그인을 유지합니다.</div>
     </div>
     <div class="modalactions">
       <button class="btn" data-close="adminLoginModal" type="button">취소</button>
-      <button id="adminLoginSubmit" class="btn primary" type="button">확인</button>
+      <button id="adminLoginSubmit" class="btn primary" type="submit">확인</button>
     </div>
+    </form>
   </div>
 </div>
 
@@ -353,7 +355,7 @@
 <script src="./assets/js/booking-links.js?v=20260919-routes1"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260919-share1"></script>
-<script src="./assets/js/04-rendering.js?v=20260919-smoothsheet1"></script>
+<script src="./assets/js/04-rendering.js?v=20260919-adminform1"></script>
 <script src="./assets/js/body-sheet-drag.js?v=20260919-smoothsheet1"></script>
 <script src="./assets/js/detail-resize.js?v=20260919-smoothsheet1"></script>
 <script src="./assets/js/menu-resize.js?v=20260919-bodydrag1"></script>
@@ -361,7 +363,7 @@
 <script src="./assets/js/06-save-motion.js?v=20260919-owner-review1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260919-list-region1"></script>
-<script src="./assets/js/09-init-events.js?v=20260919-menus1"></script>
+<script src="./assets/js/09-init-events.js?v=20260919-adminform1"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260918-all-cities1"></script>
 <script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>
 <script defer src="./assets/vendor/realtime-2.116.0.min.js"></script>

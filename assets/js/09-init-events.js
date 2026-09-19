@@ -404,7 +404,10 @@ $('#reviewModal').addEventListener('keydown',e=>{
 
 $('#pBenefitEnabled').addEventListener('change',toggleBenefitField);
 $('#adminBtn').onclick=toggleAdminMode;
-$('#adminLoginSubmit').onclick=submitAdminPassword;
+$('#adminCredentialsForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(!$('#adminLoginSubmit').disabled)submitAdminPassword();
+});
 $('#rPhotos').addEventListener('change',handleReviewPhotoSelection);
 $('#pPhotos').addEventListener('change',()=>{handlePlacePhotoSelection().catch(err=>{console.error(err);alert(err.message||'사진 처리 중 오류가 발생했습니다.');state.placePhotoProcessing=false;updatePlacePhotoSaveState();});});
 $('#pPhotoPreview').addEventListener('click',e=>{
@@ -412,9 +415,6 @@ $('#pPhotoPreview').addEventListener('click',e=>{
   if(!btn)return;
   e.preventDefault();
   removePlacePhoto(btn.dataset.placePhotoKind,btn.dataset.placePhotoIndex);
-});
-$('#adminPassword').addEventListener('keydown',e=>{
-  if(e.key==='Enter')submitAdminPassword();
 });
 
 $('#addBtn').onclick=()=>{

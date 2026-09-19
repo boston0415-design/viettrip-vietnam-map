@@ -58,6 +58,7 @@ async function toggleAdminMode(){
     return;
   }
 
+  $('#adminPassword').disabled=false;
   $('#adminPassword').value='';
   $('#adminLoginStatus').textContent='로그아웃하기 전까지 이 브라우저에서 로그인을 유지합니다.';
   $('#adminLoginStatus').style.color='#64748b';
@@ -100,6 +101,7 @@ async function submitAdminPassword(){
 
   saveAdminKey(key);
   input.value='';
+  input.disabled=true;
   state.isAdmin=true;
   syncAdminButton();
   $('#adminLoginModal').classList.remove('open');
@@ -659,7 +661,10 @@ function closeModalById(id){
   }else if(id==='reviewModal'){
     resetReviewDraftUi();
   }else if(id==='adminLoginModal'){
-    if($('#adminPassword'))$('#adminPassword').value='';
+    if($('#adminPassword')){
+      $('#adminPassword').value='';
+      $('#adminPassword').disabled=true;
+    }
     if($('#adminLoginStatus')){
       $('#adminLoginStatus').textContent='';
       $('#adminLoginStatus').style.color='#64748b';
