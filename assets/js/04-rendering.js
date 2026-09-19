@@ -470,6 +470,9 @@ function closeDetailPanel(){
 
 function renderDetail(){
   const p=db().places.find(x=>x.id===state.selected);const d=$('#detail');
+  if(p && detailPlaceId===p.id && window.DetailSheetResize?.isInteracting()){
+    window.DetailSheetResize.deferRefresh();return;
+  }
   if(!p){
     if(typeof clearGooglePlacePhotos==='function')clearGooglePlacePhotos();
     d.classList.remove('show');

@@ -4,6 +4,7 @@ const read=path=>fs.readFileSync(path,'utf8');
 (async()=>{
 for(const kind of ['touch','pointer']){
  const dom=new JSDOM(read('index.html'),{runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window,d=w.document;
+ w.matchMedia=()=>({matches:false});
  await new Promise(r=>d.addEventListener('DOMContentLoaded',r,{once:true}));
  const run=code=>vm.runInContext(code,dom.getInternalVMContext());
  w.HTMLElement.prototype.setPointerCapture=function(id){this.capture=id};

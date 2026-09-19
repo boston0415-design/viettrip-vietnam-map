@@ -5,7 +5,8 @@
 .detailResizeHandle:focus-visible{outline:2px solid #247f78;outline-offset:-2px}
 #detail.detailResized.show{height:var(--sheet-height)!important;max-height:var(--sheet-height)!important;top:auto!important;bottom:var(--sheet-bottom)!important}
 @media(min-width:901px){#detail.show{top:auto!important;bottom:24px!important}}
-#detail.detailDragging{transition:none!important;user-select:none}
+#detail.detailDragging,#detail.detailSettling{transition:none!important;user-select:none;will-change:height}
+#detail .detailHeader,#detail .detailHeader *{touch-action:none;-webkit-user-select:none;user-select:none}
 #detail.show{display:flex;flex-direction:column;overflow:hidden!important}
 #detail .detailHeader{flex:none}
 #detail .detailBody{min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
