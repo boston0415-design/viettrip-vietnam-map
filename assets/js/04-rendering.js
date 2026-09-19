@@ -2,7 +2,8 @@ function renderMarkers(){
   state.markers.forEach(m=>m.setMap(null));state.markers=[];
   clearPremiumEffects();
   if(!state.map)return;
-  items().forEach(p=>{
+  const visible=items();
+  (window.BusinessShare?.includeSelectedPlace(visible)||visible).forEach(p=>{
     if(!validMapLocation(p))return;
     const st=stats(p.id);
     const m=new google.maps.Marker({
@@ -451,12 +452,14 @@ function setDetailExpanded(expanded){
 }
 
 function closeDetailPanel(){
+  const sharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
   window.DetailSheetResize?.reset();
   if(typeof clearGooglePlacePhotos==='function')clearGooglePlacePhotos();
   detailExpanded=false;
   detailPlaceId=null;
   detailPositionFrame++;
   state.selected=null;
+  if(sharedSelection)renderMarkers();
   const d=$('#detail');
   if(d)d.classList.remove('show');
   $('.mapwrap')?.classList.remove('detailOpen');
@@ -505,6 +508,7 @@ function renderDetail(){
     ${booking}
   </div>
   <div id="detailBody" class="detailBody">
+  ${window.BusinessShare?.html(p)||''}
   <div class="copyRow">
     ${businessDirectionsLinkHtml(p)}
     ${booking}
@@ -530,11 +534,13 @@ function renderDetail(){
 }
 function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync()}
 async function selectPlace(id,pan=true,showInfo=false){
+  const previousSharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
   closeSystemInfo();
   closeAreaPanel();
   setMobileLegendExpanded(false);
   if(isMobileMapLayout())closeMobileBusinessList();
   state.selected=id;
+  if(previousSharedSelection || window.BusinessShare?.isSharedSelection({id}))renderMarkers();
   renderList();
   renderDetail();
 

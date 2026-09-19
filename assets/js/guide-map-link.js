@@ -9,7 +9,7 @@
   document.addEventListener('DOMContentLoaded',()=>{
     syncGuideLinks();
     document.addEventListener('click',e=>{if(e.target.closest('[data-city],[data-nav-cat],[data-cat],[data-benefit-filter]'))queueMicrotask(syncGuideLinks)});
-    const params=new URL(location.href).searchParams;if(params.get('from')!=='guide')return;
+    const params=new URL(location.href).searchParams;if(params.has('place')||params.get('from')!=='guide')return;
     const city=Object.hasOwn(CITY_DATA,params.get('city'))?params.get('city'):'hcmc';
     const category=NAV_CATEGORIES.find(c=>c.id===params.get('category'))?.id;
     const group=['all','airport','grab','green','bus','taxi','terminal'].includes(params.get('group'))?params.get('group'):null;
