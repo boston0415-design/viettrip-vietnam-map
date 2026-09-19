@@ -1,4 +1,9 @@
 :root{--bg:#f5f6f8;--panel:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;--blue:#1a73e8;--blue2:#e8f0fe;--gold:#f4a100;--green:#16a36a;--shadow:0 12px 30px rgba(0,0,0,.12)}
+.field .recommendChoice{display:flex;align-items:center;gap:9px;min-height:44px;cursor:pointer}
+.field .recommendChoice input{width:20px;height:20px;flex:0 0 20px;accent-color:#267a72}
+.badge.recommendationBadge{background:#fff2d8;color:#805200}
+.businessRegion{font-size:12px;font-weight:700;color:#267a72;margin:5px 0;overflow-wrap:anywhere}
+.cardtop>div:first-child{min-width:0}
 *{box-sizing:border-box}html,body{margin:0;height:100%;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;color:var(--text);background:var(--bg)}
 button,input,select,textarea{font:inherit}button{cursor:pointer}
 .app{height:100%;display:grid;grid-template-rows:76px 1fr}

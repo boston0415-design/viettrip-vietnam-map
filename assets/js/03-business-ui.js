@@ -105,7 +105,7 @@ function normalizedRestaurantSub(sub=''){
 }
 
 function restaurantTagsOf(place){
-  const tags=[...(place?.tags||[])];
+  const tags=(place?.tags||[]).filter(tag=>tag!=='강추업소');
   if(place?.subcategory==='고기집' && !tags.includes('고기·구이'))tags.push('고기·구이');
   if(place?.subcategory==='해산물' && !tags.includes('해산물'))tags.push('해산물');
   return [...new Set(tags)];
@@ -615,10 +615,22 @@ function personalPlaceActionsHtml(p){
   const icon=path=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
   return `<div class="cardPersonalActions"><button type="button" data-personal-action="favorite" data-place-id="${esc(p.id)}" class="${favorite?'isFavorite':''}" aria-pressed="${favorite}" aria-label="${esc(p.name)} 즐겨찾기 ${favorite?'해제':'추가'}" title="즐겨찾기 ${favorite?'해제':'추가'}">${icon(star)}</button><button type="button" data-personal-action="hide" data-place-id="${esc(p.id)}" aria-label="${esc(p.name)} ${hidden?'숨기기 해제':'내 목록에서 숨기기'}" title="${hidden?'숨기기 해제':'내 목록에서 숨기기'}">${icon(eye)}</button></div>`;
 }
+function selectedPlaceTags(){
+  return [...($('#pCat').value==='restaurant'?selectedRestaurantTags():[]).filter(t=>t!=='강추업소'),...($('#pRecommended')?.checked?['강추업소']:[])];
+}
+function recommendationBadges(place){
+  const count=new Set(db().reviews.filter(r=>r.placeId===place.id&&r.recommended).map(r=>r.createdByHash||r.createdBy||r.id)).size;
+  return `${place.tags?.includes('강추업소')?'<span class="badge recommendationBadge">👍 등록자 강추</span>':''}${count?`<span class="badge recommendationBadge">👍 회원 강추 ${count}명</span>`:''}`;
+}
+function placeRegionLabel(place){
+  const city=CITY_DATA[placeCityKey(place)]?.label||'';
+  const area=String(place.area||'').trim();
+  return area.includes(city)&&city?area:[city,area].filter(Boolean).join(' · ')||'지역 미등록';
+}
 function renderList(){
   const arr=items({forList:true});$('#count').textContent=state.sharedDbLoading && !arr.length?'업체 불러오는 중…':`${arr.length}개 업체`;
   $('#list').innerHTML=arr.length
-    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 ${p.reviews.length}개 보기 ›</span></button><div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside">${Number.isFinite(p.distanceMeters)?`<span class="nearbyDistance">직선 ${window.NearbyBusinesses.distanceLabel(p.distanceMeters)}</span>`:''}<div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.area||'')}</span><span>${esc(p.address||'')}</span></div></article>`).join('')
+    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 ${p.reviews.length}개 보기 ›</span></button><div class="businessRegion">${esc(placeRegionLabel(p))}</div><div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${recommendationBadges(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside">${Number.isFinite(p.distanceMeters)?`<span class="nearbyDistance">직선 ${window.NearbyBusinesses.distanceLabel(p.distanceMeters)}</span>`:''}<div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.address||'')}</span></div></article>`).join('')
     : state.sharedDbLoading
       ? '<div class="empty"><b>공용 업체 불러오는 중…</b><br>잠시만 기다려주세요.</div>'
       : window.PersonalPlaces?.getView()==='hidden'

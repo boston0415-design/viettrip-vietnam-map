@@ -191,6 +191,7 @@ function remoteReviewToLocal(r){
     id:r.id,
     placeId:r.place_id,
     nickname:r.author_name||'회원',
+    recommended:!!r.recommended,
     rating:r.rating==null?null:Number(r.rating),
     text:r.body||'',
     cafeUrl:r.cafe_url||'',

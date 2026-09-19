@@ -87,7 +87,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
       member_benefit:benefitEnabled,
       benefit_text:benefitEnabled ? (benefitText || '카페 회원 전용 혜택 제공') : '',
       photo_urls:placePhotoUrls,
-      tags:$('#pCat').value==='restaurant' ? selectedRestaurantTags() : []
+      tags:selectedPlaceTags()
     };
 
     setPlaceSaving(true,'수정 저장 중…');
@@ -226,7 +226,7 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
     memberBenefit:benefitEnabled,
     benefitText:benefitEnabled ? (benefitText || '카페 회원 전용 혜택 제공') : '',
     photoUrls:placePhotoUrls,
-    tags:$('#pCat').value==='restaurant' ? selectedRestaurantTags() : []
+    tags:selectedPlaceTags()
   };
 
   x.places.push(newPlace);
@@ -299,6 +299,7 @@ function openReview(){
   $('#rName').value=mine?.nickname||rememberedMemberNickname();
   bindRememberedNicknameInput($('#rName'));
   $('#rText').value=mine?.text||'';
+  $('#rRecommended').checked=!!mine?.recommended;
   $('#rCafeUrl').value=mine?.cafeUrl||'';
   $('#reviewCafeLink').open=!!mine?.cafeUrl;
   if($('#rPhotos'))$('#rPhotos').value='';
@@ -335,7 +336,7 @@ async function saveReview(){
   try{
     const photoUrls=await uploadSelectedReviewPhotos(placeId,reviewId);
 
-    const remoteId=await supaRpc('device_upsert_review_with_link',{
+    const remoteId=await supaRpc('device_upsert_recommended_review',{
       p_review_id:reviewId,
       p_place_id:placeId,
       p_device_id:deviceId,
@@ -343,7 +344,8 @@ async function saveReview(){
       p_rating:state.rating==null?null:Number(state.rating),
       p_body:text,
       p_photo_urls:photoUrls,
-      p_cafe_url:cafeUrl
+      p_cafe_url:cafeUrl,
+      p_recommended:$('#rRecommended').checked
     });
 
     if(remoteId)reviewId=String(remoteId).replace(/^"|"$/g,'');
@@ -371,6 +373,7 @@ async function saveReview(){
       x.reviews.push(existing);
     }
 
+    existing.recommended=$('#rRecommended').checked;
     saveDb(dedupeDbData(x));
     $('#reviewModal').classList.remove('open');
     revokeReviewPreviewUrls();

@@ -1,0 +1,41 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const {JSDOM}=require(process.env.JSDOM_PATH||'jsdom');
+const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+(async()=>{
+for(const mobile of [false,true]){
+ const dom=new JSDOM(read('index.html'),{url:'https://viettrip-vietnam-map.pages.dev/',runScripts:'outside-only'});
+ const w=dom.window,run=s=>vm.runInContext(s,dom.getInternalVMContext());w.assert=assert;
+ w.matchMedia=()=>({matches:mobile});w.setTimeout=()=>0;w.setInterval=()=>0;
+ for(const name of fs.readdirSync(path.join(root,'assets/js')).filter(n=>/^0[1-8]-/.test(n)).sort())run(read('assets/js/'+name));
+ await run(`(async()=>{
+ const fixture={places:[{id:'test',name:'테스트',category:'cafe',subcategory:'카페',lat:10.77,lng:106.7,area:'7군',tags:['강추업소']}],reviews:[]};
+ db=()=>fixture;saveDb=()=>{};state.selected='test';state.sharedDbLoading=false;
+ assert.equal(placeRegionLabel(fixture.places[0]),'호치민 · 7군');
+ assert.equal(placeRegionLabel({...fixture.places[0],area:'호치민 · 7군'}),'호치민 · 7군');
+ assert.equal(restaurantTagsOf({tags:['강추업소','해산물']}).join(','),'해산물');
+ $('#pCat').innerHTML='<option value="cafe">카페</option>';
+ $('#pRecommended').checked=true;assert.equal(selectedPlaceTags().join(','),'강추업소');
+ $('#pRecommended').checked=false;assert.equal(selectedPlaceTags().length,0);
+ let sent;uploadSelectedReviewPhotos=async()=>[];supaRpc=async(name,args)=>{sent={name,args};return 'review-id'};
+ fetchSharedDb=async()=>fixture;renderAll=()=>{};selectPlace=()=>{};renderReviewPhotoPreview=()=>{};revokeReviewPreviewUrls=()=>{};
+ openReview();assert.equal($('#rRecommended').checked,false);
+ $('#rName').value='회원';$('#rText').value='추천합니다';$('#rRecommended').checked=true;state.rating=4;
+ await saveReview();
+ assert.equal(sent.name,'device_upsert_recommended_review');assert.equal(sent.args.p_recommended,true);
+ assert.equal(fixture.reviews.length,1);assert.equal(fixture.reviews[0].recommended,true);
+ assert.match(recommendationBadges(fixture.places[0]),/등록자 강추/);
+ assert.match(recommendationBadges(fixture.places[0]),/회원 강추 1명/);
+ openReview();assert.equal($('#rRecommended').checked,true);
+ $('#rRecommended').checked=false;await saveReview();
+ assert.equal(sent.args.p_recommended,false);assert.equal(fixture.reviews.length,1);
+ assert.doesNotMatch(recommendationBadges(fixture.places[0]),/회원 강추/);
+ assert.equal(remoteReviewToLocal({recommended:true}).recommended,true);
+ items=()=>[{...fixture.places[0],rating:4,count:1,reviews:fixture.reviews}];
+ renderList();
+ assert.equal(document.querySelector('.businessRegion').textContent,'호치민 · 7군');
+ assert.match(document.querySelector('#list').textContent,/등록자 강추/);
+ })()`);
+ dom.window.close();
+}
+console.log('PASS PC/mobile recommendation form, save, restore, revoke, badges and city/area labels');
+})().catch(e=>{console.error(e);process.exitCode=1});
