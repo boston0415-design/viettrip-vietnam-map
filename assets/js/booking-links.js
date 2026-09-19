@@ -1,16 +1,16 @@
-// Curated official booking destinations, checked 2026-09-18.
+// Curated official booking destinations; see each entry's verification date.
 // Never infer a reservation URL from a place name or accept arbitrary member URLs.
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
-    "id": "a229bbfc-41eb-4749-8da2-4cedecaff5e7",
-    "name": "Pizza 4P’s Le Thanh Ton",
-    "category": "restaurant",
-    "address": "Vincom Building, Lê Thánh Tôn, Sài Gòn, Hồ Chí Minh 700000 베트남",
-    "url": "https://booking.pizza4ps.com/",
-    "sourceUrl": "https://pizza4ps.com/vn/",
-    "note": "예약 화면에서 방문할 지점과 주소를 확인하세요.",
-    "verifiedOn": "2026-09-18"
+    "id": "d2a04f77-2218-4101-b9be-3fdf172a8958",
+    "name": "렉스 호텔",
+    "category": "stay",
+    "address": "141 Nguyễn Huệ, Sài Gòn, Hồ Chí Minh 700000 베트남",
+    "url": "https://www.rexhotelsaigon.com/",
+    "sourceUrl": "https://www.rexhotelsaigon.com/",
+    "note": "141 Nguyễn Huệ의 Rex Hotel Saigon 공식 사이트입니다. Book Now에서 숙박 날짜·인원·객실과 취소 조건을 확인하세요.",
+    "verifiedOn": "2026-09-19"
   },
   {
     "id": "890c1003-06f9-482b-b601-bfa9a8b6e2ff",
@@ -75,6 +75,86 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 ]);
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
+  {
+    "id": "4a33bd0b-9bd7-433e-879b-00348ff6e15c",
+    "name": "The View Rooftop Bar",
+    "category": "bar",
+    "address": "On the 9th floor of Duc Vuong Hotel, 195 Bùi Viện, Bến Thành, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://ducvuonghotel.com/en/restaurant-2/",
+    "note": "Duc Vuong Hotel · 195 Bùi Viện의 The View Rooftop Bar입니다. 객실이 아닌 루프톱 테이블 예약이라고 말하고 방문 날짜·시간·인원을 알려주세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/TheViewRooftopBarHCM/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84944795522",
+        "display": "+84 944 795 522"
+      }
+    ],
+    "verifiedOn": "2026-09-19"
+  },
+  {
+    "id": "00c49c81-8085-43b9-a7a1-284bc2550cd2",
+    "name": "에스에이치 가든",
+    "category": "restaurant",
+    "address": "26 Ngô Quang Huy, An Khánh, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://shgarden.com.vn/",
+    "note": "SH Garden Thảo Điền · 26 Ngô Quang Huy 지점의 예약 전화입니다. 페이스북은 공통 계정이므로 Đồng Khởi점이 아닌 Thảo Điền점이라고 지정하세요.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+84965596266",
+        "display": "+84 965 596 266"
+      },
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/shgardenhcm"
+      }
+    ],
+    "verifiedOn": "2026-09-19"
+  },
+  {
+    "id": "e6acd5e1-242d-4d45-9195-953dcb0b9306",
+    "name": "카라벨 사이공",
+    "category": "stay",
+    "address": "19-23 Công trường Lam Sơn, Sài Gòn, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.caravellehotel.com/contact-us/",
+    "note": "19–23 Lam Son Square의 Caravelle Saigon 호텔 공식 연락처입니다. 객실 예약 담당 연결을 요청하고 숙박 날짜·인원·객실 및 취소 조건을 확인하세요.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+842838234999",
+        "display": "+84 28 3823 4999"
+      },
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/caravellesaigon"
+      }
+    ],
+    "verifiedOn": "2026-09-19"
+  },
+  {
+    "id": "3b69b891-1c6e-465a-9379-b1dd61ce1c38",
+    "name": "파크 하얏트 사이공",
+    "category": "stay",
+    "address": "2 Công trường Lam Sơn, Bến Nghé, Sài Gòn, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.hyatt.com/park-hyatt/en-US/saiph-park-hyatt-saigon",
+    "note": "2 Lam Son Square의 Park Hyatt Saigon 대표전화입니다. 객실 예약 담당 연결을 요청하고 날짜·인원·객실 및 예약 조건을 확인하세요.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+842838241234",
+        "display": "+84 28 3824 1234"
+      }
+    ],
+    "verifiedOn": "2026-09-19"
+  },
   {
     "id": "4150f0a4-0dc5-4454-8b8e-e32c1c4fc092",
     "name": "골든로터스 힐링 월드",

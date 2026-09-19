@@ -19,6 +19,12 @@ async function check(mobile){
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
     assert.equal(new Set(VERIFIED_BUSINESS_CONTACTS.map(p=>p.id)).size,VERIFIED_BUSINESS_CONTACTS.length,'each verified branch has one contact entry');
+    for(const id of ['4a33bd0b-9bd7-433e-879b-00348ff6e15c','00c49c81-8085-43b9-a7a1-284bc2550cd2','e6acd5e1-242d-4d45-9195-953dcb0b9306','3b69b891-1c6e-465a-9379-b1dd61ce1c38']){
+      const entry=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id===id);
+      assert(entry,'newly verified inquiry route');
+      assert.equal(entry.verifiedOn,'2026-09-19');
+      assert(entry.channels.some(c=>c.kind==='phone'),'verified operator phone retained');
+    }
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);
