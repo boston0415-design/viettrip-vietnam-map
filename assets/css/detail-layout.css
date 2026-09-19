@@ -1,4 +1,11 @@
 /* Keep the selected place and the map visible together. */
+.detailResizeHandle{flex:0 0 26px;display:flex;align-items:center;justify-content:center;cursor:ns-resize;touch-action:none;user-select:none;margin:-5px 0 3px;border-radius:8px}
+.detailResizeHandle span{width:44px;height:5px;border-radius:999px;background:#b6c8c1}
+.detailResizeHandle:hover span,.detailResizeHandle:focus-visible span{background:#247f78}
+.detailResizeHandle:focus-visible{outline:2px solid #247f78;outline-offset:-2px}
+#detail.detailResized.show{height:var(--sheet-height)!important;max-height:var(--sheet-height)!important;top:auto!important;bottom:var(--sheet-bottom)!important}
+@media(min-width:901px){#detail.show{top:auto!important;bottom:24px!important}}
+#detail.detailDragging{transition:none!important;user-select:none}
 #detail.show{display:flex;flex-direction:column;overflow:hidden!important}
 #detail .detailHeader{flex:none}
 #detail .detailBody{min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}

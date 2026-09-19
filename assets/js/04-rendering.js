@@ -438,9 +438,11 @@ function syncDetailPanelLayout(){
   }
   $('.mapwrap')?.classList.add('detailOpen');
   if(typeof syncGooglePlacePhotos==='function')syncGooglePlacePhotos();
+  window.DetailSheetResize?.sync();
 }
 
 function setDetailExpanded(expanded){
+  window.DetailSheetResize?.reset();
   detailExpanded=Boolean(expanded);
   const body=$('#detailBody');
   if(!detailExpanded && body?.contains(document.activeElement))$('#detailExpandBtn')?.focus({preventScroll:true});
@@ -449,6 +451,7 @@ function setDetailExpanded(expanded){
 }
 
 function closeDetailPanel(){
+  window.DetailSheetResize?.reset();
   if(typeof clearGooglePlacePhotos==='function')clearGooglePlacePhotos();
   detailExpanded=false;
   detailPlaceId=null;
@@ -470,7 +473,7 @@ function renderDetail(){
     $('.mapwrap')?.classList.remove('detailOpen');
     return;
   }
-  if(detailPlaceId!==p.id){detailExpanded=false;detailPlaceId=p.id;d.scrollTop=0;}
+  if(detailPlaceId!==p.id){window.DetailSheetResize?.reset();detailExpanded=false;detailPlaceId=p.id;d.scrollTop=0;}
   const st=stats(p.id);
   const owner=isOwnerPlace(p);
   const canEdit=owner||state.isAdmin;
