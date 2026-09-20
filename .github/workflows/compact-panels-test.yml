@@ -1,0 +1,84 @@
+name: Compact map panels validation
+on:
+  push:
+    branches: ['fix/compact-map-panels-20260920']
+permissions:
+  contents: write
+concurrency:
+  group: compact-map-panels
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/compact-map-panels-20260920
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply verified compact-panel source patch
+        run: |
+          python3 - <<'PY'
+          import pathlib, gzip, base64, hashlib, subprocess
+          transfer=pathlib.Path('scripts/compact-panels.patch.gz.b64')
+          if transfer.exists():
+              patch=gzip.decompress(base64.b64decode(transfer.read_text().replace('FjobqrcUkC72iT0+Acg','FjobqrcUkC72iT0+0bx3w+Acg')))
+              assert hashlib.sha256(patch).hexdigest()=='546ba4b4db2e76212113853119f16ac4929a7c9b8a78f26b93141f45744c2fec'
+              subprocess.run(['git','apply','--check','-'],input=patch,check=True)
+              subprocess.run(['git','apply','-'],input=patch,check=True)
+              transfer.unlink()
+              workflow=pathlib.Path('.github/workflows/map-ux-regression.yml')
+              text=workflow.read_text()
+              old="'assets/css/map-ux.css',"
+              assert old in text
+              workflow.write_text(text.replace(old,old+"'assets/css/panel-comfort.css','assets/js/list-layout.js','assets/js/personal-places.js',"))
+          PY
+      - name: Syntax and build
+        run: |
+          find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
+          node scripts/build-pages.mjs
+      - name: Install test dependencies
+        run: |
+          npm install --no-save --package-lock=false jsdom@26.1.0 playwright@1.55.0
+          npx playwright install chromium --with-deps
+      - name: Full existing regression suite
+        run: |
+          mkdir -p test-results
+          failed=0
+          for test in tests/*.test.cjs; do
+            echo "===== $test =====" | tee -a test-results/existing-tests.log
+            if ! timeout 45 node "$test" >>test-results/existing-tests.log 2>&1; then
+              echo "FAILED: $test" | tee -a test-results/existing-tests.log
+              failed=1
+            fi
+          done
+          cat test-results/existing-tests.log
+          exit "$failed"
+      - name: Desktop and emulated mobile interaction tests
+        run: node scripts/test-map-ux.cjs
+      - name: Commit tested source only
+        if: success()
+        run: |
+          git add -A -- assets index.html scripts tests .github/workflows/map-ux-regression.yml
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Make nearby results dismissible, halve list panels and unify title/body scrolling'
+            git push origin HEAD:fix/compact-map-panels-20260920
+          fi
+          git rev-parse HEAD > test-results/tested-commit.txt
+      - name: Preserve diagnostic transfer on verification failure
+        if: always()
+        run: |
+          mkdir -p test-results
+          if [ -f scripts/compact-panels.patch.gz.b64 ]; then cp scripts/compact-panels.patch.gz.b64 test-results/received-transfer.txt; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compact-panels-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
