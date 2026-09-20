@@ -37,33 +37,41 @@ for(const kind of ['touch','pointer']){
  function drag(target,x,y){begin(target);const event=send(target,'move',x,y);end(target);return event}
  for(const p of panels){
    const prop=p===detail?'--sheet-height':'--menu-height',body=p.querySelector('.bodyFixture'),description=body.querySelector('.description');
-   assert.equal(drag(description,100,400).defaultPrevented,true,'body upward drag resizes '+p.id);
+   // Content is always native scrolling; only explicit handles/title resize.
+   assert.equal(drag(description,100,400).defaultPrevented,false,'body scroll never resizes '+p.id);
+   assert.equal(p.style.getPropertyValue(prop),'');
+   const header=p.querySelector(p===detail?'.detailResizeHandle':'.menuResizeGrip');
+   if(p.hasAttribute('data-no-sheet-resize')){
+     assert.equal(header,null,'fixed membership dialog has no resize grip');
+     continue;
+   }
+   assert(header,'explicit grip exists '+p.id);
+   assert(drag(header,100,400).defaultPrevented,'grip resizes '+p.id);
    assert.equal(p.style.getPropertyValue(prop),'400px');
-   assert.equal(drag(description,100,550).defaultPrevented,true);assert.equal(p.style.getPropertyValue(prop),'350px');
-   assert(!p.classList.contains('menuDragging'));assert(!p.classList.contains('detailDragging'));
-   // Every header, including nested title text, now uses the same touch path.
-   const header=p.querySelector(p===detail?'.detailHeader':'.menuResizeHeader');
-   if(header){const title=d.createElement('span');title.textContent='제목 터치';header.append(title);assert(drag(title,100,470).defaultPrevented,'nested header drag works '+p.id);assert.equal(p.style.getPropertyValue(prop),'380px');}
-   const previous=p.style.getPropertyValue(prop),scroll=body.querySelector('.scrollFixture');scroll.scrollTop=50;
-   assert.equal(drag(scroll.firstChild,100,580).defaultPrevented,false,'mid-content downward scrolling wins');assert.equal(p.style.getPropertyValue(prop),previous);
-   scroll.scrollTop=0;begin(scroll.firstChild);send(scroll.firstChild,'move',180,499);assert.equal(send(scroll.firstChild,'move',180,300).defaultPrevented,false,'horizontal intent stays scrolling');end(scroll.firstChild);
+   const previous=p.style.getPropertyValue(prop);
+   for(const control of body.querySelectorAll('input,textarea,button,a,img')){
+     assert.equal(drag(control,100,300).defaultPrevented,false,'controls do not resize');
+     assert.equal(p.style.getPropertyValue(prop),previous);
+   }
+   const scroll=body.querySelector('.scrollFixture');scroll.scrollTop=50;
+   assert.equal(drag(scroll.firstChild,100,580).defaultPrevented,false);
+   assert.equal(drag(description,180,499).defaultPrevented,false);
    assert.equal(p.style.getPropertyValue(prop),previous);
-   for(const control of body.querySelectorAll('input,textarea')){assert.equal(drag(control,100,300).defaultPrevented,false);assert.equal(p.style.getPropertyValue(prop),previous)}
-   // Taps still activate buttons; drags starting on buttons must not activate them.
+   await new Promise(r=>setTimeout(r,510));
    const button=body.querySelector('button');let clicks=0;button.addEventListener('click',()=>clicks++);
-   await new Promise(r=>setTimeout(r,510));begin(button);end(button);button.click();assert.equal(clicks,1);
-   drag(button,100,450);button.click();assert.equal(clicks,1,'drag does not activate the button');
-   drag(description,100,-5000);const maxHeight=p.style.getPropertyValue(prop);
-   assert.equal(drag(description,100,400).defaultPrevented,false,'at maximum height upward gesture scrolls content');assert.equal(p.style.getPropertyValue(prop),maxHeight);
-   begin(description);send(description,'move',100,550);send(description,'cancel');assert(!p.classList.contains('menuDragging'));assert(!p.classList.contains('detailDragging'));
-   // A re-rendered child inherits the panel-level gesture binding.
-   description.innerHTML='<span>새로 그린 본문</span>';assert.equal(drag(description.firstChild,100,550).defaultPrevented,true);
+   begin(button);end(button);button.click();assert.equal(clicks,1,'tap preserved');
+   description.innerHTML='<span>새로 그린 본문</span>';
+   assert.equal(drag(description.firstChild,100,550).defaultPrevented,false,'rerendered body scrolls');
+   assert.equal(p.style.getPropertyValue(prop),previous);
+   begin(header);send(header,'move',100,550);send(header,'cancel');
+   assert(!p.classList.contains('menuDragging'));assert(!p.classList.contains('detailDragging'));
  }
  if(kind==='touch'){
    const target=detail.querySelector('.description'),height=detail.style.getPropertyValue('--sheet-height');
    begin(target);send(target,'move',100,400,{touches:[touch(),touch(2,160,500)]});assert.equal(detail.style.getPropertyValue('--sheet-height'),height,'pinch is not a sheet resize');
  }
+ await new Promise(resolve=>setImmediate(resolve));
  dom.window.close();
 }
-console.log('PASS touch/mouse body gestures on every menu, direction arbitration, scrolled content, horizontal rails, controls/taps, click suppression, limits, cancellation, pinch and rerendered content (DOM simulation)');
+console.log('PASS touch/mouse grip-only resize, native body scrolling, fixed membership dialog, controls/photo taps, cancellation, pinch and rerendered content (DOM simulation)');
 })().catch(error=>{console.error(error);process.exitCode=1});

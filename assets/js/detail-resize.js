@@ -10,7 +10,7 @@
     const p=panel(),style=getComputedStyle(p);
     let fixed=(parseFloat(style.paddingTop)||0)+(parseFloat(style.paddingBottom)||0)+8;
     for(const child of p.children){
-      if(!child.matches('.detailResizeHandle,.detailHeader,.detailQuickActions,.externalMeta'))continue;
+      if(!child.matches('.detailResizeHandle,.detailHeader,.browseNavigation,.externalRegisterBar,.detailQuickActions,.externalMeta'))continue;
       const css=getComputedStyle(child);if(css.display==='none')continue;
       fixed+=child.getBoundingClientRect().height+(parseFloat(css.marginTop)||0)+(parseFloat(css.marginBottom)||0);
     }
@@ -78,7 +78,7 @@
   function sync(){
     const p=panel();if(!p?.classList.contains('show'))return;
     window.BodySheetDrag?.bind(p,{
-      includeHeaders:true,headerSelector:'.detailHeader,.detailResizeHandle',bounds,
+      handlesOnly:true,includeHeaders:true,headerSelector:'.detailHeader,.detailResizeHandle',bounds,
       prepare(){stopAnimation();flush();tracking=true},
       start(){bottom=null;dragBounds=bounds();dragging=true;p.classList.add('detailDragging')},
       size:queue,end:settle,
@@ -89,7 +89,7 @@
       handle=document.createElement('div');handle.className='detailResizeHandle';handle.tabIndex=0;
       handle.setAttribute('role','separator');handle.setAttribute('aria-orientation','horizontal');
       handle.setAttribute('aria-label','상세창 높이 조절');handle.setAttribute('aria-controls','detailBody');
-      handle.title='창 어디서든 위아래로 끌어서 크기 조절 · 방향키로도 조절';
+      handle.title='손잡이를 끌어 높이 조절 · 방향키로도 조절';
       handle.innerHTML='<span aria-hidden="true"></span>';p.prepend(handle);
       handle.addEventListener('keydown',event=>{
         const b=bounds(),current=height??p.getBoundingClientRect().height;

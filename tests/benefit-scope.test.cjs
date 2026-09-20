@@ -6,7 +6,7 @@ const root=path.join(__dirname,'../assets/js');
 const context=vm.createContext({console,assert,setTimeout:()=>0,clearTimeout(){},setInterval:()=>0,clearInterval(){},URL,Map,Set,Promise,requestAnimationFrame:fn=>fn()});
 context.window=context;
 context.document={addEventListener(){},querySelector(){return {value:'',classList:{toggle(){},add(){},remove(){}}}},querySelectorAll(){return []}};
-for(const file of fs.readdirSync(root).filter(f=>f.endsWith('.js')&&!f.startsWith('09-')).sort())vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context,{filename:file});
+for(const file of fs.readdirSync(root).filter(f=>/^(0[1-8]|10)-/.test(f)&&f.endsWith('.js')).sort())vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context,{filename:file});
 const run=code=>vm.runInContext(code,context);
 run(`
 let fixtures=[];

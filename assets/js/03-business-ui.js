@@ -635,7 +635,7 @@ function placeRegionLabel(place){
 function renderList(){
   const arr=items({forList:true});$('#count').textContent=state.sharedDbLoading && !arr.length?'업체 불러오는 중…':`${arr.length}개 업체`;
   $('#list').innerHTML=arr.length
-    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-place-reviews="${esc(p.id)}" aria-label="${esc(p.name)} 후기 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">후기 ${p.reviews.length}개 보기 ›</span></button><div class="businessRegion">${esc(placeRegionLabel(p))}</div><div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${recommendationBadges(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside">${Number.isFinite(p.distanceMeters)?`<span class="nearbyDistance">직선 ${window.NearbyBusinesses.distanceLabel(p.distanceMeters)}</span>`:''}<div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.address||'')}</span></div></article>`).join('')
+    ? arr.map(p=>`<article class="card ${tier(p.rating)} ${p.memberBenefit?'hasBenefit':''} ${state.selected===p.id?'active':''}" data-id="${p.id}"><div class="cardtop"><div><button type="button" class="name businessReviewName" data-open-business="${esc(p.id)}" aria-label="${esc(p.name)} 상세 보기">${esc(p.name||'업체명 미입력')}<span class="reviewNameHint">업소 상세 보기 ›</span></button><button type="button" class="cardReviewLink" data-place-reviews="${esc(p.id)}">회원 후기 ${p.reviews.length}개</button><div class="businessRegion">${esc(placeRegionLabel(p))}</div><div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${recommendationBadges(p)}${benefitInlineBadgeHtml(p)}</div></div><div class="cardAside">${Number.isFinite(p.distanceMeters)?`<span class="nearbyDistance">직선 ${window.NearbyBusinesses.distanceLabel(p.distanceMeters)}</span>`:''}<div class="rating">${p.rating==null?'—':p.rating.toFixed(1)}<small>${p.count} 평가</small></div>${personalPlaceActionsHtml(p)}</div></div><div class="meta"><span>${esc(p.address||'')}</span></div>${p.memberBenefit?`<div class="cardBenefit"><strong>${esc(benefitInfoLabel(p))}</strong><span>${esc(p.benefitText||'혜택 조건은 업소에 확인해 주세요.')}</span></div>`:''}</article>`).join('')
     : state.sharedDbLoading
       ? '<div class="empty"><b>공용 업체 불러오는 중…</b><br>잠시만 기다려주세요.</div>'
       : window.PersonalPlaces?.getView()==='hidden'
@@ -645,8 +645,8 @@ function renderList(){
           : state.nearby?'<div class="empty">이 반경과 조건에 맞는 등록 업소가 없습니다.<br>반경을 넓히거나 업종·평점·혜택 조건을 조정해 보세요.</div>':'<div class="empty">현재 조건에 맞는 업체가 없습니다.<br>업종·평점·혜택 조건을 조정해 보세요.</div>';
   document.querySelectorAll('[data-id]').forEach(el=>el.onclick=(event)=>{
     if(event.target.closest('[data-place-reviews],[data-personal-action]'))return;
-    closeMobileBusinessList();
-    selectPlace(el.dataset.id,true);
+    if(window.MapUX)window.MapUX.openBusiness(el.dataset.id,'list');
+    else{closeMobileBusinessList();selectPlace(el.dataset.id,true);}
   });
   document.querySelectorAll('[data-personal-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.personalView===(window.PersonalPlaces?.getView()||'all'))));
   const hiddenCount=(db().places||[]).filter(p=>window.PersonalPlaces?.isHidden(p.id)).length;
@@ -654,6 +654,7 @@ function renderList(){
   const hiddenHelp=document.getElementById('hiddenPlacesHelp');if(hiddenHelp)hiddenHelp.hidden=window.PersonalPlaces?.getView()!=='hidden';
   renderRatingFilterState();
   syncMobileListCount();
+  window.MapUX?.syncNearby();
 }
 function ratingStyle(r){
   if(r==null)return {color:'#94a3b8',scale:14,z:10,level:0};

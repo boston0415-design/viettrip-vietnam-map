@@ -3,13 +3,13 @@ const path=require('node:path');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
 const ctx=vm.createContext({console,assert,URL,Map,Set,Promise,setTimeout:()=>0,clearTimeout(){},setInterval:()=>0,clearInterval(){}});
-ctx.window=ctx;
+ctx.window=ctx;ctx.matchMedia=()=>({matches:false});
 ctx.document={addEventListener(){},querySelector(){return {value:'',textContent:'',classList:{toggle(){},add(){},remove(){}}}},querySelectorAll(){return []}};
-for(const file of fs.readdirSync(path.join(__dirname,'../assets/js')).filter(f=>f.endsWith('.js')&&!f.startsWith('09-')).sort())vm.runInContext(fs.readFileSync(path.join(__dirname,'../assets/js',file),'utf8'),ctx,{filename:file});
+for(const file of fs.readdirSync(path.join(__dirname,'../assets/js')).filter(f=>/^(0[1-8]|10)-/.test(f)&&f.endsWith('.js')).sort())vm.runInContext(fs.readFileSync(path.join(__dirname,'../assets/js',file),'utf8'),ctx,{filename:file});
 const run=s=>vm.runInContext(s,ctx);
 run(`
 class TestCircle{constructor(options){this.options=options}addListener(){}setMap(map){this.removed=map===null}}
-google={maps:{Circle:TestCircle}};
+google={maps:{Circle:TestCircle,Marker:TestCircle,Size:class{},Point:class{}}};
 state.map={};setDbStatus=()=>{};
 const originalQuery=document.querySelector;
 state.map={getDiv:()=>({clientWidth:1000,clientHeight:800,getBoundingClientRect:()=>({top:0,bottom:800,height:800})})};
@@ -86,7 +86,7 @@ console.log('PASS all',pointCases,'fixed POIs, every golf course, consistent sty
   fitUnifiedBounds=()=>{};fitCircleGeometry=()=>{};
   clearAreaLabels=()=>{};clearSelectedSystemIcons=()=>{};closeSystemInfo=()=>{};
   resetIndependentBusinessFilters=()=>{};renderAll=()=>{};
-  createSelectedPoiMarker=()=>{};createGolfMarker=()=>{};
+  createSelectedPoiMarker=()=>{};createGolfMarker=()=>{};makeAreaLabel=()=>({setMap(){}});
   items=()=>[];
   resolvePoiLocationPromise=async p=>validMapLocation(p)||currentCity().center;
   resolveGolfLocationPromise=async p=>validMapLocation(p)||currentCity().center;

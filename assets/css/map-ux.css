@@ -1,0 +1,57 @@
+/* 20260920: compact information, predictable panel navigation and native scrolling. */
+[hidden].nearbyResults,[hidden].statLabelShort{display:none!important}
+.cardReviewLink{display:block;border:0;background:none;color:#647a71;font-size:11px;padding:5px 0;min-height:28px;text-align:left}
+.cardBenefit{margin-top:10px;padding:10px 11px;border:1px solid #bad9cd;border-radius:10px;background:#eef7f2;font-size:12px;line-height:1.6;color:#225d46;overflow-wrap:anywhere;white-space:pre-line}
+.cardBenefit strong{display:block;font-size:11px;color:#326c54;margin-bottom:3px}
+.card.hasBenefit{border-color:#8bbcab}
+.benefitTabs button[data-benefit-filter=benefit]{color:#17634b;border-color:#95bfaf;background:#e8f5ed;font-weight:800;position:relative}
+.benefitTabs button[data-benefit-filter=benefit]::before{content:'🎁 ';font-size:12px}
+.benefitTabs button[data-benefit-filter=benefit].active{background:#17694f;color:#fff;border-color:#17694f;box-shadow:0 2px 7px #17694f20}
+.browseNavigation{display:flex;align-items:center;gap:5px;flex:none;margin:5px 0 8px;padding-bottom:6px;border-bottom:1px solid #e4ece8;touch-action:manipulation}
+.browseNavigation button{min-height:36px;min-width:40px;border:1px solid #d7e5dd;border-radius:8px;background:#f5f9f6;color:#265c48;font-size:12px;padding:5px 9px}
+.browseNavigation button:first-child{margin-right:auto}.browseNavigation span{font-size:11px;color:#708377;white-space:nowrap}.browseNavigation button:disabled{opacity:.4;cursor:default}
+#detail .detailBody,.menuResizable:not(.menuDragging){overscroll-behavior:contain}
+#memberDialog{resize:none;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y pinch-zoom}
+#memberDialog .travellerDialogHead{touch-action:pan-y pinch-zoom;cursor:default}
+.memberDeviceNotice{margin:13px 0 0;padding:12px 14px;background:#f0f6f3;border:1px solid #d8e7dd;border-radius:12px}
+.memberDeviceNotice p{font-size:12px;line-height:1.6;color:#486b58;margin:0 0 6px}.memberDeviceNotice button{min-height:36px;padding:5px 0;background:none;border:0;color:#216d4e;font-size:13px;font-weight:700}
+.rankAdmin{background:#e8f0f9;color:#295778;border-color:#b9cddd}
+#memberDialog.isAdministrator #memberGradeSection,#memberDialog.isAdministrator #memberProgress{display:none!important}
+.statLabelShort{display:none}.communityStats .statLabelFull{font-size:inherit;color:inherit}
+.nearbyResults{position:absolute;z-index:13;bottom:14px;left:14px;right:14px;max-width:800px;margin:0 auto;background:#fff;border:1px solid #d5e4db;border-radius:15px;box-shadow:0 4px 20px #244c3820;padding:10px 10px 9px;overflow:hidden}
+.nearbyResultsHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 3px 8px}.nearbyResultsHead>div{min-width:0}
+.nearbyResultsHead strong{display:block;font-size:13px;color:#254b3b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nearbyResultsHead small{display:block;font-size:10px;color:#718174;margin-top:4px}
+.nearbyResultsHead button{flex:none;min-height:36px;padding:5px 9px;border:1px solid #d5e4db;border-radius:8px;background:#f2f7f4;color:#2e644c;font-size:12px}
+.nearbyResultCards{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:thin;align-items:stretch;padding-bottom:4px}
+.nearbyResultCard{flex:0 0 244px;max-width:90%;border:1px solid #dfe8e2;border-radius:10px;background:#fff;text-align:left;padding:11px;color:#3c5147;scroll-snap-align:start;white-space:normal}
+.nearbyResultCard strong{display:block;font-size:14px;line-height:1.4;color:#203e2f;overflow-wrap:anywhere}.nearbyResultCard>span{display:block;margin-top:4px;font-size:11px;line-height:1.5;overflow-wrap:anywhere}.nearbyResultCard.hasBenefit{border-color:#93bdab;background:#f5faf7}
+.uxBenefit{display:block!important;color:#286748!important;line-height:1.55;font-size:11px;white-space:pre-line;overflow-wrap:anywhere}.uxBenefit b{font-weight:700}
+.nearbyEmpty{font-size:12px;color:#6b7f72;margin:8px;line-height:1.6}
+.mapwrap.listOpen .nearbyResults,.mapwrap.detailOpen .nearbyResults,.nearbyResults.nearbyFiltersOpen{display:none}
+#detail .externalRegisterBar{flex:none}.externalRegisterBar:empty{display:none}
+#detail .externalRegisterBar button{width:100%;min-height:42px;margin:0 0 8px;background:#247f78;border-color:#247f78;color:#fff;font-size:13px;border-radius:9px}
+.top .search button.searchRegisterManually{display:block;position:sticky;bottom:0;width:100%;min-height:44px;border:1px solid #c8dfd0;border-radius:9px;margin-top:7px;padding:9px;background:#edf7f1;color:#266047;text-align:center;font-size:12px;white-space:normal}
+.top .search button.searchRegisterManually[hidden]{display:none}
+.searchResultCopy .searchMemberMeta{font-size:11px;color:#527161}.searchResultCopy .uxBenefit{margin-top:2px;font-style:normal}
+.memberMapKey{max-width:calc(100% - 24px);font-size:11px;white-space:normal}
+.memberPhotoViewer{width:min(1000px,96vw)!important;height:min(850px,94dvh)!important;max-width:96vw!important;max-height:94dvh!important;padding:12px!important;border:0;border-radius:14px;background:#101712;color:#fff;overflow:hidden!important;box-sizing:border-box}
+.memberPhotoViewer[open]{display:flex!important;flex-direction:column;gap:8px}.memberPhotoViewer::backdrop{background:#000b}
+.photoViewerHead,.photoViewerFoot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}.photoViewerHead span{font-size:13px}.photoViewerHead button{width:44px;height:44px;border:1px solid #ffffff40;border-radius:10px;background:#ffffff12;color:#fff;font-size:27px}
+.photoViewerCanvas{flex:1;min-height:0;overflow:auto;position:relative;touch-action:pan-x pan-y pinch-zoom;display:flex;align-items:center;justify-content:center}
+.photoViewerCanvas img{display:block;max-width:100%;max-height:100%;object-fit:contain}.photoViewerCanvas p{position:absolute;left:12px;right:12px;bottom:12px;text-align:center;font-size:13px}
+.photoViewerFoot button{min-height:44px;padding:8px;border:1px solid #ffffff40;border-radius:8px;background:#ffffff12;color:white;font-size:12px}.photoViewerFoot button:disabled{opacity:.35}.photoViewerFoot span{font-size:11px;color:#c4d2c7}
+.memberPhotoViewer :focus-visible,.nearbyResults :focus-visible{outline:2px solid #5eab8c;outline-offset:2px}
+@media(max-width:900px){
+ .mapUtilityBar .communityStats{display:flex!important;flex-wrap:nowrap!important;align-items:center;justify-content:space-between;gap:0!important;min-width:0;width:100%;overflow-x:auto;padding:3px 6px!important;min-height:30px!important;white-space:nowrap;font-size:10px;scrollbar-width:none}
+ .mapUtilityBar .communityStats>span{flex:0 0 auto;display:flex!important;align-items:center;justify-content:center;min-height:24px!important;gap:3px;padding:0 4px!important;border:0!important;white-space:nowrap;font-size:10px}
+ .mapUtilityBar .communityStats b{font-size:12px}.mapUtilityBar .communityStats small{font-size:9px}.mapUtilityBar .communityStats .onlineDot{width:5px;height:5px;margin:0}
+ .communityStats .statLabelFull{position:absolute!important;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+ .communityStats .statLabelShort{display:inline!important;font-size:10px}
+ .mapUtilityBar .statsReviewButton{display:flex;align-items:center;gap:3px;padding:0;min-height:24px;font-size:10px;white-space:nowrap}
+ .nearbyResults{left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));padding:9px;max-height:45%;overflow-y:auto}
+ .nearbyResultCard{flex-basis:232px}.nearbyResultsHead strong{font-size:12px}
+ .memberPhotoViewer{width:100vw!important;max-width:100vw!important;height:100dvh!important;max-height:100dvh!important;border-radius:0;padding:12px 10px max(12px,env(safe-area-inset-bottom))!important}
+ .photoViewerFoot span{display:none}
+}
+@media(max-width:360px){.mapUtilityBar .communityStats small{display:none}.mapUtilityBar .communityStats>span{padding:0 3px!important}.mapUtilityBar .communityStats b{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.nearbyResultCards{scroll-behavior:auto}}

@@ -1,0 +1,95 @@
+name: Map UX regression
+on:
+  push:
+    branches: ['main']
+    paths: ['assets/**', 'index.html', 'scripts/**', 'tests/**', '.github/workflows/map-ux-regression.yml']
+permissions:
+  contents: read
+concurrency:
+  group: map-ux-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax and build
+        run: |
+          find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
+          node scripts/build-pages.mjs
+      - name: Install test dependencies
+        run: |
+          npm install --no-save --package-lock=false jsdom@26.1.0 playwright@1.55.0
+          npx playwright install chromium --with-deps
+      - name: Existing regression suite
+        run: |
+          mkdir -p test-results
+          failed=0
+          for test in tests/*.test.cjs; do
+            echo "===== $test =====" | tee -a test-results/existing-tests.log
+            if ! timeout 45 node "$test" >>test-results/existing-tests.log 2>&1; then
+              echo "FAILED: $test" | tee -a test-results/existing-tests.log
+              failed=1
+            fi
+          done
+          cat test-results/existing-tests.log
+          exit "$failed"
+      - name: Desktop and mobile browser regressions
+        if: success() || failure()
+        run: node scripts/test-map-ux.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: map-ux-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+  production-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify published HTML and changed assets with read-only requests
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs/promises';
+          import crypto from 'node:crypto';
+          const base='https://viettrip-vietnam-map.pages.dev/';
+          const paths=['index.html','assets/js/map-ux.js','assets/css/map-ux.css','assets/js/map-membership.js','assets/js/body-sheet-drag.js','assets/js/detail-resize.js','assets/js/menu-resize.js','assets/js/03-business-ui.js','assets/js/04-rendering.js','assets/js/09-init-events.js','assets/js/place-search.js','assets/js/panel-history.js'];
+          const digest=b=>crypto.createHash('sha256').update(b).digest('hex');
+          const expected=new Map(await Promise.all(paths.map(async p=>[p,digest(await fs.readFile(p))])));
+          let verified=false;
+          await fs.mkdir('test-results',{recursive:true});
+          for(let attempt=1;attempt<=16;attempt++){
+            try{
+              const rows=await Promise.all(paths.map(async p=>{
+                const url=new URL(p==='index.html'?'':p,base);
+                url.searchParams.set('deployment_check',process.env.GITHUB_SHA);
+                const response=await fetch(url,{headers:{'Cache-Control':'no-cache'},signal:AbortSignal.timeout(12000)});
+                if(!response.ok)throw new Error(p+': HTTP '+response.status);
+                const actual=digest(Buffer.from(await response.arrayBuffer()));
+                return {path:p,sha256:actual,match:actual===expected.get(p)};
+              }));
+              const result={checkedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA,base,attempt,rows};
+              await fs.writeFile('test-results/production-assets.json',JSON.stringify(result,null,2));
+              if(rows.every(row=>row.match)){console.log('PASS production exact asset verification',JSON.stringify(result));verified=true;break;}
+              console.log('Deployment not yet current',attempt,rows.filter(row=>!row.match).map(row=>row.path));
+            }catch(error){console.log('Deployment check',attempt,error.message);}
+            if(attempt<16)await new Promise(resolve=>setTimeout(resolve,15000));
+          }
+          if(!verified)throw new Error('Exact production version was not verified; do not report deployment as confirmed.');
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: production-assets
+          path: test-results/production-assets.json
+          if-no-files-found: ignore
+          retention-days: 7

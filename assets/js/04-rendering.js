@@ -43,6 +43,7 @@ function syncAdminButton(){
   if(!button)return;
   button.textContent=state.isAdmin||adminKey()?'관리자 로그아웃':'관리자';
   button.classList.toggle('adminOn',state.isAdmin);
+  window.MapMembership?.syncRole?.();
 }
 function clearAdminSession(){
   adminSessionRevision++;
@@ -454,6 +455,7 @@ function setDetailExpanded(expanded){
 }
 
 function closeDetailPanel(){
+  window.MapUX?.onDetailClosed();
   window.PlaceSearch?.clearExternal();
   const sharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
   window.DetailSheetResize?.reset();
@@ -532,15 +534,17 @@ function renderDetail(){
 
   syncDetailPanelLayout();
   $('#detailExpandBtn').onclick=()=>setDetailExpanded(!detailExpanded);
-  if($('#detailCloseBtn')) $('#detailCloseBtn').onclick=()=>closeDetailPanel();
+  if($('#detailCloseBtn')) $('#detailCloseBtn').onclick=()=>window.MapUX?window.MapUX.closeDetail():closeDetailPanel();
+  window.MapUX?.decorateDetail();
   $('#writeReview').onclick=()=>openReview();
   if($('#editPlaceBtn')) $('#editPlaceBtn').onclick=()=>openEditPlace(p,state.isAdmin?'admin':'owner');
   if($('#requestDeleteBtn')) $('#requestDeleteBtn').onclick=()=>requestOwnerDelete(p.id);
   if($('#adminDeleteBtn')) $('#adminDeleteBtn').onclick=()=>adminDeletePlace(p.id);
   if($('#clearDeleteRequestBtn')) $('#clearDeleteRequestBtn').onclick=()=>adminClearDeleteRequest(p.id);
 }
-function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync()}
+function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync();window.MapUX?.syncNearby()}
 async function selectPlace(id,pan=true,showInfo=false){
+  window.MapUX?.onSelection(id);
   window.PlaceSearch?.clearExternal();
   const previousSharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
   closeSystemInfo();

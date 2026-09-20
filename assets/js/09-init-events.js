@@ -500,7 +500,7 @@ document.addEventListener('keydown',e=>{
   if(document.querySelector('dialog[open]'))return;
   if($('#detail')?.classList.contains('show')){
     if(isMobileMapLayout() && detailExpanded)setDetailExpanded(false);
-    else closeDetailPanel();
+    else if(window.MapUX)window.MapUX.closeDetail();else closeDetailPanel();
     e.preventDefault();
     return;
   }
