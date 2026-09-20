@@ -12,3 +12,6 @@
 #areaLegend.menuSized.mobileCollapsed{height:auto!important;max-height:52px!important}
 .benefitTabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 .benefitTabs button{min-width:0;white-space:nowrap}
+.menuResizeHeader *{-webkit-user-select:none;user-select:none}
+.menuDragging,.menuSettling{transition:none!important;will-change:height}
+.menuDragging *{cursor:ns-resize!important;-webkit-user-select:none;user-select:none}

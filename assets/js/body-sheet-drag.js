@@ -1,4 +1,5 @@
-// Body gestures resize at the top of the content; native scrolling wins elsewhere.
+// Upward drags expand from any content position. At full height, scroll natively;
+// downward drags scroll existing content to the top before collapsing.
 // Touch Events let us make that choice before preventing a native vertical scroll.
 (() => {
   const bindings=new WeakMap();
@@ -42,7 +43,7 @@
         if(Math.max(Math.abs(dx),Math.abs(dy))<6)return;
         const bounds=options.bounds();
         // Lock one gesture to scrolling or resizing. No sudden takeover midway.
-        if(Math.abs(dx)>=Math.abs(dy) || (!g.force && (!g.top || (dy>0 && g.h>=bounds.max-2) || (dy<0 && g.h<=bounds.min+2))) || !event.cancelable){g.scrolling=true;return}
+        if(Math.abs(dx)>=Math.abs(dy) || (!g.force && ((dy>0 && g.h>=bounds.max-2) || (dy<0 && (!g.top || g.h<=bounds.min+2)))) || !event.cancelable){g.scrolling=true;return}
         g.resizing=true;
         options.start?.();
         if(g.kind==='pointer')try{panel.setPointerCapture(g.id)}catch{}

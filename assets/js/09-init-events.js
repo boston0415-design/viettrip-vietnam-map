@@ -149,6 +149,7 @@ function loadGoogle({force=false}={}){
 }
 
 async function handleGooglePoiClick(event){
+  if(window.PlaceSearch && event?.placeId){event.stop?.();return window.PlaceSearch.openGoogle({placeId:event.placeId,name:'선택한 장소',position:event.latLng});}
   if(!event?.placeId || !event?.latLng)return false;
 
   // Google 기본 POI 카드가 뜨기 전에 즉시 차단.
@@ -258,10 +259,11 @@ function initMap(){
   const mapEl=$('#map');
   if(!mapEl)throw new Error('지도 영역을 찾지 못했습니다.');
   state.map=new google.maps.Map(mapEl,{center:CITY_DATA.hcmc.center,zoom:CITY_DATA.hcmc.zoom,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,zoomControl:false,gestureHandling:'greedy',scrollwheel:true,isFractionalZoomEnabled:true});
-  // Pointer previews never survive a map gesture; touch cards dismiss on pan/zoom.
+  // Zoom changes also fire during search camera animations. Only a deliberate
+  // map drag dismisses transient cards; the selected detail sheet stays open.
   for(const event of ['dragstart','zoom_changed'])state.map.addListener(event,()=>{
     hideHover();
-    if(!supportsMapHover())closeSystemInfo();
+    if(event==='dragstart' && !supportsMapHover())closeSystemInfo();
     if(event==='zoom_changed')refreshReferenceRangeVisibility();
   });
   initAddressAutocomplete();
@@ -457,7 +459,8 @@ $('#savePlace').onclick=async e=>{
 $('#saveReview').onclick=saveReview;
 $('#pAddress').addEventListener('input',invalidateAddressLocation);
 $('#searchBtn').onclick=searchMap;
-$('#searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchMap();});
+$('#searchInput').addEventListener('keydown',e=>{if(e.key==='Enter' && !e.isComposing && !e.defaultPrevented && !window.PlaceSearch)searchMap();});
+window.PlaceSearch?.init();
 $('#sort').onchange=e=>{state.sort=e.target.value;renderAll()};
 $('#locBtn').onclick=locateUser;
 
@@ -482,7 +485,7 @@ window.addEventListener('resize',()=>{
   }
   refreshMapAfterMobileLayout();
   syncDetailPanelLayout();
-  if(state.selected)positionSelectedPlaceInView();
+  if(state.selected || window.PlaceSearch?.currentPlace())positionSelectedPlaceInView();
 });
 
 document.addEventListener('keydown',e=>{

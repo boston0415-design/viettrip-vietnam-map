@@ -59,7 +59,8 @@ for(const isDesktop of [true,false]){
   assert.equal(selection(),before);assert.equal(state.markers[0],untouched);
  }
 }
-assert.equal(hoverCloses,20);assert.equal(infoCloses,10,'only mobile closes click cards during zoom, as before');
+assert.equal(hoverCloses,20);assert.equal(infoCloses,0,'automatic search zoom must never close a selected card');
+desktop=false;listeners.dragstart();assert.equal(infoCloses,1,'deliberate mobile pan still dismisses a transient map card');
 assert.equal(business.options.fillOpacity,.065,'zooming back out restores original opacity exactly');
 assert.equal(business.options.strokeOpacity,.68);
 assert.equal(state.selectionOverlays.length,3);

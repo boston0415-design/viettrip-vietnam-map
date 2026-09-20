@@ -411,8 +411,8 @@ let detailPositionFrame=0;
 function positionSelectedPlaceInView(){
   const version=++detailPositionFrame;
   requestAnimationFrame(()=>{
-    if(version!==detailPositionFrame || !state.map || !state.selected)return;
-    const place=db().places.find(p=>p.id===state.selected);
+    if(version!==detailPositionFrame || !state.map)return;
+    const place=db().places.find(p=>p.id===state.selected)||window.PlaceSearch?.currentPlace();
     const panel=$('#detail'),mapElement=$('.mapwrap');
     if(!place || !panel?.classList.contains('show') || !mapElement)return;
     const mapRect=mapElement.getBoundingClientRect(),panelRect=panel.getBoundingClientRect();
@@ -454,6 +454,7 @@ function setDetailExpanded(expanded){
 }
 
 function closeDetailPanel(){
+  window.PlaceSearch?.clearExternal();
   const sharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
   window.DetailSheetResize?.reset();
   if(typeof clearGooglePlacePhotos==='function')clearGooglePlacePhotos();
@@ -471,6 +472,7 @@ function closeDetailPanel(){
 }
 
 function renderDetail(){
+  if(!state.selected && window.PlaceSearch?.renderDetail())return;
   const p=db().places.find(x=>x.id===state.selected);const d=$('#detail');
   if(p && detailPlaceId===p.id && window.DetailSheetResize?.isInteracting()){
     window.DetailSheetResize.deferRefresh();return;
@@ -539,6 +541,7 @@ function renderDetail(){
 }
 function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync()}
 async function selectPlace(id,pan=true,showInfo=false){
+  window.PlaceSearch?.clearExternal();
   const previousSharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
   closeSystemInfo();
   closeAreaPanel();

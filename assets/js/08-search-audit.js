@@ -476,6 +476,8 @@ function fitAllRegisteredPlacesView(){
 }
 
 function switchCity(key){
+  clearSearchMarker();
+  window.PlaceSearch?.dismiss();
   if(key!=='all' && !CITY_DATA[key])return;
   window.NearbyBusinesses?.clear({refresh:false});
   if(typeof resetAdministrativeRegions==='function')resetAdministrativeRegions();
@@ -726,7 +728,7 @@ function closeMobileBusinessList(){
 function openMobileBusinessList(){
   if(!isMobileMapLayout())return;
   collapseMobileLegend();
-  if(state.selected)closeDetailPanel();
+  if($('#detail')?.classList.contains('show'))closeDetailPanel();
   closeAreaPanel();
   $('#businessSide')?.classList.add('mobileOpen');
   $('.mapwrap')?.classList.add('listOpen');

@@ -43,6 +43,8 @@ for(const mobile of [true,false]){
  assert(!p.classList.contains('detailDragging'));assert(!p.classList.contains('detailSettling'));
  // Body scrolling stays native when content is not at the top.
  const previous=height();event(body,'down',300);assert.equal(event(body,'move',450).defaultPrevented,false);event(body,'up');assert.equal(height(),previous);
+ // An upward body swipe expands even when its content was previously scrolled.
+ event(body,'down',500);assert.equal(event(body,'move',400).defaultPrevented,true);advance(16);assert(height()>previous);event(body,'cancel',400);
  p.querySelector('#detailBody').scrollTop=0;
  // Reset/close cancels all frames, including in-flight inertia.
  event(body,'down',500);event(body,'move',250);event(body,'up',250);w.DetailSheetResize.reset();advance(500);

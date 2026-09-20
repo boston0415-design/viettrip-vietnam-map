@@ -358,6 +358,7 @@ function items({ratingFilter=state.ratingFilter,forList=false}={}){
 }
 
 function clearSearchMarker(){
+  window.PlaceSearch?.clearExternal();
   if(state.searchMarker){
     state.searchMarker.setMap(null);
     state.searchMarker=null;
@@ -369,6 +370,8 @@ function clearSearchMarker(){
 function findRegisteredMatchForSearch(candidate){
   if(!candidate)return null;
 
+  const confirmed=(db().places||[]).find(p=>candidate.placeId && (p.googlePlaceId===candidate.placeId || (typeof googlePhotoSavedId==='function' && googlePhotoSavedId(googlePhotoKey(p))===candidate.placeId)));
+  if(confirmed)return confirmed;
   const nameKey=normalizePlaceName(candidate.name||'');
   const point={lat:Number(candidate.lat),lng:Number(candidate.lng)};
 
@@ -434,7 +437,8 @@ function openRegisteredSearchResult(placeId){
 window.openRegisteredSearchResult=openRegisteredSearchResult;
 
 function searchMap(){
-  if(window.NearbyBusinesses?.active()){window.NearbyBusinesses.search($('#searchInput').value);return}
+  if(window.NearbyBusinesses?.active()){window.PlaceSearch?.dismiss();window.NearbyBusinesses.search($('#searchInput').value);return}
+  if(window.PlaceSearch)return window.PlaceSearch.submit();
   cancelPendingMapWork();
   const searchActionToken=state.mapActionToken;
   clearSelectionRanges();

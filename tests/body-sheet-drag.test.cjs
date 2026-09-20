@@ -41,6 +41,9 @@ for(const kind of ['touch','pointer']){
    assert.equal(p.style.getPropertyValue(prop),'400px');
    assert.equal(drag(description,100,550).defaultPrevented,true);assert.equal(p.style.getPropertyValue(prop),'350px');
    assert(!p.classList.contains('menuDragging'));assert(!p.classList.contains('detailDragging'));
+   // Every header, including nested title text, now uses the same touch path.
+   const header=p.querySelector(p===detail?'.detailHeader':'.menuResizeHeader');
+   if(header){const title=d.createElement('span');title.textContent='제목 터치';header.append(title);assert(drag(title,100,470).defaultPrevented,'nested header drag works '+p.id);assert.equal(p.style.getPropertyValue(prop),'380px');}
    const previous=p.style.getPropertyValue(prop),scroll=body.querySelector('.scrollFixture');scroll.scrollTop=50;
    assert.equal(drag(scroll.firstChild,100,580).defaultPrevented,false,'mid-content downward scrolling wins');assert.equal(p.style.getPropertyValue(prop),previous);
    scroll.scrollTop=0;begin(scroll.firstChild);send(scroll.firstChild,'move',180,499);assert.equal(send(scroll.firstChild,'move',180,300).defaultPrevented,false,'horizontal intent stays scrolling');end(scroll.firstChild);
