@@ -18,24 +18,24 @@
 <link rel="stylesheet" href="./assets/css/base.css?v=20260919-recommend1">
 <link rel="stylesheet" href="./assets/css/responsive.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/community-stats.css?v=20260918-online1">
-<link rel="stylesheet" href="./assets/css/list-layout.css?v=20260919-card-recommend2">
+<link rel="stylesheet" href="./assets/css/list-layout.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/traveller-tools.css?v=20260918-all-cities1">
 <link rel="stylesheet" href="./assets/css/interface-polish.css?v=20260918-feedback-links2">
 <link rel="stylesheet" href="./assets/css/mobile-access.css?v=poi-directions1">
 <link rel="stylesheet" href="./assets/css/header-layout.css?v=20260918-vm1">
 <link rel="stylesheet" href="./assets/css/map-filters.css?v=mobile-filter-rails1">
 <link rel="stylesheet" href="./assets/css/detail-layout.css?v=20260920-search1">
-<link rel="stylesheet" href="./assets/css/menu-resize.css?v=20260920-search1">
+<link rel="stylesheet" href="./assets/css/menu-resize.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/place-photos.css?v=20260918-photos1">
 <link rel="stylesheet" href="./assets/css/booking-links.css?v=20260918-inquiries1">
 <link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-vm1">
 <link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20260918-vm1">
-<link rel="stylesheet" href="./assets/css/nearby-businesses.css?v=20260918-location2">
+<link rel="stylesheet" href="./assets/css/nearby-businesses.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260919-share1">
 <link rel="stylesheet" href="./assets/css/place-search.css?v=20260920-search1">
 <link rel="stylesheet" href="./assets/css/map-membership.css?v=20260920-rank1">
-<link rel="stylesheet" href="./assets/css/map-ux.css?v=20260920-ux3">
-<link rel="stylesheet" href="./assets/css/panel-comfort.css?v=20260920-compact1">
+<link rel="stylesheet" href="./assets/css/map-ux.css?v=20260920-interaction3">
+<link rel="stylesheet" href="./assets/css/panel-comfort.css?v=20260920-interaction3">
 </head>
 <body>
 <div class="app">
@@ -72,10 +72,11 @@
     <aside class="side" id="businessSide">
       <div class="mobileSideHead">
         <strong>업체 목록</strong>
-        <button id="mobileFilterToggle" type="button" aria-expanded="false" aria-controls="listCity cats subs">필터</button>
+        <button id="mobileFilterToggle" type="button" aria-expanded="false" aria-controls="listOptions">옵션</button>
         <button id="mobileListClose" type="button" aria-label="업체 목록 닫기">×</button>
       </div>
-      <div class="filters">
+      <div class="filters" id="listOptions">
+        <button type="button" id="listSharedFilters" class="btn">지역·업종·평점·혜택 필터 열기</button>
         <div class="browseHeading">업체 둘러보기 <span>이름을 누르면 후기를 볼 수 있어요</span></div>
         <div class="listRegionFilter"><label for="listCity">지역</label><select id="listCity" aria-label="업체 목록 지역 선택"></select></div>
         <div class="benefitTabs" role="group" aria-label="회원 혜택 구분">
@@ -126,7 +127,7 @@
             <p id="nearbyPickHint" role="status"></p><div><button id="nearbyPickConfirm" type="button" disabled>이 위치 사용</button><button id="nearbyPickCancel" type="button">취소</button></div>
           </div>
           <p id="nearbyAccuracy" class="nearbyAccuracy" hidden></p>
-          <p id="nearbyMessage" role="status" hidden></p>
+          <p id="nearbyMessage" role="status" hidden></p><button id="nearbyApproximate" type="button" hidden></button>
         </section>
         <button id="areaLegendTitle" class="areaTitle" type="button" aria-expanded="false" aria-controls="areaLegendBody" aria-label="지도 필터 열기">
           <svg class="filterGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="white"/><circle cx="15" cy="17" r="2" fill="white"/></svg>
@@ -163,6 +164,7 @@
           <span class="quickLabel">혜택업소</span>
           <div class="filterChoices" role="group" aria-label="혜택업소">
           <button type="button" class="benefitFilterBtn" data-benefit-filter="benefit">혜택업소</button>
+          <button type="button" class="benefitFilterBtn" data-benefit-filter="recommended">👍 강추업소</button>
           </div>
         </div>
         </div>
@@ -261,9 +263,11 @@
   </div>
 </div>
 
-<div id="reviewModal" class="modalback">
-  <div class="modal">
-    <h3>별점·후기 남기기</h3>
+<div id="reviewModal" class="modalback" role="dialog" aria-modal="true" aria-labelledby="reviewEditorTitle">
+  <div class="modal" data-no-sheet-resize>
+    <div class="reviewEditorHeader"><h3 id="reviewEditorTitle">별점·후기 남기기</h3><button type="button" id="reviewEditorClose" data-close="reviewModal" aria-label="별점·후기 수정 창 닫기">×</button></div>
+    <p id="reviewPlaceName" class="reviewPlaceName"></p>
+    <p id="reviewSaveStatus" role="status" aria-live="polite"></p>
     <p style="font-size:12px;color:#64748b">별점만 또는 후기만 등록할 수 있습니다. 같은 기기·브라우저에서는 업소별로 각각 1개만 저장되며, 다시 작성하면 기존 내용이 수정됩니다.</p>
     <div class="field"><label for="rName">닉네임 · 글 후기 작성 시 필수</label><input id="rName" name="nickname" autocomplete="nickname" maxlength="30" placeholder="카페에서 사용하는 닉네임을 적어주세요" aria-describedby="rNameHelp"><div id="rNameHelp" class="inlineHelp">이 브라우저에 닉네임을 기억합니다. 후기에 공개되며, 별점만 남길 때는 생략할 수 있습니다.</div></div>
     <div class="field"><label>별점 · 선택</label><div id="stars" class="stars"></div><div style="font-size:11px;color:#64748b;margin-top:6px">입력하지 않은 항목의 기존 별점·후기는 그대로 유지됩니다.</div></div>
@@ -383,18 +387,18 @@
 <script src="./assets/js/01-data-storage.js?v=20260918-public-office1"></script>
 <script src="./assets/js/hospital-directory.js?v=20260918-hospital-registration1"></script>
 <script src="./assets/js/pharmacy-directory.js?v=20260918-icons-pharmacy1"></script>
-<script src="./assets/js/02-services-media.js?v=20260920-rank1"></script>
+<script src="./assets/js/02-services-media.js?v=20260920-interaction3"></script>
 <script src="./assets/js/personal-places.js?v=20260920-compact1"></script>
 <script src="./assets/js/03-business-ui.js?v=20260920-compact1"></script>
 <script src="./assets/js/booking-links.js?v=20260919-routes1"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260919-share1"></script>
-<script src="./assets/js/04-rendering.js?v=20260920-ux3"></script>
-<script src="./assets/js/body-sheet-drag.js?v=20260920-ux3"></script>
-<script src="./assets/js/detail-resize.js?v=20260920-compact1"></script>
-<script src="./assets/js/menu-resize.js?v=20260920-compact1"></script>
+<script src="./assets/js/04-rendering.js?v=20260920-interaction3"></script>
+<script src="./assets/js/body-sheet-drag.js?v=20260920-interaction3"></script>
+<script src="./assets/js/detail-resize.js?v=20260920-interaction3"></script>
+<script src="./assets/js/menu-resize.js?v=20260920-interaction3"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
-<script src="./assets/js/06-save-motion.js?v=20260920-rank1"></script>
+<script src="./assets/js/06-save-motion.js?v=20260920-interaction3"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260920-search1"></script>
 <script src="./assets/js/place-search.js?v=20260920-ux3"></script>
@@ -403,7 +407,7 @@
 <script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>
 <script defer src="./assets/vendor/realtime-2.116.0.min.js"></script>
 <script defer src="./assets/js/online-presence.js?v=20260918-online1"></script>
-<script src="./assets/js/list-layout.js?v=20260920-compact1"></script>
+<script src="./assets/js/list-layout.js?v=20260920-interaction3"></script>
 <script src="./assets/js/community-reviews.js?v=20260920-rank1"></script>
 <script src="./assets/js/map-membership.js?v=20260920-ux3"></script>
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
@@ -411,8 +415,8 @@
 <script src="./assets/js/interface-polish.js?v=polish1"></script>
 <script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260919-share1"></script>
-<script src="./assets/js/nearby-businesses.js?v=20260918-location2"></script>
-<script src="./assets/js/map-ux.js?v=20260920-compact1"></script>
+<script src="./assets/js/nearby-businesses.js?v=20260920-interaction3"></script>
+<script src="./assets/js/map-ux.js?v=20260920-interaction3"></script>
 <script src="./assets/js/panel-history.js?v=20260920-ux3"></script>
 </body>
 </html>

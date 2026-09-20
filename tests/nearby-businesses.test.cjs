@@ -8,7 +8,7 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
   w.localStorage.setItem('viettrip_nearby_stay_v1',JSON.stringify({name:'이전에 지정한 숙소',address:'기억한 주소',lat:10.77,lng:106.7,expiresAt:Date.now()+(mobile?-1000:86400000)}));
   let timerId=0;const timers=new Map();
   w.setTimeout=(fn,delay)=>{timers.set(++timerId,{fn,delay});return timerId};w.clearTimeout=id=>timers.delete(id);
-  w.firePositionDeadline=()=>{const found=[...timers].find(([,t])=>t.delay===16000);assert(found,'position deadline exists');timers.delete(found[0]);found[1].fn()};w.setInterval=()=>0;w.requestAnimationFrame=()=>0;
+  w.firePositionDeadline=()=>{const found=[...timers].find(([,t])=>t.delay===10000);assert(found,'position deadline exists');timers.delete(found[0]);found[1].fn()};w.setInterval=()=>0;w.requestAnimationFrame=()=>0;
   w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','')};w.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open');this.dispatchEvent(new w.Event('close'))};
   try{
    for(const name of fs.readdirSync(path.join(root,'assets/js')).filter(n=>/^0[1-8]-/.test(n)).sort())run(read('assets/js/'+name));
@@ -18,7 +18,7 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
     class Shape{constructor(o){this.options=o;this.map=o.map;this.events={}}setMap(m){this.map=m}getMap(){return this.map}setOptions(o){Object.assign(this.options,o)}addListener(e,f){this.events[e]=f}}
     let searches=[],geoRequests=[],lastBounds=null;const realSmoothFitBounds=smoothFitBounds;
     google={maps:{Circle:Shape,Marker:Shape,LatLngBounds:Bounds,Size:class{},Point:class{},places:{PlacesService:class{findPlaceFromQuery(request,callback){searches.push({request,callback})}}}}};
-    navigator.geolocation={getCurrentPosition:(success,error)=>geoRequests.push({success,error})};
+    navigator.geolocation={getCurrentPosition:(success,error,options)=>geoRequests.push({success,error,options})};
     state.map={};bindMapFeatureInfo=()=>{};initAddressAutocomplete=()=>{};smoothFitBounds=bounds=>{lastBounds=bounds};refreshMapAfterMobileLayout=()=>{};
     const origin={lat:10.77,lng:106.7};
     const fixture={places:[
@@ -71,7 +71,7 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
     fix(watch,21,105,10,Date.now()-30000);assert.equal(state.nearby.lat,origin.lat,'cached precise-looking result is ignored');
     fix(watch,origin.lat,origin.lng,20);assert.equal(state.nearby.kind,'current');assert.equal(state.nearby.accuracy,20);assert(stoppedWatches.includes(0),'watch ID zero is cleaned up');assert($('#nearbyAccuracy').textContent.includes('20m'));assert(!$('#nearbyCurrent').disabled);
     $('#nearbyCurrent').click();watch=watches.at(-1);fix(watch,21,105,2000);firePositionDeadline();assert.equal(state.nearby.lat,origin.lat);assert($('#nearbyMessage').textContent.includes('적용하지 않았습니다'));assert(stoppedWatches.includes(1));
-    $('#nearbyCurrent').click();watch=watches.at(-1);fix(watch,10.772,106.7,150);fix(watch,10.773,106.7,280);assert.equal(state.nearby.lat,origin.lat);firePositionDeadline();assert.equal(state.nearby.lat,10.772);assert.equal(state.nearby.accuracy,150,'best eligible sample is chosen at deadline');
+    $('#nearbyCurrent').click();watch=watches.at(-1);fix(watch,10.772,106.7,150);fix(watch,10.773,106.7,280);assert.equal(state.nearby.lat,10.772);assert.equal(state.nearby.accuracy,150,'usable fix applies immediately; later worse callbacks are ignored');
     $('#nearbyCurrent').click();watch=watches.at(-1);fix(watch,21,105,NaN);fix(watch,21,105,-1);fix(watch,21,105,null);firePositionDeadline();assert.equal(state.nearby.lat,10.772);assert(!$('#nearbyCurrent').disabled);
     $('#nearbyCurrent').click();watch=watches.at(-1);watch.error({code:1});assert($('#nearbyMessage').textContent.includes('권한'));assert(stoppedWatches.includes(4));
     // Manual correction needs an explicit map point and confirmation, cancels GPS, and is private.
@@ -99,6 +99,16 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
     nearby.apply({...origin,name:'숙소'});switchCity('hanoi');assert(!nearby.active());assert.equal(state.city,'hanoi');assert.equal($('#nearbySelection').hidden,true);
     $('#nearbyStay').click();$('#nearbyForgetStay').click();assert.equal(localStorage.getItem('viettrip_nearby_stay_v1'),null);
     $('#nearbyStayClose').click();
+    // Fast coarse and precise requests run together, with bounded cache age and explicit consent for coarse fixes.
+    $('#nearbyCurrent').click();const fast=geoRequests.at(-1);
+    assert.equal(fast.options.enableHighAccuracy,false);assert.equal(fast.options.maximumAge,15000);assert.equal(fast.options.timeout,4500);
+    fast.success({timestamp:Date.now()-14000,coords:{latitude:10.776,longitude:106.7,accuracy:180}});
+    assert.equal(state.nearby.lat,10.776,'recent usable fix applies without waiting for deadline');assert(!$('#nearbyCurrent').disabled);
+    $('#nearbyCurrent').click();watch=watches.at(-1);fix(watch,10.778,106.7,2000);
+    assert.equal(state.nearby.lat,10.776,'coarse location cannot silently replace origin');assert(!$('#nearbyApproximate').hidden);
+    $('#nearbyApproximate').click();assert.equal(state.nearby.lat,10.778);assert.equal(state.nearby.accuracy,2000);assert.equal(state.nearby.name,'기기 추정 위치');assert($('#nearbyApproximate').hidden);
+    fix(watch,21,105,10);assert.equal(state.nearby.lat,10.778,'cancelled watcher cannot overwrite explicit coarse choice');
+    $('#nearbyCurrent').click();const staleFast=geoRequests.at(-1);staleFast.success({timestamp:Date.now()-30000,coords:{latitude:21,longitude:105,accuracy:5}});assert.equal(state.nearby.lat,10.778,'expired cache ignored');staleFast.error({code:1});assert(!$('#nearbyCurrent').disabled);
     // Fit the entire search circle above the taller controls in four viewport shapes.
     Bounds.prototype.getNorthEast=function(){return {lat:()=>Math.max(...this.points.map(p=>p.lat)),lng:()=>Math.max(...this.points.map(p=>p.lng))}};
     Bounds.prototype.getSouthWest=function(){return {lat:()=>Math.min(...this.points.map(p=>p.lat)),lng:()=>Math.min(...this.points.map(p=>p.lng))}};

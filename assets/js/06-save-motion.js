@@ -290,10 +290,14 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
   setTimeout(()=>selectPlace(newId,false,true),80);
 }
 function openReview(){
+  if(state.reviewSaveInProgress)return;
+  state.reviewEditPlaceId=state.selected;
   const mine=db().reviews.find(r=>r.placeId===state.selected && isOwnReview(r));
   const place=db().places.find(p=>p.id===state.selected);
   const owner=isOwnerPlace(place);
   const editing=!!mine||owner;
+  if($('#reviewPlaceName'))$('#reviewPlaceName').textContent=place?.name||'';
+  if($('#reviewSaveStatus'))$('#reviewSaveStatus').textContent=state.reviewsLoadFailed?'후기 연결이 지연되어 마지막으로 읽은 내용을 표시합니다. 저장 전 기존 내용을 확인해 주세요.':'';
   $('#reviewModal h3').textContent=editing?'내 별점·후기 수정':'별점·후기 남기기';
   $('#saveReview').textContent=editing?'수정 저장':'저장';
 
@@ -323,9 +327,14 @@ async function saveReview(){
   if(cafeUrl&&!text){alert('카페 링크와 함께 간단한 후기를 입력해주세요.');return}
   if(state.rating==null&&!text){alert('별점을 선택하거나 후기를 입력하세요.');return}
   if(text&&!nickname){alert('후기를 남길 닉네임을 입력하세요.');return}
-  const placeId=state.selected;
+  const placeId=state.reviewEditPlaceId||state.selected;
   if(!placeId)return;
+  const rating=state.rating;
+  const recommended=$('#rRecommended').checked;
+  const oldReview=db().reviews.find(r=>r.placeId===placeId&&isOwnReview(r));
+  if(oldReview?.text&&text&&text!==oldReview.text&&!confirm('기존 후기 내용을 새 내용으로 수정할까요? 빈칸으로 저장하면 기존 후기는 유지됩니다.'))return;
   state.reviewSaveInProgress=true;
+  if($('#reviewSaveStatus'))$('#reviewSaveStatus').textContent='저장 중입니다. 창을 닫지 말아주세요.';
 
   const btn=$('#saveReview');
   if(btn)btn.disabled=true;
@@ -349,11 +358,11 @@ async function saveReview(){
       p_place_id:placeId,
       p_device_id:deviceId,
       p_nickname:nickname,
-      p_rating:state.rating==null?null:Number(state.rating),
+      p_rating:rating==null?null:Number(rating),
       p_body:text,
       p_photo_urls:photoUrls,
       p_cafe_url:cafeUrl,
-      p_recommended:$('#rRecommended').checked
+      p_recommended:recommended
     });
 
     if(remoteId)reviewId=String(remoteId).replace(/^"|"$/g,'');
@@ -361,7 +370,7 @@ async function saveReview(){
     if(existing){
       existing.id=reviewId;
       existing.nickname=nickname||existing.nickname||'회원';
-      existing.rating=state.rating??existing.rating;
+      existing.rating=rating??existing.rating;
       existing.text=text||existing.text;
       existing.createdAt=now;
       existing.createdBy=deviceId;
@@ -371,7 +380,7 @@ async function saveReview(){
         id:reviewId,
         placeId,
         nickname:nickname||'회원',
-        rating:state.rating,
+        rating,
         text,
         createdAt:now,
         createdBy:deviceId,
@@ -381,7 +390,7 @@ async function saveReview(){
       x.reviews.push(existing);
     }
 
-    existing.recommended=$('#rRecommended').checked;
+    existing.recommended=recommended;
     const ownPlace=x.places.find(p=>p.id===placeId);
     if(isOwnerPlace(ownPlace)){
       if(existing.rating==null)existing.rating=ownPlace.initialRating??null;
@@ -390,6 +399,7 @@ async function saveReview(){
     }
     saveDb(dedupeDbData(x));
     $('#reviewModal').classList.remove('open');
+    state.reviewEditPlaceId=null;
     revokeReviewPreviewUrls();
 
     try{
@@ -405,6 +415,7 @@ async function saveReview(){
   }catch(err){
     console.error('review/photo save failed',err);
     alert('후기 또는 사진 저장 중 오류가 발생했습니다. 사진은 자동 압축 후 750KB 이하만 업로드됩니다.');
+    if($('#reviewSaveStatus'))$('#reviewSaveStatus').textContent='저장하지 못했습니다. 입력 내용은 남아 있습니다. 다시 시도해 주세요.';
     setDbStatus('후기/사진 저장 오류');
   }finally{
     state.reviewSaveInProgress=false;
