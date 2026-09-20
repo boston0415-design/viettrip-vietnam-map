@@ -26,8 +26,8 @@ const root=path.resolve(__dirname,'..');
  await page.goto('https://viettrip-vietnam-map.pages.dev/');
  await page.waitForFunction(()=>document.querySelector('#totalReviews').textContent==='5,678');
  await page.waitForFunction(()=>document.querySelector('#totalVisits').textContent==='1');
- await page.reload();await page.waitForFunction(()=>document.querySelector('#totalVisits').textContent==='2');
- assert.equal(visits.size,2,'reload must increase visits once');
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#totalVisits').textContent==='1');
+ assert.equal(visits.size,1,'reload within the 30-minute window must not double-count visits');
  for(const [width,height] of [[1440,900],[390,844],[320,640],[844,390]]){
   await page.setViewportSize({width,height});
   const result=await page.evaluate(()=>{
@@ -40,5 +40,5 @@ const root=path.resolve(__dirname,'..');
  }
  fail=true;await page.reload();await page.waitForTimeout(100);
  assert.equal(await page.locator('#totalVisits').textContent(),'—','failed count is not a fake zero');
- await browser.close();console.log('PASS statistics: page views including reloads, exact totals, API failure, desktop/mobile/landscape layout');
+ await browser.close();console.log('PASS statistics: 30-minute reload deduplication, exact totals, API failure, desktop/mobile/landscape layout');
 })().catch(e=>{console.error(e);process.exit(1)});

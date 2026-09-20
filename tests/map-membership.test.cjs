@@ -78,7 +78,11 @@ for(const width of [360,768,1440]){
  await w.MapMembership.open();failed=true;await w.MapMembership.refresh();assert.match(d.getElementById('memberStatus').textContent,/연결 실패/);
  assert.match(d.getElementById('memberBarRank').textContent,/대장/,'offline state must not demote');failed=false;
  run('state.isAdmin=true');await w.MapMembership.open();assert(!d.getElementById('memberAdminTools').hidden);
+ assert.equal(d.getElementById('memberBarRank').textContent,'관리자');assert.equal(d.getElementById('memberHeroRank').textContent,'관리자');
+ assert(d.getElementById('memberDialog').classList.contains('isAdministrator'));
+ run('state.isAdmin=false');w.MapMembership.syncRole();assert.match(d.getElementById('memberBarRank').textContent,/대장/);
  for(const req of calls)if(req.p_action==='badges')assert.equal(req.p_device_id,null,'public requests contain no credential');
+ await w.MapMembership.loadBadges();await flush();
  dom.window.close();
 }
 console.log('PASS 360/768/1440 membership: grades/progress, escaped badges, no credential in DOM, nickname, one-time code UI, merge consent, linked ownership/editing, correction submission, admin visibility and network failure');

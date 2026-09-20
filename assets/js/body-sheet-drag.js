@@ -4,7 +4,7 @@
 (() => {
   const bindings=new WeakMap();
   const headers='.detailResizeHandle,.detailHeader,.menuResizeGrip,.menuResizeHeader';
-  const controls='input,select,textarea,label,[contenteditable]:not([contenteditable="false"]),video,audio,iframe,[role="slider"],[data-no-sheet-drag]';
+  const controls='button,a,img,summary,[role="button"],input,select,textarea,label,[contenteditable]:not([contenteditable="false"]),video,audio,iframe,[role="slider"],[data-no-sheet-drag]';
   function bind(panel,options){
     if(bindings.has(panel))return;
     let gesture=null,suppressUntil=0;
@@ -29,7 +29,7 @@
     function begin(event,point,kind){
       if(gesture || !point || event.defaultPrevented)return;
       const target=event.target.closest?.('*');
-      if(!target || (!options.includeHeaders && target.closest(headers)) || target.closest(controls))return;
+      if(!target || (options.handlesOnly && !target.closest(options.headerSelector||headers)) || (!options.includeHeaders && target.closest(headers)) || target.closest(controls))return;
       // Do not intercept the native desktop scrollbar thumb.
       const rect=target.getBoundingClientRect();
       if(kind==='pointer' && target.clientWidth>0 && target.offsetWidth>target.clientWidth+2 && point.clientX>=rect.left+target.clientLeft+target.clientWidth)return;

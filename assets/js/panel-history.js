@@ -24,7 +24,7 @@
       toggle?.setAttribute('aria-expanded','false');
       if(toggle)toggle.textContent='업종 필터';
     });
-    add('detail',detail,()=>detail.classList.contains('show'),closeDetailPanel);
+    add('detail',detail,()=>detail.classList.contains('show'),()=>window.MapUX?window.MapUX.closeDetail({restore:false}):closeDetailPanel());
     add('detail-expanded',detail,()=>mobile() && detail.classList.contains('show') && detail.classList.contains('detailExpanded'),()=>setDetailExpanded(false));
     add('map-info',byId('map'),()=>Boolean(state.clickInfo),()=>closeSystemInfo());
     add('registration',byId('regHint'),()=>state.registerMode,cancelRegisterMode);

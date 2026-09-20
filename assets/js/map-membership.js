@@ -86,6 +86,7 @@
     });
   }
   function paint(){
+    paintRole();
     if(!profile)return;
     const [name,start]=grade(profile.level),next=GRADES[profile.level+1];
     el('memberBarRank').innerHTML=insignia(profile.level)+name;
@@ -105,7 +106,26 @@
     el('memberCorrectionList').innerHTML=(profile.corrections||[]).map(c=>`<li><strong>${esc(c.name)}</strong><span>${esc(CORRECTION[c.kind])} · ${esc(STATUS[c.status])}</span><p>${esc(c.body)}</p></li>`).join('')||'<li class="memberEmpty">아직 제출한 정보 수정 제안이 없습니다.</li>';
     el('memberGradeSteps').innerHTML=GRADES.map((g,i)=>`<li class="${i===profile.level?'current':''}" ${i===profile.level?'aria-current="step"':''}><span class="mapRank rank${i}">${insignia(i)}${g[0]}</span><span>${g[1]}건${i===profile.level?' · 현재':''}</span></li>`).join('');
     el('memberAdminTools').hidden=!state.isAdmin;
+    paintRole();
     paintBadges();
+  }
+  function paintRole(){
+    const admin=Boolean(state.isAdmin);
+    el('memberDialog')?.classList.toggle('isAdministrator',admin);
+    if(el('memberAdminTools'))el('memberAdminTools').hidden=!admin;
+    if(el('memberTitle'))el('memberTitle').textContent=admin?'관리자 · 맵 운영':'내 맵 등급 · 활동';
+    if(el('memberBarLabel'))el('memberBarLabel').textContent=admin?'맵 관리':'내 맵 등급';
+    if(admin){
+      for(const id of ['memberBarRank','memberHeroRank']){const node=el(id);if(node){node.textContent='관리자';node.className=id==='memberBarRank'?'mapRank rankAdmin':'memberHeroRank rankAdmin';}}
+      if(el('memberBarProgress'))el('memberBarProgress').textContent='운영 권한';
+      if(el('memberNext'))el('memberNext').textContent='관리자는 일반 회원 승급 대상이 아닙니다.';
+    }else if(!profile){
+      if(el('memberBarRank')){el('memberBarRank').className='mapRank rankPending';el('memberBarRank').textContent='등급 확인 중';}
+      if(el('memberHeroRank')){el('memberHeroRank').className='memberHeroRank';el('memberHeroRank').textContent='등급 확인 중';}
+      if(el('memberBarProgress'))el('memberBarProgress').textContent='내 활동 보기';
+    }
+    const linked=(profile?.devices||[]).length>1;
+    if(el('memberDeviceStatus'))el('memberDeviceStatus').textContent=linked?'기기 연결됨 · 같은 회원 기록으로 등급을 확인합니다.':'PC·모바일 등급이 다르면 두 기기를 한 번 연결해 주세요.';
   }
   async function open(){
     const dialog=el('memberDialog');if(!dialog.open)dialog.showModal();
@@ -143,6 +163,9 @@
   }
   function init(){
     el('openMapMembership').addEventListener('click',open);
+    el('memberDeviceLinkButton')?.addEventListener('click',()=>{const section=el('memberDeviceLink');if(section){section.open=true;section.scrollIntoView({block:'start'});section.querySelector('button')?.focus({preventScroll:true});}});
+    window.addEventListener('focus',schedule);
+    setInterval(()=>{if(!document.hidden&&el('memberDialog')?.open)schedule();},30000);
     el('memberClose').onclick=()=>el('memberDialog').close();
     el('memberRefresh').onclick=()=>open();
     el('memberNicknameForm').onsubmit=event=>{
@@ -194,7 +217,7 @@
     for(const id of ['detail','communityReviewFeed'])if(el(id))observer.observe(el(id),{childList:true,subtree:true});
     refresh().then(()=>loadBadges());
   }
-  window.MapMembership={GRADES,levelFor,badgeHtml,loadBadges,refresh,schedule,open,
+  window.MapMembership={GRADES,levelFor,badgeHtml,loadBadges,refresh,schedule,open,syncRole:paint,
     ownsHash:hash=>credentials.has(hash),credentialFor:hash=>credentials.get(hash)||null,
     memberFor:hash=>badges.get(hash)?.member||hash,
     correctionButton:id=>`<button type="button" class="mapCorrectionButton" data-map-correction="${esc(id)}">정보 수정 제안</button>`,

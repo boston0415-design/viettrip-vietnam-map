@@ -20,6 +20,7 @@
   function show(message=''){
     const list=byId('placeSearchList'),box=byId('placeSearchResults');if(!list)return;
     box.hidden=false;input().setAttribute('aria-expanded','true');
+    window.MapUX?.syncSearchAction();
     // Keep an option's DOM node while Google suggestions arrive. Replacing the
     // touched row between pointerdown and click would drop that selection.
     const old=new Map([...list.children].map(node=>[node.dataset.rowKey,node]));
@@ -27,7 +28,7 @@
       const key=rowKey(row),node=old.get(key)||document.createElement('button');old.delete(key);
       node.type='button';node.className='placeSearchOption';node.id='placeSuggestion'+i;node.dataset.searchIndex=i;node.dataset.rowKey=key;
       node.setAttribute('role','option');node.setAttribute('aria-selected',String(i===active));
-      const html=`<span class="searchResultIcon" aria-hidden="true">${row.source==='member'?'◉':'⌖'}</span><span class="searchResultCopy"><strong>${esc(row.name)}</strong><small>${esc(row.address||'주소 확인 중')}</small><em>${row.source==='member'?'회원 등록 업소':'Google 지도 장소'}</em></span>`;
+      const html=`<span class="searchResultIcon" aria-hidden="true">${row.source==='member'?'◉':'⌖'}</span><span class="searchResultCopy"><strong>${esc(row.name)}</strong><small>${esc(row.address||'주소 확인 중')}</small><em>${row.source==='member'?'회원 등록 업소':'Google 지도 장소'}</em>${row.source==='member'?(window.MapUX?.searchMeta(row.id)||''):''}</span>`;
       if(node._searchHtml!==html){node.innerHTML=html;node._searchHtml=html;}
       if(list.children[i]!==node)list.insertBefore(node,list.children[i]||null);
     });
@@ -141,7 +142,6 @@
   function select(row){if(!row)return;return row.source==='member'?openMember(row.id):openGoogle(row);}
   async function submit(){
     if(composing)return;
-    if(window.NearbyBusinesses?.active()){dismiss();window.NearbyBusinesses.search(input().value);return;}
     const q=input().value.trim();
     if(!q){dismiss();session=null;closeDetailPanel();clearSearchMarker();resetScope();renderAll();renderHierarchyNav();return;}
     if(!byId('placeSearchResults').hidden && active>=0)return select(rows[active]);
@@ -192,6 +192,7 @@
     panel.innerHTML=`<div class="detailHeader"><div class="detailTitleWrap"><h2>${esc(p.name)}</h2><p class="externalSource">Google 지도 장소</p></div><button id="detailCloseBtn" class="detailClose" type="button" aria-label="상세 닫기">×</button></div>
       <div class="externalMeta">${Number.isFinite(raw.rating)?`<span class="externalRating">★ ${raw.rating.toFixed(1)}</span><a href="${esc(maps)}" target="_blank" rel="noopener noreferrer">Google 후기 ${(raw.user_ratings_total||0).toLocaleString()}개 ↗</a>`:''}${hours?`<span>${hours}</span>`:''}</div>
       <div class="detailQuickActions externalActions"><button type="button" id="detailExpandBtn" aria-controls="detailBody">상세보기</button>${directions}${phone?`<a class="externalCall" href="tel:${esc(dial)}">전화</a>`:`<a href="${esc(maps)}" target="_blank" rel="noopener noreferrer">Google 지도 ↗</a>`}</div>
+      <div class="externalRegisterBar">${!entry.loading&&!entry.error&&position(p)?'<button type="button" id="registerSearchPlace" class="btn primary">이 업소 등록</button>':''}</div>
       <div id="detailBody" class="detailBody"><p class="externalLoad" role="status">${entry.loading?'장소 정보를 불러오는 중…':entry.error?'상세 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.':''}</p>
       ${entry.error?'<button type="button" id="retryPlaceDetails" class="btn">다시 불러오기</button>':''}
       <section id="externalPhotos" class="googlePlacePhotos" aria-label="장소 사진"></section>
@@ -199,7 +200,7 @@
       ${phone?`<div><strong>전화</strong><a href="tel:${esc(dial)}">${esc(phone)}</a></div>`:''}
       ${website?`<div><strong>웹사이트</strong><a href="${esc(website)}" target="_blank" rel="noopener noreferrer">공식 웹사이트 ↗</a></div>`:''}
       ${raw.opening_hours?.weekday_text?.length?`<details><summary>영업시간</summary>${raw.opening_hours.weekday_text.map(day=>`<p>${esc(day)}</p>`).join('')}</details>`:''}</div>
-      <div class="externalFooter"><a href="${esc(maps)}" target="_blank" rel="noopener noreferrer">Google 지도에서 전체 정보·후기 보기 ↗</a>${!entry.loading&&!entry.error&&position(p)?'<button type="button" id="registerSearchPlace" class="btn primary">이 업소 등록</button>':''}<p>Google 정보와 회원 등록 정보는 구분해 표시합니다.</p><div id="externalAttributions"></div></div></div>`;
+      <div class="externalFooter"><a href="${esc(maps)}" target="_blank" rel="noopener noreferrer">Google 지도에서 전체 정보·후기 보기 ↗</a><p>Google 정보와 회원 등록 정보는 구분해 표시합니다.</p><div id="externalAttributions"></div></div></div>`;
     photos(entry);
     for(const html of raw.html_attributions||[])byId('externalAttributions').append(googlePhotoAttribution(html));
     byId('detailCloseBtn').onclick=closeDetailPanel;byId('detailExpandBtn').onclick=()=>setDetailExpanded(!detailExpanded);
