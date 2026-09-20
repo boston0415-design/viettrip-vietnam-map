@@ -1,0 +1,40 @@
+name: Map UX regression
+on:
+  push:
+    branches: ['fix/map-ux-20260920']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Archive exact source for regression testing
+        run: git archive --format=zip -o map-source.zip HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: map-ux-source
+          path: map-source.zip
+          retention-days: 3
+      - name: Check JavaScript syntax
+        run: find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Build Pages
+        run: node scripts/build-pages.mjs
+      - name: Run regression checks when available
+        run: |
+          if [ -f scripts/test-map-ux.cjs ]; then
+            npm install --no-save --package-lock=false playwright@1.55.0
+            npx playwright install chromium --with-deps
+            node scripts/test-map-ux.cjs
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: map-ux-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
