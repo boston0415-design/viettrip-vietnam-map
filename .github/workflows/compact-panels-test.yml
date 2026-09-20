@@ -30,11 +30,6 @@ jobs:
               subprocess.run(['git','apply','--check','-'],input=patch,check=True)
               subprocess.run(['git','apply','-'],input=patch,check=True)
               transfer.unlink()
-              workflow=pathlib.Path('.github/workflows/map-ux-regression.yml')
-              text=workflow.read_text()
-              old="'assets/css/map-ux.css',"
-              assert old in text
-              workflow.write_text(text.replace(old,old+"'assets/css/panel-comfort.css','assets/js/list-layout.js','assets/js/personal-places.js',"))
           PY
       - name: Syntax and build
         run: |
@@ -62,7 +57,7 @@ jobs:
       - name: Commit tested source only
         if: success()
         run: |
-          git add -A -- assets index.html scripts tests .github/workflows/map-ux-regression.yml
+          git add -A -- assets index.html scripts tests
           if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -70,11 +65,6 @@ jobs:
             git push origin HEAD:fix/compact-map-panels-20260920
           fi
           git rev-parse HEAD > test-results/tested-commit.txt
-      - name: Preserve diagnostic transfer on verification failure
-        if: always()
-        run: |
-          mkdir -p test-results
-          if [ -f scripts/compact-panels.patch.gz.b64 ]; then cp scripts/compact-panels.patch.gz.b64 test-results/received-transfer.txt; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
