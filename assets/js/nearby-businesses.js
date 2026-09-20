@@ -3,6 +3,7 @@
   const storageKey='viettrip_nearby_stay_v1',radii=[500,1000,3000,5000];
   let savedStay=null,previousCity='hcmc',previousSort='newest',locationToken=0,searchToken=0;
   let circle=null,marker=null,overlayKey='',locationTimer=null,searchTimer=null,locationWatchId=null;
+  let approximateCandidate=null;
   let picking=false,pickedPoint=null,pickMarker=null,oldCursor='';
   const byId=id=>document.getElementById(id);
   const active=()=>Boolean(state.nearby);
@@ -23,6 +24,7 @@
   }
   function cancelLocation(){
     locationToken++;clearTimeout(locationTimer);
+    approximateCandidate=null;if(byId('nearbyApproximate'))byId('nearbyApproximate').hidden=true;
     if(locationWatchId!==null){navigator.geolocation?.clearWatch?.(locationWatchId);locationWatchId=null}
     byId('nearbyCurrent').disabled=false;
     byId('nearbyCurrent').textContent='현재 위치';
@@ -85,6 +87,8 @@
     cancelPendingMapWork();clearSearchMarker();clearSelectionRanges();clearAreaLabels();clearSelectedSystemIcons();
     if(typeof resetAdministrativeRegions==='function')resetAdministrativeRegions();
     closeSystemInfo();closeAreaPanel();closeDetailPanel();setMobileLegendExpanded(false);
+    closeMobileBusinessList();
+    if(!isMobileMapLayout()&&!document.querySelector('.content')?.classList.contains('desktopListCollapsed'))byId('desktopListToggle')?.click();
     if(byId('nearbyStayDialog').open)byId('nearbyStayDialog').close();
     renderCityControls();renderPopularAreas();renderGolfCourses();renderPoiMarkers();renderAll();fit();
     return true;
@@ -110,42 +114,48 @@
   function current(){
     cancelPick();cancelLocation();message();
     const geo=navigator.geolocation;
-    if(!geo?.watchPosition&&!geo?.getCurrentPosition){message('현재 위치를 사용할 수 없습니다. 지도 지정 또는 숙소 지정으로 찾아주세요.');return}
-    const token=locationToken,started=Date.now();
-    let best=null;
+    if(window.isSecureContext===false){message('위치 찾기는 HTTPS 주소에서 사용할 수 있습니다. 공식 맵 주소를 열어주세요.');return;}
+    if(!geo?.watchPosition&&!geo?.getCurrentPosition){message('이 브라우저에서 현재 위치를 제공하지 않습니다. 지도 지정 또는 숙소 지정으로 찾아주세요.');return;}
+    const token=locationToken,started=Date.now();let best=null,failures=0;
     byId('nearbyCurrent').disabled=true;byId('nearbyCurrent').textContent='위치 확인 중';byId('locBtn').disabled=true;
-    message('기기의 최신 위치를 확인하고 있습니다…');
+    message('위치를 확인 중입니다. 권한 안내가 나오면 허용해 주세요.');
+    const showCandidate=()=>{
+      if(!best)return;
+      approximateCandidate={...best};
+      const button=byId('nearbyApproximate');
+      if(button){button.hidden=false;button.textContent=`대략 위치로 찾기 · 오차 ±${distanceLabel(best.accuracy)}`;}
+    };
     const finish=error=>{
       if(token!==locationToken)return;
-      // These are app acceptance limits, not a guarantee of physical accuracy.
-      if(error?.code!==1&&best&&best.accuracy<=200){
-        apply({...best,name:'현재 위치'},'current');
-        return;
-      }
+      const candidate=best;
       cancelLocation();
-      message(error?.code===1?'위치 권한이 꺼져 있습니다. 브라우저에서 허용하거나 지도·숙소를 지정해주세요.':best
-        ?`기기 추정 오차가 약 ±${distanceLabel(best.accuracy)}여서 적용하지 않았습니다. 지도 지정 또는 숙소 지정으로 위치를 골라주세요.`
-        :'정확한 현재 위치를 확인하지 못했습니다. 다시 시도하거나 지도 지정·숙소 지정을 이용해주세요.');
+      if(error?.code===1){message('위치 권한이 꺼져 있습니다. 주소창의 사이트 권한과 컴퓨터·휴대폰의 위치 설정을 허용한 뒤 다시 눌러주세요. 지도 지정도 가능합니다.');return;}
+      if(candidate){
+        best=candidate;showCandidate();
+        message(`대략 위치만 확인했습니다(추정 오차 ±${distanceLabel(best.accuracy)}). 자동 적용하지 않았습니다. 아래 버튼으로 사용하거나 지도·숙소를 지정해 주세요.`);
+      }else message('기기에서 위치를 받지 못했습니다. 사이트 위치 권한·운영체제 위치 설정을 확인하거나 지도·숙소를 지정해 주세요.');
     };
-    const receive=position=>{
+    const receive=(position,maximumAge=0)=>{
       if(token!==locationToken)return;
       const coords=position?.coords,point=validMapLocation({lat:coords?.latitude,lng:coords?.longitude});
       const accuracy=Number(coords?.accuracy),timestamp=Number(position?.timestamp);
-      if(!point||!Number.isFinite(accuracy)||accuracy<=0||!Number.isFinite(timestamp)||timestamp<started-1000||timestamp>Date.now()+1000)return;
+      if(!point||!Number.isFinite(accuracy)||accuracy<=0||!Number.isFinite(timestamp)||timestamp<started-Math.max(1000,maximumAge)||timestamp>Date.now()+1000)return;
       if(!best||accuracy<best.accuracy)best={...point,accuracy:Math.ceil(accuracy)};
-      if(best.accuracy<=50){finish();return}
-      message(`위치를 더 정확하게 확인 중… 현재 추정 오차 약 ±${distanceLabel(best.accuracy)}`);
+      // No fixed 16-second wait for a usable result. These are acceptance rules, not guarantees.
+      if(best.accuracy<=250){apply({...best,name:'현재 위치'},'current');return;}
+      showCandidate();message(`위치 정밀도를 확인 중 · 추정 오차 ±${distanceLabel(best.accuracy)}. 대략 위치를 바로 사용하거나 지도 지정이 가능합니다.`);
     };
-    const fail=error=>{if(error?.code===1)finish(error)};
-    locationTimer=setTimeout(()=>finish(),16000);
-    const options={enableHighAccuracy:true,timeout:12000,maximumAge:0};
+    const fail=error=>{if(token!==locationToken)return;if(error?.code===1){finish(error);return;}failures++;if(failures>=2)finish(error);};
+    locationTimer=setTimeout(()=>finish(),10000);
+    // A fast network/cached fix and a fresh precise fix run together; no IP service or new API.
+    try{if(geo.getCurrentPosition)geo.getCurrentPosition(p=>receive(p,15000),fail,{enableHighAccuracy:false,timeout:4500,maximumAge:15000});}catch{failures++;}
+    if(token!==locationToken)return;
     try{
       if(geo.watchPosition){
-        const id=geo.watchPosition(receive,fail,options);
-        // A synchronous callback is allowed by test doubles/host wrappers.
+        const id=geo.watchPosition(p=>receive(p),fail,{enableHighAccuracy:true,timeout:9000,maximumAge:0});
         if(token!==locationToken)geo.clearWatch?.(id);else locationWatchId=id;
-      }else geo.getCurrentPosition(receive,error=>finish(error),options);
-    }catch{finish()}
+      }else geo.getCurrentPosition(p=>receive(p),fail,{enableHighAccuracy:true,timeout:9000,maximumAge:0});
+    }catch{finish();}
   }
   function cancelPick(){
     const wasPicking=picking;
@@ -278,6 +288,7 @@
   byId('nearbyPickCancel').addEventListener('click',cancelPick);
   byId('nearbyPickConfirm').addEventListener('click',()=>{if(pickedPoint)apply({...pickedPoint,name:'직접 지정한 위치'},'manual')});
   window.addEventListener('pagehide',()=>{cancelLocation();cancelPick()});
+  byId('nearbyApproximate')?.addEventListener('click',()=>{const candidate=approximateCandidate;if(candidate)apply({...candidate,name:'기기 추정 위치'},'current');});
   byId('nearbyCurrent').addEventListener('click',current);
   byId('locBtn').onclick=current;
   byId('nearbyStay').addEventListener('click',openStay);

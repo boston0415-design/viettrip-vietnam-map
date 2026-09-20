@@ -935,6 +935,7 @@ async function fetchSharedDb(){
   // 후기 API가 일시적으로 실패해도 업체 목록/지도 마커는 반드시 표시한다.
   let places=[];
   let reviews=[];
+  let reviewError=null;
   let placeError=null;
 
   try{
@@ -959,17 +960,23 @@ async function fetchSharedDb(){
   try{
     reviews=await supaGet('reviews_public','select=*&order=created_at.asc');
   }catch(err){
-    console.warn('reviews load failed; businesses will still be shown',err);
-    reviews=[];
+    console.warn('reviews load failed; retaining the last known review snapshot',err);
+    reviewError=err;
   }
 
-  return dedupeDbData({
+  state.reviewsLoadFailed=!!reviewError;
+  const result=dedupeDbData({
     places:(places||[]).map(remotePlaceToLocal),
-    reviews:(reviews||[]).map(remoteReviewToLocal)
+    reviews:reviewError?(db().reviews||[]):(reviews||[]).map(remoteReviewToLocal)
   });
+  // Metadata is not serialized into the public cache or confused with review records.
+  Object.defineProperty(result,'reviewsAvailable',{value:!reviewError});
+  return result;
 }
 
 async function uploadMissingLocal(local,remote){
+  // An unavailable review feed is NOT proof a review does not exist remotely.
+  if(remote.reviewsAvailable===false)return;
   local=dedupeDbData(local);
   remote=dedupeDbData(remote);
 

@@ -3,7 +3,7 @@
   'use strict';
   const el=id=>document.getElementById(id);
   let browse=null,opening=false,closing=false,nearbyKey='',nearbyHTML='';
-  let nearbyMode='expanded',nearbyOrigin=null,nearbyGesture=null;
+  let nearbyMode='expanded',nearbyOrigin=null;
   const scope=()=>JSON.stringify([state.city,state.cat,state.sub,state.sort,state.query,state.benefitFilter,state.ratingFilter,state.restaurantTag,state.nearby,window.PersonalPlaces?.getView()]);
   const mobile=()=>typeof isMobileMapLayout==='function'&&isMobileMapLayout();
   const collection=()=>typeof items==='function'?items({forList:true}):[];
@@ -55,7 +55,7 @@
     panel.querySelector('.browseNavigation')?.remove();
     const ids=browse.ids.filter(id=>db().places.some(p=>p.id===id)),index=ids.indexOf(state.selected);
     if(index<0)return;
-    const nav=document.createElement('nav');nav.className='browseNavigation';nav.setAttribute('aria-label','업소 이어보기');nav.setAttribute('data-no-sheet-drag','');
+    const nav=document.createElement('nav');nav.className='browseNavigation';nav.setAttribute('aria-label','업소 이어보기');
     nav.innerHTML=`<button type="button" data-browse-back>← ${browse.source==='nearby'?'주변목록':'업체목록'}</button><span>${index+1} / ${ids.length}</span><button type="button" data-browse-prev ${index===0?'disabled':''} aria-label="이전 업소">이전</button><button type="button" data-browse-next ${index===ids.length-1?'disabled':''} aria-label="다음 업소">다음</button>`;
     header.after(nav);
     nav.querySelector('[data-browse-back]').onclick=()=>closeDetail();
@@ -67,7 +67,8 @@
     const origin=state.nearby;
     const key=JSON.stringify(origin);
     if(!origin||origin!==nearbyOrigin||key!==nearbyKey){nearbyMode='expanded';nearbyOrigin=origin;}
-    const blocked=!origin||Boolean(state.selected)||Boolean(state.registerMode)||Boolean(window.PlaceSearch?.currentPlace());
+    const listOpen=mobile()?el('businessSide')?.classList.contains('mobileOpen'):!document.querySelector('.content')?.classList.contains('desktopListCollapsed');
+    const blocked=!origin||Boolean(state.selected)||Boolean(state.registerMode)||Boolean(window.PlaceSearch?.currentPlace())||Boolean(origin&&listOpen);
     tray.hidden=blocked||nearbyMode==='closed';
     const reopen=el('nearbyReopen');if(reopen)reopen.hidden=blocked||nearbyMode!=='closed';
     tray.classList.toggle('isCollapsed',nearbyMode==='collapsed');
@@ -93,7 +94,7 @@
   function setNearbyMode(mode){
     if(!['expanded','collapsed','closed'].includes(mode))return;
     nearbyMode=mode;
-    const tray=el('nearbyResults');tray?.style.removeProperty('height');tray?.classList.remove('nearbyDragging');
+    const tray=el('nearbyResults');tray?.style.removeProperty('height');tray?.classList.remove('nearbyDragging','nearbyTall');
     syncNearby();
     // Do not leave keyboard focus in newly hidden cards or controls.
     const focus=mode==='closed'?el('nearbyReopen'):el('nearbyCollapse');
@@ -103,7 +104,7 @@
     const tray=el('nearbyResults'),legend=el('areaLegend'),wrap=document.querySelector('.mapwrap');if(!tray||!legend||!wrap)return;
     const mapRect=wrap.getBoundingClientRect(),menuRect=legend.getBoundingClientRect();
     const bottom=Math.max(8,mapRect.bottom-menuRect.top+8);
-    const max=Math.max(52,Math.min(196,mapRect.height*.34,mapRect.height-bottom-8));
+    const max=Math.max(52,mapRect.height-bottom-8);
     const filtersOpen=el('areaLegendTitle')?.getAttribute('aria-expanded')==='true';
     for(const node of [tray,el('nearbyReopen')])if(node){
       if(node.style.bottom!==bottom+'px')node.style.bottom=bottom+'px';
@@ -113,29 +114,25 @@
   }
   function bindNearbyGrip(tray){
     const grip=el('nearbyResizeGrip');
-    const release=event=>{
-      const g=nearbyGesture;if(!g||event.pointerId!==g.id)return;
-      nearbyGesture=null;
-      try{grip.releasePointerCapture(g.id);}catch{}
-      if(event.type==='pointercancel'){setNearbyMode(g.mode);return;}
-      const dy=event.clientY-g.y;
-      setNearbyMode(Math.abs(dy)<24?g.mode:dy>0?'collapsed':'expanded');
-    };
-    grip.addEventListener('pointerdown',event=>{
-      if(!event.isPrimary||event.button!==0)return;
-      nearbyGesture={id:event.pointerId,y:event.clientY,height:tray.getBoundingClientRect().height,mode:nearbyMode};
-      try{grip.setPointerCapture(event.pointerId);}catch{}
+    window.BodySheetDrag?.bind(tray,{
+      anywhere:true,includeHeaders:true,headerSelector:'.nearbyResizeGrip,.nearbyResultsHead',
+      scrollElement:()=>el('nearbyResultsBody'),
+      bounds:()=>({min:52,max:parseFloat(tray.style.getPropertyValue('--nearby-max-height'))||196}),
+      start(){tray.classList.add('nearbyDragging');},
+      size(h){
+        nearbyMode=h<=56?'collapsed':'expanded';
+        tray.classList.toggle('isCollapsed',nearbyMode==='collapsed');
+        tray.classList.toggle('nearbyTall',h>140);
+        el('nearbyResultsBody').hidden=nearbyMode==='collapsed';
+        tray.style.height=h+'px';
+      },
+      end({canceled}){
+        tray.classList.remove('nearbyDragging');
+        if(canceled){syncNearby();return;}
+        const h=tray.getBoundingClientRect().height;
+        if(h<72)setNearbyMode('collapsed');else syncNearby();
+      }
     });
-    grip.addEventListener('pointermove',event=>{
-      const g=nearbyGesture;if(!g||event.pointerId!==g.id)return;
-      const dy=event.clientY-g.y;if(Math.abs(dy)<6)return;
-      event.preventDefault();tray.classList.add('nearbyDragging');
-      tray.classList.remove('isCollapsed');el('nearbyResultsBody').hidden=false;
-      const max=parseFloat(tray.style.getPropertyValue('--nearby-max-height'))||196;
-      tray.style.height=Math.max(52,Math.min(max,g.height-dy))+'px';
-    });
-    grip.addEventListener('pointerup',release);grip.addEventListener('pointercancel',release);
-    grip.addEventListener('lostpointercapture',()=>{if(nearbyGesture){const mode=nearbyGesture.mode;nearbyGesture=null;setNearbyMode(mode);}});
     grip.addEventListener('keydown',event=>{
       const mode={ArrowDown:'collapsed',ArrowUp:'expanded',Home:'collapsed',End:'expanded',Escape:'closed'}[event.key];
       if(mode){event.preventDefault();setNearbyMode(mode);}

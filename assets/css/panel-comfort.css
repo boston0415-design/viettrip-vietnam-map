@@ -1,5 +1,5 @@
 /* One scroll container per panel. Defaults leave at least half of the map visible. */
-#businessSide{height:40%!important;max-height:40%!important;min-height:0!important;align-self:end;display:block;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;scrollbar-width:thin}
+#businessSide{height:18%!important;max-height:18%!important;min-height:0!important;align-self:end;display:block;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;scrollbar-width:thin}
 #businessSide.menuSized{height:var(--menu-height)!important;max-height:min(var(--menu-height),calc(100% - 32px))!important}
 #businessSide .list{height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;flex:none}
 #businessSide .filters,#businessSide .mobileSideHead,#businessSide .browseHeading{position:static!important;flex:none}
@@ -50,3 +50,45 @@
 }
 @media(min-width:901px) and (max-width:1199px){.content{--desktop-list-offset:300px}}
 @media(min-width:1500px){.content{--desktop-list-offset:380px}}
+
+/* 2026-09-20: expand the PANEL first; then scroll at full height. */
+.sheetDragSurface,.sheetDragSurface *{touch-action:pan-x pinch-zoom!important;-webkit-user-select:none;user-select:none}
+.sheetDragSurface input,.sheetDragSurface textarea,.sheetDragSurface select,.sheetDragSurface [contenteditable="true"]{touch-action:auto!important;-webkit-user-select:text;user-select:text}
+#businessSide>.menuResizeGrip{height:12px;min-height:12px}
+#businessSide .mobileSideHead{min-height:36px;padding:0 7px}
+#businessSide .mobileSideHead button{min-height:32px;height:32px}
+#businessSide .filters{padding:5px 8px}
+#businessSide:not(.mobileFiltersOpen)>.filters{display:none!important}
+#businessSide .listRegionFilter,#businessSide .benefitTabs,#businessSide #cats,#businessSide #subs{display:none!important}
+#businessSide .personalPlaceTabs{flex-wrap:wrap}
+#businessSide #list{padding-top:3px}
+#businessSide .card{padding-top:7px;padding-bottom:7px}
+.nearbyResults{height:92px;max-height:var(--nearby-max-height,92px)!important}
+.nearbyResults .nearbyResizeGrip{height:10px;min-height:10px;flex-basis:10px}
+.nearbyResults .nearbyResultsHead{min-height:28px;padding-bottom:0}
+.nearbyResults .nearbyResultsHead button{min-height:28px;height:28px;padding:2px 6px}
+.nearbyResults .nearbyResultsMeta{display:none}
+.nearbyResults.nearbyTall .nearbyResultsMeta{display:flex}
+.nearbyResults .nearbyResultCard{padding:3px 7px;gap:0;font-size:11px}
+.nearbyResults .nearbyResultCard strong{font-size:12px;line-height:1.4}
+.nearbyResults.isCollapsed{height:52px!important}
+.nearbyResults.isCollapsed .nearbyResizeGrip{display:none}
+.nearbyResults.nearbyTall .nearbyResultCards{flex-wrap:wrap;overflow-x:hidden}
+.nearbyResults.nearbyTall .nearbyResultCard{flex:1 0 210px}
+#reviewModal .modal{width:min(680px,calc(100vw - 24px));height:min(88dvh,850px);max-height:min(88dvh,850px);overflow:auto;box-sizing:border-box;padding:0 18px 12px;overscroll-behavior:contain}
+.reviewEditorHeader{position:sticky;top:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;background:white;padding:12px 0;border-bottom:1px solid #e3ebe7}
+.reviewEditorHeader h3{margin:0;flex:1;font-size:18px}
+#reviewEditorClose{flex:none;width:44px;height:44px;border:0;border-radius:9px;background:#f2f6f4;color:#355b50;font-size:28px;cursor:pointer}
+.reviewPlaceName{font-size:13px;font-weight:650;color:#275b50;margin:9px 0}
+#reviewSaveStatus:empty{display:none}
+#reviewSaveStatus,.reviewConnectionNote{font-size:12px;line-height:1.6;color:#87621c}
+#reviewModal #rText{min-height:160px;resize:vertical}
+#reviewModal .modalactions{position:sticky;bottom:-12px;z-index:2;background:white;padding:10px 0;border-top:1px solid #e3ebe7}
+.ratingOnlyRecords{margin:12px 0;padding:10px;border:1px solid #e3ebe7;border-radius:10px;font-size:13px}
+.ratingOnlyRecords h3{font-size:13px;margin:0 0 6px}.ratingOnlyRecords p{margin:5px 0}.ratingOnlyRecords small{display:block;color:#718077;font-size:11px}
+.registrantDescription small{color:#718077;font-size:11px}.registrantDescription p{margin:3px 0 8px;white-space:pre-wrap}
+@media(max-width:900px){#reviewModal .modal{width:calc(100vw - 16px);height:90dvh;max-height:90dvh;padding-left:14px;padding-right:14px}}
+
+#detail.sheetDragSurface,#detail.sheetDragSurface *,#businessSide.sheetDragSurface,#businessSide.sheetDragSurface *,#areaLegend.sheetDragSurface,#areaLegend.sheetDragSurface *,#areaPanel.sheetDragSurface,#areaPanel.sheetDragSurface *,#nearbyResults.sheetDragSurface,#nearbyResults.sheetDragSurface *{touch-action:pan-x pinch-zoom!important}
+#detail.sheetDragSurface input,#detail.sheetDragSurface textarea,#businessSide.sheetDragSurface input,#businessSide.sheetDragSurface select,#areaLegend.sheetDragSurface select{touch-action:auto!important}
+#nearbyApproximate{margin:4px 0 8px;padding:7px 10px;white-space:normal;line-height:1.4}

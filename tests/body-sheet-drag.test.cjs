@@ -35,7 +35,7 @@ for(const kind of ['touch','pointer']){
  const begin=target=>send(target,kind==='touch'?'start':'down');
  const end=target=>send(target,kind==='touch'?'end':'up');
  function drag(target,x,y){begin(target);const event=send(target,'move',x,y);end(target);return event}
- for(const p of panels){
+ for(const p of panels.filter(p=>!['detail','businessSide','areaLegend','areaPanel'].includes(p.id))){
    const prop=p===detail?'--sheet-height':'--menu-height',body=p.querySelector('.bodyFixture'),description=body.querySelector('.description');
    // Content is always native scrolling; only explicit handles/title resize.
    assert.equal(drag(description,100,400).defaultPrevented,false,'body scroll never resizes '+p.id);
@@ -73,5 +73,5 @@ for(const kind of ['touch','pointer']){
  await new Promise(resolve=>setImmediate(resolve));
  dom.window.close();
 }
-console.log('PASS touch/mouse grip-only resize, native body scrolling, fixed membership dialog, controls/photo taps, cancellation, pinch and rerendered content (DOM simulation)');
+console.log('PASS unchanged modal/dialog grip resizing, fixed membership/review dialogs, native form controls and pinch; map surfaces covered by panel-interactions.test.cjs');
 })().catch(error=>{console.error(error);process.exitCode=1});

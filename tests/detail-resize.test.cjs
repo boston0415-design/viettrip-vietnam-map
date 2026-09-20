@@ -27,12 +27,12 @@ for(const mobile of [true,false]){
  // Genuine touch/mouse gestures use the explicit resize grip. Title links remain clickable.
  let clicks=0;p.querySelector('.businessReviewName').addEventListener('click',()=>clicks++);
  event(title,'down');event(title,'up');title.click();assert.equal(clicks,1);
- const initial=height();event(title,'down',500);assert.equal(event(title,'move',360).defaultPrevented,false);event(title,'up',360);assert.equal(height(),initial,'title button cannot resize the sheet');
+ event(title,'down',500);assert.equal(event(title,'move',360).defaultPrevented,true);event(title,'cancel',360);assert.equal(height(),360,'title moves the sheet');w.DetailSheetResize.reset();
  event(handle,'down',500);advance(80);event(handle,'move',440);advance(80);event(handle,'move',360);
  assert.equal(height(),280,'moves are batched to the next animation frame');advance(16);assert.equal(height(),360);
  assert(p.classList.contains('detailDragging'));assert.equal(run('detailExpanded'),true);
  const syncCount=run('syncs');advance(16);event(handle,'move',350);advance(16);assert.equal(run('syncs'),syncCount,'no full media/layout sync each frame');
- w.DetailSheetResize.deferRefresh();event(handle,'up',350);title.click();assert.equal(clicks,1,'title drag does not open reviews');
+ w.DetailSheetResize.deferRefresh();event(handle,'up',350);assert.equal(clicks,1,'drag does not generate a click');
  if(mobile){
    const before=height();assert(p.classList.contains('detailSettling'));advance(80);assert(height()>before);assert(height()<664);
    advance(200);assert.equal(Math.round(height()),412);assert(!p.classList.contains('detailSettling'));
@@ -43,9 +43,9 @@ for(const mobile of [true,false]){
  event(handle,'down',300);event(handle,'move',450);advance(16);assert(p.classList.contains('detailDragging'));event(handle,'cancel',450);
  assert(!p.classList.contains('detailDragging'));assert(!p.classList.contains('detailSettling'));
  // Body scrolling stays native when content is not at the top.
- const previous=height();event(body,'down',300);assert.equal(event(body,'move',450).defaultPrevented,false);event(body,'up');assert.equal(height(),previous);
+ const previous=height();event(body,'down',300);assert.equal(event(body,'move',330).defaultPrevented,true);event(body,'cancel',330);assert(height()<previous,'compact body drag moves panel down');
  // An upward body swipe scrolls natively and never changes the sheet height.
- event(body,'down',500);assert.equal(event(body,'move',400).defaultPrevented,false);advance(16);assert.equal(height(),previous);event(body,'cancel',400);
+ const small=height();event(body,'down',500);assert.equal(event(body,'move',400).defaultPrevented,true);advance(16);assert(height()>small,'compact body drag expands before scrolling');event(body,'cancel',400);
  p.querySelector('#detailBody').scrollTop=0;
  // Reset/close cancels all frames, including in-flight inertia.
  event(handle,'down',500);event(handle,'move',250);event(handle,'up',250);w.DetailSheetResize.reset();advance(500);

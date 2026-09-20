@@ -1,12 +1,88 @@
-// Upward drags expand from any content position. At full height, scroll natively;
-// downward drags scroll existing content to the top before collapsing.
-// Touch Events let us make that choice before preventing a native vertical scroll.
+// Map sheets expand before scrolling, including name/button/photo drags.
+// Other dialogs retain explicit-handle resizing and native form scrolling.
 (() => {
   const bindings=new WeakMap();
   const headers='.detailResizeHandle,.detailHeader,.menuResizeGrip,.menuResizeHeader';
   const controls='button,a,img,summary,[role="button"],input,select,textarea,label,[contenteditable]:not([contenteditable="false"]),video,audio,iframe,[role="slider"],[data-no-sheet-drag]';
+  function bindAnywhere(panel,options){
+    let gesture=null,suppressUntil=0;
+    panel.classList.add('sheetDragSurface');
+    const editor='input,textarea,select,[contenteditable]:not([contenteditable="false"]),video,audio,iframe,[data-native-input]';
+    const scrollNode=()=>options.scrollElement?.()||panel;
+    function finish(canceled=false){
+      const g=gesture;if(!g)return;gesture=null;
+      try{if(g.kind==='pointer'&&panel.hasPointerCapture(g.id))panel.releasePointerCapture(g.id)}catch{}
+      if(g.active){
+        suppressUntil=Date.now()+400;
+        if(g.resized)options.end?.({canceled,kind:g.kind,velocity:g.velocity});
+        else options.end?.({canceled:true,kind:g.kind,velocity:0});
+      }
+      if(g.prepared)options.afterEnd?.();
+    }
+    function begin(event,point,kind){
+      // A fresh deliberate contact must never be blocked by the preceding drag.
+      suppressUntil=0;
+      const target=event.target.closest?.('*');
+      if(gesture||!point||event.defaultPrevented||!target||target.closest(editor))return;
+      const rect=panel.getBoundingClientRect();
+      if(kind==='pointer'&&panel.offsetWidth>panel.clientWidth+2&&point.clientX>=rect.right-(panel.offsetWidth-panel.clientWidth))return;
+      options.prepare?.();
+      gesture={kind,id:kind==='touch'?point.identifier:event.pointerId,target,x:point.clientX,y:point.clientY,lastY:point.clientY,lastTime:performance.now(),height:panel.getBoundingClientRect().height,force:!!target.closest(options.headerSelector||'.detailHeader,.mobileSideHead,.nearbyResultsHead'),active:false,resized:false,prepared:true,velocity:0,axis:null};
+    }
+    function move(event,point){
+      const g=gesture;if(!g||!point||g.axis==='x')return;
+      const dx=point.clientX-g.x,total=g.y-point.clientY;
+      if(!g.active){
+        if(Math.max(Math.abs(dx),Math.abs(total))<8)return;
+        if(Math.abs(dx)>Math.abs(total)||!event.cancelable){g.axis='x';return;}
+        g.active=true;g.axis='y';options.start?.();
+        if(g.kind==='pointer')try{panel.setPointerCapture(g.id)}catch{}
+      }
+      if(event.cancelable)event.preventDefault();
+      const b=options.bounds(),scroller=scrollNode(),oldHeight=g.height;
+      let delta=g.lastY-point.clientY,pendingScroll=0;
+      if(delta>0){
+        // Even a previously scrolled compact sheet expands BEFORE its content.
+        const growth=Math.min(delta,Math.max(0,b.max-g.height));
+        g.height+=growth;delta-=growth;
+        if(delta>0&&scroller)pendingScroll=delta;
+      }else if(delta<0){
+        let down=-delta;
+        // At full height, read back to the top, then continue folding in the SAME gesture.
+        // A title/handle drag always moves the panel, even when content is scrolled.
+        if(!g.force&&g.height>=b.max-1&&scroller?.scrollTop>0){
+          const consumed=Math.min(down,scroller.scrollTop);scroller.scrollTop-=consumed;down-=consumed;
+        }
+        const shrink=Math.min(down,Math.max(0,g.height-b.min));g.height-=shrink;down-=shrink;
+        if(down>0&&scroller)scroller.scrollTop=Math.max(0,scroller.scrollTop-down);
+      }
+      const now=performance.now();
+      g.velocity=Math.max(-2.5,Math.min(2.5,(g.height-oldHeight)/Math.max(8,now-g.lastTime)));
+      if(g.height!==oldHeight){g.resized=true;options.size(g.height);if(pendingScroll)options.flush?.();}
+      if(pendingScroll&&scroller)scroller.scrollTop+=pendingScroll;
+      g.lastY=point.clientY;g.lastTime=now;
+    }
+    // Window capture runs before document-level photo/link handlers.
+    window.addEventListener('click',event=>{
+      if(event.detail!==0&&Date.now()<suppressUntil&&panel.contains(event.target)){event.preventDefault();event.stopImmediatePropagation();}
+    },true);
+    panel.addEventListener('dragstart',event=>{if(gesture)event.preventDefault();});
+    panel.addEventListener('pointerdown',event=>{if(event.pointerType!=='touch'&&event.isPrimary&&event.button===0)begin(event,event,'pointer');});
+    panel.addEventListener('pointermove',event=>{if(gesture?.kind==='pointer'&&event.pointerId===gesture.id)move(event,event);});
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])window.addEventListener(type,event=>{if(gesture?.kind==='pointer'&&event.pointerId===gesture.id)finish(type!=='pointerup');});
+    panel.addEventListener('touchstart',event=>{if(event.touches.length!==1){finish(true);return;}begin(event,event.touches[0],'touch');},{passive:true});
+    panel.addEventListener('touchmove',event=>{if(gesture?.kind!=='touch')return;if(event.touches.length!==1){finish(true);return;}move(event,[...event.touches].find(t=>t.identifier===gesture.id));},{passive:false});
+    for(const type of ['touchend','touchcancel'])panel.addEventListener(type,event=>{
+      if(gesture?.kind!=='touch'||![...event.changedTouches].some(t=>t.identifier===gesture.id))return;
+      if(gesture.active&&event.cancelable)event.preventDefault();finish(type==='touchcancel');
+    },{passive:false});
+    const cancel=()=>finish(true);
+    for(const type of ['blur','pagehide','resize'])window.addEventListener(type,cancel);
+    bindings.set(panel,{end:cancel});
+  }
   function bind(panel,options){
     if(bindings.has(panel))return;
+    if(options.anywhere){bindAnywhere(panel,options);return;}
     let gesture=null,suppressUntil=0;
     function end(canceled=false){
       if(!gesture)return;
