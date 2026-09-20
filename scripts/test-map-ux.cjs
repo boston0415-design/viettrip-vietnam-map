@@ -46,6 +46,25 @@ const server=http.createServer((req,res)=>{
    assert(rects[0].h<=30,'statistics are compact');
    await page.evaluate(()=>openMobileBusinessList());
   }
+  // Compact list: under half the old full-height panel on both layouts.
+  const sizing=await page.evaluate(()=>({list:document.getElementById('businessSide').getBoundingClientRect().height,content:document.querySelector('.content').getBoundingClientRect().height}));
+  assert(sizing.list/sizing.content<=.405,'default list height is 40% of the map content');
+  assert(sizing.list/(sizing.content-(width<901?14:0))<.5,'less than half the previous default height');
+  assert.equal(await page.locator('.memberMapKey').count(),0,'decorative map key removed');
+  assert.equal(await page.locator('#list .cardBenefit strong').count(),0,'benefit field shows terms without a duplicate heading');
+  assert.match(await page.locator('#list .cardBenefit').first().innerText(),/숙소 2박/);
+  await page.screenshot({path:path.join(out,`compact-list-${width}.png`)});
+  await page.locator('#mobileFilterToggle').click();
+  assert(await page.locator('#listCity').isVisible(),'region and other filters remain reachable');
+  await page.locator('#mobileFilterToggle').click();
+  await page.locator('#businessSide').evaluate(n=>n.scrollTop=0);
+  const sideBefore=await page.locator('#businessSide').evaluate(n=>({height:n.getBoundingClientRect().height,title:n.querySelector('.mobileSideHead').getBoundingClientRect().top}));
+  const sideScrolled=await page.locator('#businessSide').evaluate(n=>{n.scrollTop=125;return {top:n.scrollTop,title:n.querySelector('.mobileSideHead').getBoundingClientRect().top,height:n.getBoundingClientRect().height};});
+  assert(sideScrolled.top>=120,'only the outer list panel scrolls');
+  assert(sideBefore.title-sideScrolled.title>=120,'list title scrolls away with the whole panel');
+  assert.equal(sideBefore.height,sideScrolled.height,'content scrolling does not resize list');
+  assert.equal(await page.locator('#list').evaluate(n=>getComputedStyle(n).overflowY),'visible');
+  await page.locator('#businessSide').evaluate(n=>n.scrollTop=0);
   await page.locator('#list [data-open-business="ux-0"]').click();
   assert(await page.locator('#detail').evaluate(n=>n.classList.contains('show')));
   assert(await page.locator('.browseNavigation').isVisible(),'list selection retains navigation');
@@ -53,6 +72,27 @@ const server=http.createServer((req,res)=>{
   await page.locator('[data-browse-prev]').click();assert.equal(await page.evaluate(()=>state.selected),'ux-0');
   // Photo tap opens a separate layer and never collapses the place panel.
   await page.evaluate(()=>setDetailExpanded(true));
+  const detailBefore=await page.locator('#detail').evaluate(n=>({height:n.getBoundingClientRect().height,title:n.querySelector('.detailHeader').getBoundingClientRect().top}));
+  const detailAfter=await page.locator('#detail').evaluate(n=>{n.scrollTop=100;return {height:n.getBoundingClientRect().height,title:n.querySelector('.detailHeader').getBoundingClientRect().top,top:n.scrollTop};});
+  assert(detailAfter.top>=95,'detail panel itself scrolls');
+  assert(detailBefore.title-detailAfter.title>=95,'detail heading and body scroll together');
+  assert.equal(detailBefore.height,detailAfter.height,'detail native scroll keeps panel height');
+  assert.equal(await page.locator('#detailBody').evaluate(n=>getComputedStyle(n).overflowY),'visible');
+  await page.locator('#detail').evaluate(n=>n.scrollTop=0);
+  // Exercise real browser input, not only programmatic scrollTop assignments.
+  const titleRect=await page.locator('#detail .detailHeader').boundingBox();
+  if(width<901){
+    const cdp=await context.newCDPSession(page),x=Math.round(titleRect.x+18),y=Math.round(titleRect.y+12);
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+    for(let i=1;i<=8;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y-i*12}]});await page.waitForTimeout(20);}
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+  }else{
+    await page.mouse.move(titleRect.x+18,titleRect.y+12);await page.mouse.wheel(0,100);
+  }
+  await page.waitForTimeout(200);
+  assert(await page.locator('#detail').evaluate(n=>n.scrollTop>30),'touch/wheel on title scrolls the entire detail panel');
+  assert.equal(await page.locator('#detail').evaluate(n=>n.getBoundingClientRect().height),detailBefore.height,'title swipe never resizes detail');
+  await page.locator('#detail').evaluate(n=>n.scrollTop=0);
   await page.locator('.placePhotos a').first().click();
   assert(await page.locator('#memberPhotoViewer').evaluate(n=>n.open));
   assert.equal(await page.evaluate(()=>state.selected),'ux-0');
@@ -63,10 +103,11 @@ const server=http.createServer((req,res)=>{
   if(width<901)assert(await page.locator('#businessSide').evaluate(n=>n.classList.contains('mobileOpen')),'X restores original business list');
   assert.match(await page.locator('#list .cardBenefit').first().innerText(),/숙소 2박/);
   // List scroll position survives opening and closing a business further down.
-  const scroll=await page.locator('#list').evaluate(n=>{n.scrollTop=300;return n.scrollTop;});
+  const scroll=await page.locator('#businessSide').evaluate(n=>{n.scrollTop=300;return n.scrollTop;});
+  assert(scroll>0,'restore test uses the actual outer scroll container');
   await page.evaluate(()=>MapUX.openBusiness('ux-4','list'));
   await page.locator('#detailCloseBtn').click();
-  assert.equal(await page.locator('#list').evaluate(n=>n.scrollTop),scroll,'list scroll restored');
+  assert.equal(await page.locator('#businessSide').evaluate(n=>n.scrollTop),scroll,'whole-list scroll restored');
   if(width<901)await page.evaluate(()=>closeMobileBusinessList());
   // Each nearby origin gives the same informative cards and seamless detail navigation.
   for(const kind of ['current','stay','manual']){
@@ -74,6 +115,33 @@ const server=http.createServer((req,res)=>{
    assert(await page.locator('#nearbyResults').isVisible());
    assert.match(await page.locator('#nearbyResultCards').innerText(),/회원 평가|직선/);
    assert.match(await page.locator('#nearbyResultCards').innerText(),/숙소 2박/);
+   const nearbyHeight=await page.locator('#nearbyResults').evaluate(n=>n.getBoundingClientRect().height);
+   assert(nearbyHeight<=198,'nearby defaults to a small tray');
+   const criteria=await page.evaluate(()=>JSON.stringify([state.nearby,state.city,state.cat,state.sub,state.query,state.benefitFilter,state.sort]));
+   await page.locator('#nearbyCollapse').click();
+   assert(!await page.locator('#nearbyResultsBody').isVisible());
+   assert(await page.locator('#nearbyResults').evaluate(n=>n.getBoundingClientRect().height<=54));
+   await page.evaluate(()=>renderAll());
+   assert(!await page.locator('#nearbyResultsBody').isVisible(),'rerender does not undo collapse');
+   if(kind==='stay')await page.screenshot({path:path.join(out,`nearby-collapsed-${width}.png`)});
+   await page.locator('#nearbyClose').click();
+   assert(!await page.locator('#nearbyResults').isVisible());
+   assert(await page.locator('#nearbyReopen').isVisible(),'small reopen action remains accessible');
+   await page.evaluate(()=>renderAll());
+   assert(!await page.locator('#nearbyResults').isVisible(),'rerender does not reopen a dismissed tray');
+   assert.equal(await page.evaluate(()=>JSON.stringify([state.nearby,state.city,state.cat,state.sub,state.query,state.benefitFilter,state.sort])),criteria,'collapse/close never clears origin, pins or filters');
+   await page.locator('#nearbyReopen').click();
+   assert(await page.locator('#nearbyResultsBody').isVisible());
+   const grip=await page.locator('#nearbyResizeGrip').boundingBox();
+   if(width<901){
+    const cdp=await context.newCDPSession(page),x=Math.round(grip.x+grip.width/2),y=Math.round(grip.y+grip.height/2);
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+65}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+   }else{await page.mouse.move(grip.x+grip.width/2,grip.y+grip.height/2);await page.mouse.down();await page.mouse.move(grip.x+grip.width/2,grip.y+grip.height/2+65,{steps:8});await page.mouse.up();}
+   assert(!await page.locator('#nearbyResultsBody').isVisible(),'drag down folds nearby results');
+   await page.locator('#nearbyCollapse').click();
+   assert(await page.locator('#nearbyResultsBody').isVisible());
    if(kind==='stay')await page.screenshot({path:path.join(out,`nearby-${width}.png`)});
    await page.locator('[data-nearby-business="ux-0"]').click();
    await page.locator('[data-browse-next]').click();
@@ -113,7 +181,7 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{closeDetailPanel();renderAll();});
   await page.screenshot({path:path.join(out,`overview-${width}.png`)});
   assert.deepEqual(errors,[],`no runtime error at ${width}px`);
-  results.push({width,passed:true,checks:['one-row stats','title to detail','previous/next','photo modal','list/nearby restoration','benefit text','admin role','membership height','search registration','manual location validation']});
+  results.push({width,passed:true,checks:['40% list height','full-panel scrolling','nearby collapse/close/reopen','drag-to-collapse','removed redundant labels','one-row stats','title to detail','previous/next','photo modal','list/nearby restoration','benefit text','admin role','membership height','search registration','manual location validation']});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'map-ux-results.json'),JSON.stringify(results,null,2));console.log('PASS Map UX browser regression',JSON.stringify(results));

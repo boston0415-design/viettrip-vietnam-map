@@ -6,15 +6,9 @@
     if(dragBounds)return dragBounds;
     const map=document.querySelector('.mapwrap').getBoundingClientRect(),rect=panel().getBoundingClientRect();
     const gap=bottom??Math.max(12,map.bottom-rect.bottom),max=Math.max(80,map.height-gap-12);
-    // Long names and contact actions must remain reachable at the smallest size.
-    const p=panel(),style=getComputedStyle(p);
-    let fixed=(parseFloat(style.paddingTop)||0)+(parseFloat(style.paddingBottom)||0)+8;
-    for(const child of p.children){
-      if(!child.matches('.detailResizeHandle,.detailHeader,.browseNavigation,.externalRegisterBar,.detailQuickActions,.externalMeta'))continue;
-      const css=getComputedStyle(child);if(css.display==='none')continue;
-      fixed+=child.getBoundingClientRect().height+(parseFloat(css.marginTop)||0)+(parseFloat(css.marginBottom)||0);
-    }
-    return {min:Math.min(Math.max(180,fixed),max),max,gap};
+    // Title and actions now share the panel's native scroll container.
+    // Long names must not force the entire sheet to stay tall.
+    return {min:Math.min(180,max),max,gap};
   }
   const clamp=(value,b=bounds())=>Math.max(b.min,Math.min(b.max,value));
   function refresh(){if(pendingRefresh){pendingRefresh=false;renderDetail()}}
@@ -78,7 +72,7 @@
   function sync(){
     const p=panel();if(!p?.classList.contains('show'))return;
     window.BodySheetDrag?.bind(p,{
-      handlesOnly:true,includeHeaders:true,headerSelector:'.detailHeader,.detailResizeHandle',bounds,
+      handlesOnly:true,includeHeaders:true,headerSelector:'.detailResizeHandle',bounds,
       prepare(){stopAnimation();flush();tracking=true},
       start(){bottom=null;dragBounds=bounds();dragging=true;p.classList.add('detailDragging')},
       size:queue,end:settle,
