@@ -42,6 +42,9 @@ for(const width of [390,768,1440]){
  const photos=panel.querySelector('#externalPhotos img');
  for(let i=0;i<4;i++)run('renderAll()');assert(panel.classList.contains('show'),'DB/filter refresh never dismisses Google detail');assert.equal(panel.querySelector('#externalPhotos img'),photos);assert.equal(run('photoCalls'),1);
  assert.equal(run('cameraCalls'),1);
+ d.getElementById('detailExpandBtn').click();assert(d.getElementById('detailBody').hidden,'map view collapses on desktop as well as mobile');
+ d.getElementById('detailExpandBtn').click();assert(!d.getElementById('detailBody').hidden);
+ assert.equal(panel.querySelector('#externalPhotos img'),photos,'expanding reuses the loaded photo');
  // User dismissal / another selection must win over delayed Google responses.
  const pending=w.PlaceSearch.openGoogle({placeId:'other',name:'다른 장소'});run('closeDetailPanel()');run(`details[1].cb(raw('other'),'OK')`);await pending;
  assert(!panel.classList.contains('show'));assert.equal(w.PlaceSearch.currentPlace(),null);

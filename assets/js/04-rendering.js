@@ -431,7 +431,7 @@ function positionSelectedPlaceInView(){
 function syncDetailPanelLayout(){
   const panel=$('#detail');
   if(!panel?.classList.contains('show'))return;
-  const expanded=!isMobileMapLayout() || detailExpanded;
+  const expanded=panel.classList.contains('externalDetail')?detailExpanded:(!isMobileMapLayout() || detailExpanded);
   panel.classList.toggle('detailExpanded',expanded);
   const body=$('#detailBody'),toggle=$('#detailExpandBtn');
   if(body)body.hidden=!expanded;

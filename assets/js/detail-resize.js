@@ -6,7 +6,15 @@
     if(dragBounds)return dragBounds;
     const map=document.querySelector('.mapwrap').getBoundingClientRect(),rect=panel().getBoundingClientRect();
     const gap=bottom??Math.max(12,map.bottom-rect.bottom),max=Math.max(80,map.height-gap-12);
-    return {min:Math.min(180,max),max,gap};
+    // Long names and contact actions must remain reachable at the smallest size.
+    const p=panel(),style=getComputedStyle(p);
+    let fixed=(parseFloat(style.paddingTop)||0)+(parseFloat(style.paddingBottom)||0)+8;
+    for(const child of p.children){
+      if(!child.matches('.detailResizeHandle,.detailHeader,.detailQuickActions,.externalMeta'))continue;
+      const css=getComputedStyle(child);if(css.display==='none')continue;
+      fixed+=child.getBoundingClientRect().height+(parseFloat(css.marginTop)||0)+(parseFloat(css.marginBottom)||0);
+    }
+    return {min:Math.min(Math.max(180,fixed),max),max,gap};
   }
   const clamp=(value,b=bounds())=>Math.max(b.min,Math.min(b.max,value));
   function refresh(){if(pendingRefresh){pendingRefresh=false;renderDetail()}}
@@ -21,7 +29,7 @@
     const p=panel(),b=bounds();height=clamp(value,b);bottom=b.gap;
     p.style.setProperty('--sheet-height',Math.round(height*100)/100+'px');
     p.style.setProperty('--sheet-bottom',bottom+'px');p.classList.add('detailResized');
-    const expanded=height>Math.min(240,b.min+60);
+    const expanded=height>(p.classList.contains('externalDetail')?b.min+32:Math.min(240,b.min+60));
     // No media reload, markup replacement or repeated layout sync on drag frames.
     if(detailExpanded!==expanded){detailExpanded=expanded;syncDetailPanelLayout()}
     aria();
