@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(place?.address)card.append(node('p',place.address,'reviewPlaceAddress'));
     const meta=node('div',null,'communityReviewMeta');
     meta.append(node('strong',review.author_name||'회원'));
+    if(window.MapMembership){const badge=node('span');badge.innerHTML=window.MapMembership.badgeHtml(review.created_by_hash);meta.append(badge)}
     if(review.recommended)meta.append(node('span','👍 강추','badge recommendationBadge'));
     if(review.rating!=null)meta.append(node('span',`★ ${Number(review.rating).toFixed(1)}`,'communityReviewRating'));
     const date=new Date(review.created_at);
@@ -80,7 +81,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(busy)return;busy=true;more.disabled=true;status.textContent='후기 불러오는 중…';
     const token=generation;
     try{
-      const rows=await communityRead('reviews_public',`select=id,place_id,author_name,rating,body,photo_urls,created_at,cafe_url,recommended${scopePlaceId?'&place_id=eq.'+encodeURIComponent(scopePlaceId):''}&body=not.is.null&body=neq.&order=created_at.desc,id.desc&limit=${COMMUNITY_REVIEW_PAGE_SIZE}&offset=${offset}`);
+      const rows=await communityRead('reviews_public',`select=id,place_id,author_name,rating,body,photo_urls,created_at,cafe_url,recommended,created_by_hash${scopePlaceId?'&place_id=eq.'+encodeURIComponent(scopePlaceId):''}&body=not.is.null&body=neq.&order=created_at.desc,id.desc&limit=${COMMUNITY_REVIEW_PAGE_SIZE}&offset=${offset}`);
       const ids=[...new Set(rows.map(r=>r.place_id))].filter(id=>/^[0-9a-f-]{36}$/i.test(id));
       if(ids.length){
         const found=await communityRead('places_public',`select=id,name,address&id=in.(${ids.join(',')})`);
@@ -88,6 +89,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
       if(token!==generation)return;
       writtenCommunityReviews(rows).forEach(r=>feed.append(renderRow(r)));
+      window.MapMembership?.loadBadges(false,rows.map(r=>r.created_by_hash));
       offset+=rows.length;more.hidden=rows.length<COMMUNITY_REVIEW_PAGE_SIZE;more.textContent='후기 더 보기';
       status.textContent=feed.children.length?'업체명을 누르면 업체 정보와 후기를 함께 볼 수 있습니다.':'아직 작성된 회원 후기가 없습니다. 별점만 남긴 평가는 이 목록에 표시되지 않습니다.';
     }catch{

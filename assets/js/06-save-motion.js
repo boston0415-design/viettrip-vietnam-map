@@ -330,11 +330,14 @@ async function saveReview(){
   const btn=$('#saveReview');
   if(btn)btn.disabled=true;
 
-  const deviceId=getDeviceId();
   const now=new Date().toISOString();
   const x=db();
 
   let existing=x.reviews.find(r=>r.placeId===placeId && isOwnReview(r));
+  const registeredPlace=x.places.find(p=>p.id===placeId);
+  const deviceId=window.MapMembership?.credentialFor(existing?.createdByHash)
+    || (isOwnerPlace(registeredPlace)?window.MapMembership?.credentialFor(registeredPlace.ownerKeyHash):null)
+    || getDeviceId();
   if(!existing || nickname!==existing.nickname)rememberMemberNickname(nickname);
   let reviewId=existing?.id || crypto.randomUUID();
 

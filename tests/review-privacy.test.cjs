@@ -20,6 +20,9 @@ for(const f of ['01-data-storage.js','02-services-media.js'])vm.runInContext(fs.
   await uploadMissingLocal({places:[],reviews:[other,{...local,id:'missing'}]},{places:[],reviews:[]});
   assert.equal(writes.length,1);assert.equal(writes[0].name,'device_upsert_review_with_link');
   assert.equal(writes[0].data.p_device_id,'test-private-device');
+  writes=[];fetchSharedDb=async()=>({places:[],reviews:[]});
+  await uploadMissingLocal({places:[{id:'deleted',name:'삭제된 업소',ownerKeyHash:state.deviceHash,lat:10,lng:106}],reviews:[own,other]},{places:[],reviews:[]});
+  assert.equal(writes.length,0,'server-deleted snapshots never resurrect or earn new credit');
   console.log('PASS public review privacy, own/other detection, deduplication, public reads, and own-only migration');
  })()`,ctx);
 })().catch(e=>{console.error(e);process.exitCode=1});

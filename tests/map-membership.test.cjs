@@ -1,0 +1,85 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const {JSDOM}=require(process.env.JSDOM_PATH||'jsdom');
+const read=file=>fs.readFileSync(file,'utf8');
+(async()=>{
+for(const width of [360,768,1440]){
+ const dom=new JSDOM(read('index.html'),{url:'https://viettrip-vietnam-map.pages.dev/',runScripts:'outside-only'});
+ const w=dom.window,d=w.document,run=code=>vm.runInContext(code,dom.getInternalVMContext());
+ await new Promise(resolve=>d.addEventListener('DOMContentLoaded',resolve,{once:true}));
+ Object.defineProperty(w,'innerWidth',{value:width});w.matchMedia=()=>({matches:width<=900});
+ w.HTMLDialogElement.prototype.showModal=function(){this.open=true};
+ w.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new w.Event('close'))};
+ w.confirm=()=>true;w.alert=()=>{};
+ for(const file of fs.readdirSync('assets/js').filter(n=>/^0[1-8]-/.test(n)).sort())run(read('assets/js/'+file));
+ const own='a'.repeat(64),other='b'.repeat(64),secret='12345678-1234-4234-8234-123456789abc';
+ const calls=[];let failed=false,opened=null;
+ let server={id:'member-a',nickname:'회원',total:3,level:1,devices:[{hash:own,key:secret}],has_recovery:false,
+  counts:{place:1,review:2,correction:0},activities:[{kind:'review',source_id:'r',place_id:'p',name:'카페 <img onerror=x>',at:'2026-09-20T01:00:00Z'}],corrections:[]};
+ w.fetch=async(url,options)=>{
+  const req=JSON.parse(options.body);calls.push(req);
+  if(failed)throw new Error('연결 실패');
+  let data;
+  if(req.p_action==='badges')data=req.p_payload.hashes.map(hash=>({hash,member:hash===own?'member-a':'member-b',total:hash===own?server.total:25,level:hash===own?server.level:3}));
+  else if(req.p_action==='code')data={code:'VM-'+'c'.repeat(48),kind:req.p_payload.kind};
+  else if(req.p_action==='nickname'){server={...server,nickname:req.p_payload.nickname};data=server}
+  else if(req.p_action==='moderation')data=[];
+  else data=server;
+  return {ok:true,json:async()=>JSON.parse(JSON.stringify(data))};
+ };
+ w.PlaceSearch={openMember:async id=>{opened=id}};
+ run(`const fixture={places:[{id:'p',name:'업체',registrantNickname:'등록자',ownerKeyHash:'${own}',category:'cafe',subcategory:'카페',lat:10.77,lng:106.7,address:'주소',tags:[]}],reviews:[{id:'r',placeId:'p',nickname:'후기작성자',createdByHash:'${own}',text:'음식이 맛있고 직원들이 친절했습니다.',rating:1,photoUrls:[]}]};db=()=>fixture;state.sharedDbLoading=false;state.selected='p';renderMarkers=()=>{};refreshRegisteredCoverage=()=>{};renderDetail=()=>{};`);
+ run(read('assets/js/map-membership.js'));
+ const flush=async()=>{for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r))};await flush();
+ assert.match(d.getElementById('memberBarRank').textContent,/이등병/);
+ assert.match(d.getElementById('memberBarProgress').textContent,/일병까지 7건/);
+ assert(w.MapMembership.ownsHash(own));assert(!w.MapMembership.ownsHash(other));
+ assert.equal(w.MapMembership.credentialFor(own),secret);assert.equal(run('isOwnerPlace(fixture.places[0])'),true);
+ assert.equal(run('isOwnReview(fixture.reviews[0])'),true,'linked device owns review');
+ assert.equal(w.MapMembership.badgeHtml('" onclick=bad'),'', 'untrusted hash cannot create markup');
+ const badge=d.createElement('div');badge.innerHTML=w.MapMembership.badgeHtml(other);d.getElementById('detail').append(badge);
+ await w.MapMembership.loadBadges(false,[other]);await flush();assert.match(badge.textContent,/상병/);
+ d.getElementById('openMapMembership').click();await flush();assert(d.getElementById('memberDialog').open);
+ assert.equal(d.querySelectorAll('#memberGradeSteps li').length,6);
+ assert.equal(d.querySelector('#memberGradeSteps [aria-current=step] .mapRank').textContent,'이등병');
+ assert(!d.querySelector('#memberActivityList img'),'activity name is escaped');
+ assert(!d.body.innerHTML.includes(secret),'private credentials never rendered');
+ assert.equal(d.getElementById('memberAdminTools').hidden,true);
+ d.getElementById('memberNickname').value='새 닉네임';
+ d.getElementById('memberNicknameForm').dispatchEvent(new w.Event('submit',{cancelable:true}));await flush();
+ assert.equal(d.getElementById('memberHeroName').textContent,'새 닉네임');
+ d.querySelector('[data-member-code=link]').click();await flush();
+ assert.equal(d.getElementById('memberCodeBox').hidden,false);assert.match(d.getElementById('memberCodeHelp').textContent,/10분/);
+ d.getElementById('memberClose').click();assert.equal(d.getElementById('memberCode').value,'');assert(d.getElementById('memberCodeBox').hidden);
+ await w.MapMembership.open();
+ d.getElementById('memberConnectCode').value='VM-'+'c'.repeat(48);
+ d.getElementById('memberConnectForm').dispatchEvent(new w.Event('submit',{cancelable:true}));await flush();
+ assert(!calls.some(r=>r.p_action==='connect'),'merge consent is required');
+ d.getElementById('memberMerge').checked=true;
+ d.getElementById('memberConnectForm').dispatchEvent(new w.Event('submit',{cancelable:true}));await flush();
+ assert.equal(calls.find(r=>r.p_action==='connect').p_payload.merge,true);
+ assert.equal(d.getElementById('memberConnectCode').value,'');
+ d.querySelector('#memberActivityList button').click();await flush();assert.equal(opened,'p');assert(!d.getElementById('memberDialog').open);
+ // Same identity must be used when updating a review or place from a linked device.
+ let sent;w.assert=assert;
+ run(`supaRpc=async(name,args)=>{window.sent={name,args};return true};state.editMode='owner';`);
+ await run("updateExistingPlaceWithFallback('p',fixture.places[0],{name:'수정'})");assert.equal(w.sent.args.p_owner_key,secret);
+ run(`uploadSelectedReviewPhotos=async()=>[];fetchSharedDb=async()=>fixture;renderAll=()=>{};revokeReviewPreviewUrls=()=>{};renderReviewPhotoPreview=()=>{};openReview();`);
+ d.getElementById('rText').value='다시 방문해도 음식이 좋았습니다.';await run('saveReview()');
+ assert.equal(w.sent.args.p_device_id,secret,'cross-device review edits original credential');
+ // New correction form is accessible on mobile and desktop, and pending does not fake points.
+ const holder=d.createElement('div');holder.innerHTML=w.MapMembership.correctionButton('p');d.body.append(holder);holder.firstChild.click();
+ assert(d.getElementById('mapCorrectionDialog').open);
+ d.getElementById('correctionBody').value='영업시간은 오후 열 시까지로 확인했습니다.';
+ d.getElementById('mapCorrectionForm').dispatchEvent(new w.Event('submit',{cancelable:true}));await flush();
+ assert.equal(calls.find(r=>r.p_action==='correct').p_payload.place_id,'p');assert.match(d.getElementById('correctionStatus').textContent,/접수/);
+ assert.equal(d.getElementById('memberTotal').textContent,'3');
+ server={...server,total:150,level:5};await w.MapMembership.refresh();assert.match(d.getElementById('memberBarRank').textContent,/대장/);
+ assert.equal(d.getElementById('memberProgress').value,1);
+ await w.MapMembership.open();failed=true;await w.MapMembership.refresh();assert.match(d.getElementById('memberStatus').textContent,/연결 실패/);
+ assert.match(d.getElementById('memberBarRank').textContent,/대장/,'offline state must not demote');failed=false;
+ run('state.isAdmin=true');await w.MapMembership.open();assert(!d.getElementById('memberAdminTools').hidden);
+ for(const req of calls)if(req.p_action==='badges')assert.equal(req.p_device_id,null,'public requests contain no credential');
+ dom.window.close();
+}
+console.log('PASS 360/768/1440 membership: grades/progress, escaped badges, no credential in DOM, nickname, one-time code UI, merge consent, linked ownership/editing, correction submission, admin visibility and network failure');
+})().catch(e=>{console.error(e);process.exitCode=1});

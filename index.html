@@ -33,6 +33,7 @@
 <link rel="stylesheet" href="./assets/css/nearby-businesses.css?v=20260918-location2">
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260919-share1">
 <link rel="stylesheet" href="./assets/css/place-search.css?v=20260920-search1">
+<link rel="stylesheet" href="./assets/css/map-membership.css?v=20260920-rank1">
 </head>
 <body>
 <div class="app">
@@ -50,6 +51,7 @@
     </div>
   </header>
   <div class="mapUtilityBar">
+  <button id="openMapMembership" class="memberGradeBar" type="button" aria-haspopup="dialog" aria-controls="memberDialog"><span>내 맵 등급</span><strong id="memberBarRank" class="mapRank rankPending">확인 중</strong><span id="memberBarProgress">내 활동 보기</span><span aria-hidden="true">›</span></button>
   <div class="appInstallBar" id="homeScreenBar">
     <img src="./assets/icons/vietmap-192.png?v=20260918-vm1" alt="" width="28" height="28">
     <div class="appInstallCopy"><strong>홈 화면에서 지도를 바로 열어요</strong><span>아이콘 하나로 지도·회원 후기까지</span></div>
@@ -347,21 +349,50 @@
   <p class="nearbyRememberNote">선택한 숙소는 이 기기·브라우저에 30일 동안 기억합니다. 다른 회원에게 공개되지 않으며 언제든 삭제할 수 있습니다.</p>
 </dialog>
 
+<dialog id="memberDialog" class="travellerDialog memberDialog" aria-labelledby="memberTitle">
+  <div class="travellerDialogHead"><div><h2 id="memberTitle">내 맵 등급 · 활동</h2><p>회원의 경험으로 함께 만드는 지도</p></div><button id="memberClose" type="button" aria-label="내 활동 닫기">×</button></div>
+  <section class="memberHero" aria-label="나의 등급">
+    <span id="memberHeroName">나의 맵 활동</span><strong id="memberHeroRank" class="memberHeroRank">등급 확인 중</strong>
+    <p>인정된 기여 <b id="memberTotal">—</b>건</p><progress id="memberProgress" max="1" value="0" aria-label="승급 진행률"></progress><p id="memberNext">활동 정보를 불러오고 있어요.</p>
+  </section>
+  <p id="memberStatus" class="memberStatus" role="status" aria-live="polite"></p>
+  <button id="memberRefresh" class="memberRefresh" type="button">활동 새로고침</button>
+  <dl class="memberCounts"><div><dt>업소 등록</dt><dd id="memberCount_place">—</dd></div><div><dt>방문 후기</dt><dd id="memberCount_review">—</dd></div><div><dt>정보 수정</dt><dd id="memberCount_correction">—</dd></div></dl>
+  <section class="memberSection"><h3>등급과 승급 기준</h3><ol id="memberGradeSteps" class="memberGradeSteps"></ol><p class="memberHelp">기여량 기준의 맵 등급이며, 카페 계급·혜택과는 별도입니다. 미접속 때문에 등급이 내려가지는 않습니다.</p></section>
+  <details class="memberSection"><summary>어떤 활동이 인정되나요?</summary><ul class="memberRules"><li>이름·주소·위치가 있는 새 업소 등록: 업소별 1건</li><li>10자 이상으로 경험을 남긴 방문 후기: 업소별 1건. 별점이 낮아도 동일하게 인정합니다.</li><li>관리자가 확인한 정보 수정 제안: 업소·항목별 1건</li><li>같은 내용의 반복 후기, 중복 업소, 단순 수정·사진 추가는 건수를 늘리지 않습니다.</li><li>별점만 남기기·강추·조회·출석·공유에는 기여가 적립되지 않습니다.</li><li>삭제되거나 허위·도배로 인정이 취소된 기록은 제외됩니다. 등급은 후기의 정확성을 보증하지 않습니다.</li></ul></details>
+  <section class="memberSection"><h3>내 기여 내역 <small>최근 50건</small></h3><ul id="memberActivityList" class="memberActivityList"><li>불러오는 중…</li></ul></section>
+  <details class="memberSection"><summary>내 정보 수정 제안</summary><ul id="memberCorrectionList" class="memberCorrectionList"></ul></details>
+  <details class="memberSection"><summary>닉네임 설정</summary><form id="memberNicknameForm"><label for="memberNickname">맵 활동 닉네임</label><div class="memberInputRow"><input id="memberNickname" type="text" maxlength="30" required autocomplete="nickname"><button id="memberNicknameSave" type="submit">저장</button></div></form></details>
+  <details class="memberSection"><summary>다른 기기 연결 · 활동 복구</summary>
+    <p class="memberHelp">별도 가입 없이 이 브라우저에서 시작합니다. PC·휴대폰의 활동을 합치려면 기존 기기에서 연결 코드를 만들고, 다른 기기에 입력하세요. 닉네임이 같아도 자동으로 합쳐지지 않습니다.</p>
+    <div class="memberCodeActions"><button type="button" data-member-code="link">기기 연결 코드 만들기</button><button type="button" data-member-code="recovery">복구 코드 발급</button></div>
+    <p id="memberRecoveryNote" class="memberHelp">브라우저 기록을 지우기 전에 복구 코드를 보관해 주세요.</p>
+    <div id="memberCodeBox" hidden><p id="memberCodeHelp" class="memberHelp"></p><div class="memberInputRow"><input id="memberCode" type="text" readonly autocomplete="off" spellcheck="false" aria-label="발급된 연결 또는 복구 코드" data-no-sheet-drag><button id="memberCopyCode" type="button">복사</button></div></div>
+    <form id="memberConnectForm"><label for="memberConnectCode">다른 기기의 연결 코드 또는 보관한 복구 코드</label><input id="memberConnectCode" type="text" required maxlength="100" autocomplete="off" spellcheck="false" placeholder="VM-으로 시작하는 코드" data-no-sheet-drag><label class="memberMerge"><input id="memberMerge" type="checkbox" required>현재 기기의 활동을 해당 회원 활동과 합칩니다.</label><button id="memberConnect" type="submit">내 활동 연결</button></form>
+    <p class="memberHelp">코드는 본인만 보관해 주세요. 연결된 기기와 복구 코드가 모두 없으면 닉네임만으로 활동을 복구할 수 없습니다.</p>
+  </details>
+  <details id="memberAdminTools" class="memberSection" hidden><summary>관리자 · 정보 수정 제안</summary><p class="memberHelp">업소 정보를 확인·수정한 후 기여를 인정해 주세요. 허위·중복 제안은 반려하거나 인정을 취소할 수 있습니다.</p><button id="memberModerationLoad" type="button">제안 불러오기</button><div id="memberModeration"></div></details>
+</dialog>
+<dialog id="mapCorrectionDialog" class="travellerDialog memberDialog" aria-labelledby="mapCorrectionTitle">
+  <div class="travellerDialogHead"><div><h2 id="mapCorrectionTitle">정보 수정 제안</h2><p id="correctionPlaceName"></p></div><button id="correctionClose" type="button" aria-label="정보 수정 제안 닫기">×</button></div>
+  <form id="mapCorrectionForm"><input id="correctionPlaceId" type="hidden"><label for="correctionKind">어떤 정보가 달라졌나요?</label><select id="correctionKind"><option value="address">주소·위치</option><option value="hours">영업시간</option><option value="closed">폐업·휴업</option><option value="other">기타 정보</option></select><label for="correctionBody">확인한 내용</label><textarea id="correctionBody" minlength="10" maxlength="1000" required rows="4" placeholder="바뀐 정보와 확인한 날짜·근거를 적어주세요."></textarea><p class="memberHelp">관리자 확인 후 기여 1건으로 인정됩니다. 접수만으로 업소 정보가 변경되지는 않습니다.</p><button id="correctionSave" type="submit">제안 보내기</button><p id="correctionStatus" role="status" aria-live="polite"></p></form>
+</dialog>
+
 <script src="./assets/js/01-data-storage.js?v=20260918-public-office1"></script>
 <script src="./assets/js/hospital-directory.js?v=20260918-hospital-registration1"></script>
 <script src="./assets/js/pharmacy-directory.js?v=20260918-icons-pharmacy1"></script>
-<script src="./assets/js/02-services-media.js?v=20260919-recommend1"></script>
+<script src="./assets/js/02-services-media.js?v=20260920-rank1"></script>
 <script src="./assets/js/personal-places.js?v=20260919-card-recommend1"></script>
 <script src="./assets/js/03-business-ui.js?v=20260920-search1"></script>
 <script src="./assets/js/booking-links.js?v=20260919-routes1"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260919-share1"></script>
-<script src="./assets/js/04-rendering.js?v=20260920-search2"></script>
+<script src="./assets/js/04-rendering.js?v=20260920-rank1"></script>
 <script src="./assets/js/body-sheet-drag.js?v=20260920-search1"></script>
 <script src="./assets/js/detail-resize.js?v=20260920-search2"></script>
 <script src="./assets/js/menu-resize.js?v=20260920-search1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
-<script src="./assets/js/06-save-motion.js?v=20260919-owner-review1"></script>
+<script src="./assets/js/06-save-motion.js?v=20260920-rank1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260920-search1"></script>
 <script src="./assets/js/place-search.js?v=20260920-search2"></script>
@@ -371,7 +402,8 @@
 <script defer src="./assets/vendor/realtime-2.116.0.min.js"></script>
 <script defer src="./assets/js/online-presence.js?v=20260918-online1"></script>
 <script src="./assets/js/list-layout.js?v=20260917-list1"></script>
-<script src="./assets/js/community-reviews.js?v=20260919-recommend1"></script>
+<script src="./assets/js/community-reviews.js?v=20260920-rank1"></script>
+<script src="./assets/js/map-membership.js?v=20260920-rank1"></script>
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=polish1"></script>

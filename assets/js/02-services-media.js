@@ -87,6 +87,7 @@ function reviewIdentityKey(r){
 }
 function isOwnReview(r){
   if(!r)return false;
+  if(r.createdByHash && window.MapMembership?.ownsHash(r.createdByHash))return true;
   return r.createdByHash
     ? !!state.deviceHash && r.createdByHash===state.deviceHash
     : !!r.createdBy && r.createdBy===getDeviceId();
@@ -311,7 +312,7 @@ function isOwnerPlace(p){
   // 서버 소유자 해시가 있는 업체는 반드시 해시가 일치해야 수정 가능.
   // 로컬 기억값은 owner_key_hash가 없는 예전 데이터에만 보조적으로 사용.
   if(p.ownerKeyHash){
-    return !!(state.deviceHash && state.deviceHash===p.ownerKeyHash);
+    return !!(state.deviceHash && state.deviceHash===p.ownerKeyHash) || !!window.MapMembership?.ownsHash(p.ownerKeyHash);
   }
 
   return isLocallyOwnedPlace(p.id);
@@ -452,7 +453,7 @@ async function updateExistingPlaceWithFallback(placeId,current,patch){
       try{
         const ok=await supaRpc('owner_update_place',{
           p_place_id:placeId,
-          p_owner_key:getDeviceId(),
+          p_owner_key:window.MapMembership?.credentialFor(current.ownerKeyHash)||getDeviceId(),
           p_patch:patch
         });
         if(ok===true)return {ok:true,mode:'owner'};
@@ -466,7 +467,7 @@ async function updateExistingPlaceWithFallback(placeId,current,patch){
   try{
     const ok=await supaRpc('owner_update_place',{
       p_place_id:placeId,
-      p_owner_key:getDeviceId(),
+      p_owner_key:window.MapMembership?.credentialFor(current.ownerKeyHash)||getDeviceId(),
       p_patch:patch
     });
     if(ok===true)return {ok:true,mode:'owner'};
@@ -988,6 +989,9 @@ async function uploadMissingLocal(local,remote){
       localToRemoteId.set(p.id,existing.id);
       continue;
     }
+    // A public server snapshot is not an unsent registration. Never resurrect
+    // a deleted place or credit a cached place to the current member.
+    if(p.ownerKeyHash)continue;
     try{
       await supaInsert('places',placeToRemote(p));
       remoteByKey.set(key,p);
@@ -1006,7 +1010,7 @@ async function uploadMissingLocal(local,remote){
 
   for(const r of dedupeReviews(local.reviews)){
     // Publicly read reviews must never be re-uploaded as this device's content.
-    if(!isOwnReview(r))continue;
+    if(!isOwnReview(r) || r.createdByHash)continue;
     const remotePlaceId=localToRemoteId.get(r.placeId)||r.placeId;
     const normalized={...r, placeId:remotePlaceId};
 
@@ -1137,6 +1141,7 @@ function saveDb(x){
   const current=safeStorageGet(DBKEY);
   if(current)safeStorageSet(DBKEY+'_backup',current);
   safeStorageSet(DBKEY,json);
+  if(typeof document!=='undefined' && typeof document.dispatchEvent==='function' && typeof CustomEvent==='function')document.dispatchEvent(new CustomEvent('map-data-saved'));
   return true;
 }
 
