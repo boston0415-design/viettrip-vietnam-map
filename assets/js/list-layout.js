@@ -3,11 +3,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   filterToggle?.addEventListener('click',()=>{
     const open=document.getElementById('businessSide').classList.toggle('mobileFiltersOpen');
     filterToggle.setAttribute('aria-expanded',String(open));
-    filterToggle.textContent=open?'필터 접기':'업종 필터';
+    filterToggle.textContent=open?'필터 접기':'필터';
   });
   const button=document.getElementById('desktopListToggle');
   const content=document.querySelector('.content');
   if(!button||!content)return;
+  document.getElementById('mobileListClose')?.addEventListener('click',()=>{
+    if(window.matchMedia('(min-width:901px)').matches&&!content.classList.contains('desktopListCollapsed'))button.click();
+  });
   button.addEventListener('click',()=>{
     if(!window.matchMedia('(min-width:901px)').matches)return;
     const collapsed=content.classList.toggle('desktopListCollapsed');

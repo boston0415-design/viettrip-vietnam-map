@@ -61,9 +61,9 @@ for(const mobile of [true,false]){
    const interrupted=height();event(handle,'down',400);assert(!p.classList.contains('detailSettling'));advance(500);assert.equal(height(),interrupted,'new touch immediately stops settling');event(handle,'up',400);
  }
  advance(600);title.click();assert.equal(clicks,2,'a later intentional title tap still works');
- // A long place heading cannot hide the fixed actions at the minimum height.
+ // A long heading scrolls with the content instead of forcing a tall minimum height.
  mapHeight=700;p.querySelector('.detailHeader').getBoundingClientRect=()=>({height:300});
- handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Home',cancelable:true}));assert(height()>=308);
+ handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Home',cancelable:true}));assert.equal(height(),180);
  dom.window.close();
 }
 console.log('PASS real touch-event/mouse grip resizing and native title/body paths, frame batching, momentum snap, interruption, reduced motion, deferred refresh, scroll priority, taps, keyboard, bounds and cancellation (DOM simulation)');

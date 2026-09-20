@@ -32,11 +32,12 @@
   }
   function refresh(focusId,action){
     const list=document.getElementById('list'),scrollTop=list?.scrollTop||0;
+    const side=document.getElementById('businessSide'),sideScroll=side?.scrollTop||0;
     closeSystemInfo();
     if(data.hidden.has(state.selected))state.selected=null;
     renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();
     if(list){
-      list.scrollTop=scrollTop;
+      list.scrollTop=scrollTop;if(side)side.scrollTop=sideScroll;
       if(focusId){
         const button=[...list.querySelectorAll('[data-personal-action]')].find(b=>b.dataset.placeId===focusId&&b.dataset.personalAction===action);
         const fallback=document.querySelector('[data-personal-view][aria-pressed="true"]');

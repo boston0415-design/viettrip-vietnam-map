@@ -3,6 +3,7 @@
   'use strict';
   const el=id=>document.getElementById(id);
   let browse=null,opening=false,closing=false,nearbyKey='',nearbyHTML='';
+  let nearbyMode='expanded',nearbyOrigin=null,nearbyGesture=null;
   const scope=()=>JSON.stringify([state.city,state.cat,state.sub,state.sort,state.query,state.benefitFilter,state.ratingFilter,state.restaurantTag,state.nearby,window.PersonalPlaces?.getView()]);
   const mobile=()=>typeof isMobileMapLayout==='function'&&isMobileMapLayout();
   const collection=()=>typeof items==='function'?items({forList:true}):[];
@@ -64,9 +65,18 @@
   function syncNearby(){
     const tray=el('nearbyResults');if(!tray)return;
     const origin=state.nearby;
-    tray.hidden=!origin||Boolean(state.selected)||Boolean(state.registerMode)||Boolean(window.PlaceSearch?.currentPlace());
-    if(!origin)return;
-    const key=JSON.stringify(origin),all=collection(),shown=all.slice(0,30);
+    const key=JSON.stringify(origin);
+    if(!origin||origin!==nearbyOrigin||key!==nearbyKey){nearbyMode='expanded';nearbyOrigin=origin;}
+    const blocked=!origin||Boolean(state.selected)||Boolean(state.registerMode)||Boolean(window.PlaceSearch?.currentPlace());
+    tray.hidden=blocked||nearbyMode==='closed';
+    const reopen=el('nearbyReopen');if(reopen)reopen.hidden=blocked||nearbyMode!=='closed';
+    tray.classList.toggle('isCollapsed',nearbyMode==='collapsed');
+    if(el('nearbyResultsBody'))el('nearbyResultsBody').hidden=nearbyMode==='collapsed';
+    el('nearbyResizeGrip')?.setAttribute('aria-valuenow',nearbyMode==='collapsed'?'0':'1');
+    const toggle=el('nearbyCollapse');if(toggle){toggle.textContent=nearbyMode==='collapsed'?'펼치기':'접기';toggle.setAttribute('aria-expanded',String(nearbyMode!=='collapsed'));}
+    if(!origin){nearbyKey='';return;}
+    const all=collection(),shown=all.slice(0,30);
+    if(reopen)reopen.textContent=`주변 결과 ${all.length}곳 ▴`;
     const title=el('nearbyResultsTitle');title.textContent=`${origin.name} 주변 · ${all.length}곳`;
     const note=el('nearbyResultsNote');note.textContent=`현재 반경·필터의 등록업소 · 직선거리순${all.length>30?' · 가까운 30곳 표시':''}`;
     // A user may choose another sort in the full list. Describe the actual order.
@@ -80,13 +90,56 @@
     nearbyKey=key;
     positionNearby();
   }
+  function setNearbyMode(mode){
+    if(!['expanded','collapsed','closed'].includes(mode))return;
+    nearbyMode=mode;
+    const tray=el('nearbyResults');tray?.style.removeProperty('height');tray?.classList.remove('nearbyDragging');
+    syncNearby();
+    // Do not leave keyboard focus in newly hidden cards or controls.
+    const focus=mode==='closed'?el('nearbyReopen'):el('nearbyCollapse');
+    focus?.focus({preventScroll:true});
+  }
   function positionNearby(){
     const tray=el('nearbyResults'),legend=el('areaLegend'),wrap=document.querySelector('.mapwrap');if(!tray||!legend||!wrap)return;
-    if(!mobile()){tray.style.removeProperty('bottom');return;}
     const mapRect=wrap.getBoundingClientRect(),menuRect=legend.getBoundingClientRect();
     const bottom=Math.max(8,mapRect.bottom-menuRect.top+8);
-    if(tray.style.bottom!==bottom+'px')tray.style.bottom=bottom+'px';
-    tray.classList.toggle('nearbyFiltersOpen',el('areaLegendTitle')?.getAttribute('aria-expanded')==='true');
+    const max=Math.max(52,Math.min(196,mapRect.height*.34,mapRect.height-bottom-8));
+    const filtersOpen=el('areaLegendTitle')?.getAttribute('aria-expanded')==='true';
+    for(const node of [tray,el('nearbyReopen')])if(node){
+      if(node.style.bottom!==bottom+'px')node.style.bottom=bottom+'px';
+      node.classList.toggle('nearbyFiltersOpen',filtersOpen);
+    }
+    tray.style.setProperty('--nearby-max-height',Math.floor(max)+'px');
+  }
+  function bindNearbyGrip(tray){
+    const grip=el('nearbyResizeGrip');
+    const release=event=>{
+      const g=nearbyGesture;if(!g||event.pointerId!==g.id)return;
+      nearbyGesture=null;
+      try{grip.releasePointerCapture(g.id);}catch{}
+      if(event.type==='pointercancel'){setNearbyMode(g.mode);return;}
+      const dy=event.clientY-g.y;
+      setNearbyMode(Math.abs(dy)<24?g.mode:dy>0?'collapsed':'expanded');
+    };
+    grip.addEventListener('pointerdown',event=>{
+      if(!event.isPrimary||event.button!==0)return;
+      nearbyGesture={id:event.pointerId,y:event.clientY,height:tray.getBoundingClientRect().height,mode:nearbyMode};
+      try{grip.setPointerCapture(event.pointerId);}catch{}
+    });
+    grip.addEventListener('pointermove',event=>{
+      const g=nearbyGesture;if(!g||event.pointerId!==g.id)return;
+      const dy=event.clientY-g.y;if(Math.abs(dy)<6)return;
+      event.preventDefault();tray.classList.add('nearbyDragging');
+      tray.classList.remove('isCollapsed');el('nearbyResultsBody').hidden=false;
+      const max=parseFloat(tray.style.getPropertyValue('--nearby-max-height'))||196;
+      tray.style.height=Math.max(52,Math.min(max,g.height-dy))+'px';
+    });
+    grip.addEventListener('pointerup',release);grip.addEventListener('pointercancel',release);
+    grip.addEventListener('lostpointercapture',()=>{if(nearbyGesture){const mode=nearbyGesture.mode;nearbyGesture=null;setNearbyMode(mode);}});
+    grip.addEventListener('keydown',event=>{
+      const mode={ArrowDown:'collapsed',ArrowUp:'expanded',Home:'collapsed',End:'expanded',Escape:'closed'}[event.key];
+      if(mode){event.preventDefault();setNearbyMode(mode);}
+    });
   }
   function syncSearchAction(){
     const box=el('placeSearchResults');if(!box)return;
@@ -106,9 +159,14 @@
     const wrap=document.querySelector('.mapwrap');
     if(wrap&&!el('nearbyResults')){
       const tray=document.createElement('section');tray.id='nearbyResults';tray.className='nearbyResults';tray.hidden=true;
-      tray.setAttribute('aria-label','주변 등록업소 미리보기');tray.setAttribute('data-no-sheet-drag','');
-      tray.innerHTML='<div class="nearbyResultsHead"><div><strong id="nearbyResultsTitle"></strong><small id="nearbyResultsNote"></small></div><button id="nearbyAllResults" type="button">전체 목록 ›</button></div><div id="nearbyResultCards" class="nearbyResultCards"></div>';
+      tray.setAttribute('aria-label','주변 등록업소 미리보기');
+      tray.innerHTML='<div id="nearbyResizeGrip" class="nearbyResizeGrip" tabindex="0" role="separator" aria-label="주변 결과 접기·펼치기" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="1" aria-valuenow="1" aria-controls="nearbyResultsBody" title="아래로 끌어 접기 · 위로 끌어 펼치기"><span aria-hidden="true"></span></div><div class="nearbyResultsHead"><strong id="nearbyResultsTitle"></strong><button id="nearbyCollapse" type="button" aria-controls="nearbyResultsBody" aria-expanded="true">접기</button><button id="nearbyClose" type="button" aria-label="주변 결과 닫기">×</button></div><div id="nearbyResultsBody"><div class="nearbyResultsMeta"><small id="nearbyResultsNote"></small><button id="nearbyAllResults" type="button">전체 목록 ›</button></div><div id="nearbyResultCards" class="nearbyResultCards"></div></div>';
       wrap.append(tray);
+      const reopen=document.createElement('button');reopen.id='nearbyReopen';reopen.className='nearbyReopen';reopen.type='button';reopen.hidden=true;reopen.setAttribute('aria-controls','nearbyResults');wrap.append(reopen);
+      reopen.onclick=()=>setNearbyMode('expanded');
+      el('nearbyCollapse').onclick=()=>setNearbyMode(nearbyMode==='collapsed'?'expanded':'collapsed');
+      el('nearbyClose').onclick=()=>setNearbyMode('closed');
+      bindNearbyGrip(tray);
       el('nearbyAllResults').onclick=()=>{if(mobile())openMobileBusinessList();else{if(document.querySelector('.content')?.classList.contains('desktopListCollapsed'))el('desktopListToggle')?.click();el('list')?.scrollIntoView({block:'nearest'});}};
       tray.addEventListener('click',event=>{const b=event.target.closest('[data-nearby-business]');if(b)openBusiness(b.dataset.nearbyBusiness,'nearby');});
     }

@@ -1,0 +1,52 @@
+/* One scroll container per panel. Defaults leave at least half of the map visible. */
+#businessSide{height:40%!important;max-height:40%!important;min-height:0!important;align-self:end;display:block;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;scrollbar-width:thin}
+#businessSide.menuSized{height:var(--menu-height)!important;max-height:min(var(--menu-height),calc(100% - 32px))!important}
+#businessSide .list{height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;flex:none}
+#businessSide .filters,#businessSide .mobileSideHead,#businessSide .browseHeading{position:static!important;flex:none}
+#businessSide .mobileSideHead{display:flex!important;min-height:44px;align-items:center;gap:8px;padding:0 9px}
+#businessSide .mobileSideHead strong{font-size:14px;white-space:nowrap}
+#businessSide .browseHeading{display:none}
+#businessSide #mobileFilterToggle{margin-left:auto;width:auto!important;min-height:36px;min-width:44px;padding:5px 10px;font-size:12px;border:1px solid #dbe3eb;background:white;border-radius:8px}
+#businessSide #mobileListClose{width:40px;height:40px;min-width:40px;border:0;border-radius:8px;background:#f2f6f4;font-size:25px;color:#405a4c}
+#businessSide:not(.mobileFiltersOpen) .listRegionFilter,#businessSide:not(.mobileFiltersOpen) .personalPlaceTabs,#businessSide:not(.mobileFiltersOpen) #hiddenPlacesHelp,#businessSide:not(.mobileFiltersOpen) #cats,#businessSide:not(.mobileFiltersOpen) #subs{display:none!important}
+#businessSide .benefitTabs{margin:4px 0}.side .sort{margin-top:3px}
+#businessSide>.menuResizeGrip{min-height:24px;height:24px}
+#detail.show{display:block!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;scrollbar-width:thin}
+#detail .detailBody,#detail .detailSummary{overflow:visible!important;max-height:none!important;flex:none}
+#detail .detailHeader,#detail .detailHeader *,#businessSide .menuResizeHeader,#businessSide .menuResizeHeader *{position:static;touch-action:pan-y pinch-zoom!important;cursor:auto;-webkit-user-select:auto;user-select:auto}
+#detail .detailHeader button,#businessSide .mobileSideHead button{cursor:pointer}
+/* Nearby results can be closed without clearing the search origin or map pins. */
+.nearbyResults{display:flex;flex-direction:column;max-height:var(--nearby-max-height,196px)!important;overflow:hidden!important;padding:0 8px 8px;box-sizing:border-box}
+.nearbyResizeGrip{display:flex;flex:0 0 24px;min-height:24px;align-items:center;justify-content:center;touch-action:none;cursor:ns-resize;user-select:none}
+.nearbyResizeGrip span{width:42px;height:4px;border-radius:8px;background:#b6c8c1}
+.nearbyResults .nearbyResultsHead{flex:none;gap:4px;padding:0 0 4px}
+.nearbyResultsHead>strong{min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nearbyResults .nearbyResultsHead button{min-height:36px;min-width:40px;padding:4px 7px}
+.nearbyResults #nearbyClose{font-size:24px;border:0;background:#f2f6f4}
+#nearbyResultsBody{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+#nearbyResultsBody[hidden]{display:none!important}
+.nearbyResultsMeta{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.nearbyResultsMeta small{font-size:10px;line-height:1.4;color:#718174;flex:1}
+.nearbyResultsMeta button{flex:none;min-height:28px;padding:4px 7px;font-size:11px;border:0;background:transparent;color:#2e644c}
+.nearbyResults .nearbyResultCard{padding:8px 10px}
+.nearbyResults.isCollapsed{height:52px;max-height:52px!important;padding:7px 8px}
+.nearbyResults.isCollapsed .nearbyResizeGrip{position:absolute;inset:0 110px 0 0;min-height:0;opacity:0}
+.nearbyResults.isCollapsed .nearbyResultsHead{padding:0}
+.nearbyResults.nearbyDragging{transition:none!important;user-select:none}
+.nearbyReopen{position:absolute;z-index:13;bottom:14px;left:14px;min-height:40px;padding:8px 13px;border:1px solid #bed8c9;border-radius:20px;background:#fff;color:#2a624a;font:600 12px/1.4 system-ui,sans-serif;box-shadow:0 3px 12px #244c381c}
+.nearbyReopen[hidden],.nearbyReopen.nearbyFiltersOpen,.mapwrap.listOpen .nearbyReopen,.mapwrap.detailOpen .nearbyReopen{display:none!important}
+.nearbyReopen:focus-visible,.nearbyResizeGrip:focus-visible{outline:2px solid #247f78;outline-offset:-2px}
+@media(max-width:900px){.nearbyResults{padding:0 8px 6px}.nearbyReopen{left:10px}.nearbyResults .nearbyResultCard{flex-basis:225px}}
+/* On desktop the freed space belongs to the map, not an empty sidebar column. */
+@media(min-width:901px){
+ .content{--desktop-list-offset:350px}
+ .content>.mapwrap{grid-column:1/-1;grid-row:1}
+ .content>#businessSide{grid-column:1;grid-row:1;z-index:14;border:1px solid #dce6e2;border-radius:14px 14px 0 0;box-shadow:0 3px 14px #244c3817}
+ .content.desktopListCollapsed{--desktop-list-offset:0px}
+ #desktopListToggle{left:var(--desktop-list-offset)}
+ .mapwrap #areaLegend{left:calc(var(--desktop-list-offset) + 14px)!important;max-width:calc(100% - var(--desktop-list-offset) - 28px)}
+ .mapwrap.detailOpen #areaLegend{max-width:calc(100% - var(--desktop-list-offset) - clamp(360px,34vw,440px))}
+ .nearbyResults,.nearbyReopen{left:calc(var(--desktop-list-offset) + 14px)}
+}
+@media(min-width:901px) and (max-width:1199px){.content{--desktop-list-offset:300px}}
+@media(min-width:1500px){.content{--desktop-list-offset:380px}}
