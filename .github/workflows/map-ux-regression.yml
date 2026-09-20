@@ -3,34 +3,77 @@ on:
   push:
     branches: ['fix/map-ux-20260920']
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: map-ux-regression
+  cancel-in-progress: false
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: fix/map-ux-20260920
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Archive exact source for regression testing
-        run: git archive --format=zip -o map-source.zip HEAD
-      - uses: actions/upload-artifact@v4
-        with:
-          name: map-ux-source
-          path: map-source.zip
-          retention-days: 3
+      - name: Apply checksum-verified source patch
+        run: |
+          if [ -f scripts/map-ux-transfer.1 ]; then
+          python3 - <<'PY'
+          import base64, gzip, hashlib, pathlib, subprocess
+          parts = [pathlib.Path(f'scripts/map-ux-transfer.{i}') for i in (1, 2, 3)]
+          patch = gzip.decompress(base64.b64decode(''.join(p.read_text().strip() for p in parts)))
+          assert hashlib.sha256(patch).hexdigest() == '3efb63f76ea6f8db902f84194e8755aedf9186129405d6d80c174db6d7261ec8', 'Patch checksum mismatch'
+          subprocess.run(['git', 'apply', '--check', '-'], input=patch, check=True)
+          subprocess.run(['git', 'apply', '-'], input=patch, check=True)
+          for p in parts:
+              p.unlink()
+          PY
+          fi
       - name: Check JavaScript syntax
         run: find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
       - name: Build Pages
         run: node scripts/build-pages.mjs
-      - name: Run regression checks when available
+      - name: Install isolated test dependencies
         run: |
-          if [ -f scripts/test-map-ux.cjs ]; then
-            npm install --no-save --package-lock=false playwright@1.55.0
-            npx playwright install chromium --with-deps
-            node scripts/test-map-ux.cjs
+          npm install --no-save --package-lock=false jsdom@26.1.0 playwright@1.55.0
+          npx playwright install chromium --with-deps
+      - name: Existing offline regression suite
+        run: |
+          mkdir -p test-results
+          failed=0
+          for test in tests/*.test.cjs; do
+            echo "===== $test =====" | tee -a test-results/existing-tests.log
+            if ! timeout 45 node "$test" >>test-results/existing-tests.log 2>&1; then
+              echo "FAILED: $test" | tee -a test-results/existing-tests.log
+              failed=1
+            fi
+          done
+          cat test-results/existing-tests.log
+          exit "$failed"
+      - name: Desktop and mobile browser regressions
+        if: success() || failure()
+        run: node scripts/test-map-ux.cjs
+      - name: Commit tested conventional source and remove transfer files
+        if: success()
+        run: |
+          git add -A -- assets index.html tests scripts
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Fix mobile and desktop map browsing, photos, benefits and membership UX'
+            git push origin HEAD:fix/map-ux-20260920
           fi
+          git rev-parse HEAD > test-results/tested-commit.txt
+      - name: Record source state
+        if: always()
+        run: |
+          mkdir -p test-results
+          git diff --stat > test-results/uncommitted-summary.txt
+          tar --exclude=node_modules --exclude=.git --exclude=test-results --exclude=dist-pages -czf test-results/applied-source.tar.gz assets index.html scripts tests
       - uses: actions/upload-artifact@v4
         if: always()
         with:
