@@ -1,0 +1,17 @@
+name: Panel interaction validation
+on:
+  push:
+    branches: ['fix/panel-interaction-review-safety']
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git archive --format=zip -o map-current-source.zip HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: current-source
+          path: map-current-source.zip
+          retention-days: 2
