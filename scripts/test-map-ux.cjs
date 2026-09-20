@@ -7,7 +7,7 @@ const testData={places:Array.from({length:24},(_,i)=>({id:'ux-'+i,name:i===0?'í˜
 db=()=>testData;state.sharedDbLoading=false;state.city='all';state.cat='all';state.sub='all';state.sort='newest';state.query='';state.clickLatLng=null;
 const empty=()=>{};
 for(const name of ['renderMarkers','refreshRegisteredCoverage','renderPopularAreas','renderGolfCourses','renderPoiMarkers','clearSelectionRanges','clearAreaLabels','clearSelectedSystemIcons','closeSystemInfo','refreshMapAfterMobileLayout','positionSelectedPlaceInView','cancelPendingMapWork','fitCircleGeometry','fitSelectedCityView'])window[name]=empty;
-getDeviceId=()=>"test-device-id";isOwnerPlace=()=>false;bootstrapSharedDb=async()=>testData;loadGoogle=async()=>{};restoreAdminSession=async()=>{};bindAreaNavigation=empty;
+getDeviceId=()=>"test-device-id";isOwnerPlace=()=>false;bootstrapSharedDb=async()=>testData;loadGoogle=async()=>{};restoreAdminSession=async()=>{};
 focusLocationAtZoom=async()=>{};
 state.map={getCenter:()=>({lat:()=>10.77,lng:()=>106.7}),getZoom:()=>16,setCenter:empty,panBy:empty,setOptions:empty,get:()=>'',getDiv:()=>document.getElementById('map'),addListener:()=>({remove:empty})};
 class TestMarker{constructor(o){Object.assign(this,o);}setMap(map){this.map=map;}getMap(){return this.map;}addListener(){return {remove:empty}}}
@@ -29,7 +29,7 @@ const server=http.createServer((req,res)=>{
  try{
  for(const width of [320,390,768,1440]){
   const context=await browser.newContext({viewport:{width,height:width===1440?1000:844},isMobile:width<901,hasTouch:width<901});
-  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const page=await context.newPage(),errors=[];page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));
   await page.route('https://**/*',route=>route.request().url().includes('fixture.invalid')?route.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==','base64')}):route.fulfill({contentType:'application/json',body:'[]'}));
   if(process.env.OFFLINE_UI){
    const storageShim='<script>(()=>{const memoryStorage=new Map();Object.defineProperty(window,"localStorage",{value:{getItem:k=>memoryStorage.get(k)||null,setItem:(k,v)=>memoryStorage.set(k,String(v)),removeItem:k=>memoryStorage.delete(k)}});Object.defineProperty(window,"sessionStorage",{value:window.localStorage});})();</script>';
@@ -86,9 +86,50 @@ const server=http.createServer((req,res)=>{
   const sideBefore=await page.locator('#businessSide').evaluate(n=>({height:n.getBoundingClientRect().height,title:n.querySelector('.mobileSideHead').getBoundingClientRect().top}));
   const sideScrolled=await page.locator('#businessSide').evaluate(n=>{n.scrollTop=125;return {top:n.scrollTop,title:n.querySelector('.mobileSideHead').getBoundingClientRect().top,height:n.getBoundingClientRect().height};});
   assert(sideScrolled.top>=120,'only the outer list panel scrolls');
-  assert(sideBefore.title-sideScrolled.title>=120,'list title scrolls away with the whole panel');
+  assert(Math.abs(sideBefore.title-sideScrolled.title)<1,'list control bar stays anchored while content scrolls');
   assert.equal(sideBefore.height,sideScrolled.height,'content scrolling does not resize list');
   assert.equal(await page.locator('#list').evaluate(n=>getComputedStyle(n).overflowY),'visible');
+  async function assertAnchored(panelSelector,headerSelector,gripSelector){
+   const geometry=await page.locator(panelSelector).evaluate((p,{headerSelector,gripSelector})=>{
+    const h=p.querySelector(headerSelector),g=p.querySelector(gripSelector),saved=p.scrollTop;
+    const result=[0,50,125,400,100000].map(scroll=>{p.scrollTop=scroll;
+     const pr=p.getBoundingClientRect(),hr=h.getBoundingClientRect(),gr=g.getBoundingClientRect();
+     const control=h.querySelector('button:last-child'),cr=control.getBoundingClientRect();
+     return {scroll:p.scrollTop,header:hr.top-pr.top,grip:gr.top-pr.top,gap:hr.top-gr.bottom,
+       visible:cr.top>=pr.top&&cr.bottom<=pr.bottom,topmost:control.contains(document.elementFromPoint(cr.x+cr.width/2,cr.y+cr.height/2))};
+    });p.scrollTop=saved;return result;
+   },{headerSelector,gripSelector});
+   assert(geometry.some(r=>r.scroll>100),'fixture has genuinely scrolled content');
+   for(const r of geometry){
+    assert(Math.abs(r.header-geometry[0].header)<1,'header fixed at scroll '+r.scroll);
+    assert(Math.abs(r.grip-geometry[0].grip)<1,'grip fixed at scroll '+r.scroll);
+    assert(r.gap>=-1,'grip never overlaps header');
+    assert(r.visible&&r.topmost,'close/options stay visible and reachable');
+   }
+  }
+  await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
+  // After the sheet reaches its upper limit, further title drags scroll content,
+  // but must not carry the control bar or grip beyond the panel's upper edge.
+  await page.locator('#businessSide').evaluate(n=>n.scrollTop=0);
+  await page.locator('#businessSide>.menuResizeGrip').press('End');
+  const fullList=await page.locator('#businessSide').boundingBox();
+  const anchoredTitle=await page.locator('#businessSide>.mobileSideHead').boundingBox();
+  await dragAt('#businessSide .mobileSideHead strong',55);
+  assert(Math.abs((await page.locator('#businessSide').boundingBox()).height-fullList.height)<1,'expanded list stops at its upper limit');
+  assert(Math.abs((await page.locator('#businessSide>.mobileSideHead').boundingBox()).y-anchoredTitle.y)<1,'title drag at the limit never pushes controls upward');
+  assert(await page.locator('#businessSide').evaluate(n=>n.scrollTop>20),'content remains scrollable below anchored controls');
+  await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
+  await page.screenshot({path:path.join(out,`pinned-list-${width}.png`)});
+  await page.locator('#mobileFilterToggle').click();
+  assert(await page.locator('#businessSide').evaluate(n=>n.classList.contains('mobileFiltersOpen')),'options still respond after scrolling');
+  await page.locator('#mobileFilterToggle').click();
+  await dragAt('#businessSide .mobileSideHead strong',-90);
+  assert((await page.locator('#businessSide').boundingBox()).height<fullList.height-40,'sticky title still drags the whole sheet down');
+  await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
+  await page.locator('#mobileListClose').click();
+  if(width<901)await page.locator('#mobileListBtn').click();
+  else await page.locator('#desktopListToggle').click();
+  await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
   await page.locator('#businessSide').evaluate(n=>n.scrollTop=0);
   await page.locator('#list [data-open-business="ux-0"]').click();
   assert(await page.locator('#detail').evaluate(n=>n.classList.contains('show')));
@@ -100,9 +141,10 @@ const server=http.createServer((req,res)=>{
   const detailBefore=await page.locator('#detail').evaluate(n=>({height:n.getBoundingClientRect().height,title:n.querySelector('.detailHeader').getBoundingClientRect().top}));
   const detailAfter=await page.locator('#detail').evaluate(n=>{n.scrollTop=100;return {height:n.getBoundingClientRect().height,title:n.querySelector('.detailHeader').getBoundingClientRect().top,top:n.scrollTop};});
   assert(detailAfter.top>=95,'detail panel itself scrolls');
-  assert(detailBefore.title-detailAfter.title>=95,'detail heading and body scroll together');
+  assert(Math.abs(detailBefore.title-detailAfter.title)<1,'detail title and close stay anchored while content scrolls');
   assert.equal(detailBefore.height,detailAfter.height,'detail native scroll keeps panel height');
   assert.equal(await page.locator('#detailBody').evaluate(n=>getComputedStyle(n).overflowY),'visible');
+  await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
   await page.locator('#detail').evaluate(n=>n.scrollTop=0);
   // Exercise real browser input, not only programmatic scrollTop assignments.
   const titleRect=await page.locator('#detail .detailHeader').boundingBox();
@@ -117,6 +159,8 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(200);
   if(width<901)assert(await page.locator('#detail').evaluate(n=>n.getBoundingClientRect().height)>detailBefore.height,'touch starting on business title expands the whole panel');
   else assert(await page.locator('#detail').evaluate(n=>n.scrollTop>30),'desktop wheel continues scrolling');
+  await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
+  await page.screenshot({path:path.join(out,`pinned-detail-${width}.png`)});
   await page.locator('#detail').evaluate(n=>n.scrollTop=0);
   await dragAt('.placePhotos img',-65);
   assert(!await page.locator('#memberPhotoViewer').evaluate(n=>n.open),'photo DRAG does not open the viewer');
@@ -239,7 +283,7 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{closeDetailPanel();renderAll();});
   await page.screenshot({path:path.join(out,`overview-${width}.png`)});
   assert.deepEqual(errors,[],`no runtime error at ${width}px`);
-  results.push({width,passed:true,checks:['18% list height','expand-first title drag and full-panel scrolling','nearby collapse/close/reopen','drag-to-collapse','removed redundant labels','one-row stats','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','admin role','membership height','search registration','manual location validation']});
+  results.push({width,passed:true,checks:['18% list height','expand-first title drag with anchored header and grip','nearby collapse/close/reopen','drag-to-collapse','removed redundant labels','one-row stats','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','admin role','membership height','search registration','manual location validation']});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'map-ux-results.json'),JSON.stringify(results,null,2));console.log('PASS Map UX browser regression',JSON.stringify(results));

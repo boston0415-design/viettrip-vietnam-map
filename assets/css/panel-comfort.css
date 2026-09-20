@@ -92,3 +92,14 @@
 #detail.sheetDragSurface,#detail.sheetDragSurface *,#businessSide.sheetDragSurface,#businessSide.sheetDragSurface *,#areaLegend.sheetDragSurface,#areaLegend.sheetDragSurface *,#areaPanel.sheetDragSurface,#areaPanel.sheetDragSurface *,#nearbyResults.sheetDragSurface,#nearbyResults.sheetDragSurface *{touch-action:pan-x pinch-zoom!important}
 #detail.sheetDragSurface input,#detail.sheetDragSurface textarea,#businessSide.sheetDragSurface input,#businessSide.sheetDragSurface select,#areaLegend.sheetDragSurface select{touch-action:auto!important}
 #nearbyApproximate{margin:4px 0 8px;padding:7px 10px;white-space:normal;line-height:1.4}
+
+/* Anchored sheet headers: scrolling content never carries the grip/title/close away.
+   The outer panel still scrolls so expand-first, anywhere-drag and saved positions
+   use the same container. Sticky offsets match each grip's actual occupied height. */
+#businessSide{--list-header-grip:12px;scroll-padding-top:64px}
+#businessSide>.menuResizeGrip{position:sticky;top:0;z-index:12;height:var(--list-header-grip);min-height:var(--list-header-grip);margin:0;background:#fff;border-radius:0}
+#businessSide>.mobileSideHead{position:sticky!important;top:var(--list-header-grip);z-index:11;background:#fff;box-shadow:0 1px 0 #e3ebe7}
+#detail{--detail-header-inset:16px;--detail-header-grip:34px;scroll-padding-top:144px}
+#detail>.detailResizeHandle{position:sticky;top:var(--detail-header-inset);z-index:12;height:var(--detail-header-grip);min-height:var(--detail-header-grip);margin:0;background:#fff;box-shadow:0 calc(-1 * var(--detail-header-inset)) 0 var(--detail-header-inset) #fff;border-radius:0}
+#detail>.detailHeader{position:sticky!important;top:calc(var(--detail-header-inset) + var(--detail-header-grip));z-index:11;background:#fff;box-shadow:0 1px 0 #e3ebe7}
+@media(max-width:900px){#detail{--detail-header-inset:10px}}
