@@ -76,6 +76,35 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "12579ac9-0154-40f9-b58c-bc666ed78451",
+    "name": "NJ184 Vietnam Head Spa & Massage | 호치민 마사지 | 越式洗頭按摩",
+    "category": "barber",
+    "address": "184 Trần Hưng Đạo, Cầu Ông Lãnh, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://nj184barbershop.com/lien-he",
+    "note": "184 Trần Hưng Đạo의 NJ184 공식 예약 문의 채널입니다. 원하는 서비스와 날짜·시간을 알리고 업소의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "zalo",
+        "url": "https://zalo.me/0708999184"
+      },
+      {
+        "kind": "whatsapp",
+        "url": "https://wa.me/message/HHXWKMM2B7MBB1"
+      },
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/profile.php?id=61569992383435"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84708999184",
+        "display": "+84 708 999 184"
+      }
+    ],
+    "verifiedOn": "2026-09-21"
+  },
+  {
     "id": "4a33bd0b-9bd7-433e-879b-00348ff6e15c",
     "name": "The View Rooftop Bar",
     "category": "bar",

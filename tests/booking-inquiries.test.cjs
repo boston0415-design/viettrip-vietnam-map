@@ -25,6 +25,12 @@ async function check(mobile){
       assert.equal(entry.verifiedOn,'2026-09-19');
       assert(entry.channels.some(c=>c.kind==='phone'),'verified operator phone retained');
     }
+    const nj184=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='12579ac9-0154-40f9-b58c-bc666ed78451');
+    assert(nj184,'new NJ184 inquiry route');
+    assert.equal(nj184.verifiedOn,'2026-09-21');
+    assert.equal(nj184.sourceUrl,'https://nj184barbershop.com/lien-he');
+    assert.deepEqual(nj184.channels.map(c=>c.kind),['zalo','whatsapp','facebook','phone']);
+    assert(nj184.channels.some(c=>c.url==='tel:+84708999184'));
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);
