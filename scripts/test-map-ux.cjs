@@ -97,9 +97,11 @@ const server=http.createServer((req,res)=>{
    await tabs.locator(`[data-benefit-filter="${value}"]`).click();assert.equal(await page.locator('#list article').count(),1,'repeated tap retains selected scope');
   }
   await tabs.locator('[data-benefit-filter="all"]').click();assert.equal(await page.locator('#list article').count(),24);
+  await page.locator('#mobileFilterToggle').click();
   await page.locator('#businessSide>.menuResizeGrip').focus();await page.keyboard.press('Home');
   await page.locator('#mobileListClose').click();await page.locator('#browseShowList').click();
   const reopened=await page.locator('#businessSide').boundingBox();assert(reopened.height>=sizing.list-2,'list entry restores a usable height after minimizing');
+  assert.equal(await page.locator('#mobileFilterToggle').getAttribute('aria-expanded'),'false','list entry shows businesses before secondary options');
   const firstCard=await page.locator('#list article').first().boundingBox();assert(firstCard.y<reopened.y+reopened.height-60,'business content is visible without another drag');
   assert(await tabs.isVisible(),'tabs remain visible after reopening');assert(await page.locator('.mapWeather').isVisible(),'weather stays available with the list open');
   await page.screenshot({path:path.join(out,`compact-list-${width}.png`)});

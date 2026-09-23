@@ -53,6 +53,7 @@
     if(isMobileMapLayout())openMobileBusinessList();else if(document.querySelector('.content')?.classList.contains('desktopListCollapsed'))el('desktopListToggle')?.click();
     // A previously minimized sheet must show actual businesses when explicitly opened.
     const side=el('businessSide'),available=document.querySelector('.content').getBoundingClientRect().height;
+    side.classList.remove('mobileFiltersOpen');el('mobileFilterToggle').setAttribute('aria-expanded','false');el('mobileFilterToggle').textContent='옵션';
     if(side.getBoundingClientRect().height<available*.44-1){
       window.BodySheetDrag?.cancel(side);side.classList.remove('menuSized');side.style.removeProperty('--menu-height');
     }
