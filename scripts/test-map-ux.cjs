@@ -238,6 +238,7 @@ const server=http.createServer((req,res)=>{
   const tallestDetail=await page.locator('#detail').boundingBox();
   assert(Math.abs(tallestDetail.y-readingMap.y-14)<=2,'maximized detail reaches just below the map top');
   await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
+  assert(await page.locator('#detail .detailName').evaluate(n=>{const r=n.getBoundingClientRect();return n.contains(document.elementFromPoint(r.left+8,r.top+8))}),'map controls never cover the maximized business title');
   await page.screenshot({path:path.join(out,`detail-reading-space-${width}.png`)});
   await page.locator('#detail').evaluate(n=>n.scrollTop=0);
   await dragAt('.placePhotos img',-65);

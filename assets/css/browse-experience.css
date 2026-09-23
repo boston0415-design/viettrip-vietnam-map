@@ -61,7 +61,7 @@
 #businessSide .rating{font-size:21px}
 #businessSide .meta{font-size:12px;line-height:1.5;margin-top:7px}
 #businessSide .badge{font-size:11px}.side .cardReviewLink{font-size:11px}
-#detail.show{overflow-anchor:none;scroll-behavior:auto;border-radius:18px;box-shadow:0 5px 24px #183d3524}
+#detail.show{z-index:16;overflow-anchor:none;scroll-behavior:auto;border-radius:18px;box-shadow:0 5px 24px #183d3524}
 #detail{--detail-header-inset:6px;--detail-header-grip:12px;padding-top:var(--detail-header-inset)!important;scroll-padding-top:90px}
 #detail.show:not(.detailResized){max-height:calc(100% - max(24px,calc(env(safe-area-inset-bottom) + 12px)) - 14px)!important}
 #detail .detailHeader{padding-bottom:4px}
