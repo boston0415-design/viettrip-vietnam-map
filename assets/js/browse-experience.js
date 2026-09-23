@@ -14,7 +14,7 @@
   const options=values=>values.map(([value,label])=>`<option value="${esc(value)}">${esc(label)}</option>`).join('');
   el('browseCity').innerHTML=options([['all','전체 지역'],...Object.entries(CITY_DATA).map(([k,v])=>[k,v.label])]);
   el('browseCategory').innerHTML=options([['all','전체 업종'],...Object.entries(CONFIG.categories).map(([k,v])=>[k,v.label])]);
-  el('browseRating').innerHTML=options(Object.entries(ratings));el('browseBenefit').innerHTML=options(Object.entries(benefits));
+  el('browseRating').innerHTML=options(['all','3plus','4plus','4.5','5','1','2','3','4'].map(key=>[key,ratings[key]]));el('browseBenefit').innerHTML=options(Object.entries(benefits));
   el('browseTag').innerHTML=options([['all','전체 메뉴'],...RESTAURANT_TAGS.map(t=>[t,t])]);
   function subOptions(value='all'){
     const category=el('browseCategory').value;

@@ -42,6 +42,7 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('.onlineStat').isVisible(),false,'visitor count stays hidden before admin login');
   assert.equal(await page.locator('[data-browse-filter]').count(),4,'all four primary conditions are always available');
   await page.locator('[data-browse-filter="category"]').click();
+  if(width<901)assert((await page.locator('#browseFilterDialog').boundingBox()).width>=width-2,'mobile conditions use the full screen width');
   await page.locator('#browseCategory').selectOption('cafe');
   await page.locator('#browseRating').selectOption('4plus');
   await page.locator('#browseBenefit').selectOption('benefit');
@@ -72,6 +73,7 @@ const server=http.createServer((req,res)=>{
   assert((await page.locator('#businessSide').boundingBox()).y+sizing.list<=page.viewportSize().height+2,'compact list stays in viewport');
   assert(sizing.list/sizing.content<=.46,'default list leaves more than half of the map visible');
   assert(sizing.list/sizing.content>=.35,'default list shows useful content without a preliminary drag');
+  assert.equal(await page.locator('.browseListFilters').evaluate(button=>{const range=document.createRange();range.selectNodeContents(button);return range.getClientRects().length}),1,'filter label stays on one line even at 320px');
   assert.equal(await page.locator('.memberMapKey').count(),0,'decorative map key removed');
   assert.equal(await page.locator('#list .cardBenefit strong').count(),0,'benefit field shows terms without a duplicate heading');
   assert.match(await page.locator('#list .cardBenefit').first().innerText(),/숙소 2박/);

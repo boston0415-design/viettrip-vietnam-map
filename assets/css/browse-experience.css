@@ -22,12 +22,12 @@
 .browseDialogHead button{flex:none;width:44px;height:44px;border:0;border-radius:50%;font-size:27px;background:#f1f5f3;color:#395548}
 .browseFields{display:grid;grid-template-columns:1fr 1fr;gap:17px 14px;padding:20px}
 .browseFields label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:650;min-width:0}
-.browseFields select,.browseFields input{width:100%;min-width:0;box-sizing:border-box;min-height:46px;padding:10px;border:1px solid #ccdcd5;border-radius:10px;background:#fff;font-family:inherit;font-size:15px;font-weight:400;line-height:1.5;color:#243c31}
+.browseFields select,.browseFields input{width:100%;min-width:0;box-sizing:border-box;min-height:46px;margin:0;padding:10px;border:1px solid #ccdcd5;border-radius:10px;background:#fff;font-family:inherit;font-size:15px;font-weight:400;line-height:1.5;color:#243c31}
 .browseFields select:disabled{background:#f5f7f6;color:#9aa9a1}
 .browseWide{grid-column:1/-1}.browseFields [hidden]{display:none}
 #browseNearbyNote{font-size:12px;color:#61796d;margin:0;line-height:1.5}
 .browseDialogFoot{position:sticky;bottom:0;background:#fff;border-top:1px solid #e5eee9;display:grid;grid-template-columns:1fr 2fr;gap:8px;padding:14px 20px max(14px,env(safe-area-inset-bottom))}
-.browseDialogFoot button{min-height:46px;border-radius:10px;border:1px solid #d7e3dc;background:#fff;color:#365c4a;font-family:inherit;font-weight:600;font-size:14px;line-height:1.4}
+.browseDialogFoot button{min-height:46px;white-space:nowrap;border-radius:10px;border:1px solid #d7e3dc;background:#fff;color:#365c4a;font-family:inherit;font-weight:600;font-size:14px;line-height:1.4}
 #browseApply{background:#247f78;border-color:#247f78;color:white}
 #browsePreview{grid-column:1/-1;font-size:12px;line-height:1.5;color:#6b7e75;margin:0}
 .browseTools button:focus-visible,.browseFilterDialog :focus-visible{outline:3px solid #458e7d;outline-offset:2px}
@@ -39,7 +39,7 @@
 #businessSide .mobileSideHead strong{font-size:16px;flex:1}
 #browseListCount{margin-left:6px;font-size:12px;font-weight:500;color:#6d8177}
 #businessSide .mobileSideHead button{min-height:40px;height:40px}
-#businessSide .browseListFilters{border:1px solid #d3e0d9;background:white;border-radius:9px;color:#365b4a;font-family:inherit;font-size:12px;font-weight:600;line-height:1.4;padding:6px 10px}
+#businessSide .browseListFilters{min-width:52px!important;width:auto!important;flex:none;white-space:nowrap;border:1px solid #d3e0d9;background:white;border-radius:9px;color:#365b4a;font-family:inherit;font-size:12px;font-weight:600;line-height:1.4;padding:6px 10px}
 #businessSide #mobileFilterToggle{margin:0;font-size:11px;min-width:36px;padding:4px 6px}
 #businessSide .card{padding:14px 12px;margin:0;border:0;border-bottom:1px solid #e6ede9;border-radius:0;background:#fff;box-shadow:none}
 #businessSide .card.active{background:#eef7f3}
@@ -63,7 +63,7 @@
 .weatherLayer[data-kind="rain"] i{width:1px;height:18px;background:#547f94;border-radius:2px}
 .weatherLayer[data-kind="snow"] i{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 2px #607780}
 @keyframes weather-fall{to{transform:translate3d(var(--drift),var(--fall),0)}}
-.mapWeather{position:absolute;right:12px;bottom:28px;z-index:11;max-width:190px;background:#ffffffed;border:1px solid #dce6e0;border-radius:10px;padding:6px 8px;font-size:11px;color:#556e62;line-height:1.4}
+.mapWeather{position:absolute;right:12px;top:118px;z-index:11;max-width:190px;background:#ffffffed;border:1px solid #dce6e0;border-radius:10px;padding:6px 8px;font-size:11px;color:#556e62;line-height:1.4}
 .mapWeather button{font:inherit;color:#315e4a;border:0;background:none;min-height:28px;cursor:pointer;padding:2px 3px}
 .mapWeather a{font-size:9px;color:#768a7e;text-decoration:underline}.mapWeather small{font-size:10px;display:block}
 .mapwrap.detailOpen .mapWeather,.mapwrap.listOpen .mapWeather{display:none}
@@ -81,7 +81,8 @@
  #businessSide.mobileOpen{left:0;right:0;bottom:0;width:auto;height:44%!important;max-height:calc(100% - 108px)!important;border-radius:18px 18px 0 0!important}
  #businessSide.mobileOpen.menuSized{height:var(--menu-height)!important}
  #businessSide .card{padding:13px 14px}
- .browseFilterDialog{margin:auto auto 0;width:100%;max-height:90dvh;border-radius:20px 20px 0 0}
+ .browseFilterDialog{margin:auto auto 0;width:100%;max-width:100vw;max-height:90dvh;border-radius:20px 20px 0 0}
+ .browseDialogHead h2{font-size:18px;letter-spacing:-.3px}
  .browseFields{gap:15px 12px;padding:18px 16px}.browseDialogHead{padding:16px}.browseDialogFoot{padding-left:16px;padding-right:16px}
  #detail.show{max-height:calc(100% - 110px)!important;max-width:100%}
  #detail:not(.detailExpanded):not(.detailResized){height:min(260px,46%)!important}

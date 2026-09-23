@@ -84,6 +84,7 @@
       if(event.detail!==0&&Date.now()<suppressUntil&&panel.contains(event.target)){event.preventDefault();event.stopImmediatePropagation();}
     },true);
     panel.addEventListener('dragstart',event=>{if(gesture)event.preventDefault();});
+    panel.addEventListener('wheel',stopMomentum,{passive:true});
     panel.addEventListener('pointerdown',event=>{if(event.pointerType!=='touch'&&event.isPrimary&&event.button===0)begin(event,event,'pointer');});
     panel.addEventListener('pointermove',event=>{if(gesture?.kind==='pointer'&&event.pointerId===gesture.id)move(event,event);});
     for(const type of ['pointerup','pointercancel','lostpointercapture'])window.addEventListener(type,event=>{if(gesture?.kind==='pointer'&&event.pointerId===gesture.id)finish(type!=='pointerup');});

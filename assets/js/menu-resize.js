@@ -47,7 +47,7 @@
        window.BodySheetDrag?.bind(p,{
          anywhere:['businessSide','areaLegend','areaPanel'].includes(p.id),handlesOnly:true,includeHeaders:true,headerSelector:header+',.menuResizeGrip',bounds:()=>records.get(p).bounds||limits(p),
          prepare(){stop(p);records.get(p).bounds=limits(p)},
-         start(){expand(p);p.classList.add('menuDragging')},size:value=>queue(p,value),flush:()=>stop(p),end:info=>end(p,info),afterEnd(){records.get(p).bounds=null}
+         start(){expand(p);p.classList.add('menuDragging')},size:value=>queue(p,value),flush:()=>stop(p),end:info=>end(p,info),afterEnd(){if(records.get(p).animation==null)records.get(p).bounds=null}
        });
        grip.addEventListener('keydown',event=>{
          const b=limits(p),h=p.getBoundingClientRect().height,next={ArrowUp:h+40,ArrowDown:h-40,Home:b.min,End:b.max}[event.key];
