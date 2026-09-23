@@ -37,11 +37,12 @@
  function end(p,{canceled=false,velocity=0}={}){
    stop(p);const r=records.get(p);r.bounds=null;p.classList.remove('menuDragging');
    if(canceled)return;
+   // Keep the list at the height the user chose; snapping back also moves every card.
+   if(p.id==='businessSide')return;
    if(!['businessSide','areaLegend','areaPanel'].includes(p.id)&&!window.matchMedia('(max-width:900px)').matches)return;
    const start=parseFloat(p.style.getPropertyValue('--menu-height'));if(!Number.isFinite(start))return;
    const b=limits(p),projected=Math.max(b.min,Math.min(b.max,start+velocity*150));
-   const stops=p.id==='businessSide'?[b.min,Math.max(b.min,b.max*.52),b.max]:null;
-   const target=stops?stops.reduce((best,h)=>Math.abs(h-projected)<Math.abs(best-projected)?h:best,stops[0]):projected;
+   const target=projected;
    if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){size(p,target);return;}
    if(Math.abs(target-start)<2)return;
    const began=performance.now();r.bounds=b;p.classList.add('menuSettling');

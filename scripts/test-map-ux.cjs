@@ -124,15 +124,16 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:path.join(out,`compact-list-${width}.png`)});
   await checkDoubleClick('#businessSide','#businessSide .mobileSideHead strong');
   await page.locator('#businessSide').evaluate(n=>{n.classList.remove('menuSized');n.style.removeProperty('--menu-height');n.scrollTop=0;});
-  async function dragAt(selector,delta){
+  async function dragAt(selector,delta,hold=0){
    const box=await page.locator(selector).first().boundingBox();assert(box,'drag target visible '+selector);
    const x=box.x+Math.min(box.width/2,120),y=Math.max(10,Math.min(page.viewportSize().height-24,box.y+Math.min(box.height/2,18)));
    if(width<901){
     const cdp=await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
     for(let i=1;i<=8;i++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y-delta*i/8}]});
+    if(hold)await page.waitForTimeout(hold);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
-   }else{await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x,y-delta,{steps:8});await page.mouse.up();}
+   }else{await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x,y-delta,{steps:8});if(hold)await page.waitForTimeout(hold);await page.mouse.up();}
    await page.waitForTimeout(300);
   }
   // Names and actual cards, not merely the decorative grip, must expand the LIST.
@@ -200,8 +201,9 @@ const server=http.createServer((req,res)=>{
   await page.locator('#mobileFilterToggle').click();
   assert(await page.locator('#businessSide').evaluate(n=>n.classList.contains('mobileFiltersOpen')),'options still respond after scrolling');
   await page.locator('#mobileFilterToggle').click();
-  await dragAt('#businessSide .mobileSideHead strong',-90);
-  assert((await page.locator('#businessSide').boundingBox()).height<fullList.height-40,'sticky title still drags the whole sheet down');
+  await dragAt('#businessSide .mobileSideHead strong',-90,180);
+  const loweredList=await page.locator('#businessSide').boundingBox();
+  assert(Math.abs(loweredList.height-(fullList.height-90))<2,'sticky title keeps the chosen height after release: '+JSON.stringify({width,fullList,loweredList}));
   await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
   await page.locator('#mobileListClose').click();
   if(width<901)await page.locator('#browseShowList').click();
