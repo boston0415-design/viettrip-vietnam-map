@@ -3,7 +3,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path'),
 const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results');fs.mkdirSync(out,{recursive:true});
 const fixture=String.raw`
-const testData={places:Array.from({length:24},(_,i)=>({id:'ux-'+i,name:i===0?'혜택 있는 카페':'주변 업소 '+i,category:'cafe',subcategory:'카페',address:'호치민 테스트 주소 '+i,area:'호치민',lat:10.77+i*.0001,lng:106.7,initialRating:null,memberBenefit:i===0,benefitText:i===0?'숙소 2박 이상 이용 회원 · 예약 시 혜택 확인':'',tags:[],photoUrls:i===0?['https://fixture.invalid/photo1.png','https://fixture.invalid/photo2.png']:[],createdAt:new Date(2026,8,20-i).toISOString()})),reviews:[{id:'review-1',placeId:'ux-0',nickname:'시험 회원',createdBy:'test-device-id',rating:4,text:'사진과 후기를 함께 확인하는 테스트입니다.',photoUrls:['https://fixture.invalid/photo3.png']}]};
+const testData={places:Array.from({length:24},(_,i)=>({id:'ux-'+i,name:i===0?'혜택 있는 카페':'주변 업소 '+i,category:'cafe',subcategory:'카페',address:'호치민 테스트 주소 '+i,area:'호치민',lat:10.77+i*.0001,lng:106.7,initialRating:null,memberBenefit:i===0,benefitText:i===0?'숙소 2박 이상 이용 회원 · 예약 시 혜택 확인':'',tags:[],photoUrls:i===0?['https://fixture.invalid/photo1.png','https://fixture.invalid/photo2.png']:[],createdAt:new Date(2026,8,20-i).toISOString()})),reviews:[{id:'review-1',placeId:'ux-0',nickname:'시험 회원',createdBy:'test-device-id',rating:4,recommended:true,text:'사진과 후기를 함께 확인하는 테스트입니다.',photoUrls:['https://fixture.invalid/photo3.png']}]};
 db=()=>testData;state.sharedDbLoading=false;state.city='all';state.cat='all';state.sub='all';state.sort='newest';state.query='';state.clickLatLng=null;
 const empty=()=>{};
 for(const name of ['renderMarkers','refreshRegisteredCoverage','renderPopularAreas','renderGolfCourses','renderPoiMarkers','clearSelectionRanges','clearAreaLabels','clearSelectedSystemIcons','closeSystemInfo','refreshMapAfterMobileLayout','positionSelectedPlaceInView','cancelPendingMapWork','fitCircleGeometry','fitSelectedCityView'])window[name]=empty;
@@ -12,7 +12,7 @@ focusLocationAtZoom=async()=>{};
 state.map={getCenter:()=>({lat:()=>10.77,lng:()=>106.7}),getZoom:()=>16,setCenter:empty,panBy:empty,setOptions:empty,get:()=>'',getDiv:()=>document.getElementById('map'),addListener:()=>({remove:empty})};
 class TestMarker{constructor(o){Object.assign(this,o);}setMap(map){this.map=map;}getMap(){return this.map;}addListener(){return {remove:empty}}}
 window.google={maps:{Marker:TestMarker,Circle:TestMarker,Size:class{},Point:class{},event:{trigger:empty},places:{AutocompleteSessionToken:class{},AutocompleteService:class{getPlacePredictions(r,cb){cb([{place_id:'external-ux',structured_formatting:{main_text:'검색한 새 업소',secondary_text:'호치민 주소'}}],'OK')}},PlacesService:class{getDetails(r,cb){cb({place_id:r.placeId,name:'검색한 새 업소',formatted_address:'정확한 주소',geometry:{location:{lat:()=>10.775,lng:()=>106.705}},types:['cafe'],formatted_phone_number:'+84 123 456 789',opening_hours:{weekday_text:['월요일 09:00–21:00'],isOpen:()=>true},rating:4.5,user_ratings_total:22},'OK')}findPlaceFromQuery(r,cb){cb([],'ZERO_RESULTS')}}}}};
-fetch=async(url,options={})=>{let req;try{req=JSON.parse(options.body)}catch{};const data=req?.p_action==='badges'?[]:{id:'ux-member',nickname:'시험 회원',total:3,level:1,devices:[{hash:'a'.repeat(64),key:'test-device-key'}],counts:{place:1,review:2,correction:0},activities:[],corrections:[]};return {ok:true,json:async()=>data,text:async()=>'',status:200};};
+fetch=async(url,options={})=>{if(String(url).includes('api.met.no'))return {ok:true,headers:{get:()=>new Date(Date.now()+3600000).toUTCString()},json:async()=>({properties:{timeseries:[{time:new Date(Math.floor(Date.now()/3600000)*3600000).toISOString(),data:{instant:{details:{air_temperature:27}},next_1_hours:{summary:{symbol_code:'cloudy'}}}}]}})};let req;try{req=JSON.parse(options.body)}catch{};const data=req?.p_action==='badges'?[]:{id:'ux-member',nickname:'시험 회원',total:3,level:1,devices:[{hash:'a'.repeat(64),key:'test-device-key'}],counts:{place:1,review:2,correction:0},activities:[],corrections:[]};return {ok:true,json:async()=>data,text:async()=>'',status:200};};
 `;
 const source=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const html=source.replace(/<script[^>]+src="[^"]*(?:online-presence|realtime-|community-stats|10-runtime-guard|home-screen|guide-map-link|transport-guide|business-share|admin-regions)[^"]*"[^>]*><\/script>/g,'').replace(/(<script src="\.\/assets\/js\/09-init-events[^>]*>)/,`<script>${fixture}</script>$1`);
@@ -40,8 +40,18 @@ const server=http.createServer((req,res)=>{
   if(errors.length){await page.screenshot({path:path.join(out,'failure.png')});throw Error('Startup: '+errors.join('; '));}
   assert.equal(await page.locator('#list article').count(),24);
   assert.equal(await page.locator('.onlineStat').isVisible(),false,'visitor count stays hidden before admin login');
-  assert.equal(await page.locator('[data-browse-filter]').count(),4,'all four primary conditions are always available');
-  await page.locator('[data-browse-filter="category"]').click();
+  assert.equal(await page.locator('[data-browse-filter]').count(),3,'region, category and rating are directly selectable');
+  await page.locator('[data-browse-filter="city"]').selectOption('hcmc');
+  await page.locator('[data-browse-filter="category"]').selectOption('cafe');
+  assert.equal(await page.locator('#list article').count(),24,'quick filters show actual places immediately');
+  assert(!(await page.locator('#browseFilterDialog').isVisible()),'quick choices never open a second form');
+  await page.locator('.mapWeather').waitFor({state:'visible'});
+  assert.equal(await page.locator('.mapWeather').innerText(),'27°');
+  const weather=await page.locator('.mapWeather').boundingBox(),map=await page.locator('.mapwrap').boundingBox();
+  assert(weather.y+weather.height<=map.y+1,'temperature stays outside the map on both layouts');
+  assert.equal(await page.locator('.weatherLayer i').count(),3,'cloud animation stays lightweight');
+  await page.locator('.mapWeather').click();assert(await page.locator('#weatherDialog').isVisible());await page.locator('#weatherClose').click();
+  await page.locator('.browseListFilters').click();
   if(width<901)assert((await page.locator('#browseFilterDialog').boundingBox()).width>=width-2,'mobile conditions use the full screen width');
   await page.locator('#browseCategory').selectOption('cafe');
   await page.locator('#browseRating').selectOption('4plus');
@@ -49,7 +59,7 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#browseApply').innerText(),'1곳 보기');
   await page.locator('#browseFilterClose').click();
   assert.equal(await page.locator('#list article').count(),24,'cancel leaves current map/list unchanged');
-  await page.locator('[data-browse-filter="benefit"]').click();
+  await page.locator('.browseListFilters').click();
   await page.locator('#browseCategory').selectOption('cafe');
   await page.locator('#browseRating').selectOption('4plus');
   await page.locator('#browseBenefit').selectOption('benefit');
@@ -77,6 +87,21 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('.memberMapKey').count(),0,'decorative map key removed');
   assert.equal(await page.locator('#list .cardBenefit strong').count(),0,'benefit field shows terms without a duplicate heading');
   assert.match(await page.locator('#list .cardBenefit').first().innerText(),/숙소 2박/);
+  const tabs=page.locator('.browseListTabs');assert(await tabs.isVisible());
+  const tabRect=await tabs.boundingBox(),headRect=await page.locator('#businessSide .mobileSideHead').boundingBox();
+  assert(Math.abs(tabRect.y-(headRect.y+headRect.height))<=2,'primary tabs sit immediately under the title');
+  for(const value of ['benefit','recommended']){
+   await tabs.locator(`[data-benefit-filter="${value}"]`).click();
+   assert.equal(await page.locator('#list article').count(),1,'one tap reveals '+value+' businesses');
+   assert(!(await page.locator('#browseFilterDialog').isVisible()));
+   await tabs.locator(`[data-benefit-filter="${value}"]`).click();assert.equal(await page.locator('#list article').count(),1,'repeated tap retains selected scope');
+  }
+  await tabs.locator('[data-benefit-filter="all"]').click();assert.equal(await page.locator('#list article').count(),24);
+  await page.locator('#businessSide>.menuResizeGrip').focus();await page.keyboard.press('Home');
+  await page.locator('#mobileListClose').click();await page.locator('#browseShowList').click();
+  const reopened=await page.locator('#businessSide').boundingBox();assert(reopened.height>=sizing.list-2,'list entry restores a usable height after minimizing');
+  const firstCard=await page.locator('#list article').first().boundingBox();assert(firstCard.y<reopened.y+reopened.height-60,'business content is visible without another drag');
+  assert(await tabs.isVisible(),'tabs remain visible after reopening');assert(await page.locator('.mapWeather').isVisible(),'weather stays available with the list open');
   await page.screenshot({path:path.join(out,`compact-list-${width}.png`)});
   async function dragAt(selector,delta){
    const box=await page.locator(selector).first().boundingBox();assert(box,'drag target visible '+selector);
@@ -109,6 +134,7 @@ const server=http.createServer((req,res)=>{
   assert(sideScrolled.top>=120,'only the outer list panel scrolls');
   assert(Math.abs(sideBefore.title-sideScrolled.title)<1,'list control bar stays anchored while content scrolls');
   assert.equal(sideBefore.height,sideScrolled.height,'content scrolling does not resize list');
+  const pinnedTabs=await tabs.boundingBox(),pinnedHead=await page.locator('#businessSide .mobileSideHead').boundingBox();assert(Math.abs(pinnedTabs.y-(pinnedHead.y+pinnedHead.height))<=2,'tabs stay pinned below the title when scrolling');
   assert.equal(await page.locator('#list').evaluate(n=>getComputedStyle(n).overflowY),'visible');
   async function assertAnchored(panelSelector,headerSelector,gripSelector){
    const geometry=await page.locator(panelSelector).evaluate((p,{headerSelector,gripSelector})=>{

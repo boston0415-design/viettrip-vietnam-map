@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="./assets/css/map-membership.css?v=20260920-rank1">
 <link rel="stylesheet" href="./assets/css/map-ux.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/panel-comfort.css?v=20260921-sticky-header1">
-<link rel="stylesheet" href="./assets/css/browse-experience.css?v=20260923-ux1">
+<link rel="stylesheet" href="./assets/css/browse-experience.css?v=20260923-direct2">
 </head>
 <body>
 <div class="app">
@@ -72,19 +72,19 @@
   <div class="content">
     <aside class="side" id="businessSide">
       <div class="mobileSideHead">
-        <strong>업체 목록</strong>
+        <strong>업소 목록</strong>
         <button id="mobileFilterToggle" type="button" aria-expanded="false" aria-controls="listOptions">옵션</button>
         <button id="mobileListClose" type="button" aria-label="업체 목록 닫기">×</button>
       </div>
+      <nav class="browseListTabs" aria-label="업소 목록 구분">
+        <button type="button" data-benefit-filter="all" aria-pressed="true" class="active">전체</button>
+        <button type="button" data-benefit-filter="benefit" aria-pressed="false">혜택업소</button>
+        <button type="button" data-benefit-filter="recommended" aria-pressed="false">강추업소</button>
+      </nav>
       <div class="filters" id="listOptions">
         <button type="button" id="listSharedFilters" class="btn">지역·업종·평점·혜택 필터 열기</button>
         <div class="browseHeading">업체 둘러보기 <span>이름을 누르면 후기를 볼 수 있어요</span></div>
         <div class="listRegionFilter"><label for="listCity">지역</label><select id="listCity" aria-label="업체 목록 지역 선택"></select></div>
-        <div class="benefitTabs" role="group" aria-label="회원 혜택 구분">
-          <button type="button" data-benefit-filter="all" class="active">전체 업체</button>
-          <button type="button" data-benefit-filter="benefit">혜택업소</button>
-          <button type="button" data-benefit-filter="recommended">👍 강추업소</button>
-        </div>
         <div class="personalPlaceTabs" role="group" aria-label="내 업체 목록" title="현재 기기·브라우저에 저장됩니다. 다른 회원의 목록에는 영향을 주지 않습니다.">
           <button type="button" data-personal-view="all" aria-pressed="true">전체</button>
           <button type="button" data-personal-view="favorites" aria-pressed="false">☆ 즐겨찾기</button>
@@ -419,8 +419,8 @@
 <script src="./assets/js/guide-map-link.js?v=20260919-share1"></script>
 <script src="./assets/js/nearby-businesses.js?v=20260920-interaction3"></script>
 <script src="./assets/js/map-ux.js?v=20260920-interaction3"></script>
-<script src="./assets/js/browse-experience.js?v=20260923-ux1"></script>
-<script src="./assets/js/map-weather.js?v=20260923-ux1"></script>
+<script src="./assets/js/browse-experience.js?v=20260923-direct2"></script>
+<script src="./assets/js/map-weather.js?v=20260923-direct2"></script>
 <script src="./assets/js/panel-history.js?v=20260920-ux3"></script>
 </body>
 </html>

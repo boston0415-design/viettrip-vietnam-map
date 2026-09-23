@@ -4,11 +4,11 @@
 .communityStats>span+span{margin-left:0!important;padding-left:0!important}
 .communityStats>span::before{display:none!important}
 .browseTools{position:absolute;top:10px;left:14px;right:14px;z-index:15;max-width:700px;pointer-events:none}
-.browseTools button{pointer-events:auto;font-family:inherit;cursor:pointer}
-.browseFilterButtons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.browseFilterButtons button{display:grid;grid-template-columns:1fr auto;gap:2px 5px;text-align:left;min-height:52px;padding:7px 11px;border:1px solid #d7e2df;border-radius:12px;background:#fff;color:#344a45;box-shadow:0 2px 8px #2146380c}
+.browseTools button,.browseTools select{pointer-events:auto;font-family:inherit;cursor:pointer}
+.browseFilterButtons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.browseFilterButtons label{display:flex;flex-direction:column;justify-content:center;min-width:0;min-height:52px;padding:5px 10px;border:1px solid #d7e2df;border-radius:12px;background:#fff;color:#344a45;box-shadow:0 2px 8px #2146380c;pointer-events:auto;box-sizing:border-box}
 .browseFilterButtons small{grid-column:1/-1;font-size:11px;color:#73867e;font-weight:500}
-.browseFilterButtons strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}
+.browseFilterButtons select{width:100%;min-width:0;padding:3px 0;margin:0;border:0;border-radius:0;background:transparent;color:inherit;font-size:14px;font-weight:600;text-overflow:ellipsis;line-height:1.4}
 .browseFilterButtons .isSet{border-color:#a7c8be;background:#f5faf8}
 .browseResultBar{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:12px}
 .browseResultBar button{border:1px solid #d5e1dc;border-radius:20px;background:#fff;color:#2e5145;min-height:36px;padding:6px 13px;font-weight:600}
@@ -30,17 +30,20 @@
 .browseDialogFoot button{min-height:46px;white-space:nowrap;border-radius:10px;border:1px solid #d7e3dc;background:#fff;color:#365c4a;font-family:inherit;font-weight:600;font-size:14px;line-height:1.4}
 #browseApply{background:#247f78;border-color:#247f78;color:white}
 #browsePreview{grid-column:1/-1;font-size:12px;line-height:1.5;color:#6b7e75;margin:0}
-.browseTools button:focus-visible,.browseFilterDialog :focus-visible{outline:3px solid #458e7d;outline-offset:2px}
+.browseTools :focus-visible,.browseListTabs :focus-visible,.mapWeather:focus-visible,.weatherDialog :focus-visible,.browseFilterDialog :focus-visible{outline:3px solid #458e7d;outline-offset:2px}
 #businessSide{height:44%!important;max-height:calc(100% - 110px)!important;border-radius:18px 18px 0 0!important;background:#fff;scroll-behavior:auto;overflow-anchor:none}
 #businessSide.menuSized{height:var(--menu-height)!important;max-height:calc(100% - 110px)!important}
 #businessSide>.menuResizeGrip{height:18px;min-height:18px;--list-header-grip:18px}
-#businessSide{--list-header-grip:18px}
-#businessSide>.mobileSideHead{min-height:48px;padding:0 12px 6px;gap:6px}
+#businessSide{--list-header-grip:18px;--list-head-height:52px;scroll-padding-top:120px}
+#businessSide>.mobileSideHead{height:var(--list-head-height);min-height:var(--list-head-height);box-sizing:border-box;padding:0 12px 6px;gap:6px}
 #businessSide .mobileSideHead strong{font-size:16px;flex:1}
 #browseListCount{margin-left:6px;font-size:12px;font-weight:500;color:#6d8177}
 #businessSide .mobileSideHead button{min-height:40px;height:40px}
 #businessSide .browseListFilters{min-width:52px!important;width:auto!important;flex:none;white-space:nowrap;border:1px solid #d3e0d9;background:white;border-radius:9px;color:#365b4a;font-family:inherit;font-size:12px;font-weight:600;line-height:1.4;padding:6px 10px}
 #businessSide #mobileFilterToggle{margin:0;font-size:11px;min-width:36px;padding:4px 6px}
+#businessSide>.browseListTabs{position:sticky;top:calc(var(--list-header-grip) + var(--list-head-height));z-index:10;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:0;padding:0 12px 8px;background:#fff;border-bottom:1px solid #e3ebe7}
+.browseListTabs button{min-height:40px;padding:6px 4px;border:0;border-radius:9px;background:#f4f6f5;font-family:inherit;font-size:13px;line-height:1.4;font-weight:600;color:#65786f;white-space:nowrap;cursor:pointer}
+.browseListTabs button.active{background:#e5f2ee;color:#21685a;box-shadow:inset 0 0 0 1px #a9cebf}
 #businessSide .card{padding:14px 12px;margin:0;border:0;border-bottom:1px solid #e6ede9;border-radius:0;background:#fff;box-shadow:none}
 #businessSide .card.active{background:#eef7f3}
 #businessSide .name{font-size:16px;line-height:1.4;font-weight:700;overflow-wrap:anywhere}
@@ -62,11 +65,17 @@
 .weatherLayer i{position:absolute;top:-24px;left:var(--x);animation:weather-fall var(--duration) linear infinite;animation-delay:var(--delay);opacity:.35;pointer-events:none;will-change:transform}
 .weatherLayer[data-kind="rain"] i{width:1px;height:18px;background:#547f94;border-radius:2px}
 .weatherLayer[data-kind="snow"] i{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 2px #607780}
+.weatherLayer[data-kind="cloud"] i{top:var(--y);width:140px;height:40px;border-radius:50%;background:#cad5d7;opacity:.14;animation-name:weather-cloud}
+.weatherLayer[data-kind="cloud"] i::before,.weatherLayer[data-kind="cloud"] i::after{content:"";position:absolute;bottom:12px;left:24px;width:64px;height:52px;border-radius:50%;background:inherit}
+.weatherLayer[data-kind="cloud"] i::after{left:72px;width:42px;height:40px}
 @keyframes weather-fall{to{transform:translate3d(var(--drift),var(--fall),0)}}
-.mapWeather{position:absolute;right:12px;top:118px;z-index:11;max-width:190px;background:#ffffffed;border:1px solid #dce6e0;border-radius:10px;padding:6px 8px;font-size:11px;color:#556e62;line-height:1.4}
-.mapWeather button{font:inherit;color:#315e4a;border:0;background:none;min-height:28px;cursor:pointer;padding:2px 3px}
-.mapWeather a{font-size:9px;color:#768a7e;text-decoration:underline}.mapWeather small{font-size:10px;display:block}
-.mapwrap.detailOpen .mapWeather,.mapwrap.listOpen .mapWeather{display:none}
+@keyframes weather-cloud{from{transform:translate3d(-60px,0,0)}to{transform:translate3d(150px,0,0)}}
+.mapWeather{flex:none;align-self:center;min-height:28px;min-width:36px;padding:3px 5px;border:0;border-radius:6px;background:#eef4f1;color:#385a4a;font:600 13px/1.4 system-ui,sans-serif;cursor:pointer}
+.weatherDialog{width:min(310px,calc(100vw - 32px));box-sizing:border-box;padding:18px;border:1px solid #dce6e0;border-radius:16px;color:#385a4a;background:#fff;box-shadow:0 6px 24px #183d3524}
+.weatherDialog::backdrop{background:#18312944}.weatherDialogHead{display:flex;align-items:center;justify-content:space-between}.weatherDialogHead button{width:40px;height:40px;border:0;border-radius:50%;background:#f2f6f4;color:inherit;font-size:25px;cursor:pointer}
+#weatherSummary{font-size:16px;font-weight:600;margin:10px 0}#weatherTime{font-size:12px;line-height:1.6;color:#6b7e75}
+#weatherToggle{min-height:42px;padding:8px 12px;border:1px solid #d1dfd7;border-radius:9px;background:#f5faf7;color:inherit;font:inherit;cursor:pointer}
+.weatherDialog small{display:block;margin-top:16px;font-size:11px}.weatherDialog a{color:#617a6b;text-decoration:underline}
 .weatherLayer[hidden],.mapWeather[hidden]{display:none!important}
 @media(min-width:901px){
  .browseTools{max-width:740px}
@@ -75,8 +84,8 @@
 }
 @media(max-width:900px){
  .browseTools{left:10px;right:10px;top:8px}
- .browseFilterButtons{gap:4px}.browseFilterButtons button{padding:6px 8px;border-radius:10px;min-height:50px}
- .browseFilterButtons strong{font-size:12px}.browseFilterButtons small{font-size:10px}
+ .browseFilterButtons{gap:5px}.browseFilterButtons label{padding:4px 8px;border-radius:10px;min-height:50px}
+ .browseFilterButtons select{font-size:13px}.browseFilterButtons small{font-size:10px}
  #mobileListBtn{display:none!important}
  #businessSide.mobileOpen{left:0;right:0;bottom:0;width:auto;height:44%!important;max-height:calc(100% - 108px)!important;border-radius:18px 18px 0 0!important}
  #businessSide.mobileOpen.menuSized{height:var(--menu-height)!important}
@@ -87,7 +96,7 @@
  #detail.show{max-height:calc(100% - 110px)!important;max-width:100%}
  #detail:not(.detailExpanded):not(.detailResized){height:min(260px,46%)!important}
  #detail.detailExpanded:not(.detailResized){height:65%!important}
- .mapUtilityBar .communityStats{display:flex!important;justify-content:center;gap:12px!important;min-height:26px}
+ .mapUtilityBar .communityStats{display:flex!important;justify-content:center;gap:6px!important;min-height:26px}
  .mapUtilityBar .communityStats>span{min-height:26px}
 }
 @media(prefers-reduced-motion:reduce){.weatherLayer{display:none!important}}

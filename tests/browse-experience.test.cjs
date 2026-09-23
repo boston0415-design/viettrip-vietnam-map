@@ -14,7 +14,7 @@ for(const mobile of [false,true]){
  {id:'coffee',name:'호치민 커피',category:'cafe',subcategory:'카페',area:'호치민',address:'호치민',lat:10.77,lng:106.7,initialRating:4},
  {id:'hidden',name:'숨김 식당',category:'restaurant',subcategory:'베트남',area:'하노이',lat:21.03,lng:105.79,initialRating:5,memberBenefit:true},
  {id:'low',name:'보통 식당',category:'restaurant',subcategory:'베트남',area:'하노이',lat:21.03,lng:105.79,initialRating:3},
- ],reviews:[{id:'keep',placeId:'pho',text:'원문 보존',rating:5}]};
+ ],reviews:[{id:'keep',placeId:'pho',text:'원문 보존',rating:5,recommended:true}]};
  db=()=>fixture;state.city='all';state.cat='all';state.sub='all';state.query='';state.ratingFilter='all';state.benefitFilter='all';state.restaurantTag='all';state.sharedDbLoading=false;
  window.PersonalPlaces={isHidden:id=>id==='hidden',getView:()=> 'all',setView:()=>{},filter:rows=>rows.filter(p=>p.id!=='hidden')};
  cancelPendingMapWork=()=>{};renderAll=()=>{window.BrowseExperience?.sync()};renderHierarchyNav=()=>{};renderCityControls=()=>{};closeDetailPanel=()=>{state.selected=null};
@@ -30,7 +30,17 @@ for(const mobile of [false,true]){
  assert.equal(run('matchesRatingFilter(4.3,"4plus")'),true);assert.equal(run('matchesRatingFilter(3.9,"4plus")'),false);assert.equal(run('matchesRatingFilter(null,"4plus")'),false);
  w.BrowseExperience.open();change('browseQuery','없는 업소');assert.equal(el('browseApply').textContent,'0곳 보기');assert.match(el('browsePreview').textContent,/조건을 넓혀/);el('browseFilterClose').click();assert.equal(run('items().length'),1);
  el('browseClear').click();assert.equal(run('items().length'),3);assert.equal(run('JSON.stringify(fixture)'),before,'browse operations never change reviews or places');
- assert.equal(w.document.querySelectorAll('[data-browse-filter]').length,4);
+ assert.equal(w.document.querySelectorAll('[data-browse-filter]').length,3);
+ const quick=w.document.querySelector('[data-browse-filter="category"]');quick.value='restaurant';quick.dispatchEvent(new w.Event('change',{bubbles:true}));
+ assert.equal(run('state.cat'),'restaurant');assert.equal(run('items().length'),2,'quick category applies without opening a form');assert(!el('browseFilterDialog').open);
+ const tabs=w.document.querySelector('.browseListTabs');assert.equal(tabs.previousElementSibling.className,'mobileSideHead');assert(!tabs.closest('.filters'),'primary tabs never live in hidden options');
+ tabs.querySelector('[data-benefit-filter="recommended"]').click();assert.equal(run('items().map(p=>p.id).join()'),'pho');
+ tabs.querySelector('[data-benefit-filter="recommended"]').click();assert.equal(run('state.benefitFilter'),'recommended','selected tab stays selected');
+ assert.equal(tabs.querySelector('[data-benefit-filter="recommended"]').getAttribute('aria-pressed'),'true');
+ tabs.querySelector('[data-benefit-filter="all"]').click();assert.equal(run('items().length'),2);assert.equal(run('state.cat'),'restaurant','tabs preserve region/category conditions');
+ tabs.querySelector('[data-benefit-filter="benefit"]').click();assert.equal(run('items().map(p=>p.id).join()'),'pho');
+ el('browseShowList').click();assert(!el('browseFilterDialog').open,'list entry immediately shows the list');
+ assert.equal(run('JSON.stringify(fixture)'),before,'direct choices preserve review and place data');
  dom.window.close();
 }
 console.log('PASS shared filters: draft isolation, cancelled/zero results, combined rating-benefit-name matching, accent search, hidden exclusions, reset and no data writes in desktop/mobile DOM');
