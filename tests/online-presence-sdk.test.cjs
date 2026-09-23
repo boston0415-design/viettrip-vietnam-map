@@ -19,9 +19,9 @@ class Socket{
  }
  close(){if(this.readyState===3)return;this.readyState=3;peers.delete(this);this.onclose?.({code:1000});broadcast()}
 }
-function open(storage){
+function open(storage,admin=true){
  const dom=new JSDOM(read('index.html'),{url:'https://viettrip-vietnam-map.pages.dev/',runScripts:'outside-only'}),w=dom.window;
- windows.push(w);w.WebSocket=Socket;w.SUPABASE_URL='https://example.supabase.co';w.SUPABASE_HEADERS={apikey:'public-test-key'};
+ windows.push(w);w.state={isAdmin:admin};w.WebSocket=Socket;w.SUPABASE_URL='https://example.supabase.co';w.SUPABASE_HEADERS={apikey:'public-test-key'};
  Object.defineProperty(w,'localStorage',{value:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}});
  vm.runInContext(read('assets/vendor/realtime-2.116.0.min.js'),dom.getInternalVMContext());
  vm.runInContext(read('assets/js/online-presence.js'),dom.getInternalVMContext());
@@ -32,7 +32,8 @@ async function settle(){for(let n=0;n<12;n++)await new Promise(r=>setImmediate(r
  try{
   const storage=new Map(),a=open(storage);await settle();assert.equal(a.count(),'1');
   const secondTab=open(storage);await settle();assert.equal(a.count(),'1');assert.equal(secondTab.count(),'1');
-  const b=open(new Map());await settle();assert.equal(a.count(),'2');assert.equal(b.count(),'2');
+  const b=open(new Map(),false);await settle();assert.equal(a.count(),'2');assert.equal(b.count(),'—','ordinary visitor contributes to count but never sees it');
+  assert(b.w.document.querySelector('.onlineStat').hidden);
   secondTab.close();await settle();assert.equal(a.count(),'2');b.close();await settle();assert.equal(a.count(),'1');
   a.close();await settle();assert.equal(peers.size,0);
   console.log('PASS shipped Realtime SDK browser bundle, protocol subscription/tracking, multi-tab deduplication and departure sync');

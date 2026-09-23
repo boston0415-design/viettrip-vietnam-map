@@ -39,9 +39,28 @@ const server=http.createServer((req,res)=>{
   await page.waitForTimeout(150);
   if(errors.length){await page.screenshot({path:path.join(out,'failure.png')});throw Error('Startup: '+errors.join('; '));}
   assert.equal(await page.locator('#list article').count(),24);
+  assert.equal(await page.locator('.onlineStat').isVisible(),false,'visitor count stays hidden before admin login');
+  assert.equal(await page.locator('[data-browse-filter]').count(),4,'all four primary conditions are always available');
+  await page.locator('[data-browse-filter="category"]').click();
+  await page.locator('#browseCategory').selectOption('cafe');
+  await page.locator('#browseRating').selectOption('4plus');
+  await page.locator('#browseBenefit').selectOption('benefit');
+  assert.equal(await page.locator('#browseApply').innerText(),'1곳 보기');
+  await page.locator('#browseFilterClose').click();
+  assert.equal(await page.locator('#list article').count(),24,'cancel leaves current map/list unchanged');
+  await page.locator('[data-browse-filter="benefit"]').click();
+  await page.locator('#browseCategory').selectOption('cafe');
+  await page.locator('#browseRating').selectOption('4plus');
+  await page.locator('#browseBenefit').selectOption('benefit');
+  await page.screenshot({path:path.join(out,`browse-filters-${width}.png`)});
+  await page.locator('#browseApply').click();
+  assert.equal(await page.locator('#list article').count(),1,'combined conditions apply to real list');
+  assert.match(await page.locator('#browseShowList').innerText(),/1곳/);
+  await page.locator('#browseClear').click();
+  assert.equal(await page.locator('#list article').count(),24,'reset restores all matched places');
   await page.evaluate(()=>{document.getElementById('onlineUsers').textContent='12';document.getElementById('totalVisits').textContent='12,345';document.getElementById('totalPlaces').textContent='999';document.getElementById('totalReviews').textContent='456';});
   if(width<901){
-   const rects=await page.locator('.communityStats').evaluate(n=>[...n.children].map(c=>{const r=c.getBoundingClientRect();return {y:r.y,h:r.height}}));
+   const rects=await page.locator('.communityStats').evaluate(n=>[...n.children].filter(c=>!c.hidden).map(c=>{const r=c.getBoundingClientRect();return {y:r.y,h:r.height}}));
    assert(rects.every(r=>Math.abs(r.y-rects[0].y)<2),'mobile statistics stay in one row');
    assert(rects[0].h<=30,'statistics are compact');
    await page.evaluate(()=>openMobileBusinessList());
@@ -51,8 +70,8 @@ const server=http.createServer((req,res)=>{
   const sizing=await page.evaluate(()=>({list:document.getElementById('businessSide').getBoundingClientRect().height,content:document.querySelector('.content').getBoundingClientRect().height}));
   assert(sizing.list>50,'list remains operable');
   assert((await page.locator('#businessSide').boundingBox()).y+sizing.list<=page.viewportSize().height+2,'compact list stays in viewport');
-  assert(sizing.list/sizing.content<=.185,'default list height is 18% of the map content');
-  assert(sizing.list/(sizing.content*.4)<.5,'less than half the preceding 40% height');
+  assert(sizing.list/sizing.content<=.46,'default list leaves more than half of the map visible');
+  assert(sizing.list/sizing.content>=.35,'default list shows useful content without a preliminary drag');
   assert.equal(await page.locator('.memberMapKey').count(),0,'decorative map key removed');
   assert.equal(await page.locator('#list .cardBenefit strong').count(),0,'benefit field shows terms without a duplicate heading');
   assert.match(await page.locator('#list .cardBenefit').first().innerText(),/숙소 2박/);
@@ -127,7 +146,7 @@ const server=http.createServer((req,res)=>{
   assert((await page.locator('#businessSide').boundingBox()).height<fullList.height-40,'sticky title still drags the whole sheet down');
   await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
   await page.locator('#mobileListClose').click();
-  if(width<901)await page.locator('#mobileListBtn').click();
+  if(width<901)await page.locator('#browseShowList').click();
   else await page.locator('#desktopListToggle').click();
   await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
   await page.locator('#businessSide').evaluate(n=>n.scrollTop=0);
@@ -283,7 +302,7 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{closeDetailPanel();renderAll();});
   await page.screenshot({path:path.join(out,`overview-${width}.png`)});
   assert.deepEqual(errors,[],`no runtime error at ${width}px`);
-  results.push({width,passed:true,checks:['18% list height','expand-first title drag with anchored header and grip','nearby collapse/close/reopen','drag-to-collapse','removed redundant labels','one-row stats','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','admin role','membership height','search registration','manual location validation']});
+  results.push({width,passed:true,checks:['readable list under half height','expand-first title drag with anchored header and grip','nearby collapse/close/reopen','drag-to-collapse','removed redundant labels','one-row stats','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','admin role','membership height','search registration','manual location validation']});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'map-ux-results.json'),JSON.stringify(results,null,2));console.log('PASS Map UX browser regression',JSON.stringify(results));

@@ -33,10 +33,8 @@ for(const mobile of [true,false]){
  assert(p.classList.contains('detailDragging'));assert.equal(run('detailExpanded'),true);
  const syncCount=run('syncs');advance(16);event(handle,'move',350);advance(16);assert.equal(run('syncs'),syncCount,'no full media/layout sync each frame');
  w.DetailSheetResize.deferRefresh();event(handle,'up',350);assert.equal(clicks,1,'drag does not generate a click');
- if(mobile){
-   const before=height();assert(p.classList.contains('detailSettling'));advance(80);assert(height()>before);assert(height()<664);
-   advance(200);assert.equal(Math.round(height()),412);assert(!p.classList.contains('detailSettling'));
- }else assert.equal(height(),370);
+ const before=height();assert(p.classList.contains('detailSettling'));advance(80);assert.notEqual(height(),before);assert(height()<=566);
+ advance(200);assert.equal(Math.round(height()),351);assert(!p.classList.contains('detailSettling'));
  assert.equal(run('renders'),1,'deferred DB repaint resumes only after the gesture settles');
  // Grip drag can shrink even when the body has been scrolled.
  p.querySelector('#detailBody').scrollTop=200;
@@ -52,11 +50,11 @@ for(const mobile of [true,false]){
  assert.equal(p.style.getPropertyValue('--sheet-height'),'');assert.equal(w.DetailSheetResize.isInteracting(),false);
  // Header/body controls retain keyboard accessibility, limits and viewport clamping.
  handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Home',cancelable:true}));assert.equal(height(),180);
- handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'End',cancelable:true}));assert.equal(height(),664);
- mapHeight=350;w.dispatchEvent(new w.Event('resize'));assert.equal(height(),314);
+ handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'End',cancelable:true}));assert.equal(height(),566);
+ mapHeight=350;w.dispatchEvent(new w.Event('resize'));assert.equal(height(),216);
  if(mobile){
    mapHeight=700;w.DetailSheetResize.reset();reduced=true;event(handle,'down',500);advance(100);event(handle,'move',300);event(handle,'up',300);
-   assert.equal(height(),664);assert(!p.classList.contains('detailSettling'),'reduced-motion skips animation');
+   assert.equal(height(),566);assert(!p.classList.contains('detailSettling'),'reduced-motion skips animation');
    reduced=false;w.DetailSheetResize.reset();event(handle,'down',500);advance(100);event(handle,'move',350);event(handle,'up',350);advance(60);
    const interrupted=height();event(handle,'down',400);assert(!p.classList.contains('detailSettling'));advance(500);assert.equal(height(),interrupted,'new touch immediately stops settling');event(handle,'up',400);
  }

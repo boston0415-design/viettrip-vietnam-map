@@ -1144,6 +1144,8 @@ function db(){
   }
 }
 function saveDb(x){
+  window.ReviewVault?.archive(db().reviews);
+  window.ReviewVault?.archive(x.reviews);
   const json=JSON.stringify(x);
   const current=safeStorageGet(DBKEY);
   if(current)safeStorageSet(DBKEY+'_backup',current);

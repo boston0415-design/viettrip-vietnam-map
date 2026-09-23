@@ -201,6 +201,8 @@ function matchesRatingFilter(rating,filter){
   if(rating==null || !Number.isFinite(Number(rating)))return false;
 
   const r=Number(rating);
+  if(filter==='3plus')return r>=3;
+  if(filter==='4plus')return r>=4;
   if(filter==='1')return r>=1 && r<2;
   if(filter==='2')return r>=2 && r<3;
   if(filter==='3')return r>=3 && r<4;
@@ -329,6 +331,11 @@ function renderRatingFilterState(){
   });
 }
 
+function matchesBusinessQuery(p,query){
+  const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/\s+/g,' ').trim();
+  const text=normalize(`${p.name} ${p.area} ${p.address} ${catLabel(p.category)} ${p.subcategory} ${(p.tags||[]).join(' ')}`);
+  return normalize(query).split(' ').filter(Boolean).every(token=>text.includes(token));
+}
 function items({ratingFilter=state.ratingFilter,forList=false}={}){
   const hiddenView=window.PersonalPlaces?.getView()==='hidden';
   if(hiddenView&&!forList)return [];
@@ -342,7 +349,7 @@ function items({ratingFilter=state.ratingFilter,forList=false}={}){
   if(state.cat==='restaurant' && state.restaurantTag!=='all')arr=arr.filter(p=>hasRestaurantTag(p,state.restaurantTag));
   if(ratingFilter!=='all')arr=arr.filter(p=>matchesRatingFilter(p.rating,ratingFilter));
   if(state.benefitFilter!=='all')arr=arr.filter(p=>matchesBenefitFilter(p,state.benefitFilter));
-  if(state.query){const q=state.query.toLowerCase();arr=arr.filter(p=>`${p.name} ${p.area} ${p.address} ${catLabel(p.category)} ${p.subcategory} ${(p.tags||[]).join(' ')}`.toLowerCase().includes(q))}
+  if(state.query)arr=arr.filter(p=>matchesBusinessQuery(p,state.query));
   }
   if(state.nearby&&!hiddenView){
     arr=arr.map(p=>({...p,distanceMeters:validMapLocation(p)?geoDistanceMeters(state.nearby,p):Infinity}))

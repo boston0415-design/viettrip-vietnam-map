@@ -676,8 +676,8 @@ function mapFilterSummary(){
     parts.push(label);
   }
   if(state.restaurantTag && state.restaurantTag!=='all')parts.push(state.restaurantTag);
-  if(state.ratingFilter && state.ratingFilter!=='all')parts.push(state.ratingFilter==='4.5'?'4.5★ 이상':`${state.ratingFilter}★`);
-  if(state.benefitFilter && state.benefitFilter!=='all')parts.push('혜택업소');
+  if(state.ratingFilter && state.ratingFilter!=='all')parts.push(['3plus','4plus','4.5'].includes(state.ratingFilter)?`${state.ratingFilter.replace('plus','')}★ 이상`:`${state.ratingFilter}★`);
+  if(state.benefitFilter && state.benefitFilter!=='all')parts.push(state.benefitFilter==='recommended'?'강추업소':'혜택업소');
   if(state.query)parts.push(`검색: ${state.query}`);
   if(parts.length===1)parts.push(state.city==='all'?'등록 업소':'전체');
   return parts;

@@ -5,7 +5,7 @@
   function bounds(){
     if(dragBounds)return dragBounds;
     const map=document.querySelector('.mapwrap').getBoundingClientRect(),rect=panel().getBoundingClientRect();
-    const gap=bottom??Math.max(12,map.bottom-rect.bottom),max=Math.max(80,map.height-gap-12);
+    const gap=bottom??Math.max(12,map.bottom-rect.bottom),max=Math.max(80,map.height-gap-110);
     // Title and actions now share the panel's native scroll container.
     // Long names must not force the entire sheet to stay tall.
     return {min:Math.min(180,max),max,gap};
@@ -45,7 +45,6 @@
     flush();dragging=false;dragBounds=null;
     const p=panel();p?.classList.remove('detailDragging');
     if(canceled || !p?.classList.contains('show') || height===null)return;
-    if(!mobile()){positionSelectedPlaceInView();return}
     const b=bounds(),stops=[clamp(220,b),clamp(b.max*.62,b),b.max];
     const projected=clamp(height+velocity*150,b);
     const target=stops.reduce((best,value)=>Math.abs(value-projected)<Math.abs(best-projected)?value:best,stops[0]);

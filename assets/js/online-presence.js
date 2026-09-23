@@ -8,7 +8,12 @@
   const format=new Intl.NumberFormat('ko-KR');
   let client=null,channel=null,identity=null,generation=0,starting=false,ready=false;
   let suspended=false,retryTimer=null,retryDelay=3000;
+  let lastValue=null,lastStatus='connecting';
   function display(value,status){
+    lastValue=value;lastStatus=status;
+    const allowed=typeof state!=='undefined'&&state.isAdmin===true;
+    badge.hidden=!allowed;
+    if(!allowed){count.textContent='—';badge.removeAttribute('aria-label');return;}
     count.textContent=value==null?'—':format.format(value);
     badge.dataset.status=status;
     badge.setAttribute('aria-label',value==null?'실시간 접속자 수 확인 중':`실시간 접속 ${format.format(value)}명`);
@@ -97,5 +102,7 @@
   window.addEventListener('storage',event=>{
     if(event.key===KEY && valid(event.newValue) && event.newValue!==identity){stop();start()}
   });
+  window.OnlinePresence={syncVisibility:()=>display(lastValue,lastStatus)};
+  display(null,'connecting');
   start();
 })();

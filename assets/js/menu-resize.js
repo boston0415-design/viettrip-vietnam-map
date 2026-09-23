@@ -4,7 +4,7 @@
  function limits(p){
    const container=p.closest('.content')||p.closest('.modalback');
    const available=container?.getBoundingClientRect().height||window.visualViewport?.height||innerHeight;
-   const max=Math.max(80,available-32);return {min:Math.min(p.id==='businessSide'?64:150,max),max};
+   const max=Math.max(80,available-(p.id==='businessSide'?110:32));return {min:Math.min(p.id==='businessSide'?110:150,max),max};
  }
  function size(p,value){
    const record=records.get(p),b=record.bounds||limits(p),h=Math.round(Math.max(b.min,Math.min(b.max,value)));
@@ -25,12 +25,16 @@
  function expand(p){if(p.id==='areaLegend'&&p.classList.contains('mobileCollapsed'))setMobileLegendExpanded(true)}
  function end(p,{canceled=false,velocity=0}={}){
    stop(p);const r=records.get(p);r.bounds=null;p.classList.remove('menuDragging');
-   if(canceled||!window.matchMedia('(max-width:900px)').matches||window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+   if(canceled)return;
+   if(!['businessSide','areaLegend','areaPanel'].includes(p.id)&&!window.matchMedia('(max-width:900px)').matches)return;
    const start=parseFloat(p.style.getPropertyValue('--menu-height'));if(!Number.isFinite(start))return;
-   const b=limits(p),target=Math.max(b.min,Math.min(b.max,start+velocity*90));
+   const b=limits(p),projected=Math.max(b.min,Math.min(b.max,start+velocity*150));
+   const stops=p.id==='businessSide'?[b.min,Math.max(b.min,b.max*.52),b.max]:null;
+   const target=stops?stops.reduce((best,h)=>Math.abs(h-projected)<Math.abs(best-projected)?h:best,stops[0]):projected;
+   if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){size(p,target);return;}
    if(Math.abs(target-start)<2)return;
    const began=performance.now();r.bounds=b;p.classList.add('menuSettling');
-   function tick(now){const t=Math.min(1,(now-began)/200);size(p,start+(target-start)*(1-Math.pow(1-t,3)));if(t<1)r.animation=requestAnimationFrame(tick);else{r.animation=null;r.bounds=null;p.classList.remove('menuSettling')}}
+   function tick(now){const t=Math.min(1,(now-began)/260);size(p,start+(target-start)*(1-Math.pow(1-t,3)));if(t<1)r.animation=requestAnimationFrame(tick);else{r.animation=null;r.bounds=null;p.classList.remove('menuSettling')}}
    r.animation=requestAnimationFrame(tick);
  }
  function scan(){

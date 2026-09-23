@@ -316,6 +316,7 @@ function openReview(){
   renderStars();
   renderReviewPhotoPreview();
   $('#reviewModal').classList.add('open');
+  window.ReviewVault?.offer(place?.id,mine);
 }
 function renderStars(){$('#stars').innerHTML=[1,2,3,4,5].map(n=>`<button type="button" class="star ${n<=state.rating?'on':''}" data-star="${n}" aria-label="${n}점" aria-pressed="${state.rating===n}">★</button>`).join('')+'<button type="button" id="skipReviewRating" class="btn">별점 선택 안 함</button>';document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{state.rating=Number(b.dataset.star);renderStars()});$('#skipReviewRating').onclick=()=>{state.rating=null;renderStars()}}
 async function saveReview(){
@@ -333,6 +334,8 @@ async function saveReview(){
   const recommended=$('#rRecommended').checked;
   const oldReview=db().reviews.find(r=>r.placeId===placeId&&isOwnReview(r));
   if(oldReview?.text&&text&&text!==oldReview.text&&!confirm('기존 후기 내용을 새 내용으로 수정할까요? 빈칸으로 저장하면 기존 후기는 유지됩니다.'))return;
+  window.ReviewVault?.capture();
+  window.ReviewVault?.archive(oldReview?[oldReview]:[]);
   state.reviewSaveInProgress=true;
   if($('#reviewSaveStatus'))$('#reviewSaveStatus').textContent='저장 중입니다. 창을 닫지 말아주세요.';
 
@@ -399,6 +402,7 @@ async function saveReview(){
     }
     saveDb(dedupeDbData(x));
     $('#reviewModal').classList.remove('open');
+    window.ReviewVault?.saved(placeId);
     state.reviewEditPlaceId=null;
     revokeReviewPreviewUrls();
 

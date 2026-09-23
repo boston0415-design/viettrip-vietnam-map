@@ -21,7 +21,7 @@ class RealtimeClient{
 function open({storage=new Map(),blocked=false,missing=false,host='viettrip-vietnam-map.pages.dev',locks=false}={}){
  const dom=new JSDOM(html,{url:'https://'+host,runScripts:'outside-only'}),w=dom.window;
  windows.push(w);w.SUPABASE_URL='https://example.supabase.co';w.SUPABASE_HEADERS={apikey:'public-test-key'};
- w.ViettripRealtime=missing?undefined:{RealtimeClient};let online=true;Object.defineProperty(w.navigator,'onLine',{get:()=>online});
+ w.state={isAdmin:true};w.ViettripRealtime=missing?undefined:{RealtimeClient};let online=true;Object.defineProperty(w.navigator,'onLine',{get:()=>online});
  Object.defineProperty(w.document,'hidden',{value:false,configurable:true});
  Object.defineProperty(w,'localStorage',{value:{getItem:k=>{if(blocked)throw Error('blocked');return storage.get(k)},setItem:(k,v)=>{if(blocked)throw Error('blocked');storage.set(k,v)}}});
  if(locks)w.navigator.locks={request:async(key,fn)=>fn()};
@@ -37,6 +37,8 @@ function open({storage=new Map(),blocked=false,missing=false,host='viettrip-viet
   const shared=new Map(),a=open({storage:shared,locks:true});await tick();assert.equal(a.node.textContent,'1');
   assert.equal(a.badge.nextElementSibling.querySelector('b').id,'totalVisits','online count precedes cumulative visits');
   assert.equal(a.badge.dataset.status,'online');
+  a.w.state.isAdmin=false;a.w.OnlinePresence.syncVisibility();assert.equal(a.badge.hidden,true);assert.equal(a.node.textContent,'—','non-admin DOM never receives a visitor count');
+  a.w.state.isAdmin=true;a.w.OnlinePresence.syncVisibility();assert.equal(a.badge.hidden,false);assert.equal(a.node.textContent,'1','admin can see all tracked visitors');
   const aTab=open({storage:shared});await tick();assert.equal(a.node.textContent,'1');assert.equal(aTab.node.textContent,'1');
   const b=open();await tick();assert.equal(a.node.textContent,'2');assert.equal(b.node.textContent,'2');
   assert(clients.every(c=>c.rooms.every(r=>Object.keys(r.meta).join()==='online')),'no owner IDs, nicknames or profile data in presence');

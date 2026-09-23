@@ -4,6 +4,9 @@ const {JSDOM}=require('jsdom');
 for(const kind of ['touch','pointer']){
  const dom=new JSDOM('<section id="panel"><header><button><span>업소 이름</span></button></header><article><p>본문</p><a href="#photo"><img></a><button>예약</button><input><textarea></textarea></article></section>',{runScripts:'outside-only'});
  const w=dom.window,p=w.document.getElementById('panel');let h=100,ends=0;
+ let now=1000,id=0,reduced=false;const frames=new Map();w.performance.now=()=>now;w.matchMedia=()=>({matches:reduced});
+ w.requestAnimationFrame=fn=>{frames.set(++id,fn);return id};w.cancelAnimationFrame=id=>frames.delete(id);
+ const advance=ms=>{now+=ms;const tasks=[...frames.values()];frames.clear();tasks.forEach(fn=>fn(now))};
  p.getBoundingClientRect=()=>({height:h,width:360,left:0,right:360});
  p.setPointerCapture=()=>{};p.hasPointerCapture=()=>false;
  Object.defineProperty(p,'scrollHeight',{get:()=>1200});Object.defineProperty(p,'clientHeight',{get:()=>h});
@@ -26,6 +29,11 @@ for(const kind of ['touch','pointer']){
  const button=p.querySelector('header button');let clicks=0;button.onclick=()=>clicks++;event(title,'down');event(title,'up');button.click();assert.equal(clicks,1,'deliberate name tap preserved');
  event(body,'down');event(body,'move',440);event(body,'cancel',440);assert(ends>0,'cancel releases gesture state');
  if(kind==='touch'){h=100;event(body,'down');event(body,'move',400,100,{touches:[{identifier:1,clientX:100,clientY:400},{identifier:2,clientX:160,clientY:400}]});assert.equal(h,100,'pinch is not panel resize');}
+ h=500;p.scrollTop=0;event(body,'down',500);advance(60);event(body,'move',410);event(body,'up',410);
+ const scroll=p.scrollTop;advance(16);assert(p.scrollTop>scroll,'a released content swipe continues with inertia');
+ event(body,'down',400);const stopped=p.scrollTop;advance(100);assert.equal(p.scrollTop,stopped,'fresh contact immediately interrupts inertia');event(body,'cancel',400);
+ p.scrollTop=0;event(body,'down',500);advance(60);event(body,'move',410);advance(180);event(body,'up',410);const held=p.scrollTop;advance(50);assert.equal(p.scrollTop,held,'holding before release must not fling');
+ reduced=true;p.scrollTop=0;event(body,'down',500);advance(60);event(body,'move',410);event(body,'up',410);const still=p.scrollTop;advance(50);assert.equal(p.scrollTop,still,'reduced-motion skips content inertia');
  dom.window.close();
 }
 console.log('PASS touch and mouse: any-area expand-first, same-gesture scroll handoff, title folding, tap distinction, text inputs, horizontal swipes and pinch');

@@ -1,0 +1,25 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const {JSDOM}=require('jsdom');
+(async()=>{
+ const dom=new JSDOM('<div class="mapwrap"></div>',{url:'https://example.test',runScripts:'outside-only'}),w=dom.window;
+ let time=Date.parse('2026-09-23T10:15:00Z'),hidden=false,id=0;const timers=new Map(),requests=[],media={matches:false,addEventListener:(name,fn)=>media.change=fn};
+ w.Date.now=()=>time;Object.defineProperty(w.document,'hidden',{get:()=>hidden});w.matchMedia=()=>media;
+ w.setTimeout=(fn,delay)=>{timers.set(++id,{fn,delay});return id};w.clearTimeout=id=>timers.delete(id);
+ w.state={city:'hcmc'};w.CITY_DATA={hcmc:{label:'호치민',center:{lat:10.7769,lng:106.7009}},hanoi:{label:'하노이',center:{lat:21.0285,lng:105.8542}}};
+ w.safeStorageGet=k=>w.localStorage.getItem(k);w.safeStorageSet=(k,v)=>w.localStorage.setItem(k,v);
+ w.fetch=(url,opts)=>new Promise(resolve=>requests.push({url,opts,resolve}));
+ const answer=(req,symbol)=>req.resolve({ok:true,headers:{get:()=>new Date(time+3600000).toUTCString()},json:async()=>({properties:{timeseries:[{time:new Date(Math.floor(time/3600000)*3600000).toISOString(),data:{instant:{details:{air_temperature:27}},next_1_hours:{summary:{symbol_code:symbol}}}}]}})});
+ const flush=()=>new Promise(resolve=>setImmediate(resolve));
+ vm.runInContext(fs.readFileSync('assets/js/map-weather.js','utf8'),dom.getInternalVMContext());
+ assert.equal(requests.length,1);assert.match(requests[0].url,/lat=10\.777&lon=106\.701/,'public city center, never precise user GPS');answer(requests[0],'lightrain');await flush();
+ const layer=w.document.querySelector('.weatherLayer'),badge=w.document.querySelector('.mapWeather');assert(!layer.hidden);assert.equal(layer.dataset.kind,'rain');assert(layer.children.length<=32);assert.match(badge.textContent,/비 예보/);
+ await w.MapWeather.sync();assert.equal(requests.length,1,'cached forecast coalesces map repaint requests');
+ w.document.getElementById('weatherToggle').click();assert(layer.hidden);assert.equal(w.localStorage.getItem('viettrip_weather_effect'),'off');w.document.getElementById('weatherToggle').click();
+ media.matches=true;media.change();assert(layer.hidden,'reduced motion stops effect');media.matches=false;media.change();assert(!layer.hidden);
+ hidden=true;w.document.dispatchEvent(new w.Event('visibilitychange'));assert(layer.hidden);hidden=false;w.document.dispatchEvent(new w.Event('visibilitychange'));assert(!layer.hidden);assert.equal(requests.length,1);
+ w.state.city='hanoi';w.MapWeather.sync();assert.equal(requests.length,2);w.state.city='all';w.MapWeather.sync();answer(requests[1],'snow');await flush();assert(layer.hidden);assert(badge.hidden,'late city response must not leak into a new scope');
+ w.state.city='hanoi';w.MapWeather.sync();answer(requests[2],'snow');await flush();assert.equal(layer.dataset.kind,'snow');assert(!layer.hidden);
+ time+=3*3600000;const work=w.MapWeather.sync();requests[3].resolve({ok:false});await work;assert(layer.hidden);assert(badge.hidden,'failure does not claim old weather is current');
+ await w.MapWeather.sync();assert.equal(requests.length,4,'backoff avoids retry storms');w.dispatchEvent(new w.Event('pagehide'));dom.window.close();
+ console.log('PASS city forecast effects: rain/snow, caching, reduced-motion, opt-out, hidden tab pause, stale response rejection and graceful failure');
+})().catch(e=>{console.error(e);process.exitCode=1});

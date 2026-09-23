@@ -5,7 +5,21 @@
   const headers='.detailResizeHandle,.detailHeader,.menuResizeGrip,.menuResizeHeader';
   const controls='button,a,img,summary,[role="button"],input,select,textarea,label,[contenteditable]:not([contenteditable="false"]),video,audio,iframe,[role="slider"],[data-no-sheet-drag]';
   function bindAnywhere(panel,options){
-    let gesture=null,suppressUntil=0;
+    let gesture=null,suppressUntil=0,momentum=null;
+    const stopMomentum=()=>{if(momentum!==null)cancelAnimationFrame(momentum);momentum=null;};
+    function coast(scroller,velocity){
+      stopMomentum();
+      if(!scroller||Math.abs(velocity)<.08||window.matchMedia?.('(prefers-reduced-motion:reduce)').matches)return;
+      let previous=performance.now(),speed=Math.max(-2.5,Math.min(2.5,velocity));
+      function tick(now){
+        const elapsed=Math.min(40,now-previous);previous=now;
+        speed*=Math.exp(-elapsed/260);
+        const before=scroller.scrollTop,max=Math.max(0,scroller.scrollHeight-scroller.clientHeight);
+        scroller.scrollTop=Math.max(0,Math.min(max,before+speed*elapsed));
+        if(Math.abs(speed)>.025&&Math.abs(scroller.scrollTop-before)>.1&&panel.isConnected)momentum=requestAnimationFrame(tick);else momentum=null;
+      }
+      momentum=requestAnimationFrame(tick);
+    }
     panel.classList.add('sheetDragSurface');
     const editor='input,textarea,select,[contenteditable]:not([contenteditable="false"]),video,audio,iframe,[data-native-input]';
     const scrollNode=()=>options.scrollElement?.()||panel;
@@ -14,20 +28,21 @@
       try{if(g.kind==='pointer'&&panel.hasPointerCapture(g.id))panel.releasePointerCapture(g.id)}catch{}
       if(g.active){
         suppressUntil=Date.now()+400;
-        if(g.resized)options.end?.({canceled,kind:g.kind,velocity:g.velocity});
+        if(g.resized)options.end?.({canceled,kind:g.kind,velocity:performance.now()-g.lastTime<120?g.velocity:0});
         else options.end?.({canceled:true,kind:g.kind,velocity:0});
       }
       if(g.prepared)options.afterEnd?.();
+      if(!canceled&&g.active&&g.height>=g.bounds.max-1&&performance.now()-g.lastTime<120)coast(g.scroller,g.scrollVelocity||0);
     }
     function begin(event,point,kind){
       // A fresh deliberate contact must never be blocked by the preceding drag.
-      suppressUntil=0;
+      suppressUntil=0;stopMomentum();
       const target=event.target.closest?.('*');
       if(gesture||!point||event.defaultPrevented||!target||target.closest(editor))return;
       const rect=panel.getBoundingClientRect();
       if(kind==='pointer'&&panel.offsetWidth>panel.clientWidth+2&&point.clientX>=rect.right-(panel.offsetWidth-panel.clientWidth))return;
       options.prepare?.();
-      gesture={kind,id:kind==='touch'?point.identifier:event.pointerId,target,x:point.clientX,y:point.clientY,lastY:point.clientY,lastTime:performance.now(),height:panel.getBoundingClientRect().height,force:!!target.closest(options.headerSelector||'.detailHeader,.mobileSideHead,.nearbyResultsHead'),active:false,resized:false,prepared:true,velocity:0,axis:null};
+      gesture={kind,id:kind==='touch'?point.identifier:event.pointerId,target,x:point.clientX,y:point.clientY,lastY:point.clientY,lastTime:performance.now(),height:panel.getBoundingClientRect().height,bounds:options.bounds(),scroller:scrollNode(),scrollVelocity:0,force:!!target.closest(options.headerSelector||'.detailHeader,.mobileSideHead,.nearbyResultsHead'),active:false,resized:false,prepared:true,velocity:0,axis:null};
     }
     function move(event,point){
       const g=gesture;if(!g||!point||g.axis==='x')return;
@@ -39,7 +54,7 @@
         if(g.kind==='pointer')try{panel.setPointerCapture(g.id)}catch{}
       }
       if(event.cancelable)event.preventDefault();
-      const b=options.bounds(),scroller=scrollNode(),oldHeight=g.height;
+      const b=g.bounds,scroller=g.scroller,oldHeight=g.height,oldScroll=scroller?.scrollTop||0;
       let delta=g.lastY-point.clientY,pendingScroll=0;
       if(delta>0){
         // Even a previously scrolled compact sheet expands BEFORE its content.
@@ -60,6 +75,8 @@
       g.velocity=Math.max(-2.5,Math.min(2.5,(g.height-oldHeight)/Math.max(8,now-g.lastTime)));
       if(g.height!==oldHeight){g.resized=true;options.size(g.height);if(pendingScroll)options.flush?.();}
       if(pendingScroll&&scroller)scroller.scrollTop+=pendingScroll;
+      const scrollDelta=(scroller?.scrollTop||0)-oldScroll;
+      g.scrollVelocity=scrollDelta/Math.max(8,now-g.lastTime);
       g.lastY=point.clientY;g.lastTime=now;
     }
     // Window capture runs before document-level photo/link handlers.
@@ -76,7 +93,7 @@
       if(gesture?.kind!=='touch'||![...event.changedTouches].some(t=>t.identifier===gesture.id))return;
       if(gesture.active&&event.cancelable)event.preventDefault();finish(type==='touchcancel');
     },{passive:false});
-    const cancel=()=>finish(true);
+    const cancel=()=>{stopMomentum();finish(true);};
     for(const type of ['blur','pagehide','resize'])window.addEventListener(type,cancel);
     bindings.set(panel,{end:cancel});
   }

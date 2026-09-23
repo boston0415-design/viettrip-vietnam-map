@@ -43,6 +43,7 @@ function syncAdminButton(){
   if(!button)return;
   button.textContent=state.isAdmin||adminKey()?'관리자 로그아웃':'관리자';
   button.classList.toggle('adminOn',state.isAdmin);
+  window.OnlinePresence?.syncVisibility();
   window.MapMembership?.syncRole?.();
 }
 function clearAdminSession(){
@@ -545,7 +546,7 @@ function renderDetail(){
   if($('#adminDeleteBtn')) $('#adminDeleteBtn').onclick=()=>adminDeletePlace(p.id);
   if($('#clearDeleteRequestBtn')) $('#clearDeleteRequestBtn').onclick=()=>adminClearDeleteRequest(p.id);
 }
-function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync();window.MapUX?.syncNearby()}
+function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync();window.MapUX?.syncNearby();window.BrowseExperience?.sync();window.MapWeather?.sync()}
 async function selectPlace(id,pan=true,showInfo=false){
   window.MapUX?.onSelection(id);
   window.PlaceSearch?.clearExternal();

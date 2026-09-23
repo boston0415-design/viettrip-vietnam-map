@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="./assets/css/map-membership.css?v=20260920-rank1">
 <link rel="stylesheet" href="./assets/css/map-ux.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/panel-comfort.css?v=20260921-sticky-header1">
+<link rel="stylesheet" href="./assets/css/browse-experience.css?v=20260923-ux1">
 </head>
 <body>
 <div class="app">
@@ -62,7 +63,7 @@
     </button>
   </div>
   <div class="communityStats" aria-label="전체 지도 이용 통계">
-    <span class="onlineStat" data-status="connecting" title="현재 연결된 브라우저 수입니다. 같은 브라우저의 여러 탭은 1명으로 집계합니다. 연결 종료 반영에는 잠시 지연이 있을 수 있으며, 브라우저 저장을 차단하면 중복 집계될 수 있습니다."><i class="onlineDot" aria-hidden="true"></i><span class="statLabelFull">실시간 접속</span><span class="statLabelShort" aria-hidden="true">접속</span> <b id="onlineUsers">—</b><small>명</small></span>
+    <span class="onlineStat" hidden data-status="connecting" title="현재 연결된 브라우저 수입니다. 같은 브라우저의 여러 탭은 1명으로 집계합니다. 연결 종료 반영에는 잠시 지연이 있을 수 있으며, 브라우저 저장을 차단하면 중복 집계될 수 있습니다."><i class="onlineDot" aria-hidden="true"></i><span class="statLabelFull">실시간 접속</span><span class="statLabelShort" aria-hidden="true">접속</span> <b id="onlineUsers">—</b><small>명</small></span>
     <span title="같은 브라우저에서는 최초 접속 후 30분 동안 1회 집계하며, 이후 재접속하면 다시 집계합니다. 과거 누적 수치는 유지됩니다. 브라우저 저장을 차단하면 중복 집계될 수 있으며 실제 사람 수와는 다릅니다."><span class="statLabelFull">누적 방문</span><span class="statLabelShort" aria-hidden="true">방문</span> <b id="totalVisits">—</b><small>회</small></span>
     <span><span class="statLabelFull">등록 업체</span><span class="statLabelShort" aria-hidden="true">업체</span> <b id="totalPlaces">—</b><small>곳</small></span>
     <span><button id="openCommunityReviews" class="statsReviewButton" type="button" aria-haspopup="dialog"><span class="statLabelFull">회원 후기</span><span class="statLabelShort" aria-hidden="true">후기</span> <b id="totalReviews">—</b><small>개</small><span aria-hidden="true"> ›</span></button></span>
@@ -387,26 +388,27 @@
 <script src="./assets/js/01-data-storage.js?v=20260918-public-office1"></script>
 <script src="./assets/js/hospital-directory.js?v=20260918-hospital-registration1"></script>
 <script src="./assets/js/pharmacy-directory.js?v=20260918-icons-pharmacy1"></script>
-<script src="./assets/js/02-services-media.js?v=20260920-interaction3"></script>
+<script src="./assets/js/02-services-media.js?v=20260923-ux1"></script>
+<script src="./assets/js/review-vault.js?v=20260923-ux1"></script>
 <script src="./assets/js/personal-places.js?v=20260920-compact1"></script>
-<script src="./assets/js/03-business-ui.js?v=20260920-compact1"></script>
+<script src="./assets/js/03-business-ui.js?v=20260923-ux1"></script>
 <script src="./assets/js/booking-links.js?v=20260921-routes2"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260919-share1"></script>
-<script src="./assets/js/04-rendering.js?v=20260920-interaction3"></script>
-<script src="./assets/js/body-sheet-drag.js?v=20260920-interaction3"></script>
-<script src="./assets/js/detail-resize.js?v=20260920-interaction3"></script>
-<script src="./assets/js/menu-resize.js?v=20260920-interaction3"></script>
+<script src="./assets/js/04-rendering.js?v=20260923-ux1"></script>
+<script src="./assets/js/body-sheet-drag.js?v=20260923-ux1"></script>
+<script src="./assets/js/detail-resize.js?v=20260923-ux1"></script>
+<script src="./assets/js/menu-resize.js?v=20260923-ux1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
-<script src="./assets/js/06-save-motion.js?v=20260920-interaction3"></script>
+<script src="./assets/js/06-save-motion.js?v=20260923-ux1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
-<script src="./assets/js/08-search-audit.js?v=20260920-search1"></script>
+<script src="./assets/js/08-search-audit.js?v=20260923-ux1"></script>
 <script src="./assets/js/place-search.js?v=20260920-ux3"></script>
 <script src="./assets/js/09-init-events.js?v=20260920-ux3"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260918-all-cities1"></script>
 <script src="./assets/js/community-stats.js?v=20260918-feedback-links2"></script>
 <script defer src="./assets/vendor/realtime-2.116.0.min.js"></script>
-<script defer src="./assets/js/online-presence.js?v=20260918-online1"></script>
+<script defer src="./assets/js/online-presence.js?v=20260923-ux1"></script>
 <script src="./assets/js/list-layout.js?v=20260920-interaction3"></script>
 <script src="./assets/js/community-reviews.js?v=20260920-rank1"></script>
 <script src="./assets/js/map-membership.js?v=20260920-ux3"></script>
@@ -417,6 +419,8 @@
 <script src="./assets/js/guide-map-link.js?v=20260919-share1"></script>
 <script src="./assets/js/nearby-businesses.js?v=20260920-interaction3"></script>
 <script src="./assets/js/map-ux.js?v=20260920-interaction3"></script>
+<script src="./assets/js/browse-experience.js?v=20260923-ux1"></script>
+<script src="./assets/js/map-weather.js?v=20260923-ux1"></script>
 <script src="./assets/js/panel-history.js?v=20260920-ux3"></script>
 </body>
 </html>

@@ -1,0 +1,92 @@
+/* Calm controls, readable cards and stable panel headers on both layouts. */
+.mapUtilityBar .communityStats>.onlineStat[hidden]{display:none!important}
+.communityStats{gap:10px!important}
+.communityStats>span+span{margin-left:0!important;padding-left:0!important}
+.communityStats>span::before{display:none!important}
+.browseTools{position:absolute;top:10px;left:14px;right:14px;z-index:15;max-width:700px;pointer-events:none}
+.browseTools button{pointer-events:auto;font-family:inherit;cursor:pointer}
+.browseFilterButtons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.browseFilterButtons button{display:grid;grid-template-columns:1fr auto;gap:2px 5px;text-align:left;min-height:52px;padding:7px 11px;border:1px solid #d7e2df;border-radius:12px;background:#fff;color:#344a45;box-shadow:0 2px 8px #2146380c}
+.browseFilterButtons small{grid-column:1/-1;font-size:11px;color:#73867e;font-weight:500}
+.browseFilterButtons strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}
+.browseFilterButtons .isSet{border-color:#a7c8be;background:#f5faf8}
+.browseResultBar{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:12px}
+.browseResultBar button{border:1px solid #d5e1dc;border-radius:20px;background:#fff;color:#2e5145;min-height:36px;padding:6px 13px;font-weight:600}
+#browseConditions{max-width:50%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;background:#ffffffed;border-radius:8px;padding:4px 6px}
+#browseConditions:empty{display:none}
+#browseClear{font-size:11px;padding:4px 10px}
+.browseFilterDialog{padding:0!important;width:min(560px,calc(100vw - 24px));max-height:85dvh;border:1px solid #dce6e1;border-radius:20px;color:#253a32;overflow:auto;overscroll-behavior:contain;box-sizing:border-box}
+.browseFilterDialog::backdrop{background:#18312955}
+.browseDialogHead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 12px;background:#fff;border-bottom:1px solid #e8eeeb}
+.browseDialogHead h2{font-size:20px;margin:0 0 5px}.browseDialogHead p{font-size:12px;color:#6e8179;margin:0}
+.browseDialogHead button{flex:none;width:44px;height:44px;border:0;border-radius:50%;font-size:27px;background:#f1f5f3;color:#395548}
+.browseFields{display:grid;grid-template-columns:1fr 1fr;gap:17px 14px;padding:20px}
+.browseFields label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:650;min-width:0}
+.browseFields select,.browseFields input{width:100%;min-width:0;box-sizing:border-box;min-height:46px;padding:10px;border:1px solid #ccdcd5;border-radius:10px;background:#fff;font-family:inherit;font-size:15px;font-weight:400;line-height:1.5;color:#243c31}
+.browseFields select:disabled{background:#f5f7f6;color:#9aa9a1}
+.browseWide{grid-column:1/-1}.browseFields [hidden]{display:none}
+#browseNearbyNote{font-size:12px;color:#61796d;margin:0;line-height:1.5}
+.browseDialogFoot{position:sticky;bottom:0;background:#fff;border-top:1px solid #e5eee9;display:grid;grid-template-columns:1fr 2fr;gap:8px;padding:14px 20px max(14px,env(safe-area-inset-bottom))}
+.browseDialogFoot button{min-height:46px;border-radius:10px;border:1px solid #d7e3dc;background:#fff;color:#365c4a;font-family:inherit;font-weight:600;font-size:14px;line-height:1.4}
+#browseApply{background:#247f78;border-color:#247f78;color:white}
+#browsePreview{grid-column:1/-1;font-size:12px;line-height:1.5;color:#6b7e75;margin:0}
+.browseTools button:focus-visible,.browseFilterDialog :focus-visible{outline:3px solid #458e7d;outline-offset:2px}
+#businessSide{height:44%!important;max-height:calc(100% - 110px)!important;border-radius:18px 18px 0 0!important;background:#fff;scroll-behavior:auto;overflow-anchor:none}
+#businessSide.menuSized{height:var(--menu-height)!important;max-height:calc(100% - 110px)!important}
+#businessSide>.menuResizeGrip{height:18px;min-height:18px;--list-header-grip:18px}
+#businessSide{--list-header-grip:18px}
+#businessSide>.mobileSideHead{min-height:48px;padding:0 12px 6px;gap:6px}
+#businessSide .mobileSideHead strong{font-size:16px;flex:1}
+#browseListCount{margin-left:6px;font-size:12px;font-weight:500;color:#6d8177}
+#businessSide .mobileSideHead button{min-height:40px;height:40px}
+#businessSide .browseListFilters{border:1px solid #d3e0d9;background:white;border-radius:9px;color:#365b4a;font-family:inherit;font-size:12px;font-weight:600;line-height:1.4;padding:6px 10px}
+#businessSide #mobileFilterToggle{margin:0;font-size:11px;min-width:36px;padding:4px 6px}
+#businessSide .card{padding:14px 12px;margin:0;border:0;border-bottom:1px solid #e6ede9;border-radius:0;background:#fff;box-shadow:none}
+#businessSide .card.active{background:#eef7f3}
+#businessSide .name{font-size:16px;line-height:1.4;font-weight:700;overflow-wrap:anywhere}
+#businessSide .reviewNameHint{display:none}
+#businessSide .businessRegion{font-size:12px;margin:5px 0}
+#businessSide .cardAside{min-width:75px}
+#businessSide .rating{font-size:21px}
+#businessSide .meta{font-size:12px;line-height:1.5;margin-top:7px}
+#businessSide .badge{font-size:11px}.side .cardReviewLink{font-size:11px}
+#detail.show{overflow-anchor:none;scroll-behavior:auto;border-radius:18px;box-shadow:0 5px 24px #183d3524}
+#detail .detailHeader{padding-bottom:8px}
+#detail>.detailResizeHandle{height:24px;min-height:24px;--detail-header-grip:24px}
+#detail{--detail-header-grip:24px}
+#detail .detailHeader h2{font-size:20px;line-height:1.35;margin:4px 0}
+#detail .detailHeader .detailClose{width:44px;height:44px;flex:none;border:0;background:#f2f6f4;border-radius:50%}
+.reviewRecovery{margin:10px 0;padding:10px 12px;border:1px solid #ceddd4;border-radius:10px;background:#f5faf7;font-size:12px;line-height:1.6}
+.reviewRecovery button{min-height:38px;padding:5px 10px;border:1px solid #bbd3c4;border-radius:8px;color:#276647;background:#fff;margin-top:5px}
+.weatherLayer{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;contain:strict}
+.weatherLayer i{position:absolute;top:-24px;left:var(--x);animation:weather-fall var(--duration) linear infinite;animation-delay:var(--delay);opacity:.35;pointer-events:none;will-change:transform}
+.weatherLayer[data-kind="rain"] i{width:1px;height:18px;background:#547f94;border-radius:2px}
+.weatherLayer[data-kind="snow"] i{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 2px #607780}
+@keyframes weather-fall{to{transform:translate3d(var(--drift),var(--fall),0)}}
+.mapWeather{position:absolute;right:12px;bottom:28px;z-index:11;max-width:190px;background:#ffffffed;border:1px solid #dce6e0;border-radius:10px;padding:6px 8px;font-size:11px;color:#556e62;line-height:1.4}
+.mapWeather button{font:inherit;color:#315e4a;border:0;background:none;min-height:28px;cursor:pointer;padding:2px 3px}
+.mapWeather a{font-size:9px;color:#768a7e;text-decoration:underline}.mapWeather small{font-size:10px;display:block}
+.mapwrap.detailOpen .mapWeather,.mapwrap.listOpen .mapWeather{display:none}
+.weatherLayer[hidden],.mapWeather[hidden]{display:none!important}
+@media(min-width:901px){
+ .browseTools{max-width:740px}
+ .mapwrap #areaLegend{left:auto!important;right:14px;max-width:min(600px,calc(100% - var(--desktop-list-offset) - 28px))}
+ #detail.show{max-height:calc(100% - 125px)!important}
+}
+@media(max-width:900px){
+ .browseTools{left:10px;right:10px;top:8px}
+ .browseFilterButtons{gap:4px}.browseFilterButtons button{padding:6px 8px;border-radius:10px;min-height:50px}
+ .browseFilterButtons strong{font-size:12px}.browseFilterButtons small{font-size:10px}
+ #mobileListBtn{display:none!important}
+ #businessSide.mobileOpen{left:0;right:0;bottom:0;width:auto;height:44%!important;max-height:calc(100% - 108px)!important;border-radius:18px 18px 0 0!important}
+ #businessSide.mobileOpen.menuSized{height:var(--menu-height)!important}
+ #businessSide .card{padding:13px 14px}
+ .browseFilterDialog{margin:auto auto 0;width:100%;max-height:90dvh;border-radius:20px 20px 0 0}
+ .browseFields{gap:15px 12px;padding:18px 16px}.browseDialogHead{padding:16px}.browseDialogFoot{padding-left:16px;padding-right:16px}
+ #detail.show{max-height:calc(100% - 110px)!important;max-width:100%}
+ #detail:not(.detailExpanded):not(.detailResized){height:min(260px,46%)!important}
+ #detail.detailExpanded:not(.detailResized){height:65%!important}
+ .mapUtilityBar .communityStats{display:flex!important;justify-content:center;gap:12px!important;min-height:26px}
+ .mapUtilityBar .communityStats>span{min-height:26px}
+}
+@media(prefers-reduced-motion:reduce){.weatherLayer{display:none!important}}
