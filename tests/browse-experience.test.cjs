@@ -31,6 +31,9 @@ for(const mobile of [false,true]){
  w.BrowseExperience.open();change('browseQuery','없는 업소');assert.equal(el('browseApply').textContent,'0곳 보기');assert.match(el('browsePreview').textContent,/조건을 넓혀/);el('browseFilterClose').click();assert.equal(run('items().length'),1);
  el('browseClear').click();assert.equal(run('items().length'),3);assert.equal(run('JSON.stringify(fixture)'),before,'browse operations never change reviews or places');
  assert.equal(w.document.querySelectorAll('[data-browse-filter]').length,3);
+ assert.equal(w.document.querySelectorAll('.mapwrap [data-browse-filter]').length,0,'selectors never cover the map');
+ assert.equal(w.document.querySelectorAll('#businessSide [data-browse-filter]').length,3,'selectors are inside the list');
+ assert.equal(w.document.querySelectorAll('.top #adminBtn').length,0,'operator control is not in the header');
  const quick=w.document.querySelector('[data-browse-filter="category"]');quick.value='restaurant';quick.dispatchEvent(new w.Event('change',{bubbles:true}));
  assert.equal(run('state.cat'),'restaurant');assert.equal(run('items().length'),2,'quick category applies without opening a form');assert(!el('browseFilterDialog').open);
  const tabs=w.document.querySelector('.browseListTabs');assert.equal(tabs.previousElementSibling.className,'mobileSideHead');assert(!tabs.closest('.filters'),'primary tabs never live in hidden options');

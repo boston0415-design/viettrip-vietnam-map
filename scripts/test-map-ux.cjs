@@ -38,8 +38,25 @@ const server=http.createServer((req,res)=>{
   }else await page.goto(`http://127.0.0.1:${server.address().port}/`,{waitUntil:'load'});
   await page.waitForTimeout(150);
   if(errors.length){await page.screenshot({path:path.join(out,'failure.png')});throw Error('Startup: '+errors.join('; '));}
+  async function checkDoubleClick(panelSelector,titleSelector){
+   const panel=page.locator(panelSelector),title=page.locator(titleSelector),original=await panel.boundingBox();
+   await title.dblclick();const first=await panel.boundingBox();
+   if(width<901){assert(Math.abs(first.height-original.height)<2,'mobile double tap retains drag behavior: '+panelSelector);return;}
+   await title.dblclick();const second=await panel.boundingBox();
+   const larger=first.height>second.height?first:second,smaller=first.height>second.height?second:first;
+   assert(larger.height>smaller.height+60,'double click switches maximum/minimum: '+panelSelector+' '+JSON.stringify({first,second}));
+   assert(larger.y>=-1&&larger.y+larger.height<=page.viewportSize().height+2,'maximized window stays on screen: '+panelSelector);
+   assert(smaller.height>=50,'minimized window remains reachable');
+   await title.dblclick();const third=await panel.boundingBox();
+   assert(Math.abs(third.height-first.height)<3,'repeated toggles remain consistent: '+panelSelector);
+   if(third.height<larger.height-3)await title.dblclick();
+  }
   assert.equal(await page.locator('#list article').count(),24);
   assert.equal(await page.locator('.onlineStat').isVisible(),false,'visitor count stays hidden before admin login');
+  assert.equal(await page.locator('.communityStats').isVisible(),false,'all statistics are operator-only');
+  assert.equal(await page.locator('.top #adminBtn').count(),0,'operator login does not clutter the header');
+  assert.equal(await page.locator('.mapwrap [data-browse-filter]').count(),0,'no permanent filter boxes over the map');
+  await page.locator('#browseShowList').click();
   assert.equal(await page.locator('[data-browse-filter]').count(),3,'region, category and rating are directly selectable');
   await page.locator('[data-browse-filter="city"]').selectOption('hcmc');
   await page.locator('[data-browse-filter="category"]').selectOption('cafe');
@@ -50,13 +67,16 @@ const server=http.createServer((req,res)=>{
   const weather=await page.locator('.mapWeather').boundingBox(),map=await page.locator('.mapwrap').boundingBox();
   assert(weather.y+weather.height<=map.y+1,'temperature stays outside the map on both layouts');
   assert.equal(await page.locator('.weatherLayer i').count(),3,'cloud animation stays lightweight');
-  await page.locator('.mapWeather').click();assert(await page.locator('#weatherDialog').isVisible());await page.locator('#weatherClose').click();
+  await page.locator('.mapWeather').click();assert(await page.locator('#weatherDialog').isVisible());
+  await checkDoubleClick('#weatherDialog','#weatherTitle');await page.locator('#weatherClose').click();
   await page.locator('.browseListFilters').click();
   if(width<901)assert((await page.locator('#browseFilterDialog').boundingBox()).width>=width-2,'mobile conditions use the full screen width');
   await page.locator('#browseCategory').selectOption('cafe');
   await page.locator('#browseRating').selectOption('4plus');
   await page.locator('#browseBenefit').selectOption('benefit');
   assert.equal(await page.locator('#browseApply').innerText(),'1곳 보기');
+  await checkDoubleClick('#browseFilterDialog','#browseFilterTitle');
+  assert.equal(await page.locator('#browseCategory').inputValue(),'cafe','resizing keeps filter draft');
   await page.locator('#browseFilterClose').click();
   assert.equal(await page.locator('#list article').count(),24,'cancel leaves current map/list unchanged');
   await page.locator('.browseListFilters').click();
@@ -71,9 +91,6 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#list article').count(),24,'reset restores all matched places');
   await page.evaluate(()=>{document.getElementById('onlineUsers').textContent='12';document.getElementById('totalVisits').textContent='12,345';document.getElementById('totalPlaces').textContent='999';document.getElementById('totalReviews').textContent='456';});
   if(width<901){
-   const rects=await page.locator('.communityStats').evaluate(n=>[...n.children].filter(c=>!c.hidden).map(c=>{const r=c.getBoundingClientRect();return {y:r.y,h:r.height}}));
-   assert(rects.every(r=>Math.abs(r.y+r.h/2-(rects[0].y+rects[0].h/2))<2),'mobile statistics and temperature share one centered row: '+JSON.stringify(rects));
-   assert(rects[0].h<=30,'statistics are compact');
    await page.evaluate(()=>openMobileBusinessList());
   }
   await page.waitForTimeout(280);
@@ -105,6 +122,8 @@ const server=http.createServer((req,res)=>{
   const firstCard=await page.locator('#list article').first().boundingBox();assert(firstCard.y<reopened.y+reopened.height-60,'business content is visible without another drag');
   assert(await tabs.isVisible(),'tabs remain visible after reopening');assert(await page.locator('.mapWeather').isVisible(),'weather stays available with the list open');
   await page.screenshot({path:path.join(out,`compact-list-${width}.png`)});
+  await checkDoubleClick('#businessSide','#businessSide .mobileSideHead strong');
+  await page.locator('#businessSide').evaluate(n=>{n.classList.remove('menuSized');n.style.removeProperty('--menu-height');n.scrollTop=0;});
   async function dragAt(selector,delta){
    const box=await page.locator(selector).first().boundingBox();assert(box,'drag target visible '+selector);
    const x=box.x+Math.min(box.width/2,120),y=Math.max(10,Math.min(page.viewportSize().height-24,box.y+Math.min(box.height/2,18)));
@@ -213,9 +232,11 @@ const server=http.createServer((req,res)=>{
   await page.locator('#detail').evaluate(n=>n.scrollTop=0);
   await dragAt('.placePhotos img',-65);
   assert(!await page.locator('#memberPhotoViewer').evaluate(n=>n.open),'photo DRAG does not open the viewer');
+  await checkDoubleClick('#detail','#detail .detailHeader h2');
   await page.locator('.placePhotos a').first().click();
   assert(await page.locator('#memberPhotoViewer').evaluate(n=>n.open));
   assert.equal(await page.evaluate(()=>state.selected),'ux-0');
+  await checkDoubleClick('#memberPhotoViewer','#memberPhotoCount');
   await page.locator('#memberPhotoNext').click();assert.match(await page.locator('#memberPhotoCount').innerText(),/2 \/ 2/);
   await page.locator('#memberPhotoClose').click();
   assert(await page.locator('#detailBody').isVisible());
@@ -270,6 +291,7 @@ const server=http.createServer((req,res)=>{
    assert(!await page.locator('#nearbyResultsBody').isVisible(),'nearby TITLE also folds panel');
    await page.locator('#nearbyCollapse').click();
    if(kind==='stay')await page.screenshot({path:path.join(out,`nearby-${width}.png`)});
+   if(kind==='manual')await checkDoubleClick('#nearbyResults','#nearbyResultsTitle');
    await page.locator('[data-nearby-business="ux-0"]').click();
    await page.locator('[data-browse-next]').click();
    await page.locator('#detailCloseBtn').click();
@@ -282,6 +304,10 @@ const server=http.createServer((req,res)=>{
   assert(reviewBox.height>=Math.min(820,page.viewportSize().height*.86),'larger review editing area');
   assert.equal(await page.locator('#reviewModal .menuResizeGrip').count(),0,'writing is not intercepted by resizing');
   await page.locator('#rText').fill('취소할 임시 문장');
+  await checkDoubleClick('#reviewModal .modal','#reviewEditorTitle');
+  assert.equal(await page.locator('#rText').inputValue(),'취소할 임시 문장','resizing preserves review draft');
+  const editingHeight=(await page.locator('#reviewModal .modal').boundingBox()).height;
+  await page.locator('#rText').dblclick();assert.equal((await page.locator('#reviewModal .modal').boundingBox()).height,editingHeight,'text selection never resizes editor');
   await page.screenshot({path:path.join(out,`review-editor-${width}.png`)});
   await page.locator('#reviewEditorClose').click();
   assert.equal(await page.evaluate(()=>testData.reviews[0].text),'사진과 후기를 함께 확인하는 테스트입니다.','close does not change saved text');
@@ -301,16 +327,21 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{({supaRpc,uploadSelectedReviewPhotos,fetchSharedDb,saveDb}=window.__savedFunctions);closeDetailPanel();});
   // Admin is a role, never an ordinary rank; native scrolling does not resize membership.
   await page.evaluate(()=>{state.isAdmin=true;syncAdminButton();});
-  assert.equal(await page.locator('#memberBarRank').innerText(),'관리자');
-  await page.locator('#openMapMembership').click();
+  assert.equal(await page.locator('#openMapMembership').isVisible(),false,'operator banner stays out of the header');
+  assert(await page.locator('.communityStats').isVisible(),'operator can see dashboard counts');
+  await page.locator('#browseShowList').click();await page.locator('#mobileFilterToggle').click();
+  await page.locator('#openOperatorTools').click();
   assert.equal(await page.locator('#memberHeroRank').innerText(),'관리자');
   assert.equal(await page.locator('#memberDialog .menuResizeGrip').count(),0);
   assert(!await page.locator('#memberGradeSection').isVisible());
   const before=await page.locator('#memberDialog').evaluate(n=>n.getBoundingClientRect().height);
   await page.locator('#memberDialog').evaluate(n=>n.scrollTop=180);
   assert.equal(await page.locator('#memberDialog').evaluate(n=>n.getBoundingClientRect().height),before);
+  await page.locator('#memberDialog').evaluate(n=>n.scrollTop=0);
+  await checkDoubleClick('#memberDialog','#memberTitle');
   await page.locator('#memberClose').click();
   await page.evaluate(()=>{state.isAdmin=false;syncAdminButton();});
+  assert.equal(await page.locator('.communityStats').isVisible(),false,'logout removes dashboard counts');
   assert.match(await page.locator('#memberBarRank').innerText(),/이등병/,await page.locator('#memberStatus').innerText());
   // Global search works even with nearby active; registration CTA remains outside scroll body.
   await page.locator('#searchInput').fill('검색한 새 업소');
@@ -322,6 +353,8 @@ const server=http.createServer((req,res)=>{
   await page.locator('#registerSearchPlace').click();
   assert(await page.locator('#placeModal').evaluate(n=>n.classList.contains('open')));
   assert.equal(await page.locator('#pName').inputValue(),'검색한 새 업소');
+  await checkDoubleClick('#placeModal .modal','#placeModal h3');
+  assert.equal(await page.locator('#pName').inputValue(),'검색한 새 업소','resizing preserves registration draft');
   await page.evaluate(()=>closeModalById('placeModal'));
   // Failed lookup still offers a manual form, without assigning the map center as location.
   await page.locator('#searchInput').fill('직접 등록할 업소');
@@ -330,9 +363,16 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.evaluate(()=>state.clickLatLng),null);
   await page.evaluate(()=>closeModalById('placeModal'));
   await page.evaluate(()=>{closeDetailPanel();renderAll();});
+  if(width>900){
+   await page.evaluate(()=>setMobileLegendExpanded(true));
+   await checkDoubleClick('#areaLegend','#areaLegendTitle');
+   await page.locator('#openAreaDirectory').click();
+   await checkDoubleClick('#areaPanel','#areaPanelTitle');await page.locator('#areaPanelClose').click();
+   await page.evaluate(()=>setMobileLegendExpanded(false));
+  }
   await page.screenshot({path:path.join(out,`overview-${width}.png`)});
   assert.deepEqual(errors,[],`no runtime error at ${width}px`);
-  results.push({width,passed:true,checks:['readable list under half height','expand-first title drag with anchored header and grip','nearby collapse/close/reopen','drag-to-collapse','removed redundant labels','one-row stats','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','admin role','membership height','search registration','manual location validation']});
+  results.push({width,passed:true,checks:['list-only quick filters','no public dashboard counts','operator controls in list options','desktop double-click max/min and mobile drag preservation','readable list under half height','expand-first title drag with anchored header and grip','nearby collapse/close/reopen','drag-to-collapse','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','membership height','search registration','manual location validation']});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'map-ux-results.json'),JSON.stringify(results,null,2));console.log('PASS Map UX browser regression',JSON.stringify(results));

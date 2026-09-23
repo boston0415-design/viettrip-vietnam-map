@@ -111,6 +111,7 @@
   }
   function paintRole(){
     const admin=Boolean(state.isAdmin);
+    if(el('openMapMembership'))el('openMapMembership').hidden=admin;
     el('memberDialog')?.classList.toggle('isAdministrator',admin);
     if(el('memberAdminTools'))el('memberAdminTools').hidden=!admin;
     if(el('memberTitle'))el('memberTitle').textContent=admin?'관리자 · 맵 운영':'내 맵 등급 · 활동';
@@ -163,6 +164,7 @@
   }
   function init(){
     el('openMapMembership').addEventListener('click',open);
+    el('openOperatorTools')?.addEventListener('click',open);
     el('memberDeviceLinkButton')?.addEventListener('click',()=>{const section=el('memberDeviceLink');if(section){section.open=true;section.scrollIntoView({block:'start'});section.querySelector('button')?.focus({preventScroll:true});}});
     window.addEventListener('focus',schedule);
     setInterval(()=>{if(!document.hidden&&el('memberDialog')?.open)schedule();},30000);

@@ -5,7 +5,7 @@
   // Our stated rule, not a claim about Naver's internal counting algorithm.
   const VISIT_WINDOW_MS=30*60*1000;
   const VISIT_KEY='viettrip_counted_visit_v2';
-  let visitToken,visitRecorded=false;
+  let visitToken,visitRecorded=false,roleRevision=0,loading=null;
   function reuseVisitToken(){
     if(visitToken)return visitToken;
     let storage;
@@ -29,13 +29,13 @@
     try{return await fetch(endpoint+path,{...options,signal:controller.signal,headers:{...SUPABASE_HEADERS,...options.headers}})}
     finally{clearTimeout(timer)}
   }
-  async function count(path,id){
+  async function count(path,id,version){
     const response=await request(path,{method:'HEAD',headers:{Prefer:'count=exact'}});
     if(!response.ok)throw new Error('Statistics unavailable');
     const raw=response.headers.get('content-range')?.split('/').pop();
     if(!raw||!/^\d+$/.test(raw))throw new Error('Invalid statistics');
     const node=document.getElementById(id);
-    if(node)node.textContent=format.format(Number(raw));
+    if(node&&state.isAdmin&&version===roleRevision)node.textContent=format.format(Number(raw));
   }
   async function recordVisit(){
     // Count only the production domain; previews and local checks do not inflate totals.
@@ -54,13 +54,19 @@
       }catch{}
     }
   }
-  async function visits(){
-    try{await recordVisit()}catch{} // Failed recording must not hide the existing total.
-    await count('site_visits?select=created_at&limit=0','totalVisits');
+  // Anonymous visits are still counted. Aggregate requests are only made in operator mode.
+  const visitReady=recordVisit().catch(()=>{});
+  function syncRole(){
+    const allowed=state.isAdmin===true;
+    document.querySelectorAll('.communityStats>span').forEach(node=>{node.hidden=!allowed;});
+    if(!allowed){roleRevision++;loading=null;for(const id of ['totalVisits','totalPlaces','totalReviews']){const node=document.getElementById(id);if(node)node.textContent='—';}return;}
+    if(loading)return;
+    const version=++roleRevision;
+    loading=Promise.allSettled([
+      visitReady.then(()=>{if(state.isAdmin&&version===roleRevision)return count('site_visits?select=created_at&limit=0','totalVisits',version);}),
+      count('places_public?select=id&limit=0','totalPlaces',version),
+      count('reviews?select=id&body=not.is.null&body=neq.&limit=0','totalReviews',version)
+    ]).finally(()=>{if(version===roleRevision)loading=null;});
   }
-  Promise.allSettled([
-    visits(),
-    count('places_public?select=id&limit=0','totalPlaces'),
-    count('reviews?select=id&body=not.is.null&body=neq.&limit=0','totalReviews')
-  ]);
+  window.CommunityStats={syncRole};syncRole();
 })();

@@ -1,7 +1,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {JSDOM}=require('jsdom');
 (async()=>{
- const dom=new JSDOM('<div class="communityStats"></div><div class="mapwrap"></div>',{url:'https://example.test',runScripts:'outside-only'}),w=dom.window;
+ const dom=new JSDOM('<div class="brandLinks"></div><div class="communityStats"></div><div class="mapwrap"></div>',{url:'https://example.test',runScripts:'outside-only'}),w=dom.window;
  let time=Date.parse('2026-09-23T10:15:00Z'),hidden=false,id=0;const timers=new Map(),requests=[],media={matches:false,addEventListener:(name,fn)=>media.change=fn};
  w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','')};w.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open')};
  w.Date.now=()=>time;Object.defineProperty(w.document,'hidden',{get:()=>hidden});w.matchMedia=()=>media;
@@ -14,7 +14,7 @@ const {JSDOM}=require('jsdom');
  vm.runInContext(fs.readFileSync('assets/js/map-weather.js','utf8'),dom.getInternalVMContext());
  assert.equal(requests.length,1);assert.match(requests[0].url,/lat=10\.777&lon=106\.701/,'public city center, never precise user GPS');answer(requests[0],'lightrain');await flush();
  const layer=w.document.querySelector('.weatherLayer'),badge=w.document.querySelector('.mapWeather');assert(!layer.hidden);assert.equal(layer.dataset.kind,'rain');assert(layer.children.length<=22);assert.equal(badge.textContent,'27°','only temperature is visible');assert.match(badge.getAttribute('aria-label'),/비 예보/);
- assert(badge.closest('.communityStats'));assert(!badge.closest('.mapwrap'),'weather cannot cover map content');
+ assert(badge.closest('.brandLinks'));assert(!badge.closest('.mapwrap'),'weather cannot cover map content');
  badge.click();assert(w.document.getElementById('weatherDialog').open);assert.equal(w.document.querySelectorAll('#weatherDialog a').length,2,'forecast attribution remains available');w.document.getElementById('weatherClose').click();assert(!w.document.getElementById('weatherDialog').open);
  await w.MapWeather.sync();assert.equal(requests.length,1,'cached forecast coalesces map repaint requests');
  w.document.getElementById('weatherToggle').click();assert(layer.hidden);assert.equal(w.localStorage.getItem('viettrip_weather_effect'),'off');w.document.getElementById('weatherToggle').click();

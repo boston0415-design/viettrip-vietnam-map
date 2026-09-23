@@ -4,7 +4,9 @@
  function limits(p){
    const container=p.closest('.content')||p.closest('.modalback');
    const available=container?.getBoundingClientRect().height||window.visualViewport?.height||innerHeight;
-   const max=Math.max(80,available-(p.id==='businessSide'?110:32));return {min:Math.min(p.id==='businessSide'?110:150,max),max};
+   let max=Math.max(80,available-(p.id==='businessSide'?110:32));
+   if(container&&['areaLegend','areaPanel'].includes(p.id))max=Math.max(80,Math.min(max,p.getBoundingClientRect().bottom-container.getBoundingClientRect().top-12));
+   return {min:Math.min(p.id==='businessSide'?110:150,max),max};
  }
  function size(p,value){
    const record=records.get(p),b=record.bounds||limits(p),h=Math.round(Math.max(b.min,Math.min(b.max,value)));
@@ -23,6 +25,14 @@
    if(r.frame==null)r.frame=requestAnimationFrame(()=>{r.frame=null;const next=r.pending;r.pending=null;size(p,next)});
  }
  function expand(p){if(p.id==='areaLegend'&&p.classList.contains('mobileCollapsed'))setMobileLegendExpanded(true)}
+ function toggle(p){
+   if(!records.has(p))return false;
+   window.BodySheetDrag?.cancel(p);stop(p);records.get(p).bounds=null;
+   const b=limits(p),minimize=p.getBoundingClientRect().height>=b.max-3;
+   if(minimize&&p.id==='areaLegend')setMobileLegendExpanded(false);
+   else{expand(p);size(p,minimize?b.min:b.max);}
+   p.scrollTop=0;return true;
+ }
  function end(p,{canceled=false,velocity=0}={}){
    stop(p);const r=records.get(p);r.bounds=null;p.classList.remove('menuDragging');
    if(canceled)return;
@@ -59,5 +69,6 @@
  }
  function start(){scan();new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+ window.MenuSheetResize={toggle};
  for(const event of ['blur','pagehide','resize'])window.addEventListener(event,()=>{for(const p of records.keys()){window.BodySheetDrag?.cancel(p);stop(p);records.get(p).bounds=null;if(event==='resize'&&p.classList.contains('menuSized'))size(p,parseFloat(p.style.getPropertyValue('--menu-height')))}});
 })();

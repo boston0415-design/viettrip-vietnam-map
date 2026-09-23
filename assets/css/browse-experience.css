@@ -1,5 +1,6 @@
 /* Calm controls, readable cards and stable panel headers on both layouts. */
-.mapUtilityBar .communityStats>.onlineStat[hidden]{display:none!important}
+.mapUtilityBar .communityStats>span[hidden],.memberGradeBar[hidden],#openOperatorTools[hidden]{display:none!important}
+.mapUtilityBar .communityStats:not(:has(>span:not([hidden]))):not(:has(.mapWeather:not([hidden]))){display:none!important}
 .communityStats{gap:10px!important}
 .communityStats>span+span{margin-left:0!important;padding-left:0!important}
 .communityStats>span::before{display:none!important}
@@ -10,7 +11,14 @@
 .browseFilterButtons small{grid-column:1/-1;font-size:11px;color:#73867e;font-weight:500}
 .browseFilterButtons select{width:100%;min-width:0;padding:3px 0;margin:0;border:0;border-radius:0;background:transparent;color:inherit;font-size:14px;font-weight:600;text-overflow:ellipsis;line-height:1.4}
 .browseFilterButtons .isSet{border-color:#a7c8be;background:#f5faf8}
-.browseResultBar{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:12px}
+.browseQuickFilters{padding:6px 12px 8px;background:#fff;border-bottom:1px solid #e3ebe7;gap:5px}
+.browseQuickFilters label{min-height:43px;padding:3px 7px;border-radius:8px;box-shadow:none}
+.browseQuickFilters select{font-family:inherit;font-size:12px;cursor:pointer}
+.browseQuickFilters :focus-visible{outline:2px solid #458e7d;outline-offset:2px}
+.operatorOptions{display:flex;gap:12px;flex-wrap:wrap;padding-top:8px;margin-top:6px;border-top:1px solid #e3ebe7}
+.operatorOptions button{font:inherit;font-size:12px;color:#657c70;background:none;border:0;min-height:36px;cursor:pointer}
+.detailReviewLink{border:0;background:none;padding:4px 0;color:#60788a;font-family:inherit;cursor:pointer;text-align:left;min-height:28px}
+.browseResultBar{display:flex;align-items:center;gap:7px;margin-top:0;font-size:12px}
 .browseResultBar button{border:1px solid #d5e1dc;border-radius:20px;background:#fff;color:#2e5145;min-height:36px;padding:6px 13px;font-weight:600}
 #browseConditions{max-width:50%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;background:#ffffffed;border-radius:8px;padding:4px 6px}
 #browseConditions:empty{display:none}
@@ -71,6 +79,7 @@
 @keyframes weather-fall{to{transform:translate3d(var(--drift),var(--fall),0)}}
 @keyframes weather-cloud{from{transform:translate3d(-60px,0,0)}to{transform:translate3d(150px,0,0)}}
 .mapWeather{flex:none;align-self:center;min-height:28px;min-width:36px;padding:3px 5px;border:0;border-radius:6px;background:#eef4f1;color:#385a4a;font:600 13px/1.4 system-ui,sans-serif;cursor:pointer}
+.brandLinks .mapWeather{min-height:24px;min-width:32px;padding:2px 4px;margin-left:6px;font-size:11px}
 .weatherDialog{width:min(310px,calc(100vw - 32px));box-sizing:border-box;padding:18px;border:1px solid #dce6e0;border-radius:16px;color:#385a4a;background:#fff;box-shadow:0 6px 24px #183d3524}
 .weatherDialog::backdrop{background:#18312944}.weatherDialogHead{display:flex;align-items:center;justify-content:space-between}.weatherDialogHead button{width:40px;height:40px;border:0;border-radius:50%;background:#f2f6f4;color:inherit;font-size:25px;cursor:pointer}
 #weatherSummary{font-size:16px;font-weight:600;margin:10px 0}#weatherTime{font-size:12px;line-height:1.6;color:#6b7e75}
@@ -78,13 +87,15 @@
 .weatherDialog small{display:block;margin-top:16px;font-size:11px}.weatherDialog a{color:#617a6b;text-decoration:underline}
 .weatherLayer[hidden],.mapWeather[hidden]{display:none!important}
 @media(min-width:901px){
+ body .modalback .modal.desktopWindowSized,body dialog.desktopWindowSized{height:var(--desktop-window-height)!important;min-height:0!important;max-height:calc(100dvh - 40px)!important;overflow-y:auto!important;box-sizing:border-box}
+ [data-desktop-resize-hint]{user-select:none}
  .browseTools{max-width:740px}
  .mapwrap #areaLegend{left:auto!important;right:14px;max-width:min(600px,calc(100% - var(--desktop-list-offset) - 28px))}
  #detail.show{max-height:calc(100% - 125px)!important}
 }
 @media(max-width:900px){
  .browseTools{left:10px;right:10px;top:8px}
- .browseFilterButtons{gap:5px}.browseFilterButtons label{padding:4px 8px;border-radius:10px;min-height:50px}
+ .browseFilterButtons{gap:5px}.browseFilterButtons label{padding:3px 7px;border-radius:8px;min-height:43px}
  .browseFilterButtons select{font-size:13px}.browseFilterButtons small{font-size:10px}
  #mobileListBtn{display:none!important}
  #businessSide.mobileOpen{left:0;right:0;bottom:0;width:auto;height:44%!important;max-height:calc(100% - 108px)!important;border-radius:18px 18px 0 0!important}

@@ -92,7 +92,12 @@
     }
     aria();
   }
-  window.DetailSheetResize={sync,reset,isInteracting:()=>tracking||dragging||animation!==null,deferRefresh:()=>{pendingRefresh=true}};
+  function toggle(){
+    const p=panel();if(!p?.classList.contains('show'))return;
+    window.BodySheetDrag?.cancel(p);stopAnimation();flush();dragBounds=null;
+    const b=bounds();apply(p.getBoundingClientRect().height>=b.max-3?b.min:b.max);p.scrollTop=0;positionSelectedPlaceInView();
+  }
+  window.DetailSheetResize={sync,reset,toggle,isInteracting:()=>tracking||dragging||animation!==null,deferRefresh:()=>{pendingRefresh=true}};
   window.addEventListener('resize',()=>{stopAnimation();dragBounds=null;if(height!==null&&panel()?.classList.contains('show')){bottom=null;apply(height)}});
   window.addEventListener('blur',stopAnimation);
   window.addEventListener('pagehide',stopAnimation);

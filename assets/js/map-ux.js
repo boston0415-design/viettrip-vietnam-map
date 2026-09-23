@@ -100,6 +100,13 @@
     const focus=mode==='closed'?el('nearbyReopen'):el('nearbyCollapse');
     focus?.focus({preventScroll:true});
   }
+  function toggleNearbySize(){
+    const tray=el('nearbyResults');if(!tray||tray.hidden)return;
+    window.BodySheetDrag?.cancel(tray);
+    const max=parseFloat(tray.style.getPropertyValue('--nearby-max-height'))||196;
+    if(tray.getBoundingClientRect().height>=max-3&&!tray.classList.contains('isCollapsed'))setNearbyMode('collapsed');
+    else{nearbyMode='expanded';syncNearby();tray.classList.add('nearbyTall');tray.style.height=max+'px';}
+  }
   function positionNearby(){
     const tray=el('nearbyResults'),legend=el('areaLegend'),wrap=document.querySelector('.mapwrap');if(!tray||!legend||!wrap)return;
     const mapRect=wrap.getBoundingClientRect(),menuRect=legend.getBoundingClientRect();
@@ -210,7 +217,7 @@
       paint();if(!dialog.open)dialog.showModal();el('memberPhotoClose').focus({preventScroll:true});
     },true);
   }
-  window.MapUX={openBusiness,closeDetail,decorateDetail,onSelection,onDetailClosed,syncNearby,searchMeta,syncSearchAction,registerFromSearch};
+  window.MapUX={openBusiness,closeDetail,decorateDetail,onSelection,onDetailClosed,syncNearby,searchMeta,syncSearchAction,registerFromSearch,toggleNearbySize};
   // Register the photo dialog before panel-history collects dialog layers.
   init();
 })();

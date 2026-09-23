@@ -79,8 +79,10 @@ for(const width of [360,768,1440]){
  assert.match(d.getElementById('memberBarRank').textContent,/대장/,'offline state must not demote');failed=false;
  run('state.isAdmin=true');await w.MapMembership.open();assert(!d.getElementById('memberAdminTools').hidden);
  assert.equal(d.getElementById('memberBarRank').textContent,'관리자');assert.equal(d.getElementById('memberHeroRank').textContent,'관리자');
+ assert(d.getElementById('openMapMembership').hidden,'no administrator role banner above the map');
  assert(d.getElementById('memberDialog').classList.contains('isAdministrator'));
  run('state.isAdmin=false');w.MapMembership.syncRole();assert.match(d.getElementById('memberBarRank').textContent,/대장/);
+ assert(!d.getElementById('openMapMembership').hidden,'member progress remains accessible');
  for(const req of calls)if(req.p_action==='badges')assert.equal(req.p_device_id,null,'public requests contain no credential');
  await w.MapMembership.loadBadges();await flush();
  dom.window.close();

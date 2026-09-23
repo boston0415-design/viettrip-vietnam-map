@@ -5,8 +5,8 @@
   const layer=document.createElement('div');layer.className='weatherLayer';layer.hidden=true;layer.setAttribute('aria-hidden','true');wrap.append(layer);
   const badge=document.createElement('button');badge.type='button';badge.className='mapWeather';badge.hidden=true;
   badge.setAttribute('aria-haspopup','dialog');badge.setAttribute('aria-controls','weatherDialog');badge.innerHTML='<span id="weatherLabel"></span>';
-  // Temperature belongs to the existing utility row, never on top of the map.
-  (document.querySelector('.communityStats')||document.querySelector('.mapUtilityBar'))?.append(badge);
+  // Temperature shares the header links, without creating a public statistics row.
+  (document.querySelector('.brandLinks')||document.querySelector('.communityStats'))?.append(badge);
   const details=document.createElement('dialog');details.id='weatherDialog';details.className='weatherDialog';details.setAttribute('data-no-sheet-resize','');details.setAttribute('aria-labelledby','weatherTitle');
   details.innerHTML='<div class="weatherDialogHead"><strong id="weatherTitle">날씨</strong><button id="weatherClose" type="button" aria-label="날씨 닫기">×</button></div><p id="weatherSummary"></p><p id="weatherTime"></p><button id="weatherToggle" type="button" aria-pressed="true">효과 끄기</button><small>시간대 예보 · <a href="https://api.met.no/weatherapi/locationforecast/2.0/documentation" target="_blank" rel="noopener">MET Norway</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></small>';
   document.body.append(details);

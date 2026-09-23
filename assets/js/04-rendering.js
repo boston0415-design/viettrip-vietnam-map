@@ -41,8 +41,11 @@ let adminSessionRevision=0;
 function syncAdminButton(){
   const button=$('#adminBtn');
   if(!button)return;
-  button.textContent=state.isAdmin||adminKey()?'관리자 로그아웃':'관리자';
+  button.textContent=state.isAdmin||adminKey()?'운영자 로그아웃':'운영자 로그인';
   button.classList.toggle('adminOn',state.isAdmin);
+  document.querySelectorAll('.communityStats>span').forEach(node=>{node.hidden=!state.isAdmin;});
+  const tools=$('#openOperatorTools');if(tools)tools.hidden=!state.isAdmin;
+  window.CommunityStats?.syncRole();
   window.OnlinePresence?.syncVisibility();
   window.MapMembership?.syncRole?.();
 }
@@ -509,7 +512,7 @@ function renderDetail(){
 
   d.classList.add('show');
   $('.mapwrap')?.classList.add('detailOpen');
-  d.innerHTML=`<div class="detailHeader"><div class="detailTitleWrap"><h2><button type="button" class="businessReviewName" data-place-reviews="${esc(p.id)}"><span class="detailName">${esc(p.name)}</span><span class="reviewNameHint">회원 후기 ${st.reviews.length}개 보기 ›</span></button></h2></div><button id="detailCloseBtn" class="detailClose" type="button" aria-label="상세 닫기">×</button></div>
+  d.innerHTML=`<div class="detailHeader"><div class="detailTitleWrap"><h2><span class="detailName">${esc(p.name)}</span></h2><button type="button" class="detailReviewLink reviewNameHint" data-place-reviews="${esc(p.id)}">회원 후기 ${st.reviews.length}개 보기 ›</button></div><button id="detailCloseBtn" class="detailClose" type="button" aria-label="상세 닫기">×</button></div>
   <div class="detailSummary">
     <div class="detailSummaryMeta"><span>${catLabel(p.category)}${p.subcategory?' · '+esc(p.subcategory):''}</span><span class="detailSummaryRating">${st.rating==null?'평가 없음':`★ ${st.rating.toFixed(1)} <small>(${st.count})</small>`}</span></div>
     ${p.address?`<p class="detailSummaryAddress" title="${esc(p.address)}">${esc(p.address)}</p>`:''}

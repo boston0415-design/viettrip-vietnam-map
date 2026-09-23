@@ -27,14 +27,14 @@ async function login(a){a.node('#adminPassword').value=password;await a.run('sub
 (async()=>{
   const a=app();await login(a);
   assert.equal(a.local.get(KEY),password);assert(!a.session.has(KEY));assert.equal(a.run('state.isAdmin'),true);
-  assert.equal(a.node('#adminPassword').value,'');assert.equal(a.node('#adminBtn').textContent,'관리자 로그아웃');
+  assert.equal(a.node('#adminPassword').value,'');assert.equal(a.node('#adminBtn').textContent,'운영자 로그아웃');
 
   // A new page context and empty sessionStorage simulate closing/reopening the browser.
   const b=app(a.local);b.run('bindAdminSessionEvents()');await b.run('restoreAdminSession()');
   assert.equal(b.run('state.isAdmin'),true,'persistent credential still requires server verification');
   await a.run('toggleAdminMode()');await b.emit('storage',{key:KEY,newValue:''});
   assert.equal(b.run('state.isAdmin'),false);assert.equal(b.run('adminKey()'),'');
-  assert.equal(b.node('#adminBtn').textContent,'관리자');
+  assert.equal(b.node('#adminBtn').textContent,'운영자 로그인');
   const afterLogout=app(a.local);await afterLogout.run('restoreAdminSession()');assert.equal(afterLogout.run('state.isAdmin'),false);
 
   const legacy=app(new Map(),new Map([[KEY,password]]));await legacy.run('restoreAdminSession()');
