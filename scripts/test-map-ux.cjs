@@ -72,7 +72,7 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>{document.getElementById('onlineUsers').textContent='12';document.getElementById('totalVisits').textContent='12,345';document.getElementById('totalPlaces').textContent='999';document.getElementById('totalReviews').textContent='456';});
   if(width<901){
    const rects=await page.locator('.communityStats').evaluate(n=>[...n.children].filter(c=>!c.hidden).map(c=>{const r=c.getBoundingClientRect();return {y:r.y,h:r.height}}));
-   assert(rects.every(r=>Math.abs(r.y-rects[0].y)<2),'mobile statistics stay in one row');
+   assert(rects.every(r=>Math.abs(r.y+r.h/2-(rects[0].y+rects[0].h/2))<2),'mobile statistics and temperature share one centered row: '+JSON.stringify(rects));
    assert(rects[0].h<=30,'statistics are compact');
    await page.evaluate(()=>openMobileBusinessList());
   }
@@ -334,5 +334,5 @@ const server=http.createServer((req,res)=>{
   await context.close();
  }
  fs.writeFileSync(path.join(out,'map-ux-results.json'),JSON.stringify(results,null,2));console.log('PASS Map UX browser regression',JSON.stringify(results));
- }finally{await browser.close();server.close();}
+ }catch(error){for(const context of browser.contexts())for(const page of context.pages()){await page.screenshot({path:path.join(out,'failure-'+page.viewportSize().width+'.png')}).catch(()=>{});}throw error;}finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
