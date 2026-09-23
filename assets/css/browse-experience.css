@@ -62,10 +62,12 @@
 #businessSide .meta{font-size:12px;line-height:1.5;margin-top:7px}
 #businessSide .badge{font-size:11px}.side .cardReviewLink{font-size:11px}
 #detail.show{overflow-anchor:none;scroll-behavior:auto;border-radius:18px;box-shadow:0 5px 24px #183d3524}
-#detail .detailHeader{padding-bottom:8px}
-#detail>.detailResizeHandle{height:24px;min-height:24px;--detail-header-grip:24px}
-#detail{--detail-header-grip:24px}
-#detail .detailHeader h2{font-size:20px;line-height:1.35;margin:4px 0}
+#detail{--detail-header-inset:6px;--detail-header-grip:12px;padding-top:var(--detail-header-inset)!important;scroll-padding-top:90px}
+#detail.show:not(.detailResized){max-height:calc(100% - max(24px,calc(env(safe-area-inset-bottom) + 12px)) - 14px)!important}
+#detail .detailHeader{padding-bottom:4px}
+#detail>.detailResizeHandle{height:var(--detail-header-grip);min-height:var(--detail-header-grip)}
+#detail .detailHeader h2{font-size:20px;line-height:1.3;margin:0}
+#detail .detailReviewLink{min-height:24px;padding:2px 0;margin-top:0}
 #detail .detailHeader .detailClose{width:44px;height:44px;flex:none;border:0;background:#f2f6f4;border-radius:50%}
 .reviewRecovery{margin:10px 0;padding:10px 12px;border:1px solid #ceddd4;border-radius:10px;background:#f5faf7;font-size:12px;line-height:1.6}
 .reviewRecovery button{min-height:38px;padding:5px 10px;border:1px solid #bbd3c4;border-radius:8px;color:#276647;background:#fff;margin-top:5px}
@@ -92,7 +94,6 @@
  .browseTools{max-width:740px}
  .mapwrap #areaLegend{left:auto!important;right:14px;max-width:min(600px,calc(100% - var(--desktop-list-offset) - 28px))}
  .mapwrap #areaPanel{left:calc(var(--desktop-list-offset) + 14px)}
- #detail.show{max-height:calc(100% - 125px)!important}
 }
 @media(max-width:900px){
  .browseTools{left:10px;right:10px;top:8px}
@@ -105,9 +106,9 @@
  .browseFilterDialog{margin:auto auto 0;width:100%;max-width:100vw;max-height:90dvh;border-radius:20px 20px 0 0}
  .browseDialogHead h2{font-size:18px;letter-spacing:-.3px}
  .browseFields{gap:15px 12px;padding:18px 16px}.browseDialogHead{padding:16px}.browseDialogFoot{padding-left:16px;padding-right:16px}
- #detail.show{max-height:calc(100% - 110px)!important;max-width:100%}
+ #detail.show{max-width:100%}
  #detail:not(.detailExpanded):not(.detailResized){height:min(260px,46%)!important}
- #detail.detailExpanded:not(.detailResized){height:65%!important}
+ #detail.detailExpanded:not(.detailResized){height:82%!important}
  .mapUtilityBar .communityStats{display:flex!important;justify-content:center;gap:6px!important;min-height:26px}
  .mapUtilityBar .communityStats>span{min-height:26px}
 }

@@ -206,6 +206,11 @@ const server=http.createServer((req,res)=>{
   await page.locator('[data-browse-prev]').click();assert.equal(await page.evaluate(()=>state.selected),'ux-0');
   // Photo tap opens a separate layer and never collapses the place panel.
   await page.evaluate(()=>setDetailExpanded(true));
+  const readingPanel=await page.locator('#detail').boundingBox(),readingMap=await page.locator('.mapwrap').boundingBox();
+  assert(readingPanel.y<=readingMap.y+readingMap.height*.23,'expanded detail uses the upper reading space on both layouts');
+  const heading=await page.locator('#detail .detailHeader').boundingBox(),closeButton=await page.locator('#detailCloseBtn').boundingBox();
+  assert(heading.y+heading.height-readingPanel.y<=90,'short business title leaves a compact anchored header');
+  assert(closeButton.width>=44&&closeButton.height>=44,'compact header retains a usable close target');
   const detailBefore=await page.locator('#detail').evaluate(n=>({height:n.getBoundingClientRect().height,title:n.querySelector('.detailHeader').getBoundingClientRect().top}));
   const detailAfter=await page.locator('#detail').evaluate(n=>{n.scrollTop=100;return {height:n.getBoundingClientRect().height,title:n.querySelector('.detailHeader').getBoundingClientRect().top,top:n.scrollTop};});
   assert(detailAfter.top>=95,'detail panel itself scrolls');
@@ -229,6 +234,11 @@ const server=http.createServer((req,res)=>{
   else assert(await page.locator('#detail').evaluate(n=>n.scrollTop>30),'desktop wheel continues scrolling');
   await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
   await page.screenshot({path:path.join(out,`pinned-detail-${width}.png`)});
+  await page.locator('#detail>.detailResizeHandle').press('End');
+  const tallestDetail=await page.locator('#detail').boundingBox();
+  assert(Math.abs(tallestDetail.y-readingMap.y-14)<=2,'maximized detail reaches just below the map top');
+  await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
+  await page.screenshot({path:path.join(out,`detail-reading-space-${width}.png`)});
   await page.locator('#detail').evaluate(n=>n.scrollTop=0);
   await dragAt('.placePhotos img',-65);
   assert(!await page.locator('#memberPhotoViewer').evaluate(n=>n.open),'photo DRAG does not open the viewer');

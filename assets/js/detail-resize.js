@@ -5,7 +5,7 @@
   function bounds(){
     if(dragBounds)return dragBounds;
     const map=document.querySelector('.mapwrap').getBoundingClientRect(),rect=panel().getBoundingClientRect();
-    const gap=bottom??Math.max(12,map.bottom-rect.bottom),max=Math.max(80,map.height-gap-110);
+    const gap=bottom??Math.max(12,map.bottom-rect.bottom),max=Math.max(80,map.height-gap-14);
     // Title and actions now share the panel's native scroll container.
     // Long names must not force the entire sheet to stay tall.
     return {min:Math.min(180,max),max,gap};
