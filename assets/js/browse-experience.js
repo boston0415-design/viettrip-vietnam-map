@@ -18,7 +18,10 @@
   el('browseCategory').innerHTML=options([['all','전체 업종'],...Object.entries(CONFIG.categories).map(([k,v])=>[k,v.label])]);
   el('browseRating').innerHTML=options(['all','3plus','4plus','4.5','5','1','2','3','4'].map(key=>[key,ratings[key]]));el('browseBenefit').innerHTML=options(Object.entries(benefits));
   el('browseTag').innerHTML=options([['all','전체 메뉴'],...RESTAURANT_TAGS.map(t=>[t,t])]);
-  for(const [key,id] of Object.entries({city:'browseCity',category:'browseCategory',rating:'browseRating'}))quick.querySelector(`[data-browse-filter="${key}"]`).innerHTML=el(id).innerHTML;
+  for(const [key,id] of Object.entries({city:'browseCity',category:'browseCategory',rating:'browseRating'})){
+    const select=quick.querySelector(`[data-browse-filter="${key}"]`);select.innerHTML=el(id).innerHTML;
+    select.querySelector('option[value="all"]').textContent='전체';
+  }
   function subOptions(value='all'){
     const category=el('browseCategory').value;
     el('browseSub').innerHTML=options([['all','전체'],...(CONFIG.categories[category]?.subs||[]).map(s=>[s,s])]);el('browseSub').value=value;

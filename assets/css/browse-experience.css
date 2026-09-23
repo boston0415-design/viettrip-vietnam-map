@@ -91,6 +91,7 @@
  [data-desktop-resize-hint]{user-select:none}
  .browseTools{max-width:740px}
  .mapwrap #areaLegend{left:auto!important;right:14px;max-width:min(600px,calc(100% - var(--desktop-list-offset) - 28px))}
+ .mapwrap #areaPanel{left:calc(var(--desktop-list-offset) + 14px)}
  #detail.show{max-height:calc(100% - 125px)!important}
 }
 @media(max-width:900px){
