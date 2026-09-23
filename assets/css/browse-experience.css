@@ -39,8 +39,8 @@
 #browseApply{background:#247f78;border-color:#247f78;color:white}
 #browsePreview{grid-column:1/-1;font-size:12px;line-height:1.5;color:#6b7e75;margin:0}
 .browseTools :focus-visible,.browseListTabs :focus-visible,.mapWeather:focus-visible,.weatherDialog :focus-visible,.browseFilterDialog :focus-visible{outline:3px solid #458e7d;outline-offset:2px}
-#businessSide{height:44%!important;max-height:calc(100% - 110px)!important;border-radius:18px 18px 0 0!important;background:#fff;scroll-behavior:auto;overflow-anchor:none}
-#businessSide.menuSized{height:var(--menu-height)!important;max-height:calc(100% - 110px)!important}
+#businessSide{height:44%!important;max-height:calc(100% - 14px)!important;border-radius:18px 18px 0 0!important;background:#fff;scroll-behavior:auto;overflow-anchor:none}
+#businessSide.menuSized{height:var(--menu-height)!important;max-height:calc(100% - 14px)!important}
 #businessSide>.menuResizeGrip{height:18px;min-height:18px;--list-header-grip:18px}
 #businessSide{--list-header-grip:18px;--list-head-height:52px;scroll-padding-top:120px}
 #businessSide>.mobileSideHead{height:var(--list-head-height);min-height:var(--list-head-height);box-sizing:border-box;padding:0 12px 6px;gap:6px}
@@ -89,6 +89,7 @@
 .weatherDialog small{display:block;margin-top:16px;font-size:11px}.weatherDialog a{color:#617a6b;text-decoration:underline}
 .weatherLayer[hidden],.mapWeather[hidden]{display:none!important}
 @media(min-width:901px){
+ .content>#businessSide{z-index:16}
  body .modalback .modal.desktopWindowSized,body dialog.desktopWindowSized{height:var(--desktop-window-height)!important;min-height:0!important;max-height:calc(100dvh - 40px)!important;overflow-y:auto!important;box-sizing:border-box}
  [data-desktop-resize-hint]{user-select:none}
  .browseTools{max-width:740px}
@@ -100,7 +101,7 @@
  .browseFilterButtons{gap:5px}.browseFilterButtons label{padding:3px 7px;border-radius:8px;min-height:43px}
  .browseFilterButtons select{font-size:13px}.browseFilterButtons small{font-size:10px}
  #mobileListBtn{display:none!important}
- #businessSide.mobileOpen{left:0;right:0;bottom:0;width:auto;height:44%!important;max-height:calc(100% - 108px)!important;border-radius:18px 18px 0 0!important}
+ #businessSide.mobileOpen{left:0;right:0;bottom:0;width:auto;height:72%!important;max-height:calc(100% - 14px)!important;border-radius:18px 18px 0 0!important}
  #businessSide.mobileOpen.menuSized{height:var(--menu-height)!important}
  #businessSide .card{padding:13px 14px}
  .browseFilterDialog{margin:auto auto 0;width:100%;max-width:100vw;max-height:90dvh;border-radius:20px 20px 0 0}

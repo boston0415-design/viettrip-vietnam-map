@@ -1,7 +1,7 @@
 // Direct recognizer regression: body/title/buttons/photos resize first; taps do not.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {JSDOM}=require('jsdom');
-for(const kind of ['touch','pointer']){
+for(const kind of ['touch','pointer'])for(const separateResizeAndScroll of [false,true]){
  const dom=new JSDOM('<section id="panel"><header><button><span>업소 이름</span></button></header><article><p>본문</p><a href="#photo"><img></a><button>예약</button><input><textarea></textarea></article></section>',{runScripts:'outside-only'});
  const w=dom.window,p=w.document.getElementById('panel');let h=100,ends=0;
  let now=1000,id=0,reduced=false;const frames=new Map();w.performance.now=()=>now;w.matchMedia=()=>({matches:reduced});
@@ -11,7 +11,7 @@ for(const kind of ['touch','pointer']){
  p.setPointerCapture=()=>{};p.hasPointerCapture=()=>false;
  Object.defineProperty(p,'scrollHeight',{get:()=>1200});Object.defineProperty(p,'clientHeight',{get:()=>h});
  vm.runInContext(fs.readFileSync('assets/js/body-sheet-drag.js','utf8'),dom.getInternalVMContext());
- w.BodySheetDrag.bind(p,{anywhere:true,headerSelector:'header',bounds:()=>({min:60,max:500}),size:value=>h=value,end:()=>ends++});
+ w.BodySheetDrag.bind(p,{anywhere:true,separateResizeAndScroll,headerSelector:'header',bounds:()=>({min:60,max:500}),size:value=>h=value,end:()=>ends++});
  function event(target,type,y=500,x=100,extra={}){
   const e=new w.Event(kind==='touch'?({down:'touchstart',move:'touchmove',up:'touchend',cancel:'touchcancel'})[type]:'pointer'+type,{bubbles:true,cancelable:true});
   const t={identifier:1,clientX:x,clientY:y};Object.assign(e,kind==='touch'?{touches:['up','cancel'].includes(type)?[]:[t],changedTouches:[t]}:{pointerId:1,clientX:x,clientY:y,button:0,isPrimary:true,pointerType:'mouse'},extra);target.dispatchEvent(e);return e;
@@ -22,7 +22,17 @@ for(const kind of ['touch','pointer']){
   event(target,'down');event(target,'move',550);event(target,'up',550);assert.equal(h,150,selector+' folds whole panel');
  }
  const body=p.querySelector('article p'),title=p.querySelector('header span');h=100;p.scrollTop=0;
- event(body,'down',700);event(body,'move',200);assert.equal(h,500);assert.equal(p.scrollTop,100,'same gesture crosses from panel expansion to body scrolling');event(body,'move',500);assert.equal(p.scrollTop,0);assert.equal(h,300,'same gesture scrolls back then folds');event(body,'up',500);
+ event(body,'down',700);event(body,'move',200);assert.equal(h,500);
+ assert.equal(p.scrollTop,separateResizeAndScroll?0:100,'list resize stays locked when the finger overshoots its upper limit');
+ event(body,'move',500);assert.equal(p.scrollTop,0);assert.equal(h,separateResizeAndScroll?200:300);event(body,'up',500);
+ if(separateResizeAndScroll){
+   h=400;p.scrollTop=80;event(body,'down',700);advance(50);event(body,'move',450);event(body,'up',450);advance(100);
+   assert.equal(h,500);assert.equal(p.scrollTop,80,'resizing never starts scroll momentum or loses the current list position');
+   event(title,'down',500);event(title,'move',400);event(title,'up',400);assert.equal(p.scrollTop,80,'pulling the title at maximum does not scroll the list');
+   event(body,'down',500);event(body,'move',450);assert.equal(p.scrollTop,130,'a new body gesture scrolls at full height');
+   event(body,'move',700);assert.equal(p.scrollTop,0);assert.equal(h,500,'reading back to the top does not also collapse the window');event(body,'cancel',700);
+   event(body,'down',500);event(body,'move',550);event(body,'up',550);assert.equal(h,450,'a new downward gesture at the top can fold the window');
+ }
  h=500;p.scrollTop=150;event(title,'down');event(title,'move',600);event(title,'up',600);assert.equal(h,400,'title folds even when full-size body is scrolled');
  for(const selector of ['input','textarea']){h=100;const el=p.querySelector(selector);event(el,'down');assert(!event(el,'move',350).defaultPrevented);event(el,'up');assert.equal(h,100,'typing and native fields stay usable');}
  h=100;event(body,'down');assert(!event(body,'move',499,170).defaultPrevented);event(body,'up');assert.equal(h,100,'horizontal gestures are not hijacked');
@@ -36,4 +46,4 @@ for(const kind of ['touch','pointer']){
  reduced=true;p.scrollTop=0;event(body,'down',500);advance(60);event(body,'move',410);event(body,'up',410);const still=p.scrollTop;advance(50);assert.equal(p.scrollTop,still,'reduced-motion skips content inertia');
  dom.window.close();
 }
-console.log('PASS touch and mouse: any-area expand-first, same-gesture scroll handoff, title folding, tap distinction, text inputs, horizontal swipes and pinch');
+console.log('PASS touch and mouse: list resize/scroll gesture isolation, preserved position and inertia; other sheets retain handoff; title folding, taps, inputs, horizontal swipes and pinch');

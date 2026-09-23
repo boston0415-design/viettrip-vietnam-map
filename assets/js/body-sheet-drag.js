@@ -32,7 +32,7 @@
         else options.end?.({canceled:true,kind:g.kind,velocity:0});
       }
       if(g.prepared)options.afterEnd?.();
-      if(!canceled&&g.active&&g.height>=g.bounds.max-1&&performance.now()-g.lastTime<120)coast(g.scroller,g.scrollVelocity||0);
+      if(!canceled&&g.active&&g.mode!=='resize'&&g.height>=g.bounds.max-1&&performance.now()-g.lastTime<120)coast(g.scroller,g.scrollVelocity||0);
     }
     function begin(event,point,kind){
       // A fresh deliberate contact must never be blocked by the preceding drag.
@@ -50,13 +50,23 @@
       if(!g.active){
         if(Math.max(Math.abs(dx),Math.abs(total))<8)return;
         if(Math.abs(dx)>Math.abs(total)||!event.cancelable){g.axis='x';return;}
-        g.active=true;g.axis='y';options.start?.();
+        g.active=true;g.axis='y';
+        if(options.separateResizeAndScroll){
+          g.mode=g.force||g.height<g.bounds.max-1||(total<0&&!(g.scroller?.scrollTop>0))?'resize':'scroll';
+        }
+        options.start?.();
         if(g.kind==='pointer')try{panel.setPointerCapture(g.id)}catch{}
       }
       if(event.cancelable)event.preventDefault();
       const b=g.bounds,scroller=g.scroller,oldHeight=g.height,oldScroll=scroller?.scrollTop||0;
       let delta=g.lastY-point.clientY,pendingScroll=0;
-      if(delta>0){
+      if(g.mode==='resize'){
+        // Keep the same list position for the entire resize gesture, even at the limit.
+        g.height=Math.max(b.min,Math.min(b.max,g.height+delta));
+      }else if(g.mode==='scroll'){
+        // Reading back to the top does not unexpectedly start folding the sheet.
+        if(scroller)scroller.scrollTop=Math.max(0,Math.min(Math.max(0,scroller.scrollHeight-scroller.clientHeight),oldScroll+delta));
+      }else if(delta>0){
         // Even a previously scrolled compact sheet expands BEFORE its content.
         const growth=Math.min(delta,Math.max(0,b.max-g.height));
         g.height+=growth;delta-=growth;

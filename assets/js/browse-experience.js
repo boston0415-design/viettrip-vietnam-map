@@ -59,7 +59,8 @@
     // A previously minimized sheet must show actual businesses when explicitly opened.
     const side=el('businessSide'),available=document.querySelector('.content').getBoundingClientRect().height;
     side.classList.remove('mobileFiltersOpen');el('mobileFilterToggle').setAttribute('aria-expanded','false');el('mobileFilterToggle').textContent='옵션';
-    if(side.getBoundingClientRect().height<available*.44-1){
+    const openingHeight=Math.min(available*(isMobileMapLayout() ? .72 : .44),available-14);
+    if(side.getBoundingClientRect().height<openingHeight-1){
       window.BodySheetDrag?.cancel(side);side.classList.remove('menuSized');side.style.removeProperty('--menu-height');
     }
     window.MapUX?.syncNearby();

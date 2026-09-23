@@ -94,12 +94,12 @@ const server=http.createServer((req,res)=>{
    await page.evaluate(()=>openMobileBusinessList());
   }
   await page.waitForTimeout(280);
-  // Compact list: under half the old full-height panel on both layouts.
+  // Mobile opens tall enough to read cards; desktop retains its compact default.
   const sizing=await page.evaluate(()=>({list:document.getElementById('businessSide').getBoundingClientRect().height,content:document.querySelector('.content').getBoundingClientRect().height}));
   assert(sizing.list>50,'list remains operable');
   assert((await page.locator('#businessSide').boundingBox()).y+sizing.list<=page.viewportSize().height+2,'compact list stays in viewport');
-  assert(sizing.list/sizing.content<=.46,'default list leaves more than half of the map visible');
-  assert(sizing.list/sizing.content>=.35,'default list shows useful content without a preliminary drag');
+  assert(sizing.list/sizing.content<=(width<901?.74:.46),'default list retains visible map space');
+  assert(sizing.list/sizing.content>=(width<901?.70:.35),'mobile list opens with room for business information');
   assert.equal(await page.locator('.browseListFilters').evaluate(button=>{const range=document.createRange();range.selectNodeContents(button);return range.getClientRects().length}),1,'filter label stays on one line even at 320px');
   assert.equal(await page.locator('.memberMapKey').count(),0,'decorative map key removed');
   assert.equal(await page.locator('#list .cardBenefit strong').count(),0,'benefit field shows terms without a duplicate heading');
@@ -176,16 +176,25 @@ const server=http.createServer((req,res)=>{
    }
   }
   await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
-  // After the sheet reaches its upper limit, further title drags scroll content,
-  // but must not carry the control bar or grip beyond the panel's upper edge.
+  // One resize gesture stays a resize even after reaching the upper limit.
   await page.locator('#businessSide').evaluate(n=>n.scrollTop=0);
   await page.locator('#businessSide>.menuResizeGrip').press('End');
+  await page.locator('#businessSide>.menuResizeGrip').press('ArrowDown');
+  await page.locator('#businessSide').evaluate(n=>n.scrollTop=40);
+  await dragAt('#list [data-open-business="ux-0"]',120);
+  assert.equal(await page.locator('#businessSide').evaluate(n=>n.scrollTop),40,'expanding past the upper limit does not scroll cards or add scroll inertia');
+  await page.locator('#businessSide').evaluate(n=>n.scrollTop=0);
   const fullList=await page.locator('#businessSide').boundingBox();
+  const listContainer=await page.locator('.content').boundingBox();
+  assert(Math.abs(fullList.y-listContainer.y-14)<=2,'list can be raised close to the map top');
   const anchoredTitle=await page.locator('#businessSide>.mobileSideHead').boundingBox();
   await dragAt('#businessSide .mobileSideHead strong',55);
   assert(Math.abs((await page.locator('#businessSide').boundingBox()).height-fullList.height)<1,'expanded list stops at its upper limit');
   assert(Math.abs((await page.locator('#businessSide>.mobileSideHead').boundingBox()).y-anchoredTitle.y)<1,'title drag at the limit never pushes controls upward');
-  assert(await page.locator('#businessSide').evaluate(n=>n.scrollTop>20),'content remains scrollable below anchored controls');
+  assert(await page.locator('#businessSide .mobileSideHead strong').evaluate(n=>{const r=n.getBoundingClientRect();return n.contains(document.elementFromPoint(r.left+8,r.top+8))}),'map toolbar never covers the raised list title');
+  assert.equal(await page.locator('#businessSide').evaluate(n=>n.scrollTop),0,'title gestures only resize, never scroll cards');
+  await dragAt('#list [data-open-business="ux-0"]',55);
+  assert(await page.locator('#businessSide').evaluate(n=>n.scrollTop>20),'a new gesture on cards scrolls the fully expanded list');
   await assertAnchored('#businessSide','.mobileSideHead','.menuResizeGrip');
   await page.screenshot({path:path.join(out,`pinned-list-${width}.png`)});
   await page.locator('#mobileFilterToggle').click();
