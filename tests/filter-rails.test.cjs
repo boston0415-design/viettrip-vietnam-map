@@ -42,7 +42,7 @@ try{
   assert.equal(hospitalSpecialty(),'동물병원');
   assert($('#tagNav').textContent.includes('One Verandah'));
   assert(!$('#tagNav').textContent.includes('FV Hospital'));
-  assert.equal(document.querySelectorAll('.ratingLegend .filterChoices button').length,6);
+  assert.equal(document.querySelectorAll('.ratingLegend .filterChoices button').length,5);
   assert($('.areaLegendOptions').contains($('.benefitLegend [data-benefit-filter="benefit"]')));
   assert(!$('.areaLegendOptions').contains($('#closeMapFilters')));
  `);
