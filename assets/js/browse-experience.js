@@ -108,8 +108,6 @@
   },true);
   const count=document.createElement('small');count.id='browseListCount';el('businessSide').querySelector('.mobileSideHead strong').append(count);
   const find=document.createElement('button');find.type='button';find.className='browseListFilters';find.textContent='필터';find.onclick=()=>open();el('mobileFilterToggle').before(find);
-  // Existing entry points open the same controls instead of a second hidden filter UI.
-  el('listSharedFilters').addEventListener('click',e=>{e.stopImmediatePropagation();open();},true);
   document.addEventListener('map-data-saved',sync);
   window.BrowseExperience={open,sync,matching};sync();
 })();

@@ -147,7 +147,7 @@ const server=http.createServer((req,res)=>{
   await page.locator('#mobileFilterToggle').click();
   assert(await page.locator('#sort').isVisible(),'unique list options remain reachable');
   assert(!await page.locator('#listCity').isVisible(),'duplicate city filter is not displayed');
-  assert(await page.locator('#listSharedFilters').isVisible(),'single shared filter entry is reachable');
+  assert.equal(await page.locator('#listSharedFilters').count(),0,'duplicate filter entry is removed from options');
   await page.locator('#mobileFilterToggle').click();
   await page.locator('#businessSide').evaluate(n=>n.scrollTop=0);
   const sideBefore=await page.locator('#businessSide').evaluate(n=>({height:n.getBoundingClientRect().height,title:n.querySelector('.mobileSideHead').getBoundingClientRect().top}));

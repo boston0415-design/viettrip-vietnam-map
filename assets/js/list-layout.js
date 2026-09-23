@@ -5,10 +5,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     filterToggle.setAttribute('aria-expanded',String(open));
     filterToggle.textContent=open?'옵션 닫기':'옵션';
   });
-  document.getElementById('listSharedFilters')?.addEventListener('click',()=>{
-    closeMobileBusinessList();setMobileLegendExpanded(true);
-    document.getElementById('areaLegendTitle')?.focus({preventScroll:true});
-  });
   const button=document.getElementById('desktopListToggle');
   const content=document.querySelector('.content');
   if(!button||!content)return;

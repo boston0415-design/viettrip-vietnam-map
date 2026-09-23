@@ -7,7 +7,6 @@ for(const mobile of [false,true]){
  w.matchMedia=()=>({matches:mobile});w.requestAnimationFrame=()=>0;w.setTimeout=()=>0;
  w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','')};w.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open')};
  for(const name of fs.readdirSync('assets/js').filter(n=>/^0[1-8]-/.test(n)).sort())run(fs.readFileSync('assets/js/'+name,'utf8'));
- const entry=w.document.createElement('button');entry.id='listSharedFilters';w.document.body.append(entry);
  run(`
  const fixture={places:[
  {id:'pho',name:'Phở Thìn Mỹ Đình',category:'restaurant',subcategory:'베트남',area:'하노이',address:'Mỹ Đình Hà Nội',lat:21.029,lng:105.79,initialRating:5,memberBenefit:true},
