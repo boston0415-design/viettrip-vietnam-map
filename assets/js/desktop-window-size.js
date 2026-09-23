@@ -3,7 +3,7 @@
   'use strict';
   const panels='#businessSide,#detail,#areaLegend,#areaPanel,#nearbyResults,.modalback .modal,dialog';
   const actions='button,a,input,textarea,select,label,summary,img,video,audio,iframe,[contenteditable]:not([contenteditable="false"]),[role="button"],[data-no-window-resize]';
-  const windows=new Map();
+  const windows=new Map();let titleClick=null;
   const desktop=()=>window.matchMedia('(min-width:901px)').matches;
   const maxHeight=()=>Math.max(180,(window.visualViewport?.height||innerHeight)-40);
   function size(panel,maximized){
@@ -18,13 +18,22 @@
     if(window.MenuSheetResize?.toggle(panel))return;
     size(panel,windows.has(panel)?!windows.get(panel):panel.getBoundingClientRect().height<maxHeight()-3);
   }
+  // A single click folds this header and moves it. Wait briefly so a second
+  // click can reach the same title instead of falling through to the map.
+  document.addEventListener('click',event=>{
+    const title=event.target.closest?.('#areaLegendTitle');
+    if(!desktop()||!title||!event.detail||event.defaultPrevented)return;
+    event.preventDefault();event.stopImmediatePropagation();clearTimeout(titleClick);
+    if(event.detail===1)titleClick=setTimeout(()=>{titleClick=null;if(title.isConnected)title.click();},320);
+  },true);
   document.addEventListener('dblclick',event=>{
     if(!desktop()||event.button!==0||event.defaultPrevented)return;
     const target=event.target.closest?.('*'),panel=target?.closest(panels);
     if(!panel||target.closest(actions)&&!target.closest('#areaLegendTitle'))return;
     if(panel.closest('.modalback:not(.open)')||panel.matches('dialog:not([open])')||panel.hidden)return;
+    clearTimeout(titleClick);titleClick=null;
     event.preventDefault();event.stopPropagation();toggle(panel);
-  });
+  },true); // Handle overlay windows before the map consumes double-clicks.
   const titles='.mobileSideHead,.detailHeader,.menuResizeGrip,.detailResizeHandle,.areaPanelHead,.nearbyResultsHead,.nearbyResizeGrip,.travellerDialogHead,.reviewEditorHeader,.browseDialogHead,.weatherDialogHead,.photoViewerHead,.modal>h3';
   function hint(){document.querySelectorAll(titles).forEach(node=>{if(!node.hasAttribute('data-desktop-resize-hint')){node.setAttribute('data-desktop-resize-hint','');node.title='PC에서 두 번 클릭하면 창을 최대화·최소화합니다';}});}
   hint();new MutationObserver(hint).observe(document.body,{childList:true,subtree:true});

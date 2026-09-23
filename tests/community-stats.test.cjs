@@ -6,6 +6,7 @@ const root=path.resolve(__dirname,'..');
 (async()=>{
  const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  const page=await browser.newPage();
+ await page.addInitScript(()=>{window.state={isAdmin:false};});
  const visits=new Set();let fail=false,aggregateRequests=0,hold=false;const waiting=[];
  await page.route('**/*',async route=>{
   const req=route.request(),url=new URL(req.url());
