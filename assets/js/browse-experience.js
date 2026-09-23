@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const el=id=>document.getElementById(id);
-  const ratings={all:'평점 전체','3plus':'3점 이상','4plus':'4점 이상','4.5':'4.5점 이상','5':'5점','1':'1점대','2':'2점대','3':'3점대','4':'4~4.5점 미만'};
+  const ratings={all:'평점 전체','5':'5점','4':'4점','3':'3점','2':'2점','1':'1점'};
   const benefits={all:'전체 업소',benefit:'혜택업소',recommended:'강추업소'};
   const wrap=document.querySelector('.mapwrap');if(!wrap)return;
   const tools=document.createElement('nav');tools.className='browseTools';tools.setAttribute('aria-label','업소 찾기 조건');
@@ -16,7 +16,7 @@
   const options=values=>values.map(([value,label])=>`<option value="${esc(value)}">${esc(label)}</option>`).join('');
   el('browseCity').innerHTML=options([['all','전체 지역'],...Object.entries(CITY_DATA).map(([k,v])=>[k,v.label])]);
   el('browseCategory').innerHTML=options([['all','전체 업종'],...Object.entries(CONFIG.categories).map(([k,v])=>[k,v.label])]);
-  el('browseRating').innerHTML=options(['all','3plus','4plus','4.5','5','1','2','3','4'].map(key=>[key,ratings[key]]));el('browseBenefit').innerHTML=options(Object.entries(benefits));
+  el('browseRating').innerHTML=options(['all','5','4','3','2','1'].map(key=>[key,ratings[key]]));el('browseBenefit').innerHTML=options(Object.entries(benefits));
   el('browseTag').innerHTML=options([['all','전체 메뉴'],...RESTAURANT_TAGS.map(t=>[t,t])]);
   for(const [key,id] of Object.entries({city:'browseCity',category:'browseCategory',rating:'browseRating'})){
     const select=quick.querySelector(`[data-browse-filter="${key}"]`);select.innerHTML=el(id).innerHTML;

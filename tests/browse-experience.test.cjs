@@ -21,13 +21,16 @@ for(const mobile of [false,true]){
  `);
  run(fs.readFileSync('assets/js/browse-experience.js','utf8'));
  const el=id=>w.document.getElementById(id),change=(id,v)=>{el(id).value=v;el(id).dispatchEvent(new w.Event('change',{bubbles:true}))};
- const before=run('JSON.stringify(fixture)');w.BrowseExperience.open('category');change('browseCategory','restaurant');change('browseRating','4plus');change('browseBenefit','benefit');change('browseQuery','pho thin my dinh');
+ const before=run('JSON.stringify(fixture)');w.BrowseExperience.open('category');change('browseCategory','restaurant');change('browseRating','5');change('browseBenefit','benefit');change('browseQuery','pho thin my dinh');
  assert.equal(el('browseApply').textContent,'1곳 보기','Vietnamese accents and split names resolve to the original place');
  el('browseFilterClose').click();assert.equal(run('state.cat'),'all','cancel is non-mutating');assert.equal(run('state.query'),'');
- w.BrowseExperience.open();change('browseCategory','restaurant');change('browseRating','4plus');change('browseBenefit','benefit');change('browseQuery','pho thin my dinh');
+ w.BrowseExperience.open();change('browseCategory','restaurant');change('browseRating','5');change('browseBenefit','benefit');change('browseQuery','pho thin my dinh');
  el('browseFilterForm').dispatchEvent(new w.Event('submit',{cancelable:true}));
- assert.equal(run('items().map(p=>p.id).join()'),'pho');assert.equal(el('browseShowList').textContent,'업소 목록 1곳');assert.equal(run('state.ratingFilter'),'4plus');assert(!el('browseFilterDialog').open);
- assert.equal(run('matchesRatingFilter(4.3,"4plus")'),true);assert.equal(run('matchesRatingFilter(3.9,"4plus")'),false);assert.equal(run('matchesRatingFilter(null,"4plus")'),false);
+ assert.equal(run('items().map(p=>p.id).join()'),'pho');assert.equal(el('browseShowList').textContent,'업소 목록 1곳');assert.equal(run('state.ratingFilter'),'5');assert(!el('browseFilterDialog').open);
+ // Removing the separate 4.5 option must not strand fractional ratings.
+ for(const rating of [4,4.3,4.5,4.9])assert.equal(run(`matchesRatingFilter(${rating},'4')`),true);
+ for(const rating of [3.9,5,null])assert.equal(run(`matchesRatingFilter(${rating},'4')`),false);
+ assert.equal(run('matchesRatingFilter(5,"5")'),true);assert.equal(run('matchesRatingFilter(4.9,"5")'),false);
  w.BrowseExperience.open();change('browseQuery','없는 업소');assert.equal(el('browseApply').textContent,'0곳 보기');assert.match(el('browsePreview').textContent,/조건을 넓혀/);el('browseFilterClose').click();assert.equal(run('items().length'),1);
  el('browseClear').click();assert.equal(run('items().length'),3);assert.equal(run('JSON.stringify(fixture)'),before,'browse operations never change reviews or places');
  assert.equal(w.document.querySelectorAll('[data-browse-filter]').length,3);

@@ -206,7 +206,7 @@ function matchesRatingFilter(rating,filter){
   if(filter==='1')return r>=1 && r<2;
   if(filter==='2')return r>=2 && r<3;
   if(filter==='3')return r>=3 && r<4;
-  if(filter==='4')return r>=4 && r<4.5;
+  if(filter==='4')return r>=4 && r<5;
 
   // "4.5+"는 의미 그대로 4.5 이상 전체를 포함한다.
   // 따라서 5.0 업체도 4.5+ 필터에서 보여야 한다.

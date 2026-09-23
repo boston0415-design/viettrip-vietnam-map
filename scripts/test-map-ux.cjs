@@ -72,7 +72,7 @@ const server=http.createServer((req,res)=>{
   await page.locator('.browseListFilters').click();
   if(width<901)assert((await page.locator('#browseFilterDialog').boundingBox()).width>=width-2,'mobile conditions use the full screen width');
   await page.locator('#browseCategory').selectOption('cafe');
-  await page.locator('#browseRating').selectOption('4plus');
+  await page.locator('#browseRating').selectOption('4');
   await page.locator('#browseBenefit').selectOption('benefit');
   assert.equal(await page.locator('#browseApply').innerText(),'1곳 보기');
   await checkDoubleClick('#browseFilterDialog','#browseFilterTitle');
@@ -81,7 +81,7 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#list article').count(),24,'cancel leaves current map/list unchanged');
   await page.locator('.browseListFilters').click();
   await page.locator('#browseCategory').selectOption('cafe');
-  await page.locator('#browseRating').selectOption('4plus');
+  await page.locator('#browseRating').selectOption('4');
   await page.locator('#browseBenefit').selectOption('benefit');
   await page.screenshot({path:path.join(out,`browse-filters-${width}.png`)});
   await page.locator('#browseApply').click();
