@@ -30,6 +30,7 @@
     for(const key of intent.preferences||[]){
       const pattern=PREFS[key];if(!pattern)continue;
       for(const source of sources){
+        if(source.label==='Google 업소명')continue; // A promotional name is not atmosphere evidence.
         const clause=String(source.text||'').split(/[.!?。\n]/).find(text=>pattern.test(norm(text))&&!/별로|최악|안\s*좋|좋지\s*않|않|없|시끄|noisy|\bnot\b|\bbad\b|\bpoor\b/.test(norm(text)));
         if(!clause)continue;
         hits.push(key);const keyword=norm(clause).match(pattern)?.[0]||'';

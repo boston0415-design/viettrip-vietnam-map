@@ -35,6 +35,7 @@ const {JSDOM}=require('jsdom'),root=path.join(__dirname,'..'),read=p=>fs.readFil
  assert.equal(I.hotelInfo([{label:'Google 후기',text:'평점 4점, 호텔 좋았어요'}],4).kind,'unknown');assert.equal(I.hotelInfo([{label:'등록 정보',text:'3성급 호텔'}],4).kind,'different');
  assert.equal(I.preferenceEvidence([{label:'회원 후기',text:'분위기가 별로였고 시끄러웠어요'}],atmosphere).hits.length,0);
  assert.equal(I.preferenceEvidence([{label:'Google 후기',text:'Great atmosphere and lovely interior.'}],atmosphere).hits.length,1);
+ assert.equal(I.preferenceEvidence([{label:'Google 업소명',text:'분위기 좋은 식당'}],atmosphere).hits.length,0,'a business name cannot prove the requested atmosphere');
  const address='Quận 1, Hồ Chí Minh',position={lat:10.779,lng:106.702};
  const data={places:[{id:'local',googlePlaceId:'g-local',name:'회원 등록 식당',category:'restaurant',subcategory:'베트남',address,...position,initialRating:5,tags:['강추업소'],memberBenefit:true}],reviews:[{id:'r',placeId:'local',rating:4,text:'후기 보존'}]};
  const before=JSON.stringify(data),raw=(id,name,extra={})=>({id,displayName:name,types:['restaurant'],formattedAddress:address,location:position,rating:4.5,userRatingCount:20,businessStatus:'OPERATIONAL',...extra});
