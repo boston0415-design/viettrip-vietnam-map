@@ -43,11 +43,11 @@ export async function onRequest(context){
   if(!data.candidates.length)return json({picks:[],basis:'empty'});
   try{if(await throttle(request,context,'answer'))return json({error:'잠시 후 다시 시도해 주세요.'},429);}catch{return json({error:'잠시 후 다시 시도해 주세요.'},503);}
   if(!env.AI?.run)return json({error:'AI 연결을 확인하지 못했어요.'},503);
-  for(const [model,tokens,timeout] of [['@cf/zai-org/glm-4.7-flash',1600,14000],['@cf/openai/gpt-oss-120b',1800,9000]]){
+  for(const [model,tokens,timeout] of [['@cf/zai-org/glm-5.3-flash',1600,13000],['@cf/zai-org/glm-4.7-flash',1600,10000]]){
     let timer;
     try{
       const result=await Promise.race([env.AI.run(model,{messages:[{role:'system',content:SYSTEM},{role:'user',content:JSON.stringify(data)}],...(model.includes('glm')?{max_completion_tokens:tokens,reasoning_effort:'low'}:{max_tokens:tokens}),temperature:0.1,response_format:{type:'json_object'}}),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('timeout')),timeout);})]);
-      return json({picks:validatePicks(modelJSON(result),data),basis:'ai'});
+      return json({picks:validatePicks(modelJSON(result),data),basis:'ai',model});
     }catch{/* One bounded recovery; no invented prose on provider failure. */}
     finally{clearTimeout(timer);}
   }

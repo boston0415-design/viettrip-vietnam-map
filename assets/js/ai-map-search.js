@@ -343,7 +343,7 @@
     list.replaceChildren();examples.hidden=true;title.textContent='AI 검색 결과';
     list.classList.remove('aiRankingPending');
     const note=byId('aiMapNote');note.textContent='질문 조건에 맞는 업소만 표시하고, 그 안에서 회원 등록·강추·혜택 정보를 보여드려요. Google 검색은 최대 20곳의 업종·지역·평점을 확인합니다.';
-    if(intent?.mode==='advice'){title.textContent='AI 답변';status.textContent='';note.textContent='AI의 일반 안내입니다. 현재 가격·영업·예약 정보는 별도 확인이 필요합니다.';window.AIMapAnswer?.advice(list,intent.answer);return;}
+    if(intent?.mode==='advice'){title.textContent='AI 답변';status.textContent='';note.textContent='AI의 일반 안내입니다. 현재 가격·영업·예약 정보는 별도 확인이 필요합니다.';window.AIMapAnswer?.advice(list,intent.answer,intent.answerModel);return;}
     const product=window.AIResultActions?.renderProduct(list,intent||{});if(product){title.textContent=product.title;status.textContent=product.status;note.textContent=product.note;return;}
     const travel=window.AITravelSearch?.render(list,intent||{});if(travel){title.textContent=travel.title;status.textContent=travel.status;note.textContent=travel.note;return;}
     if(intent?.transport||intent?.guideTopic||intent?.travelDestination||intent?.travelHelp){
@@ -441,6 +441,7 @@
       await prepareDistricts(payload.intent,signal);
       if(payload.intent.mode!=='advice'&&!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch&&!payload.intent.travelDestination&&!payload.intent.travelHelp)await waitForPlaces(signal);
       if(token!==revision)return;
+      if(payload.model&&payload.intent.mode==='advice')payload.intent.answerModel=payload.model;
       last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
     }catch(error){if(token!==revision)return;window.AITravelSearch?.fallback(list,query);title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}
     finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}

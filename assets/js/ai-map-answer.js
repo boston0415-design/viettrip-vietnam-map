@@ -5,7 +5,8 @@
   const PREFS={date:'데이트',atmosphere:'분위기',quiet:'조용함',view:'전망',rooftop:'루프탑'};
   const node=(tag,text,className)=>{const el=document.createElement(tag);el.textContent=text;if(className)el.className=className;return el;};
   function cancel(){active?.abort();active=null;}
-  function advice(list,text){const box=node('li','','aiAnswer');box.append(node('p',text,'aiAnswerText'));list.append(box);}
+  const modelLabel=model=>({'@cf/zai-org/glm-5.3-flash':'GLM 5.3 Flash','@cf/zai-org/glm-4.7-flash':'GLM 4.7 Flash'}[model]||'AI');
+  function advice(list,text,model){const box=node('li','','aiAnswer');box.append(node('p',text,'aiAnswerText'));if(model)box.append(node('small',modelLabel(model)+' · 일반 안내','aiAnswerSource'));list.append(box);}
   function snapshot(entry){
     const rows=[...(entry.memberRows||[]),...(entry.google?.rows||[])];
     return rows.filter(row=>row.room?.kind!=='unknown'&&(!entry.intent.hotelStars||row.insights?.hotelClass?.kind==='confirmed')&&(!entry.intent.visitToday||['open','later'].includes((row.place?entry.hours?.get(row.place.id):row.hours)?.kind)))
