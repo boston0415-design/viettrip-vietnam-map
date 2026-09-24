@@ -16,8 +16,10 @@
   const AREAS={'푸미흥':'Phu My Hung','타오디엔':'Thao Dien','호안끼엠':'Hoan Kiem','미딩':'My Dinh','서호':'Tay Ho','부이비엔':'Bui Vien','레탄톤':'Le Thanh Ton'};
   const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').normalize('NFC').toLowerCase().replace(/\s+/g,' ').trim();
   const waxing=term=>/왁싱|wax(?:ing)?|wax long/i.test(normalize(term));
+  const cuisineWords=cuisine=>CUISINES[cuisine]?[CUISINES[cuisine][0]]:[];
+  const sourcesFor=place=>[{label:'Google 업소명',text:place.displayName||''},{label:'Google 업소 설명',text:place.editorialSummary||''},...(place.reviews||[]).filter(r=>r.authorAttribution?.displayName).map(review=>({label:'Google 후기',text:review.text||review.originalText||'',review}))];
   function includedType(intent){
-    if(intent.category==='restaurant')return CUISINES[intent.subcategory]?.[1]||'restaurant';
+    if(intent.category==='restaurant')return intent.cuisineAsMenu?'restaurant':CUISINES[intent.subcategory]?.[1]||'restaurant';
     if(intent.category==='bar'&&intent.subcategory==='클럽')return 'night_club';
     return '';
   }
@@ -26,7 +28,9 @@
     if(intent.category==='restaurant'&&intent.subcategory){
       const cuisine=CUISINES[intent.subcategory];
       if(!cuisine)return false;
-      if(cuisine[1])return types.includes(cuisine[1]);
+      if(cuisine[1]&&types.includes(cuisine[1]))return true;
+      if(intent.cuisineAsMenu&&types.includes('restaurant')&&window.AIMapSearch?.cuisineEvidence(sourcesFor(place),intent.subcategory))return true;
+      if(cuisine[1])return false;
       // Where Google has no specific cuisine type, require the requested cuisine
       // in the name; a generic "restaurant" result is insufficient evidence.
       return types.includes('restaurant')&&[intent.subcategory,cuisine[0]].some(word=>normalize(place.displayName).includes(normalize(word)));
@@ -35,12 +39,12 @@
     if(intent.category==='bar'&&intent.subcategory==='바')return types.some(t=>t!=='night_club'&&CATEGORY_TYPES.bar.includes(t));
     return !intent.category||(CATEGORY_TYPES[intent.category]||[]).some(type=>types.includes(type));
   }
-  function termMatches(place,term){
-    const aliases=waxing(term)?['왁싱','waxing','wax long']:[term];
-    return [place.displayName,place.editorialSummary].some(value=>aliases.some(alias=>normalize(value).includes(normalize(alias))));
+  function termProof(place,term){
+    if(term==='고기·구이'&&(place.types||[]).some(type=>['barbecue_restaurant','korean_barbecue_restaurant'].includes(type)))return {evidence:'Google 업종 · 고기·구이',source:{label:'Google 업종'}};
+    return window.AIMapSearch.evidenceFor(sourcesFor(place),term);
   }
   function queryFor(intent,includeRoom=true){
-    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':term);
+    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'고기·구이':'BBQ','회':'sashimi'}[term]||term));
     const specialty=terms.some(waxing);
     return [includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,specialty?'':SUBS[intent.subcategory]||CATEGORIES[intent.category]||'',
       ...(intent.preferences||[]).filter(p=>['quiet','rooftop'].includes(p)),
@@ -74,13 +78,16 @@
       if(['CLOSED_PERMANENTLY','CLOSED_TEMPORARILY','FUTURE_OPENING'].includes(p.businessStatus))continue;
       const country=p.addressComponents?.find(c=>c.types?.includes('country'));
       if(country&&country.shortText!=='VN')continue;
-      if(!typeMatches(p,intent)||!(intent.terms||[]).every(term=>termMatches(p,term)))continue;
+      const proofs=(intent.terms||[]).map(term=>termProof(p,term));
+      if(!typeMatches(p,intent)||proofs.some(proof=>!proof))continue;
       const place={name:String(p.displayName||'').trim(),address:p.formattedAddress||'',...position};
       if(intent.city!=='all'&&placeCityKey(place)!==intent.city)continue;
       if(!window.AIMapSearch.districtMatches(place,intent.district,boundaries)||!window.AIMapSearch.areaMatches(place,intent.area))continue;
       if(intent.nearby&&(!nearby||geoDistanceMeters(position,nearby)>nearby.radius))continue;
-      const termMatch=!!intent.terms?.length&&intent.terms.every(term=>waxing(term)?/왁싱|waxing|wax long/.test(normalize(place.name)):normalize(place.name).includes(normalize(term)));
-      const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',attributions:p.attributions||[]};
+      const termMatch=!!intent.terms?.length&&intent.terms.every(term=>window.AIMapSearch.menuKeyword(place.name,term));
+      const cuisineProof=intent.cuisineAsMenu&&!p.types?.includes(CUISINES[intent.subcategory]?.[1])?window.AIMapSearch.cuisineEvidence(sourcesFor(p),intent.subcategory):null;
+      const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',attributions:p.attributions||[],cuisineByMenu:!!cuisineProof,
+        proofs:[...(cuisineProof?[cuisineProof]:[]),...proofs].slice(0,2).map(proof=>({...proof,evidence:proof.source.label==='Google 업소 설명'?'Google 업소 설명 · '+p.editorialSummary:proof.evidence}))};
       if(window.AIMapSearch.wantsRoom(intent)){
         const sources=[{label:'Google 업소 설명',text:p.editorialSummary||''},...(p.reviews||[]).filter(r=>r.authorAttribution?.displayName).map(review=>({label:'Google 후기',text:review.text||review.originalText||'',review}))];
         row.room=window.AIMapSearch.roomInfo(sources);
@@ -105,8 +112,7 @@
     if(typeof Place?.searchByText!=='function')throw Error('GOOGLE_UNAVAILABLE');
     const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','types','attributions'];
     const roomSearch=window.AIMapSearch.wantsRoom(intent);
-    if(intent.terms?.length||roomSearch)fields.push('editorialSummary');
-    if(roomSearch)fields.push('reviews');
+    if(intent.terms?.length||roomSearch||intent.cuisineAsMenu)fields.push('editorialSummary','reviews');
     if(intent.visitToday)fields.push('currentOpeningHours');
     const bounds=boundsFor(intent,boundaries,nearby);
     const type=includedType(intent);
@@ -128,11 +134,12 @@
     let rows=rowsFrom(raw,intent,{boundaries,nearby,places});
     // One bounded supplemental request prevents sparse amenity search text
     // hiding the same-area/cuisine inquiry leads. Never loosen type or geography.
-    if(roomSearch&&rows.length<5){
-      try{rows=rowsFrom([...raw,...await fetchPlaces(queryFor(intent,false))],intent,{boundaries,nearby,places});}
+    const menuQuery=intent.terms?.includes('고기·구이')?request.textQuery.replace('BBQ','grilled meat'):intent.terms?.includes('회')?request.textQuery.replace('sashimi','횟집 sashimi'):null;
+    if((roomSearch||menuQuery)&&rows.length<5){
+      try{rows=rowsFrom([...raw,...await fetchPlaces(roomSearch?queryFor(intent,false):menuQuery)],intent,{boundaries,nearby,places});}
       catch(error){if(error.name==='AbortError'||!rows.length)throw error;}
     }
     return rows.slice(0,20);
   }
-  window.AIGoogleSearch={search,queryFor,rowsFrom,boundsFor,typeMatches,includedType};
+  window.AIGoogleSearch={search,queryFor,rowsFrom,boundsFor,typeMatches,includedType,cuisineWords};
 })();

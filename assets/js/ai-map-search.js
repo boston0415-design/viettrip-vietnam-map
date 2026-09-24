@@ -10,7 +10,37 @@
     rooftop:{label:'루프탑',pattern:/루프탑|rooftop|roof top/i}
   };
   const AREA_ALIASES=[['푸미흥','phu my hung'],['타오디엔','thao dien'],['호안끼엠','hoan kiem'],['미딩','my dinh'],['서호','tay ho'],['부이비엔','bui vien'],['레탄톤','le thanh ton']];
-  const termAliases=term=>/왁싱|waxing/i.test(term)?['왁싱','waxing','wax lông']:[term];
+  const MENU_PATTERNS={
+    '고기·구이':/고기\s*[·/]?\s*구이|고[기깃]집|삼겹살|목살|갈비|숯불|불고기|바[베비]큐|\bbbq\b|\bbarbe[cq]ue\b|\bgrilled\s+(?:meat|beef|pork)\b|\bthit\s+nuong\b|\bsuon\s+nuong\b/i,
+    '회':/초밥\s*[·/]\s*회|횟집|회집|사시미|생선회|활어회|모[둠듬]회|광어회|연어회|참치회|\bsashimi\b|\braw\s+fish\b|\bgoi\s+ca\b|(?:^|\s)회(?=\s|[·/,]|$|(?:를|가|는|도|로|와|랑|만|가\s*아니라))/i
+  };
+  function menuKeyword(text,term){
+    const value=normalize(text),pattern=MENU_PATTERNS[term];
+    if(pattern)return value.match(pattern)?.[0]?.trim()||'';
+    return (/왁싱|waxing/i.test(term)?['왁싱','waxing','wax long']:[term]).find(alias=>value.includes(normalize(alias)))||'';
+  }
+  function evidenceFor(sources,term){
+    for(const source of sources){
+      for(const clause of String(source.text||'').split(/[.!?。\n]/)){
+        const keyword=menuKeyword(clause,term);if(!keyword)continue;
+        if(MENU_PATTERNS[term]&&/없|안\s*팔|팔지\s*않|판매하지|제공하지|먹지\s*못|있는지|있나요|확인\s*필요|문의|예정|옆집|다른\s*식당|\b(?:no|not|without|whether|wish|maybe)\b|khong\s+(?:co|ban)/i.test(normalize(clause)))continue;
+        return {evidence:quote(source,keyword),source};
+      }
+    }
+    return null;
+  }
+  function cuisineEvidence(sources,cuisine){
+    const aliases=[cuisine,...(window.AIGoogleSearch?.cuisineWords(cuisine)||[]),...({'프랑스':['프렌치'],'이탈리아':['이탈리안'],'한식':['한국'],'일식':['일본'],'중식':['중국']}[cuisine]||[])];
+    for(const source of sources){
+      for(const clause of String(source.text||'').split(/[.!?。\n]/)){
+        const text=normalize(clause);
+        const word=aliases.find(alias=>new RegExp(normalize(alias)+'\\s*(?:요리|음식|메뉴|가정식|코스|퀴진|cuisine|food|dishes|menu)').test(text));
+        if(!word||/없|팔지\s*않|제공하지|있는지|있나요|예정|다른\s*식당|옆집|\b(?:no|not|without|wish|whether)\b/.test(text))continue;
+        return {evidence:quote(source,word),source};
+      }
+    }
+    return null;
+  }
   let districtData=[];
   function inRing(point,ring){
     let inside=false;
@@ -49,7 +79,12 @@
     if(!area)return true;
     const key=normalize(area),aliases=AREA_ALIASES.find(group=>group.some(a=>normalize(a)===key))||[area];
     const text=normalize([place.area,place.address,place.name].join(' '));
-    return aliases.some(alias=>text.includes(normalize(alias)));
+    if(aliases.some(alias=>text.includes(normalize(alias))))return true;
+    // Some Google addresses omit the neighbourhood. Reuse the map's existing
+    // neighbourhood radius, never substitute the whole district for Phu My Hung.
+    const point=validMapLocation(place),city=placeCityKey(place);
+    const zone=typeof EXTRA_DATA!=='undefined'&&EXTRA_DATA[city]?.zones?.find(z=>z.kind==='circle'&&aliases.some(alias=>normalize(z.name).includes(normalize(alias))));
+    return !!(point&&zone&&geoDistanceMeters(point,zone.center)<=zone.radius);
   }
   function quote(source,term){
     const index=normalize(source.text).indexOf(normalize(term));
@@ -81,24 +116,28 @@
       if(intent.city!=='all'&&placeCityKey(p)!==intent.city)continue;
       const needsWaxing=(intent.terms||[]).some(term=>/왁싱|waxing/i.test(term));
       if(intent.category&&p.category!==intent.category&&!(needsWaxing&&['spa','barber'].includes(p.category)))continue;
+      const reviews=reviewMap.get(p.id)||[];
+      const sources=[{label:'등록 정보',text:[p.name,p.subcategory,(p.tags||[]).join(' '),p.description,p.benefitText].filter(Boolean).join(' · ')},...reviews.filter(r=>r.text).map(r=>({label:'회원 후기',text:String(r.text)}))];
+      let cuisineProof=null;
       if(intent.subcategory){
         if(intent.category==='bar'&&intent.subcategory==='바'){if(p.subcategory==='클럽')continue;}
-        else if((p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)!==intent.subcategory)continue;
+        else if((p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)!==intent.subcategory){
+          cuisineProof=p.category==='restaurant'&&cuisineEvidence(sources,intent.subcategory);
+          if(!cuisineProof)continue;
+        }
       }
       if(!districtMatches(p,intent.district)||!areaMatches(p,intent.area))continue;
       if(intent.nearby&&(!nearby||!validMapLocation(p)||geoDistanceMeters(nearby,p)>nearby.radius))continue;
-      const reviews=reviewMap.get(p.id)||[];
       const memberRecommendations=new Set(reviews.filter(r=>r.recommended).map(r=>r.createdByHash||r.createdBy||r.id)).size;
       const registrantRecommended=!!p.tags?.includes('강추업소');
       const ratingValues=[p.initialRating,...reviews.map(r=>r.rating)].filter(n=>n!=null&&Number.isFinite(Number(n))&&Number(n)>=1&&Number(n)<=5).map(Number);
       const rating=ratingValues.length?ratingValues.reduce((sum,n)=>sum+n,0)/ratingValues.length:null;
-      const sources=[{label:'등록 정보',text:[p.name,p.subcategory,(p.tags||[]).join(' '),p.description,p.benefitText].filter(Boolean).join(' · ')},...reviews.filter(r=>r.text).map(r=>({label:'회원 후기',text:String(r.text)}))];
       const room=wantsRoom(intent)?roomInfo([{label:'등록 정보',text:[...(p.tags||[]),p.description,p.benefitText].filter(Boolean).join(' · ')},...sources.slice(1)]):null;
       if(room?.kind==='unavailable')continue;
-      const evidence=[],missingTerms=[];
+      const evidence=cuisineProof?[cuisineProof.evidence]:[],missingTerms=[];
       for(const term of intent.terms||[]){
-        const source=sources.find(s=>termAliases(term).some(alias=>normalize(s.text).includes(normalize(alias))));
-        if(source)evidence.push(quote(source,termAliases(term).find(alias=>normalize(source.text).includes(normalize(alias)))));else missingTerms.push(term);
+        const proof=evidenceFor(sources,term);
+        if(proof)evidence.push(proof.evidence);else missingTerms.push(term);
       }
       // A general massage/barber business is not evidence of a waxing service.
       if(needsWaxing&&missingTerms.some(term=>/왁싱|waxing/i.test(term)))continue;
@@ -126,8 +165,8 @@
     label.textContent=row.room.kind==='confirmed'?'룸 안내 있음 · 예약 가능 여부 문의':'룸 여부 문의 필요';button.append(label);
     if(row.room.evidence){const proof=document.createElement('span');proof.className='aiEvidence';proof.textContent=row.room.evidence;button.append(proof);}
   }
-  function appendRoomAttribution(li,row){
-    const review=row.room?.review;if(!review)return;
+  function appendReviewAttribution(li,review){
+    if(!review)return;
     const credit=document.createElement('div');credit.className='aiRoomCredit';
     const author=review.authorAttribution||{},photo=googlePhotoSafeUrl(author.photoURI);
     if(photo){const img=document.createElement('img');img.src=photo;img.alt='';img.loading='lazy';credit.append(img);}
@@ -227,13 +266,14 @@
       const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='aiResult aiGoogleResult';button.dataset.googlePlaceId=row.placeId;
       const name=document.createElement('strong');name.textContent=row.name;button.append(name);
       const rating=document.createElement('span');rating.className='aiRating';rating.textContent='Google ★ '+row.rating.toFixed(1)+' · 후기 '+row.ratingCount.toLocaleString('ko-KR')+'개';button.append(rating);
-      if(entry.intent.subcategory){const cuisine=document.createElement('span');cuisine.className='aiMeta';cuisine.textContent='Google 업종 확인 · '+entry.intent.subcategory;button.append(cuisine);}
+      if(entry.intent.subcategory){const cuisine=document.createElement('span');cuisine.className='aiMeta';cuisine.textContent=(row.cuisineByMenu?'메뉴 안내 확인 · ':'Google 업종 확인 · ')+entry.intent.subcategory;button.append(cuisine);}
       const address=document.createElement('span');address.textContent=row.address;button.append(address);
       appendRoomInfo(button,row);
+      for(const proof of row.proofs||[]){const label=document.createElement('span');label.className='aiEvidence';label.textContent=proof.evidence;button.append(label);}
       if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
       if(entry.intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b></b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
       button.addEventListener('click',()=>{close();input.blur();window.PlaceSearch?.openGoogle(row);});li.append(button);(row.room?.kind==='unknown'&&unknownResults?unknownResults:results).append(li);
-      appendRoomAttribution(li,row);
+      for(const review of new Set([row.room?.review,...(row.proofs||[]).map(p=>p.source.review)].filter(Boolean)))appendReviewAttribution(li,review);
       if(row.hours)showHours(button,row.hours);
       else{
         const credit=document.createElement('div');credit.className='aiHoursAttributions';
@@ -338,5 +378,5 @@
     finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}
   });
   syncInput();
-  window.AIMapSearch={findMatches,buildResults,districtMatches,areaMatches,inGeometry,wantsRoom,roomInfo,close};
+  window.AIMapSearch={findMatches,buildResults,districtMatches,areaMatches,inGeometry,wantsRoom,roomInfo,menuKeyword,evidenceFor,cuisineEvidence,close};
 })();
