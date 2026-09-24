@@ -17,7 +17,7 @@ function cuisineLabel(value){
   return Object.keys(CUISINES).find(label=>cuisineAliases(label).some(alias=>alias.toLowerCase()===text))||Object.keys(CUISINES).find(label=>label===value)||'';
 }
 const SYSTEM=`Extract search preferences for a Vietnam community map. This is NOT a factual lookup: NEVER decide whether matching businesses exist. Korean requests to find/recommend places are relevant=true even when subjective or mentioning today. Return only JSON, no reasoning. /no_think
-Schema: {"relevant":boolean,"city":string,"district":string,"area":string,"category":string,"subcategory":string,"terms":string[],"features":string[],"preferences":string[],"benefit":boolean,"recommended":boolean,"nearby":boolean,"visitToday":boolean,"unsupported":string[]}
+Schema: {"relevant":boolean,"city":string,"district":string,"area":string,"category":string,"subcategory":string,"terms":string[],"features":string[],"preferences":string[],"benefit":boolean,"recommended":boolean,"nearby":boolean,"visitToday":boolean,"unsupported":string[],"guideTopic":string,"transport":object|null}
 city: all=전체, hcmc=호치민, hanoi=하노이, danang=다낭, nhatrang=나트랑, phuquoc=푸꾸옥, dalat=달랏, hoian=호이안, vungtau=붕따우/호짬, muine=무이네. Default to supplied city. Unknown cities go in unsupported; never substitute another city.
 district: numbered district as a string e.g. "1" for 1군/Quận 1, else "". area: explicitly named neighborhood e.g. 푸미흥, 타오디엔, 호안끼엠, else "". These are required geographic constraints, not terms.
 category: restaurant=식당/맛집, spa=마사지/스파/왁싱, barber=이발소/미용실, stay=숙소, karaoke=가라오케, cafe=카페, exchange=환전소, shopping=쇼핑/과일가게, market=시장, attraction=관광명소, bar=바/클럽/펍, golf=골프, pharmacy=약국, public_office=공공기관, hospital=병원; else "". Waxing is spa with terms=["왁싱"], not barber. Keep essential narrower services in terms.
@@ -162,6 +162,14 @@ export function routeIntent(query,city){
   const transport={origin,destination,originExplicit:mentions.length===2,mode:modes.length===1?modes[0]:'all'};
   return {relevant:true,city:origin,district:'',area:'',category:'',subcategory:'',terms:[],preferences:[],benefit:false,recommended:false,nearby:false,visitToday:false,unsupported:[],transport};
 }
+export function guideIntent(query,city){
+  if(!/어떻게|방법|준비|주의|사용법|이용법|how to/i.test(query)||/매장|가게|업소|식당|최저|가장\s*싼|근처|주변|태국|일본|중국|한국에서|부산|서울/.test(query))return null;
+  const topics=[['sim-data',/유심|이심|e-?sim|sim card/i],['grab-green',/그랩|그린\s*SM|grab|green sm/i],['exchange',/환전/],['stay-choice',/숙소\s*(?:선택|고르|정하)|호텔\s*(?:선택|고르)/],['food-reviews',/카페.{0,8}후기|회원.{0,8}후기/],['useful-phrases',/베트남어/],['before-flight',/입국|비자|출국|여권/]];
+  const matches=topics.filter(([,pattern])=>pattern.test(query));if(matches.length!==1)return null;
+  // This is a related guide, never a claim to have resolved the user's dates,
+  // budget or individual visa eligibility. Its official sources stay visible.
+  return {relevant:true,city,district:'',area:'',category:'',subcategory:'',terms:[],preferences:[],benefit:false,recommended:false,nearby:false,visitToday:false,unsupported:[],guideTopic:matches[0][0]};
+}
 export function extendIntent(intent,query,city){
   const route=routeIntent(query,city);if(route)return {...route,requestText:query};
   const next={...intent};
@@ -232,7 +240,7 @@ export async function onRequest(context){
   if(query.length<2||query.length>300)return json({error:'질문을 2~300자로 입력해 주세요.'},400);
   try{if(await throttle(request,context))return json({error:'질문이 많아요. 1분 뒤 다시 시도해 주세요.'},429);}catch{return json({error:'잠시 후 다시 질문해 주세요.'},503);}
   const city=CITIES.includes(body.city)?body.city:'all';let timer;
-  const literal=routeIntent(query,city)||literalIntent(query,city);if(literal)return json({intent:extendIntent(literal,query,city)});
+  const literal=routeIntent(query,city)||guideIntent(query,city)||literalIntent(query,city);if(literal)return json({intent:extendIntent(literal,query,city)});
   if(!env.AI?.run)return json({error:'AI 연결을 준비하고 있어요. 기존 검색창을 이용해 주세요.'},503);
   try{
     const result=await Promise.race([

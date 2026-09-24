@@ -41,6 +41,7 @@
     const guide=window.VietGuideData?.articles?.find(a=>a.id===intent.guideTopic&&(!a.cities||a.cities.includes(intent.city)));
     if(guide){
       const li=element('li','','aiTravelAnswer');li.append(element('h3',guide.title),element('p',guide.summary));
+      if(!['before-flight','help'].includes(guide.id))for(const section of guide.sections.slice(0,2))li.append(element('h4',section.title),element('p',section.body));
       // Existing reviewed article, not a new model-written answer. Keep scoped
       // legal/emergency guidance in the linked article and official sources.
       link(li,'여행가이드에서 자세히 보기','./guide/?city='+encodeURIComponent(intent.city)+'&read='+encodeURIComponent(guide.id));

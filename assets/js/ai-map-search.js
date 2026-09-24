@@ -340,7 +340,7 @@
     list.classList.remove('aiRankingPending');
     const note=byId('aiMapNote');note.textContent='질문 조건에 맞는 업소만 표시하고, 그 안에서 회원 등록·강추·혜택 정보를 보여드려요. Google 검색은 최대 20곳의 업종·지역·평점을 확인합니다.';
     const travel=window.AITravelSearch?.render(list,intent||{});if(travel){title.textContent=travel.title;status.textContent=travel.status;note.textContent=travel.note;return;}
-    if(!intent?.relevant){status.textContent='질문에 답할 장소·여행 정보를 아직 확인하지 못했어요.';window.AITravelSearch?.fallback(list,intent?.requestText||input.value);return;}
+    if(!intent?.relevant){note.textContent='확인되지 않은 내용을 답으로 만들지 않고, 원래 질문과 관련된 정보를 더 찾을 수 있게 연결합니다.';status.textContent='질문에 답할 장소·여행 정보를 아직 확인하지 못했어요.';window.AITravelSearch?.fallback(list,intent?.requestText||input.value);return;}
     if(window.AISearchInsights?.renderGuide(list,intent)){title.textContent='이동·예약 안내';status.textContent='출발 항구와 공식 예매처';note.textContent='공식 선사 안내를 바탕으로 작성했습니다. 아래 링크에서 실제 출발일 정보를 확인하세요.';return;}
     const scope=[CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,intent.service==='motorbike_rental'?'오토바이 대여':intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
     if(intent.nearby&&!state.nearby){status.textContent='먼저 지도 아래 ‘주변 찾기’에서 현재 위치나 숙소를 지정한 뒤 다시 질문해 주세요.';return;}

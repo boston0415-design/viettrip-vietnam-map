@@ -15,6 +15,9 @@ const {JSDOM}=require('jsdom'),read=p=>fs.readFileSync(p,'utf8');
   const response=await api.onRequest({request:new Request('https://map.test/api/ask-map',{method:'POST',headers:{origin:'https://map.test','content-type':'application/json'},body:JSON.stringify({query,city:'hcmc'})}),env:{AI:{run(){throw Error('routine routes must not spend AI tokens')}}}});assert.equal(response.status,200);}
  for(const q of ['서울에서 달랏으로 가는 비행기','호치민에서 후에로 가는 버스','달랏으로 하노이 거쳐 가는 비행기','호치민에서 달랏으로 기차 말고 버스','호치민 버스 정류장 근처 식당'])assert.equal(api.routeIntent(q,'hcmc'),null,q);
  assert.equal(api.routeIntent('달랏으로 가는 교통편','all'),null,'no invented origin');
+ assert.equal(api.guideIntent('베트남 여행할 때 유심은 어떻게 준비해?','hcmc').guideTopic,'sim-data');
+ assert.equal(api.guideIntent('유심 가장 싼 매장 어떻게 찾아?','hcmc'),null);
+ assert.equal(api.guideIntent('태국 유심은 어떻게 준비해?','hcmc'),null);
  const q='호치민에서 아이폰 듀오 가장 싸게 파는 매장 알려줘.';
  const retail=api.extendIntent(api.clarifyIntent({...base,terms:['아이폰 듀오'],unsupported:['최저 가격','1군 제외'],preferences:['cheap']},q),q,'hcmc');
  assert(retail.relevant&&retail.productSearch);assert.equal(retail.requestText,q);assert(!retail.sortBy);assert(!retail.showPrice);assert.deepEqual(retail.unsupported,['1군 제외']);
