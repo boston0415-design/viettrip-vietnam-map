@@ -98,14 +98,9 @@
     return collectCandidates(intent,data,nearby).filter(row=>!row.missingTerms.length&&(!intent.benefit||row.place.memberBenefit)&&(!intent.recommended||row.recommended));
   }
   function buildResults(intent,data,nearby){
-    const candidates=collectCandidates(intent,data,nearby);
-    const exact=candidates.filter(row=>!row.missingTerms.length&&(!intent.benefit||row.place.memberBenefit)&&(!intent.recommended||row.recommended));
-    if(exact.length)return {rows:exact,fallback:false,missing:[]};
-    const termsMatch=candidates.filter(row=>!row.missingTerms.length);
-    // Keep geographic and business-type constraints. Never label alternatives as 강추.
-    const rows=termsMatch.length?termsMatch:(intent.category?candidates:[]);
-    const missing=[intent.recommended?'강추':null,intent.benefit?'혜택':null,(!termsMatch.length?intent.terms:[]).join(' · ')].filter(Boolean);
-    return {rows,fallback:rows.length>0,missing};
+    // Eligibility comes before member/recommendation/benefit ranking. Never
+    // replace a requested cuisine, dish or membership condition with alternatives.
+    return {rows:findMatches(intent,data,nearby),fallback:false,missing:[]};
   }
   const form=byId('aiMapForm'),input=byId('aiMapQuestion'),panel=byId('aiMapPanel'),send=byId('aiMapSend');
   if(!form)return;
@@ -180,13 +175,13 @@
     }
     const rows=entry.google.rows;
     message.textContent=rows.length?(entry.intent.terms.length?'업소명에 검색어가 있는 곳 우선 · ':'')+'Google 평점 4점 이상 · 평점, 후기 수 순':'이 지역에서 조건에 맞는 Google 평점 4점 이상 업소를 찾지 못했어요.';
-    if(entry.intent.benefit||entry.intent.recommended)message.textContent+=' 카페 혜택·회원 강추 여부는 확인되지 않은 업소입니다.';
     if(rows.length)title.textContent='추천 업소 · '+(entry.memberCount+rows.length)+'곳';
     const results=document.createElement('ul');results.className='aiGoogleResults';results.setAttribute('aria-label','Google 지도 추천 업소');section.append(results);
     for(const row of rows){
       const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='aiResult aiGoogleResult';button.dataset.googlePlaceId=row.placeId;
       const name=document.createElement('strong');name.textContent=row.name;button.append(name);
       const rating=document.createElement('span');rating.className='aiRating';rating.textContent='Google ★ '+row.rating.toFixed(1)+' · 후기 '+row.ratingCount.toLocaleString('ko-KR')+'개';button.append(rating);
+      if(entry.intent.subcategory){const cuisine=document.createElement('span');cuisine.className='aiMeta';cuisine.textContent='Google 업종 확인 · '+entry.intent.subcategory;button.append(cuisine);}
       const address=document.createElement('span');address.textContent=row.address;button.append(address);
       if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
       if(entry.intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b></b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
@@ -209,16 +204,17 @@
   }
   function render(intent){
     list.replaceChildren();examples.hidden=true;title.textContent='AI 검색 결과';
-    const note=byId('aiMapNote');note.textContent='회원 등록 업소 우선 · Google 검색 결과 최대 20곳에서 지역·평점 확인. 회원 평가와 Google 평점은 별개입니다.';
+    const note=byId('aiMapNote');note.textContent='질문 조건에 맞는 업소만 표시하고, 그 안에서 회원 등록·강추·혜택 정보를 보여드려요. Google 검색은 최대 20곳의 업종·지역·평점을 확인합니다.';
     if(!intent?.relevant){status.textContent='찾고 싶은 업소의 지역, 업종이나 메뉴를 질문해 주세요.';return;}
     const scope=[CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
     if(intent.nearby&&!state.nearby){status.textContent='먼저 지도 아래 ‘주변 찾기’에서 현재 위치나 숙소를 지정한 뒤 다시 질문해 주세요.';return;}
     if(intent.unsupported?.length){status.textContent='아직 확인할 수 없는 조건이에요: '+intent.unsupported.join(', ')+'. 지역·업종·메뉴로 다시 질문해 주세요.';return;}
     if(state.sharedDbLoading){status.textContent='등록 업소를 불러오는 중이에요. 잠시 후 질문창을 다시 눌러 주세요.';return;}
     const results=buildResults(intent,db(),state.nearby);
-    const {rows,fallback,missing}=results;
-    title.textContent=(fallback?'대신 살펴볼 등록 업소':'추천 업소')+' · '+rows.length+'곳';
-    status.textContent=scope+(fallback?' — ':rows.length?'':' — ')+(fallback?missing.join('·')+' 조건에 맞는 업소가 없어, 같은 지역·업종의 등록 업소를 추천 순으로 보여드려요.':rows.length?'':'맞는 회원 등록 업소가 없어 Google 지도에서도 찾아볼게요.');
+    const {rows}=results;
+    const memberOnly=intent.benefit||intent.recommended;
+    title.textContent='추천 업소 · '+rows.length+'곳';
+    status.textContent=scope+(intent.recommended?' · 회원 강추':'')+(intent.benefit?' · 혜택·제휴':'')+(rows.length?'':memberOnly?' — 모든 조건을 충족하는 회원 등록 업소를 찾지 못했어요. 다른 업종이나 혜택 미확인 업소로 대체하지 않습니다.':' — 맞는 회원 등록 업소가 없어 같은 조건으로 Google 지도에서도 찾아볼게요.');
     if(intent.preferences?.length)status.textContent+=' '+intent.preferences.map(key=>PREFERENCES[key]?.label).filter(Boolean).join('·')+' 관련 정보 우선.';
     if(intent.visitToday){status.textContent+=' 오늘 영업시간을 확인합니다.';note.textContent+=' 베트남 현지 날짜 기준이며, 당일 변경은 업소에 확인해 주세요.';}
     if(intent.district&&intent.city==='hcmc'&&districtData.length)note.textContent+=' '+intent.district+'군은 기존 행정구역 기준입니다.';
@@ -248,7 +244,7 @@
       const result=last?.hours?.get(place.id);if(intent.visitToday&&result)showHours(button,result);
     }
     checkHours(rows,intent);
-    if(window.AIGoogleSearch&&last){const section=document.createElement('li');section.id='aiGoogleSection';list.append(section);renderGoogle(last);searchGoogle(last);}
+    if(window.AIGoogleSearch&&last&&!memberOnly){const section=document.createElement('li');section.id='aiGoogleSection';list.append(section);renderGoogle(last);searchGoogle(last);}
   }
   input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.google=null;last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
   input.addEventListener('input',()=>{cancel();last=null;reset();show();});

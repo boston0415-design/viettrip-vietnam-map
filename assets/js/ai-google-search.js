@@ -3,10 +3,42 @@
   'use strict';
   const CITIES={hcmc:'Ho Chi Minh City',hanoi:'Ha Noi',danang:'Da Nang',nhatrang:'Nha Trang',phuquoc:'Phu Quoc',dalat:'Da Lat',hoian:'Hoi An',vungtau:'Vung Tau',muine:'Mui Ne'};
   const CATEGORIES={restaurant:'restaurant',spa:'spa massage',barber:'barber hair salon',stay:'hotel',karaoke:'karaoke',cafe:'cafe',exchange:'currency exchange',shopping:'shopping',market:'market',attraction:'tourist attraction',bar:'bar',golf:'golf course',pharmacy:'pharmacy',public_office:'government office',hospital:'hospital'};
-  const SUBS={'한식':'Korean restaurant','일식':'Japanese restaurant','베트남':'Vietnamese restaurant','중식':'Chinese restaurant','바':'bar','클럽':'night club'};
+  const CUISINES={
+    '한식':['Korean','korean_restaurant'],'일식':['Japanese','japanese_restaurant'],'베트남':['Vietnamese','vietnamese_restaurant'],'중식':['Chinese','chinese_restaurant'],
+    '대만':['Taiwanese','taiwanese_restaurant'],'태국':['Thai','thai_restaurant'],'인도':['Indian','indian_restaurant'],'네팔':['Nepalese',''],
+    '싱가포르':['Singaporean',''],'말레이시아':['Malaysian','malaysian_restaurant'],'인도네시아':['Indonesian','indonesian_restaurant'],'필리핀':['Filipino','filipino_restaurant'],
+    '이탈리아':['Italian','italian_restaurant'],'프랑스':['French','french_restaurant'],'스페인':['Spanish','spanish_restaurant'],'그리스':['Greek','greek_restaurant'],
+    '미국':['American','american_restaurant'],'멕시코':['Mexican','mexican_restaurant'],'터키':['Turkish','turkish_restaurant'],'중동':['Middle Eastern','middle_eastern_restaurant'],
+    '양식':['Western','western_restaurant'],'퓨전':['Fusion','fusion_restaurant'],'다국적':['International',''],'기타':['Other','']
+  };
+  const SUBS={...Object.fromEntries(Object.entries(CUISINES).map(([label,[word]])=>[label,word+' restaurant'])),'바':'bar','클럽':'night club'};
+  const CATEGORY_TYPES={restaurant:['restaurant'],spa:['spa','massage','massage_spa','beauty_salon','skin_care_clinic','wellness_center'],barber:['barber_shop','hair_salon','hair_care','beauty_salon'],stay:['lodging','hotel','apartment_building','apartment_complex'],karaoke:['karaoke'],cafe:['cafe','coffee_shop','bakery','dessert_shop','juice_shop'],exchange:['currency_exchange','bank','jewelry_store'],shopping:['store','shopping_mall'],market:['market'],attraction:['tourist_attraction','museum','historical_landmark','park','beach'],bar:['bar','pub','wine_bar','cocktail_bar','night_club','bar_and_grill'],golf:['golf_course'],pharmacy:['pharmacy','drugstore'],public_office:['government_office','local_government_office','embassy','post_office','police'],hospital:['hospital','doctor','medical_clinic','medical_center','dentist','veterinary_care']};
   const AREAS={'푸미흥':'Phu My Hung','타오디엔':'Thao Dien','호안끼엠':'Hoan Kiem','미딩':'My Dinh','서호':'Tay Ho','부이비엔':'Bui Vien','레탄톤':'Le Thanh Ton'};
   const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').normalize('NFC').toLowerCase().replace(/\s+/g,' ').trim();
   const waxing=term=>/왁싱|wax(?:ing)?|wax long/i.test(normalize(term));
+  function includedType(intent){
+    if(intent.category==='restaurant')return CUISINES[intent.subcategory]?.[1]||'restaurant';
+    if(intent.category==='bar'&&intent.subcategory==='클럽')return 'night_club';
+    return '';
+  }
+  function typeMatches(place,intent){
+    const types=place.types||[];
+    if(intent.category==='restaurant'&&intent.subcategory){
+      const cuisine=CUISINES[intent.subcategory];
+      if(!cuisine)return false;
+      if(cuisine[1])return types.includes(cuisine[1]);
+      // Where Google has no specific cuisine type, require the requested cuisine
+      // in the name; a generic "restaurant" result is insufficient evidence.
+      return types.includes('restaurant')&&[intent.subcategory,cuisine[0]].some(word=>normalize(place.displayName).includes(normalize(word)));
+    }
+    if(intent.category==='bar'&&intent.subcategory==='클럽')return types.includes('night_club');
+    if(intent.category==='bar'&&intent.subcategory==='바')return types.some(t=>t!=='night_club'&&CATEGORY_TYPES.bar.includes(t));
+    return !intent.category||(CATEGORY_TYPES[intent.category]||[]).some(type=>types.includes(type));
+  }
+  function termMatches(place,term){
+    const aliases=waxing(term)?['왁싱','waxing','wax long']:[term];
+    return [place.displayName,place.editorialSummary].some(value=>aliases.some(alias=>normalize(value).includes(normalize(alias))));
+  }
   function queryFor(intent){
     const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':term);
     const specialty=terms.some(waxing);
@@ -33,6 +65,8 @@
       (typeof googlePhotoBranchMatches==='function'&&googlePhotoBranchMatches(p,raw)))||null;
   }
   function rowsFrom(raw,intent,{boundaries=[],nearby=null,places=[]}={}){
+    // Google cannot establish community-only endorsements or partner benefits.
+    if(intent.benefit||intent.recommended)return [];
     const seen=new Set(),rows=[];
     for(const p of raw||[]){
       const position=googlePhotoPosition(p.location),rating=Number(p.rating),count=Number(p.userRatingCount);
@@ -40,6 +74,7 @@
       if(['CLOSED_PERMANENTLY','CLOSED_TEMPORARILY','FUTURE_OPENING'].includes(p.businessStatus))continue;
       const country=p.addressComponents?.find(c=>c.types?.includes('country'));
       if(country&&country.shortText!=='VN')continue;
+      if(!typeMatches(p,intent)||!(intent.terms||[]).every(term=>termMatches(p,term)))continue;
       const place={name:String(p.displayName||'').trim(),address:p.formattedAddress||'',...position};
       if(intent.city!=='all'&&placeCityKey(place)!==intent.city)continue;
       if(!window.AIMapSearch.districtMatches(place,intent.district,boundaries)||!window.AIMapSearch.areaMatches(place,intent.area))continue;
@@ -54,12 +89,15 @@
   }
   async function search(intent,{signal,boundaries=[],nearby=null,places=[]}={}){
     if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+    if(intent.benefit||intent.recommended)return [];
     const Place=window.google?.maps?.places?.Place;
     if(typeof Place?.searchByText!=='function')throw Error('GOOGLE_UNAVAILABLE');
-    const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','attributions'];
+    const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','types','attributions'];
+    if(intent.terms?.length)fields.push('editorialSummary');
     if(intent.visitToday)fields.push('currentOpeningHours');
     const bounds=boundsFor(intent,boundaries,nearby);
-    const request={textQuery:queryFor(intent),fields,language:'ko',region:'vn',maxResultCount:20,minRating:4,
+    const type=includedType(intent);
+    const request={textQuery:queryFor(intent),fields,language:'ko',region:'vn',maxResultCount:20,minRating:4,...(type?{includedType:type,useStrictTypeFiltering:true}:{}),
       ...(bounds?{locationRestriction:bounds}:CITY_DATA[intent.city]?.center?{locationBias:{center:CITY_DATA[intent.city].center,radius:50000}}:{})};
     let timer,abort;
     try{
@@ -71,5 +109,5 @@
       return rowsFrom(result.places,intent,{boundaries,nearby,places});
     }finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}
   }
-  window.AIGoogleSearch={search,queryFor,rowsFrom,boundsFor};
+  window.AIGoogleSearch={search,queryFor,rowsFrom,boundsFor,typeMatches,includedType};
 })();

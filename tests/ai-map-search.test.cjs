@@ -40,11 +40,11 @@ const intent={relevant:true,city:'hcmc',district:'1',area:'',preferences:[],visi
    ],reviews:[]};
    const wanted={...intent,city:'hanoi',district:'',subcategory:'',terms:[],recommended:true};
    const alternativesBefore=JSON.stringify(data),result=AIMapSearch.buildResults(wanted,data,null);
-   assert(result.fallback);assert.equal(result.rows.length,2,'return all matching registered alternatives');assert.equal(result.rows[0].place.id,'ha2','actual rating determines fallback order');
+   assert(!result.fallback);assert.equal(result.rows.length,0,'no unendorsed alternatives for an explicit member endorsement request');
    assert(result.rows.every(row=>!row.recommended),'fallback cannot invent recommendation flags');assert.equal(JSON.stringify(data),alternativesBefore);
    data.reviews.push({id:'ha-review',placeId:'ha1',rating:4,recommended:true,text:'맛있어요'});
    const exact=AIMapSearch.buildResults(wanted,data,null);assert(!exact.fallback);assert.equal(exact.rows.length,1);assert.equal(exact.rows[0].place.id,'ha1');
-   const menu=AIMapSearch.buildResults({...wanted,recommended:false,terms:['동태탕']},data,null);assert(menu.fallback);assert(menu.rows.every(row=>row.missingTerms.includes('동태탕')));
+   const menu=AIMapSearch.buildResults({...wanted,recommended:false,terms:['동태탕']},data,null);assert(!menu.fallback);assert.equal(menu.rows.length,0,'missing dishes must never broaden to all restaurants');
    assert.equal(AIMapSearch.buildResults({...wanted,district:'1'},data,null).rows.length,0,'never silently broaden district');
    const bars={places:[{id:'plain',name:'먼저 나온 바',category:'bar',area:'호치민',lat:10.77,lng:106.7,initialRating:5},{id:'mood',name:'분위기 바',category:'bar',area:'호치민',lat:10.77,lng:106.7,description:'분위기가 좋고 데이트하기 좋아요.',initialRating:4}],reviews:[]};
    const ranked=AIMapSearch.buildResults({...intent,district:'',category:'bar',subcategory:'',terms:[],preferences:['date','atmosphere']},bars,null);assert.equal(ranked.rows.length,2);assert.equal(ranked.rows[0].place.id,'mood');bars.places.push({id:'club',name:'클럽',category:'bar',subcategory:'클럽',area:'호치민',lat:10.77,lng:106.7,initialRating:5});assert.equal(AIMapSearch.buildResults({...intent,district:'',category:'bar',subcategory:'바',terms:[]},bars,null).rows.length,2,'a bar request does not become a nightclub list');
