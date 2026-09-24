@@ -82,11 +82,15 @@
       const termMatch=!!intent.terms?.length&&intent.terms.every(term=>waxing(term)?/왁싱|waxing|wax long/.test(normalize(place.name)):normalize(place.name).includes(normalize(term)));
       const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',attributions:p.attributions||[]};
       if(window.AIMapSearch.wantsRoom(intent)){
-        row.room=window.AIMapSearch.roomInfo([{label:'Google 업소 설명',text:p.editorialSummary||''}]);
+        const sources=[{label:'Google 업소 설명',text:p.editorialSummary||''},...(p.reviews||[]).filter(r=>r.authorAttribution?.displayName).map(review=>({label:'Google 후기',text:review.text||review.originalText||'',review}))];
+        row.room=window.AIMapSearch.roomInfo(sources);
         if(row.room.kind==='unavailable')continue;
         // A search hit or a business name is not proof of a dining room.
         // Display Google's editorial summary unchanged when it is the evidence.
-        if(row.room.kind==='confirmed')row.room.evidence='Google 업소 설명 · '+p.editorialSummary;
+        if(row.room.kind==='confirmed'){
+          if(row.room.source.review)row.room.review=row.room.source.review;
+          else row.room.evidence='Google 업소 설명 · '+p.editorialSummary;
+        }
       }
       if(!row.name||registeredMatch(row,places))continue;
       if(intent.visitToday&&window.AIPlaceHours)row.hours={...window.AIPlaceHours.summarize(p),attributions:row.attributions};
@@ -102,6 +106,7 @@
     const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','types','attributions'];
     const roomSearch=window.AIMapSearch.wantsRoom(intent);
     if(intent.terms?.length||roomSearch)fields.push('editorialSummary');
+    if(roomSearch)fields.push('reviews');
     if(intent.visitToday)fields.push('currentOpeningHours');
     const bounds=boundsFor(intent,boundaries,nearby);
     const type=includedType(intent);

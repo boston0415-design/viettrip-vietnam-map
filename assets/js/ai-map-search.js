@@ -65,11 +65,11 @@
         const text=normalize(clause),match=text.match(keyword);if(!match||/쇼룸|쇼\s+룸/.test(text))continue;
         const absent=/(?:룸|별실|개인실|개별실|독립실)(?:은|이|가|도|을)?\s*(?:(?:따로|별도로?|아예|전혀|더는|더 이상)\s*)?(?:없|불가|운영하지|제공하지|이용.{0,5}불가)|(?:no|not|without|never|doesn['’]?t|don['’]?t)\s+(?:(?:have|offer|any|a|longer|available)\s+)*(?:private\s+(?:dining\s+)?rooms?)|private\s+(?:dining\s+)?rooms?.{0,14}(?:unavailable|closed|not available)|khong\s+(?:co\s+)?phong\s+rieng/i;
         if(absent.test(text)){negative=true;continue;}
-        if(/있는지|있나요|있을까|모르|미확인|확인\s*필요|여부|문의|예정|계획|다른\s*(?:식당|업소)|옆집|맞은편|maybe|unsure|whether|plan(?:ned)?/.test(text))continue;
+        if(/있는지|있나요|있을까|모르|미확인|확인\s*필요|여부|문의|예정|계획|원했|원하|있으면|다른\s*(?:식당|업소)|옆집|맞은편|maybe|\bmay\b|\bmight\b|unsure|whether|plan(?:ned)?|looking for|wish/.test(text))continue;
         positive ||= {source,term:match[0]};
       }
     }
-    if(positive&&!negative)return {kind:'confirmed',evidence:quote(positive.source,positive.term)};
+    if(positive&&!negative)return {kind:'confirmed',evidence:quote(positive.source,positive.term),source:positive.source};
     return {kind:negative&&!positive?'unavailable':'unknown',evidence:''};
   }
   function collectCandidates(intent,data,nearby){
@@ -125,6 +125,15 @@
     const label=document.createElement('span');label.className='aiRoomInfo aiRoom-'+row.room.kind;
     label.textContent=row.room.kind==='confirmed'?'룸 안내 있음 · 예약 가능 여부 문의':'룸 여부 문의 필요';button.append(label);
     if(row.room.evidence){const proof=document.createElement('span');proof.className='aiEvidence';proof.textContent=row.room.evidence;button.append(proof);}
+  }
+  function appendRoomAttribution(li,row){
+    const review=row.room?.review;if(!review)return;
+    const credit=document.createElement('div');credit.className='aiRoomCredit';
+    const author=review.authorAttribution||{},photo=googlePhotoSafeUrl(author.photoURI);
+    if(photo){const img=document.createElement('img');img.src=photo;img.alt='';img.loading='lazy';credit.append(img);}
+    const link=(label,url)=>{const safe=googlePhotoSafeUrl(url),node=document.createElement(safe?'a':'span');node.textContent=label;if(safe){node.href=safe;node.target='_blank';node.rel='noopener noreferrer';}credit.append(node);};
+    link(author.displayName,author.uri);if(review.relativePublishTimeDescription)credit.append(' · '+review.relativePublishTimeDescription+' ');
+    link('Google Maps 후기 보기 ↗',review.googleMapsURI);li.append(credit);
   }
   function resultTitle(entry){
     const rows=[...(entry.memberRows||[]),...(entry.google?.rows||[])];
@@ -224,6 +233,7 @@
       if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
       if(entry.intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b></b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
       button.addEventListener('click',()=>{close();input.blur();window.PlaceSearch?.openGoogle(row);});li.append(button);(row.room?.kind==='unknown'&&unknownResults?unknownResults:results).append(li);
+      appendRoomAttribution(li,row);
       if(row.hours)showHours(button,row.hours);
       else{
         const credit=document.createElement('div');credit.className='aiHoursAttributions';
