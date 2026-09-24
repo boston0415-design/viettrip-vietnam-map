@@ -1,0 +1,50 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const {JSDOM}=require('jsdom');
+const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+(async()=>{
+ const api=await import('data:text/javascript;base64,'+Buffer.from(read('functions/api/ask-map.js')).toString('base64'));
+ const base={relevant:true,city:'hcmc',district:'',area:'',category:'restaurant',subcategory:'한식',terms:[],preferences:[],benefit:false,recommended:false,nearby:false,visitToday:false,unsupported:[]};
+ const query='오늘 2군에서 여자친구와 갈건데 룸이 있는 한식당 추천해';
+ const intent=api.clarifyIntent(api.validateIntent({...base,terms:['룸'],unsupported:['룸 보유 여부 확인 불가']},'hcmc'),query);
+ assert.equal(intent.district,'2');assert.equal(intent.subcategory,'한식');assert(intent.features.includes('private_room'));assert(intent.visitToday);assert.deepEqual(intent.terms,[]);assert.deepEqual(intent.unsupported,[]);
+ for(const term of ['룸이 있는','별실','프라이빗룸','개별실','private dining room','phòng riêng']){
+  const parsed=api.clarifyIntent({...base,terms:[term,'동태탕']},'2군 '+term+' 한식당');assert(parsed.features.includes('private_room'));assert.deepEqual(parsed.terms,['동태탕']);
+ }
+ assert(!api.clarifyIntent({...base,features:['private_room']},'조용한 한식당').features,'quiet is not proof of a private room');
+ assert(!api.clarifyIntent({...base,category:'stay',subcategory:'',terms:['룸']},'호텔 룸 찾아줘').features,'hotel rooms do not become dining-room amenities');
+ const dom=new JSDOM(read('index.html'),{url:'https://map.test',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window,run=s=>vm.runInContext(s,dom.getInternalVMContext());w.matchMedia=()=>({matches:false});
+ for(const f of fs.readdirSync(path.join(root,'assets/js')).filter(n=>/^0[1-8]-/.test(n)).sort())run(read('assets/js/'+f));
+ for(const f of ['place-photos','ai-google-search','ai-map-search'])run(read('assets/js/'+f+'.js'));
+ const classify=text=>w.AIMapSearch.roomInfo([{label:'회원 후기',text}]).kind;
+ for(const text of ['별실 완비','프라이빗 룸이 있습니다','Private dining rooms are available','Có phòng riêng','룸이 있습니다. 주차장은 없어요.'])assert.equal(classify(text),'confirmed',text);
+ for(const text of ['룸이 없어요','별실은 따로 없습니다','No private dining rooms','We do not have private rooms','Private rooms are unavailable','Không có phòng riêng'])assert.equal(classify(text),'unavailable',text);
+ for(const text of ['룸이 있는지 모르겠어요','프라이빗룸 있나요?','룸 여부 문의 필요','조용한 데이트 맛집','Private room plans are not confirmed','쇼룸 구경했어요'])assert.equal(classify(text),'unknown',text);
+ assert.equal(w.AIMapSearch.roomInfo([{text:'룸이 있어요'},{text:'룸이 없어요'}]).kind,'unknown','conflicting reports cannot establish availability');
+ const member=(id,description='',other={})=>({id,name:id,category:'restaurant',subcategory:'한식',address:'Quận 2, Hồ Chí Minh',lat:10.803,lng:106.732,initialRating:4,description,...other});
+ const data={places:[member('known','별실 완비'),member('unknown','',{initialRating:5,memberBenefit:true,tags:['강추업소']}),member('no-room','룸이 없습니다'),member('wrong-cuisine','별실 완비',{subcategory:'베트남'}),member('wrong-district','별실 완비',{address:'Quận 7, Hồ Chí Minh'}),member('conflict','룸이 있어요')],reviews:[{id:'review-stays',placeId:'conflict',text:'룸이 없어요',rating:4}]};
+ const before=JSON.stringify(data),local=w.AIMapSearch.buildResults(intent,data,null).rows;
+ assert.equal(local[0].place.id,'known','verified amenity precedes higher-rated promoted unknowns');assert.deepEqual(Array.from(local,r=>r.place.id).sort(),['conflict','known','unknown']);
+ assert.equal(w.AIMapSearch.buildResults({...intent,terms:['동태탕']},data,null).rows.length,0,'a room query still cannot relax a required dish');
+ assert.deepEqual(Array.from(w.AIMapSearch.buildResults({...intent,recommended:true,benefit:true},data,null).rows,r=>r.place.id),['unknown'],'community-only constraints remain required even for inquiry leads');
+ const raw=(id,editorialSummary='',other={})=>({id,displayName:id,formattedAddress:'Quận 2, Hồ Chí Minh',location:{lat:10.803,lng:106.732},rating:4.8,userRatingCount:100,businessStatus:'OPERATIONAL',types:['restaurant','korean_restaurant'],editorialSummary,...other});
+ const records=[raw('google-known','Korean dining with private rooms.'),raw('google-unknown'),raw('Google private room name only'),raw('google-no','No private rooms.'),raw('google-other','Private rooms.',{types:['vietnamese_restaurant']}),raw('google-d7','Private rooms.',{formattedAddress:'Quận 7, Hồ Chí Minh'})];
+ const google=w.AIGoogleSearch.rowsFrom(records,intent);assert.equal(google.length,3);assert.equal(google[0].placeId,'google-known');assert.equal(google[1].room.kind,'unknown');
+ let requests=[];w.google={maps:{places:{Place:{searchByText:async r=>{requests.push(r);return {places:r.textQuery.includes('private dining')?[]:records}}}}}};
+ const boundaries=JSON.parse(read('assets/data/admin/hcmc.geojson')).features;
+ const found=await w.AIGoogleSearch.search(intent,{boundaries});assert.equal(found.length,3);assert.equal(requests.length,2,'at most one supplemental search');
+ assert.match(requests[0].textQuery,/private dining room Korean restaurant.*Quận 2/);assert(!requests[1].textQuery.includes('private dining'));
+ for(const request of requests){assert.equal(request.includedType,'korean_restaurant');assert.equal(request.useStrictTypeFiltering,true);assert(request.locationRestriction);assert(request.fields.includes('currentOpeningHours'));assert(request.fields.includes('editorialSummary'));}
+ assert.deepEqual(requests[0].locationRestriction,requests[1].locationRestriction,'supplemental query cannot broaden geography');
+ let finish;requests=[];w.google.maps.places.Place.searchByText=r=>{requests.push(r);return new Promise(resolve=>{finish=resolve})};
+ const controller=new w.AbortController(),pending=w.AIGoogleSearch.search(intent,{signal:controller.signal});controller.abort();await assert.rejects(pending,e=>e.name==='AbortError');finish({places:[]});assert.equal(requests.length,1,'cancel prevents supplemental search');
+ w.google.maps.places.Place.searchByText=async()=>({places:records});
+ w.data=data;run('db=()=>data;state.sharedDbLoading=false;state.city="hcmc";');
+ w.fetch=async url=>({ok:true,json:async()=>String(url).includes('geojson')?{features:boundaries}:{intent}});
+ const input=w.document.getElementById('aiMapQuestion'),form=w.document.getElementById('aiMapForm');input.value=query;input.dispatchEvent(new w.Event('input'));form.dispatchEvent(new w.Event('submit',{cancelable:true}));await new Promise(r=>setTimeout(r,20));
+ assert.match(w.document.getElementById('aiMapTitle').textContent,/룸 안내 2곳 · 문의 필요 4곳/);
+ const cards=[...w.document.querySelectorAll('.aiResult')];assert.equal(cards[0].dataset.placeId,'known');assert.equal(cards[1].dataset.googlePlaceId,'google-known','Google confirmed room precedes member unknown room');
+ assert.equal(w.document.querySelectorAll('#aiRoomUnknownSection .aiResult').length,4);assert.equal(w.document.querySelectorAll('#aiRoomUnknownSection .aiBenefit,#aiRoomUnknownSection .aiRecommended').length,0,'unknown room leads are not promoted as condition-matching recommendations');
+ let selected;w.PlaceSearch={openMember:id=>{selected=id},dismiss(){}};w.document.querySelector('[data-place-id="unknown"]').click();assert.equal(selected,'unknown');assert(w.document.getElementById('aiMapPanel').hidden,'candidate opens details on one click');
+ assert.equal(JSON.stringify(data),before,'search, ranking and opening details preserve places and reviews');dom.window.close();
+ console.log('PASS room parsing, missing versus absent evidence, same-area/cuisine inquiry groups, truthful promotion, bounded Google supplementation, cancellation, direct detail and preserved data');
+})().catch(e=>{console.error(e);process.exitCode=1});

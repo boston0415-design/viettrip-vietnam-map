@@ -69,3 +69,10 @@
 .aiGoogleResults{list-style:none;margin:0;padding:0}
 .aiPanel .aiGoogleStatus{padding:0 3px 10px;font-size:12px;color:#738178}
 .aiRetry{border:1px solid #cdded3;border-radius:10px;min-height:44px;padding:8px 14px;background:#f5f9f6;color:#315e49;cursor:pointer}
+.aiResult .aiRoomInfo{font-size:12px;font-weight:650;line-height:1.5;margin-top:7px;color:#52685b}
+.aiResult .aiRoom-confirmed{color:#246647}
+.aiResult .aiRoom-unknown{color:#85612c}
+#aiRoomUnknownSection{border-top:1px solid #dde6e0;margin-top:14px;padding-top:12px}
+#aiRoomUnknownSection[hidden]{display:none}
+.aiRoomCandidates{list-style:none;margin:0;padding:0}
+.aiPanel .aiRoomExplanation{padding:0 3px 10px;font-size:12px;line-height:1.6;color:#6d7a72}

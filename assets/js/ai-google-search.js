@@ -39,10 +39,10 @@
     const aliases=waxing(term)?['왁싱','waxing','wax long']:[term];
     return [place.displayName,place.editorialSummary].some(value=>aliases.some(alias=>normalize(value).includes(normalize(alias))));
   }
-  function queryFor(intent){
+  function queryFor(intent,includeRoom=true){
     const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':term);
     const specialty=terms.some(waxing);
-    return [...terms,specialty?'':SUBS[intent.subcategory]||CATEGORIES[intent.category]||'',
+    return [includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,specialty?'':SUBS[intent.subcategory]||CATEGORIES[intent.category]||'',
       ...(intent.preferences||[]).filter(p=>['quiet','rooftop'].includes(p)),
       AREAS[intent.area]||intent.area,intent.district?'Quận '+intent.district:'',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
   }
@@ -81,11 +81,18 @@
       if(intent.nearby&&(!nearby||geoDistanceMeters(position,nearby)>nearby.radius))continue;
       const termMatch=!!intent.terms?.length&&intent.terms.every(term=>waxing(term)?/왁싱|waxing|wax long/.test(normalize(place.name)):normalize(place.name).includes(normalize(term)));
       const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',attributions:p.attributions||[]};
+      if(window.AIMapSearch.wantsRoom(intent)){
+        row.room=window.AIMapSearch.roomInfo([{label:'Google 업소 설명',text:p.editorialSummary||''}]);
+        if(row.room.kind==='unavailable')continue;
+        // A search hit or a business name is not proof of a dining room.
+        // Display Google's editorial summary unchanged when it is the evidence.
+        if(row.room.kind==='confirmed')row.room.evidence='Google 업소 설명 · '+p.editorialSummary;
+      }
       if(!row.name||registeredMatch(row,places))continue;
       if(intent.visitToday&&window.AIPlaceHours)row.hours={...window.AIPlaceHours.summarize(p),attributions:row.attributions};
       seen.add(p.id);rows.push(row);
     }
-    return rows.sort((a,b)=>Number(b.termMatch)-Number(a.termMatch)||b.rating-a.rating||b.ratingCount-a.ratingCount||a.name.localeCompare(b.name));
+    return rows.sort((a,b)=>Number(b.room?.kind==='confirmed')-Number(a.room?.kind==='confirmed')||Number(b.termMatch)-Number(a.termMatch)||b.rating-a.rating||b.ratingCount-a.ratingCount||a.name.localeCompare(b.name));
   }
   async function search(intent,{signal,boundaries=[],nearby=null,places=[]}={}){
     if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
@@ -93,21 +100,34 @@
     const Place=window.google?.maps?.places?.Place;
     if(typeof Place?.searchByText!=='function')throw Error('GOOGLE_UNAVAILABLE');
     const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','types','attributions'];
-    if(intent.terms?.length)fields.push('editorialSummary');
+    const roomSearch=window.AIMapSearch.wantsRoom(intent);
+    if(intent.terms?.length||roomSearch)fields.push('editorialSummary');
     if(intent.visitToday)fields.push('currentOpeningHours');
     const bounds=boundsFor(intent,boundaries,nearby);
     const type=includedType(intent);
     const request={textQuery:queryFor(intent),fields,language:'ko',region:'vn',maxResultCount:20,minRating:4,...(type?{includedType:type,useStrictTypeFiltering:true}:{}),
       ...(bounds?{locationRestriction:bounds}:CITY_DATA[intent.city]?.center?{locationBias:{center:CITY_DATA[intent.city].center,radius:50000}}:{})};
-    let timer,abort;
-    try{
-      const result=await Promise.race([Place.searchByText(request),new Promise((_,reject)=>{
+    async function fetchPlaces(textQuery){
+      if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+      let timer,abort;
+      try{
+      const result=await Promise.race([Place.searchByText({...request,textQuery}),new Promise((_,reject)=>{
         timer=setTimeout(()=>reject(Error('GOOGLE_TIMEOUT')),12000);
         abort=()=>reject(new DOMException('Cancelled','AbortError'));signal?.addEventListener('abort',abort,{once:true});
       })]);
       if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
-      return rowsFrom(result.places,intent,{boundaries,nearby,places});
-    }finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}
+      return result.places||[];
+      }finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}
+    }
+    const raw=await fetchPlaces(request.textQuery);
+    let rows=rowsFrom(raw,intent,{boundaries,nearby,places});
+    // One bounded supplemental request prevents sparse amenity search text
+    // hiding the same-area/cuisine inquiry leads. Never loosen type or geography.
+    if(roomSearch&&rows.length<5){
+      try{rows=rowsFrom([...raw,...await fetchPlaces(queryFor(intent,false))],intent,{boundaries,nearby,places});}
+      catch(error){if(error.name==='AbortError'||!rows.length)throw error;}
+    }
+    return rows.slice(0,20);
   }
   window.AIGoogleSearch={search,queryFor,rowsFrom,boundsFor,typeMatches,includedType};
 })();

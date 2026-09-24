@@ -56,6 +56,22 @@
     const start=Math.max(0,index-20),end=Math.min(source.text.length,Math.max(0,index)+term.length+65);
     return source.label+' · '+(start?'…':'')+source.text.slice(start,end)+(end<source.text.length?'…':'');
   }
+  const wantsRoom=intent=>intent.category==='restaurant'&&intent.features?.includes('private_room');
+  function roomInfo(sources){
+    const keyword=/(?:프라이빗\s*|개별\s*|개인\s*|별도\s*|독립\s*|단독\s*|커플\s*|vip\s*)?룸|별실|개인실|개별실|독립실|\bprivate\s+(?:dining\s+)?rooms?\b|\bphong\s+rieng\b/i;
+    let positive=null,negative=false;
+    for(const source of sources){
+      for(const clause of String(source.text||'').split(/[.!?。\n·]/)){
+        const text=normalize(clause),match=text.match(keyword);if(!match||/쇼룸|쇼\s+룸/.test(text))continue;
+        const absent=/(?:룸|별실|개인실|개별실|독립실)(?:은|이|가|도|을)?\s*(?:(?:따로|별도로?|아예|전혀|더는|더 이상)\s*)?(?:없|불가|운영하지|제공하지|이용.{0,5}불가)|(?:no|not|without|never|doesn['’]?t|don['’]?t)\s+(?:(?:have|offer|any|a|longer|available)\s+)*(?:private\s+(?:dining\s+)?rooms?)|private\s+(?:dining\s+)?rooms?.{0,14}(?:unavailable|closed|not available)|khong\s+(?:co\s+)?phong\s+rieng/i;
+        if(absent.test(text)){negative=true;continue;}
+        if(/있는지|있나요|있을까|모르|미확인|확인\s*필요|여부|문의|예정|계획|다른\s*(?:식당|업소)|옆집|맞은편|maybe|unsure|whether|plan(?:ned)?/.test(text))continue;
+        positive ||= {source,term:match[0]};
+      }
+    }
+    if(positive&&!negative)return {kind:'confirmed',evidence:quote(positive.source,positive.term)};
+    return {kind:negative&&!positive?'unavailable':'unknown',evidence:''};
+  }
   function collectCandidates(intent,data,nearby){
     const reviewMap=new Map();
     for(const r of data.reviews||[]){if(!reviewMap.has(r.placeId))reviewMap.set(r.placeId,[]);reviewMap.get(r.placeId).push(r);}
@@ -77,6 +93,8 @@
       const ratingValues=[p.initialRating,...reviews.map(r=>r.rating)].filter(n=>n!=null&&Number.isFinite(Number(n))&&Number(n)>=1&&Number(n)<=5).map(Number);
       const rating=ratingValues.length?ratingValues.reduce((sum,n)=>sum+n,0)/ratingValues.length:null;
       const sources=[{label:'등록 정보',text:[p.name,p.subcategory,(p.tags||[]).join(' '),p.description,p.benefitText].filter(Boolean).join(' · ')},...reviews.filter(r=>r.text).map(r=>({label:'회원 후기',text:String(r.text)}))];
+      const room=wantsRoom(intent)?roomInfo([{label:'등록 정보',text:[...(p.tags||[]),p.description,p.benefitText].filter(Boolean).join(' · ')},...sources.slice(1)]):null;
+      if(room?.kind==='unavailable')continue;
       const evidence=[],missingTerms=[];
       for(const term of intent.terms||[]){
         const source=sources.find(s=>termAliases(term).some(alias=>normalize(s.text).includes(normalize(alias))));
@@ -90,9 +108,9 @@
         const source=sources.find(s=>pref.pattern.test(s.text)&&!/(분위기|데이트|조용).{0,12}(별로|않|없|최악|안 좋)/.test(s.text));
         if(source){preferenceHits.push(key);const word=source.text.match(pref.pattern)?.[0]||pref.label;evidence.push(quote(source,word));}
       }
-      found.push({place:p,evidence:[...new Set(evidence)],missingTerms,preferenceHits,memberRecommendations,registrantRecommended,recommended:memberRecommendations>0||registrantRecommended,rating,ratingCount:ratingValues.length,reviewCount:reviews.filter(r=>r.text?.trim()).length});
+      found.push({place:p,room,evidence:[...new Set(evidence)],missingTerms,preferenceHits,memberRecommendations,registrantRecommended,recommended:memberRecommendations>0||registrantRecommended,rating,ratingCount:ratingValues.length,reviewCount:reviews.filter(r=>r.text?.trim()).length});
     }
-    return found.sort((a,b)=>b.preferenceHits.length-a.preferenceHits.length||Number(b.recommended)-Number(a.recommended)||b.memberRecommendations-a.memberRecommendations||(b.rating??-1)-(a.rating??-1)||b.ratingCount-a.ratingCount||b.reviewCount-a.reviewCount||String(a.place.name).localeCompare(String(b.place.name),'ko'));
+    return found.sort((a,b)=>Number(b.room?.kind==='confirmed')-Number(a.room?.kind==='confirmed')||b.preferenceHits.length-a.preferenceHits.length||Number(b.recommended)-Number(a.recommended)||b.memberRecommendations-a.memberRecommendations||(b.rating??-1)-(a.rating??-1)||b.ratingCount-a.ratingCount||b.reviewCount-a.reviewCount||String(a.place.name).localeCompare(String(b.place.name),'ko'));
   }
   function findMatches(intent,data,nearby){
     return collectCandidates(intent,data,nearby).filter(row=>!row.missingTerms.length&&(!intent.benefit||row.place.memberBenefit)&&(!intent.recommended||row.recommended));
@@ -101,6 +119,16 @@
     // Eligibility comes before member/recommendation/benefit ranking. Never
     // replace a requested cuisine, dish or membership condition with alternatives.
     return {rows:findMatches(intent,data,nearby),fallback:false,missing:[]};
+  }
+  function appendRoomInfo(button,row){
+    if(!row.room)return;
+    const label=document.createElement('span');label.className='aiRoomInfo aiRoom-'+row.room.kind;
+    label.textContent=row.room.kind==='confirmed'?'룸 안내 있음 · 예약 가능 여부 문의':'룸 여부 문의 필요';button.append(label);
+    if(row.room.evidence){const proof=document.createElement('span');proof.className='aiEvidence';proof.textContent=row.room.evidence;button.append(proof);}
+  }
+  function resultTitle(entry){
+    const rows=[...(entry.memberRows||[]),...(entry.google?.rows||[])];
+    title.textContent=wantsRoom(entry.intent)?'룸 안내 '+rows.filter(r=>r.room?.kind==='confirmed').length+'곳 · 문의 필요 '+rows.filter(r=>r.room?.kind==='unknown').length+'곳':'추천 업소 · '+rows.length+'곳';
   }
   const form=byId('aiMapForm'),input=byId('aiMapQuestion'),panel=byId('aiMapPanel'),send=byId('aiMapSend');
   if(!form)return;
@@ -165,6 +193,7 @@
   function renderGoogle(entry){
     const section=byId('aiGoogleSection');if(!section||last!==entry)return;
     section.replaceChildren();
+    const roomSearch=wantsRoom(entry.intent),unknownSection=byId('aiGoogleRoomUnknown');unknownSection?.replaceChildren();
     const heading=document.createElement('h3');heading.className='aiSourceHeading';heading.textContent='Google 지도에서 더 찾기';section.append(heading);
     const message=document.createElement('p');message.className='aiGoogleStatus';message.setAttribute('role','status');section.append(message);
     if(!entry.google){message.textContent='같은 지역의 평점 높은 업소를 찾고 있어요…';return;}
@@ -174,18 +203,27 @@
       retry.addEventListener('click',()=>{entry.google=null;renderGoogle(entry);searchGoogle(entry);});section.append(retry);return;
     }
     const rows=entry.google.rows;
-    message.textContent=rows.length?(entry.intent.terms.length?'업소명에 검색어가 있는 곳 우선 · ':'')+'Google 평점 4점 이상 · 평점, 후기 수 순':'이 지역에서 조건에 맞는 Google 평점 4점 이상 업소를 찾지 못했어요.';
-    if(rows.length)title.textContent='추천 업소 · '+(entry.memberCount+rows.length)+'곳';
+    const confirmed=rows.filter(row=>row.room?.kind==='confirmed'),unknown=rows.filter(row=>row.room?.kind==='unknown');
+    message.textContent=roomSearch?(confirmed.length?'룸 안내를 확인한 Google 업소 · '+confirmed.length+'곳':'Google 정보에서 룸 안내를 확인한 업소는 없어요.'):
+      rows.length?(entry.intent.terms.length?'업소명에 검색어가 있는 곳 우선 · ':'')+'Google 평점 4점 이상 · 평점, 후기 수 순':'이 지역에서 조건에 맞는 Google 평점 4점 이상 업소를 찾지 못했어요.';
+    resultTitle(entry);
     const results=document.createElement('ul');results.className='aiGoogleResults';results.setAttribute('aria-label','Google 지도 추천 업소');section.append(results);
+    let unknownResults;
+    if(roomSearch&&unknown.length&&unknownSection){
+      byId('aiRoomUnknownSection').hidden=false;
+      const caption=document.createElement('h3');caption.className='aiSourceHeading';caption.textContent='Google 지도 · 룸 여부 문의 필요';unknownSection.append(caption);
+      unknownResults=document.createElement('ul');unknownResults.className='aiGoogleResults';unknownResults.setAttribute('aria-label','룸 여부 문의가 필요한 Google 업소');unknownSection.append(unknownResults);
+    }
     for(const row of rows){
       const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='aiResult aiGoogleResult';button.dataset.googlePlaceId=row.placeId;
       const name=document.createElement('strong');name.textContent=row.name;button.append(name);
       const rating=document.createElement('span');rating.className='aiRating';rating.textContent='Google ★ '+row.rating.toFixed(1)+' · 후기 '+row.ratingCount.toLocaleString('ko-KR')+'개';button.append(rating);
       if(entry.intent.subcategory){const cuisine=document.createElement('span');cuisine.className='aiMeta';cuisine.textContent='Google 업종 확인 · '+entry.intent.subcategory;button.append(cuisine);}
       const address=document.createElement('span');address.textContent=row.address;button.append(address);
+      appendRoomInfo(button,row);
       if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
       if(entry.intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b></b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
-      button.addEventListener('click',()=>{close();input.blur();window.PlaceSearch?.openGoogle(row);});li.append(button);results.append(li);
+      button.addEventListener('click',()=>{close();input.blur();window.PlaceSearch?.openGoogle(row);});li.append(button);(row.room?.kind==='unknown'&&unknownResults?unknownResults:results).append(li);
       if(row.hours)showHours(button,row.hours);
       else{
         const credit=document.createElement('div');credit.className='aiHoursAttributions';
@@ -212,14 +250,26 @@
     if(state.sharedDbLoading){status.textContent='등록 업소를 불러오는 중이에요. 잠시 후 질문창을 다시 눌러 주세요.';return;}
     const results=buildResults(intent,db(),state.nearby);
     const {rows}=results;
-    const memberOnly=intent.benefit||intent.recommended;
-    title.textContent='추천 업소 · '+rows.length+'곳';
+    const memberOnly=intent.benefit||intent.recommended,roomSearch=wantsRoom(intent);
+    if(last){last.memberRows=rows;resultTitle(last);}
     status.textContent=scope+(intent.recommended?' · 회원 강추':'')+(intent.benefit?' · 혜택·제휴':'')+(rows.length?'':memberOnly?' — 모든 조건을 충족하는 회원 등록 업소를 찾지 못했어요. 다른 업종이나 혜택 미확인 업소로 대체하지 않습니다.':' — 맞는 회원 등록 업소가 없어 같은 조건으로 Google 지도에서도 찾아볼게요.');
     if(intent.preferences?.length)status.textContent+=' '+intent.preferences.map(key=>PREFERENCES[key]?.label).filter(Boolean).join('·')+' 관련 정보 우선.';
+    if(roomSearch){
+      status.textContent=scope+(intent.recommended?' · 회원 강추':'')+(intent.benefit?' · 혜택·제휴':'')+' — 룸 안내가 있는 곳을 먼저, 룸 정보가 없는 곳은 아래 문의 후보로 구분했어요.';
+      note.textContent='지역·음식 종류는 그대로 적용합니다. ‘룸 여부 문의 필요’는 룸 보유가 확인된 추천이 아닙니다. 룸 안내가 있어도 오늘 예약 가능한지는 업소에 확인해 주세요.';
+    }
     if(intent.visitToday){status.textContent+=' 오늘 영업시간을 확인합니다.';note.textContent+=' 베트남 현지 날짜 기준이며, 당일 변경은 업소에 확인해 주세요.';}
     if(intent.district&&intent.city==='hcmc'&&districtData.length)note.textContent+=' '+intent.district+'군은 기존 행정구역 기준입니다.';
     if(last)last.memberCount=rows.length;
-    if(rows.length){const heading=document.createElement('li');heading.className='aiSourceHeading';heading.textContent='회원 등록 업소 · '+rows.length+'곳';list.append(heading);}
+    const confirmedMembers=rows.filter(row=>row.room?.kind!=='unknown');
+    if(confirmedMembers.length){const heading=document.createElement('li');heading.className='aiSourceHeading';heading.textContent=(roomSearch?'룸 안내 있는 회원 업소':'회원 등록 업소')+' · '+confirmedMembers.length+'곳';list.append(heading);}
+    let unknownSection,unknownList;
+    if(roomSearch){
+      unknownSection=document.createElement('li');unknownSection.id='aiRoomUnknownSection';unknownSection.hidden=!rows.some(row=>row.room?.kind==='unknown');
+      const heading=document.createElement('h3');heading.className='aiSourceHeading';heading.textContent='룸 여부 문의가 필요한 업소';unknownSection.append(heading);
+      const explanation=document.createElement('p');explanation.className='aiRoomExplanation';explanation.textContent=scope+' 조건은 맞지만 룸 정보가 없어 확인이 필요해요.';unknownSection.append(explanation);
+      unknownList=document.createElement('ul');unknownList.className='aiRoomCandidates';unknownSection.append(unknownList);
+    }
     for(const row of rows){
       const {place,evidence}=row;
       const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='aiResult aiMemberResult';button.dataset.placeId=place.id;
@@ -227,24 +277,28 @@
       const badges=document.createElement('span');badges.className='aiBadges';
       const badge=(text,kind)=>{const el=document.createElement('span');el.className='aiBadge '+kind;el.textContent=text;badges.append(el);};
       badge('회원 등록','aiMemberBadge');
-      if(place.memberBenefit)badge('혜택업소','aiBenefit');
-      if(row.memberRecommendations)badge('회원 강추 '+row.memberRecommendations+'명','aiRecommended');
-      if(row.registrantRecommended)badge('등록자 강추','aiRecommended');
+      const promote=row.room?.kind!=='unknown';
+      if(promote&&place.memberBenefit)badge('혜택업소','aiBenefit');
+      if(promote&&row.memberRecommendations)badge('회원 강추 '+row.memberRecommendations+'명','aiRecommended');
+      if(promote&&row.registrantRecommended)badge('등록자 강추','aiRecommended');
       if(badges.childElementCount)button.append(badges);
       const meta=document.createElement('span');meta.className='aiMeta';meta.textContent=[placeRegionLabel(place),CONFIG.categories[place.category]?.label,place.subcategory].filter(Boolean).join(' · ');button.append(meta);
       if(row.rating!=null){const rating=document.createElement('span');rating.className='aiRating';rating.textContent='★ '+row.rating.toFixed(1)+' · 회원 평가 '+row.ratingCount+'개';button.append(rating);}
       const address=document.createElement('span');address.textContent=place.address||'주소 미등록';button.append(address);
+      appendRoomInfo(button,row);
       if(intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b>오늘 영업시간 확인 중…</b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
-      if(place.memberBenefit&&place.benefitText){const benefit=document.createElement('span');benefit.className='aiBenefitCopy';benefit.textContent=place.benefitText;button.append(benefit);}
+      if(promote&&place.memberBenefit&&place.benefitText){const benefit=document.createElement('span');benefit.className='aiBenefitCopy';benefit.textContent=place.benefitText;button.append(benefit);}
       for(const text of evidence.slice(0,2)){const proof=document.createElement('span');proof.className='aiEvidence';proof.textContent=text;button.append(proof);}
       const unconfirmed=[intent.recommended&&!row.recommended?'강추 지정 없음':'',intent.benefit&&!place.memberBenefit?'등록된 혜택 없음':'',...row.missingTerms.map(term=>term+' 정보 미확인'),intent.preferences?.length&&!row.preferenceHits.length?'분위기·방문 목적은 직접 확인해 주세요':''].filter(Boolean);
       if(unconfirmed.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=unconfirmed.join(' · ');button.append(info);}
       button.addEventListener('click',()=>{if(!db().places.some(p=>p.id===place.id)){render(intent);return;}close();input.blur();window.PlaceSearch?.openMember(place.id);});
-      li.append(button);list.append(li);
+      li.append(button);(row.room?.kind==='unknown'&&unknownList?unknownList:list).append(li);
       const result=last?.hours?.get(place.id);if(intent.visitToday&&result)showHours(button,result);
     }
     checkHours(rows,intent);
-    if(window.AIGoogleSearch&&last&&!memberOnly){const section=document.createElement('li');section.id='aiGoogleSection';list.append(section);renderGoogle(last);searchGoogle(last);}
+    if(window.AIGoogleSearch&&last&&!memberOnly){const section=document.createElement('li');section.id='aiGoogleSection';list.append(section);if(unknownList){const slot=document.createElement('li');slot.id='aiGoogleRoomUnknown';unknownList.append(slot);}}
+    if(unknownSection)list.append(unknownSection);
+    if(window.AIGoogleSearch&&last&&!memberOnly){renderGoogle(last);searchGoogle(last);}
   }
   input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.google=null;last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
   input.addEventListener('input',()=>{cancel();last=null;reset();show();});
@@ -274,5 +328,5 @@
     finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}
   });
   syncInput();
-  window.AIMapSearch={findMatches,buildResults,districtMatches,areaMatches,inGeometry,close};
+  window.AIMapSearch={findMatches,buildResults,districtMatches,areaMatches,inGeometry,wantsRoom,roomInfo,close};
 })();
