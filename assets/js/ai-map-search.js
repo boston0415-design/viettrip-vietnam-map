@@ -183,6 +183,8 @@
   }
   function resultTitle(entry){
     const rows=[...(entry.memberRows||[]),...(entry.google?.rows||[])];
+    if(entry.intent.hotelStars){const count=rows.filter(r=>r.insights?.hotelClass?.kind==='confirmed').length;title.textContent=entry.intent.hotelStars+'성급 안내 '+count+'곳 · 성급 문의 '+(rows.length-count)+'곳';return;}
+    if(entry.intent.subcategory==='로컬 KTV'){title.textContent='로컬 등록 '+rows.filter(r=>r.place).length+'곳 · 운영 문의 '+rows.filter(r=>!r.place).length+'곳';return;}
     title.textContent=wantsRoom(entry.intent)?'룸 안내 '+rows.filter(r=>r.room?.kind==='confirmed').length+'곳 · 문의 필요 '+rows.filter(r=>r.room?.kind==='unknown').length+'곳':'추천 업소 · '+rows.length+'곳';
   }
   const form=byId('aiMapForm'),input=byId('aiMapQuestion'),panel=byId('aiMapPanel'),send=byId('aiMapSend');
@@ -273,7 +275,7 @@
       const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='aiResult aiGoogleResult';button.dataset.googlePlaceId=row.placeId;
       const name=document.createElement('strong');name.textContent=row.name;button.append(name);
       const rating=document.createElement('span');rating.className='aiRating';rating.textContent='Google ★ '+row.rating.toFixed(1)+' · 후기 '+row.ratingCount.toLocaleString('ko-KR')+'개';button.append(rating);
-      if(entry.intent.subcategory){const cuisine=document.createElement('span');cuisine.className='aiMeta';cuisine.textContent=(row.cuisineByMenu?'메뉴 안내 확인 · ':'Google 업종 확인 · ')+entry.intent.subcategory;button.append(cuisine);}
+      if(entry.intent.subcategory){const cuisine=document.createElement('span');cuisine.className='aiMeta';cuisine.textContent=entry.intent.subcategory==='로컬 KTV'?'가라오케 · 로컬 운영 여부 미확인':(row.cuisineByMenu?'메뉴 안내 확인 · ':'Google 업종 확인 · ')+entry.intent.subcategory;button.append(cuisine);}
       const address=document.createElement('span');address.textContent=row.address;button.append(address);
       appendRoomInfo(button,row);
       window.AISearchInsights?.append(button,row,entry.intent);
@@ -293,9 +295,15 @@
   }
   function finishRanking(entry){
     list.classList.remove('aiRankingPending');
+    entry.memberRows=(entry.memberRows||[]).filter(row=>{
+      if(row.insights?.hotelClass?.kind!=='different')return true;
+      [...list.querySelectorAll('.aiMemberResult')].find(b=>b.dataset.placeId===row.place.id)?.parentElement.remove();return false;
+    });
+    resultTitle(entry);
     for(const row of entry.memberRows||[]){
       const button=[...list.querySelectorAll('.aiMemberResult')].find(b=>b.dataset.placeId===row.place.id);if(!button)continue;
-      button.querySelectorAll('.aiPrice,.aiHotelClass,.aiAudienceInfo,.aiEnrichedProof').forEach(n=>n.remove());
+      button.querySelectorAll('.aiPrice,.aiHotelClass,.aiAudienceInfo,.aiBudgetInfo,.aiEnrichedProof').forEach(n=>n.remove());
+      if(entry.intent.hotelStars&&row.insights?.hotelClass?.kind!=='confirmed')button.querySelectorAll('.aiBenefit,.aiRecommended,.aiBenefitCopy').forEach(n=>n.remove());
       window.AISearchInsights?.append(button,row,entry.intent);
       for(const proof of row.insights?.proofs||[]){const p=document.createElement('span');p.className='aiEvidence aiEnrichedProof';p.textContent=proof.evidence;button.append(p);if(proof.source.review)appendReviewAttribution(button.parentElement,proof.source.review);}
       for(const a of row.insights?.attributions||[]){const uri=googlePhotoSafeUrl(a.providerURI);if(uri&&a.provider){const link=document.createElement('a');link.className='aiHoursAttributions';link.href=uri;link.target='_blank';link.rel='noopener noreferrer';link.textContent=a.provider;button.parentElement.append(link);}}
@@ -338,11 +346,11 @@
     const memberOnly=intent.benefit||intent.recommended,roomSearch=wantsRoom(intent);
     if(last){last.memberRows=rows;resultTitle(last);}
     status.textContent=scope+(intent.recommended?' · 회원 강추':'')+(intent.benefit?' · 혜택·제휴':'')+(rows.length?'':memberOnly?' — 모든 조건을 충족하는 회원 등록 업소를 찾지 못했어요. 다른 업종이나 혜택 미확인 업소로 대체하지 않습니다.':' — 맞는 회원 등록 업소가 없어 같은 조건으로 Google 지도에서도 찾아볼게요.');
-    if(intent.preferences?.length)status.textContent+=' '+intent.preferences.map(key=>PREFERENCES[key]?.label).filter(Boolean).join('·')+' 관련 정보 우선.';
+    const preferenceLabels=(intent.preferences||[]).map(key=>PREFERENCES[key]?.label).filter(Boolean);if(preferenceLabels.length)status.textContent+=' '+preferenceLabels.join('·')+' 관련 정보 우선.';
     if(intent.sortBy)status.textContent+=' '+(window.AISearchInsights?.sortLabel(intent)||'');
-    if(intent.budget){status.textContent+=' 요청 예산 '+window.AISearchInsights?.formatMoney({amount:intent.budget.amount,currency:intent.budget.currency})+'.';note.textContent+=' 인원·이용시간·포함 항목에 따라 총액이 달라져 예산 충족 여부는 업소에 확인해야 합니다.';}
+    if(intent.budget){status.textContent+=' 요청 예산 '+window.AISearchInsights?.formatMoney({amount:intent.budget.amount,currency:intent.budget.currency})+'. 표시 가격은 일행 전체 이용 총액이 아닐 수 있어요.';note.textContent+=' 인원·이용시간·포함 항목에 따라 총액이 달라져 예산 충족 여부는 업소에 확인해야 합니다.';}
     if(intent.showPrice||intent.sortBy==='cheap')note.textContent+=' 가격대는 Google 참고 정보이며, 통화·금액 형식이 다른 가격은 직접 환산하지 않습니다. 미확인 가격은 추정하지 않습니다.';
-    if(intent.hotelStars)note.textContent+=' 호텔 '+intent.hotelStars+'성급과 이용자 별점은 다른 기준입니다. 성급 미확인 후보는 예약 전 확인하세요.';
+    if(intent.hotelStars){status.textContent+=' '+intent.hotelStars+'성급 안내가 있는 곳 우선, 성급 미확인 업소는 문의 후보로 표시합니다.';note.textContent+=' 호텔 '+intent.hotelStars+'성급과 이용자 별점은 다른 기준입니다. 성급 미확인 후보는 예약 전 확인하세요.';}
     if(roomSearch){
       status.textContent=scope+(intent.recommended?' · 회원 강추':'')+(intent.benefit?' · 혜택·제휴':'')+' — 룸 안내가 있는 곳을 먼저, 룸 정보가 없는 곳은 아래 문의 후보로 구분했어요.';
       note.textContent='지역·음식 종류는 그대로 적용합니다. ‘룸 여부 문의 필요’는 룸 보유가 확인된 추천이 아닙니다. 룸 안내가 있어도 오늘 예약 가능한지는 업소에 확인해 주세요.';
@@ -366,7 +374,7 @@
       const badges=document.createElement('span');badges.className='aiBadges';
       const badge=(text,kind)=>{const el=document.createElement('span');el.className='aiBadge '+kind;el.textContent=text;badges.append(el);};
       badge('회원 등록','aiMemberBadge');
-      const promote=row.room?.kind!=='unknown';
+      const promote=row.room?.kind!=='unknown'&&(!intent.hotelStars||row.insights?.hotelClass?.kind==='confirmed');
       if(promote&&place.memberBenefit)badge('혜택업소','aiBenefit');
       if(promote&&row.memberRecommendations)badge('회원 강추 '+row.memberRecommendations+'명','aiRecommended');
       if(promote&&row.registrantRecommended)badge('등록자 강추','aiRecommended');
@@ -379,7 +387,7 @@
       if(intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b>오늘 영업시간 확인 중…</b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
       if(promote&&place.memberBenefit&&place.benefitText){const benefit=document.createElement('span');benefit.className='aiBenefitCopy';benefit.textContent=place.benefitText;button.append(benefit);}
       for(const text of evidence.slice(0,2)){const proof=document.createElement('span');proof.className='aiEvidence';proof.textContent=text;button.append(proof);}
-      const unconfirmed=[intent.recommended&&!row.recommended?'강추 지정 없음':'',intent.benefit&&!place.memberBenefit?'등록된 혜택 없음':'',...row.missingTerms.map(term=>term+' 정보 미확인'),intent.preferences?.length&&!row.preferenceHits.length?'분위기·방문 목적은 직접 확인해 주세요':''].filter(Boolean);
+      const unconfirmed=[intent.recommended&&!row.recommended?'강추 지정 없음':'',intent.benefit&&!place.memberBenefit?'등록된 혜택 없음':'',...row.missingTerms.map(term=>term+' 정보 미확인'),intent.preferences?.some(key=>PREFERENCES[key])&&!row.preferenceHits.length?'분위기·방문 목적은 직접 확인해 주세요':''].filter(Boolean);
       if(unconfirmed.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=unconfirmed.join(' · ');button.append(info);}
       button.addEventListener('click',()=>{if(!db().places.some(p=>p.id===place.id)){render(intent);return;}close();input.blur();window.PlaceSearch?.openMember(place.id);});
       li.append(button);(row.room?.kind==='unknown'&&unknownList?unknownList:list).append(li);

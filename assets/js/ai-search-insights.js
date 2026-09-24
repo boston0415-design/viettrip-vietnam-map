@@ -58,8 +58,12 @@
     if(intent.sortBy==='cheap'){
       const ap=aa.price||{},bp=bb.price||{};
       const known=Number(!!bp.known)-Number(!!ap.known);if(known)return known;
-      if(ap.level!=null&&bp.level!=null&&ap.level!==bp.level)return ap.level-bp.level;
-      if(ap.currency&&ap.currency===bp.currency&&Number.isFinite(ap.low)&&Number.isFinite(bp.low)&&ap.low!==bp.low)return ap.low-bp.low;
+      const amount=p=>!!p.currency&&Number.isFinite(p.low),an=amount(ap),bn=amount(bp);
+      if(an!==bn)return Number(bn)-Number(an);
+      if(an&&bn){
+        if(ap.currency!==bp.currency)return Number(bp.currency==='VND')-Number(ap.currency==='VND')||ap.currency.localeCompare(bp.currency);
+        if(ap.low!==bp.low)return ap.low-bp.low;
+      }else if(ap.level!=null&&bp.level!=null&&ap.level!==bp.level)return ap.level-bp.level;
     }
     if(intent.sortBy==='atmosphere'){
       const hit=(bb.preferenceHits?.length??b.preferenceHits?.length??0)-(aa.preferenceHits?.length??a.preferenceHits?.length??0);if(hit)return hit;
@@ -70,10 +74,11 @@
     if(intent.sortBy&&ac!==bc)return bc-ac;
     return 0;
   }
-  const sortLabel=intent=>({cheap:'확인된 낮은 가격 우선 · 가격 미확인은 뒤에 표시',atmosphere:'요청한 분위기 관련 근거 우선',popular:'후기 수 많은 순 · 유명도 확정은 아님',top_rated:'이용자 평점 높은 순 · 같은 평점은 후기 수 순'}[intent.sortBy]||'');
+  const sortLabel=intent=>({cheap:'확인된 금액 낮은 순 · 금액 없는 곳은 가격 수준순 · 미확인은 마지막',atmosphere:'요청한 분위기 관련 근거 우선',popular:'후기 수 많은 순 · 유명도 확정은 아님',top_rated:'이용자 평점 높은 순 · 같은 평점은 후기 수 순'}[intent.sortBy]||'');
   function append(button,row,intent){
     const info=row.insights||{},p=info.price;
     if(p?.known||intent.showPrice){const line=document.createElement('span');line.className='aiPrice';line.textContent=p?.known?p.source+' · '+p.label:'가격 정보 미확인 · 업소에 문의';button.append(line);}
+    if(intent.budget){const line=document.createElement('span');line.className='aiAlternativeNote aiBudgetInfo';line.textContent='일행 전체 총액·포함 항목 미확인 · 예산에 맞는지 문의 필요';button.append(line);}
     if(info.hotelClass){const line=document.createElement('span');line.className='aiAlternativeNote aiHotelClass';line.textContent=info.hotelClass.kind==='confirmed'?info.hotelClass.stars+'성급 안내 있음 · 예약 전 확인':info.hotelClass.stars+'성급 여부 미확인 · 이용자 별점과 별개';button.append(line);}
     if(intent.subcategory==='로컬 KTV'&&!row.place){const line=document.createElement('span');line.className='aiAlternativeNote aiAudienceInfo';line.textContent='로컬 운영 여부·총 이용금액은 업소에 확인해 주세요.';button.append(line);}
   }

@@ -19,6 +19,9 @@ const {JSDOM}=require('jsdom'),root=path.join(__dirname,'..'),read=p=>fs.readFil
  assert.equal(I.price({priceRange:{startPrice:{units:'50000',currencyCode:'VND'},endPrice:{units:'100000',currencyCode:'VND'}}}).label,'50,000 VND–100,000 VND');
  assert.equal(I.price({priceRange:{startPrice:{units:'100',currencyCode:'USD'},endPrice:{units:'1',currencyCode:'USD'}}}).known,false);
  assert.equal(I.price({priceLevel:'INEXPENSIVE'}).label,'저렴');assert.equal(I.price({priceLevel:'VeryExpensive'}).label,'매우 높은 가격대');assert.equal(I.price({}).known,false);
+ const priced=(low,currency='VND',level=null)=>({insights:{price:{known:true,low,currency,level}}});
+ const mixed=[priced(100,'VND',1),priced(50,'VND',2),priced(75),{insights:{price:{known:true,level:1}}},priced(2,'USD'),{insights:{price:{known:false}}}];
+ for(const a of mixed)for(const b of mixed)for(const c of mixed)if(I.compare(a,b,cheap)<=0&&I.compare(b,c,cheap)<=0)assert(I.compare(a,c,cheap)<=0,'mixed price formats have a consistent order');
  assert.equal(I.hotelInfo([{label:'Google 후기',text:'평점 4점, 호텔 좋았어요'}],4).kind,'unknown');assert.equal(I.hotelInfo([{label:'등록 정보',text:'3성급 호텔'}],4).kind,'different');
  assert.equal(I.preferenceEvidence([{label:'회원 후기',text:'분위기가 별로였고 시끄러웠어요'}],atmosphere).hits.length,0);
  assert.equal(I.preferenceEvidence([{label:'Google 후기',text:'Great atmosphere and lovely interior.'}],atmosphere).hits.length,1);
@@ -31,6 +34,10 @@ const {JSDOM}=require('jsdom'),root=path.join(__dirname,'..'),read=p=>fs.readFil
  assert.match(w.AIGoogleSearch.queryFor(banh),/banh mi/);assert.equal(w.AIGoogleSearch.includedType(bakery),'bakery');assert.match(w.AIGoogleSearch.queryFor(rental),/motorbike rental/);assert.match(w.AIGoogleSearch.queryFor(hotel),/4 star hotel/);
  const wrongHotel=raw('hotel','3 star Hotel',{types:['hotel','lodging'],editorialSummary:'3-star hotel'});assert.equal(w.AIGoogleSearch.rowsFrom([wrongHotel],hotel).length,0);
  const uncertainHotel=raw('hotel','Hotel',{types:['hotel','lodging'],rating:4});assert.equal(w.AIGoogleSearch.rowsFrom([uncertainHotel],hotel)[0].insights.hotelClass.kind,'unknown');
+ const boss={id:'boss',name:'BOSS Restaurant & KTV',address:'27-29-31 Đ. số 9A, Hồ Chí Minh',...position};
+ const bossGoogle=raw('boss-google',boss.name,{formattedAddress:boss.address});
+ assert.equal(w.AIGoogleSearch.rowsFrom([bossGoogle],cheap,{places:[boss]}).length,0,'same name, numbered street and nearby pin deduplicates');
+ assert.equal(w.AIGoogleSearch.rowsFrom([bossGoogle],cheap,{places:[{...boss,address:'29 Đ. số 9A, Hồ Chí Minh'}]}).length,1,'different street number keeps separate branches');
  w.data=data;run('db=()=>data;state.sharedDbLoading=false;state.city="hcmc";');let current=cheap;w.fetch=async()=>({ok:true,json:async()=>({intent:current})});
  const input=w.document.getElementById('aiMapQuestion'),form=w.document.getElementById('aiMapForm'),list=w.document.getElementById('aiMapResults');
  const submit=async text=>{input.value=text;input.dispatchEvent(new w.Event('input'));form.dispatchEvent(new w.Event('submit',{cancelable:true}));await new Promise(r=>setTimeout(r,25));};
@@ -38,7 +45,8 @@ const {JSDOM}=require('jsdom'),root=path.join(__dirname,'..'),read=p=>fs.readFil
  input.focus();await new Promise(r=>setTimeout(r,5));assert.equal(w.document.querySelector('.aiResult').dataset.googlePlaceId,'cheap','focus preserves prices and sorting');assert.match(w.document.querySelector('[data-place-id="local"] .aiPrice').textContent,/높은 가격대/);
  current=atmosphere;await submit('분위기 좋은 식당');assert.equal(w.document.querySelector('.aiResult').dataset.googlePlaceId,'mood');assert.match(list.textContent,/Great atmosphere/);
  current=ferry;await submit('호치민에서 푸꿕 배편');assert.equal(w.document.querySelectorAll('.aiTravelAnswer a').length,2);assert.match(list.textContent,/하띠엔/);assert(!list.textContent.includes('찾고 싶은 업소'));
- current=budget;records.splice(0,records.length,raw('karaoke','Karaoke Test',{types:['karaoke']}));await submit('로컬 가라오케 500만동');assert.equal(w.document.querySelectorAll('.aiResult').length,1);assert.match(w.document.getElementById('aiMapNote').textContent,/총액/);assert.match(list.textContent,/가격 정보 미확인/);
+ current=budget;records.splice(0,records.length,raw('karaoke','Karaoke Test',{types:['karaoke']}));await submit('로컬 가라오케 500만동');assert.equal(w.document.querySelectorAll('.aiResult').length,1);assert.match(w.document.getElementById('aiMapNote').textContent,/총액/);assert.match(list.textContent,/가격 정보 미확인/);assert.match(list.textContent,/로컬 운영 여부 미확인/);assert(!list.textContent.includes('Google 업종 확인 · 로컬 KTV'));
+ w.data={places:[{...data.places[0],category:'stay',subcategory:'호텔'}],reviews:[]};current=hotel;records.splice(0,records.length,raw('g-local','회원 등록 식당',{types:['hotel'],editorialSummary:'3-star hotel'}),uncertainHotel);await submit('1군 4성급 호텔');assert.equal(w.document.querySelectorAll('.aiMemberResult').length,0,'incompatible star class discovered during enrichment removes candidate');assert.match(w.document.getElementById('aiMapTitle').textContent,/4성급 안내 0곳 · 성급 문의 1곳/);input.focus();assert.equal(w.document.querySelectorAll('.aiMemberResult').length,0,'refocus cannot restore incompatible candidate');w.data=data;
  let finish;w.AIGoogleSearch.search=()=>new Promise(r=>{finish=r});current=cheap;await submit('저렴한 식당 찾기');input.value='다른 질문';input.dispatchEvent(new w.Event('input'));finish(rows);await new Promise(r=>setTimeout(r,10));assert.equal(w.document.querySelectorAll('.aiResult').length,0,'late ranking response cannot replace edited query');
  assert.equal(JSON.stringify(data),before);dom.window.close();
  console.log('PASS six screenshot intents, price ranges and unknowns, hotel stars separate from ratings, budget inquiry, global intent ranking, repeat focus, stale cancellation and preserved reviews');

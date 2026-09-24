@@ -30,6 +30,7 @@
     if(intent.subcategory==='베이커리')return types.includes('bakery');
     if(intent.subcategory==='호텔')return types.includes('hotel')||types.includes('lodging');
     if(intent.subcategory==='로컬 KTV'&&/한인|한국식|korean karaoke|일본식|japanese karaoke|중국식|chinese karaoke/i.test([place.displayName,place.editorialSummary].join(' ')))return false;
+    if(intent.category==='karaoke')return types.includes('karaoke')||/karaoke|가라오케|\bktv\b|노래방/i.test(place.displayName||'');
     if(intent.category==='restaurant'&&intent.subcategory){
       const cuisine=CUISINES[intent.subcategory];
       if(!cuisine)return false;
@@ -69,9 +70,18 @@
   }
   function registeredMatch(row,places){
     const raw={place_id:row.placeId,name:row.name,formatted_address:row.address,geometry:{location:row.position}};
+    // Numeric street names (e.g. Đường số 9A) have no name tokens in the
+    // photo matcher. Exact name + numbered street + a close pin is sufficient
+    // for search deduplication, without changing photo/branch selection rules.
+    const exactBranch=p=>{
+      if(typeof googlePhotoText!=='function'||googlePhotoText(p.name)!==googlePhotoText(row.name))return false;
+      const a=googlePhotoText(String(p.address||'').split(',')[0]),b=googlePhotoText(String(row.address||'').split(',')[0]);
+      const position=googlePhotoPosition(p);
+      return a.length>=5&&/\d/.test(a)&&a===b&&position&&geoDistanceMeters(position,row.position)<=100;
+    };
     return places.find(p=>p.googlePlaceId===row.placeId||
       (typeof googlePhotoSavedId==='function'&&googlePhotoSavedId(googlePhotoKey(p))===row.placeId)||
-      (typeof googlePhotoBranchMatches==='function'&&googlePhotoBranchMatches(p,raw)))||null;
+      (typeof googlePhotoBranchMatches==='function'&&googlePhotoBranchMatches(p,raw))||exactBranch(p))||null;
   }
   function rowsFrom(raw,intent,{boundaries=[],nearby=null,places=[],memberUpdates=new Map()}={}){
     // Google cannot establish community-only endorsements or partner benefits.
