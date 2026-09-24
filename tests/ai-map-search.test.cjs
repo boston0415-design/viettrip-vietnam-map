@@ -18,7 +18,7 @@ const intent={relevant:true,city:'hcmc',district:'1',area:'',preferences:[],visi
  const hanoi=api.clarifyIntent(wrong,'하노이에서 회원들이 강추한 식당 찾아줘');
  assert.equal(hanoi.relevant,true);assert.equal(hanoi.city,'hanoi');assert.equal(hanoi.category,'restaurant');assert.equal(hanoi.recommended,true);
  const date=api.clarifyIntent(wrong,'오늘 여자친구와 갈만한 1군에서 분위기 좋은 바를 찾아줘');
- assert.equal(date.category,'bar');assert.equal(date.district,'1');assert(date.preferences.includes('date'));assert(date.preferences.includes('atmosphere'));assert(date.visitToday);
+ assert.equal(date.category,'bar');assert.equal(date.subcategory,'바');assert.equal(date.district,'1');assert(date.preferences.includes('date'));assert(date.preferences.includes('atmosphere'));assert(date.visitToday);
 
  const dom=new JSDOM(read('index.html'),{url:'https://map.test',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window,ctx=dom.getInternalVMContext();
  const run=s=>vm.runInContext(s,ctx);w.assert=assert;w.matchMedia=()=>({matches:false});
@@ -46,7 +46,7 @@ const intent={relevant:true,city:'hcmc',district:'1',area:'',preferences:[],visi
    const menu=AIMapSearch.buildResults({...wanted,recommended:false,terms:['동태탕']},data,null);assert(menu.fallback);assert(menu.rows.every(row=>row.missingTerms.includes('동태탕')));
    assert.equal(AIMapSearch.buildResults({...wanted,district:'1'},data,null).rows.length,0,'never silently broaden district');
    const bars={places:[{id:'plain',name:'먼저 나온 바',category:'bar',area:'호치민',lat:10.77,lng:106.7,initialRating:5},{id:'mood',name:'분위기 바',category:'bar',area:'호치민',lat:10.77,lng:106.7,description:'분위기가 좋고 데이트하기 좋아요.',initialRating:4}],reviews:[]};
-   const ranked=AIMapSearch.buildResults({...intent,district:'',category:'bar',subcategory:'',terms:[],preferences:['date','atmosphere']},bars,null);assert.equal(ranked.rows.length,2);assert.equal(ranked.rows[0].place.id,'mood');
+   const ranked=AIMapSearch.buildResults({...intent,district:'',category:'bar',subcategory:'',terms:[],preferences:['date','atmosphere']},bars,null);assert.equal(ranked.rows.length,2);assert.equal(ranked.rows[0].place.id,'mood');bars.places.push({id:'club',name:'클럽',category:'bar',subcategory:'클럽',area:'호치민',lat:10.77,lng:106.7,initialRating:5});assert.equal(AIMapSearch.buildResults({...intent,district:'',category:'bar',subcategory:'바',terms:[]},bars,null).rows.length,2,'a bar request does not become a nightclub list');
  `);
  const boundaries=JSON.parse(read('assets/data/admin/hcmc.geojson')).features;w.boundaries=boundaries;
  run(`assert(AIMapSearch.districtMatches({address:'Lê Thánh Tôn, Sài Gòn, Hồ Chí Minh',area:'호치민',lat:10.779,lng:106.702},'1',boundaries),'new ward address is matched through historical district geometry');assert(!AIMapSearch.districtMatches({address:'Quận 11, Hồ Chí Minh',lat:10.779,lng:106.702},'1',boundaries),'explicit conflicting district is never overwritten');assert(!AIMapSearch.districtMatches({address:'Thảo Điền, Hồ Chí Minh',lat:10.803,lng:106.732},'1',boundaries));`);

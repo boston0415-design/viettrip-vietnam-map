@@ -63,7 +63,10 @@
       if(!CONFIG.categories[p.category]||p.subcategory==='프라이빗룸')continue;
       if(intent.city!=='all'&&placeCityKey(p)!==intent.city)continue;
       if(intent.category&&p.category!==intent.category)continue;
-      if(intent.subcategory&&normalizedRestaurantSub(p.subcategory)!==intent.subcategory)continue;
+      if(intent.subcategory){
+        if(intent.category==='bar'&&intent.subcategory==='바'){if(p.subcategory==='클럽')continue;}
+        else if((p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)!==intent.subcategory)continue;
+      }
       if(!districtMatches(p,intent.district)||!areaMatches(p,intent.area))continue;
       if(intent.nearby&&(!nearby||!validMapLocation(p)||geoDistanceMeters(nearby,p)>nearby.radius))continue;
       const reviews=reviewMap.get(p.id)||[];
