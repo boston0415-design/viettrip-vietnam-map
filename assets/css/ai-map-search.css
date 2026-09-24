@@ -59,3 +59,13 @@
 .aiResult .aiHours .aiHoursSource{font-size:10px;font-weight:400;opacity:.85}
 
 .aiHoursAttributions{font-size:10px;color:#6d7d76;padding:0 8px 6px;display:flex;gap:6px}
+
+/* Member contributions lead; Google discoveries stay visually distinct. */
+.aiMemberResult{background:#edf5f0;border-color:#ccdfd3}
+.aiMemberResult:hover,.aiMemberResult:focus-visible{background:#e3efe7}
+.aiResult .aiMemberBadge{background:#dbeadf;color:#315e49}
+.aiSourceHeading{font:650 12px/1.5 system-ui,sans-serif;color:#476456;margin:7px 3px 9px;padding:0}
+#aiGoogleSection{padding-top:8px;margin-top:8px;border-top:1px solid #e5ece7}
+.aiGoogleResults{list-style:none;margin:0;padding:0}
+.aiPanel .aiGoogleStatus{padding:0 3px 10px;font-size:12px;color:#738178}
+.aiRetry{border:1px solid #cdded3;border-radius:10px;min-height:44px;padding:8px 14px;background:#f5f9f6;color:#315e49;cursor:pointer}

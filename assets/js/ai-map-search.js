@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const byId=id=>document.getElementById(id);
-  const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').toLowerCase().replace(/\s+/g,' ').trim();
+  const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').normalize('NFC').toLowerCase().replace(/\s+/g,' ').trim();
   const PREFERENCES={
     date:{label:'데이트',pattern:/데이트|연인|커플|romantic|date night/i},
     atmosphere:{label:'분위기',pattern:/분위기.{0,8}(좋|괜찮|멋|최고)|좋.{0,8}분위기|감성|아늑|분위기 맛집|atmosphere|ambien/i},
@@ -10,6 +10,7 @@
     rooftop:{label:'루프탑',pattern:/루프탑|rooftop|roof top/i}
   };
   const AREA_ALIASES=[['푸미흥','phu my hung'],['타오디엔','thao dien'],['호안끼엠','hoan kiem'],['미딩','my dinh'],['서호','tay ho'],['부이비엔','bui vien'],['레탄톤','le thanh ton']];
+  const termAliases=term=>/왁싱|waxing/i.test(term)?['왁싱','waxing','wax lông']:[term];
   let districtData=[];
   function inRing(point,ring){
     let inside=false;
@@ -62,7 +63,8 @@
     for(const p of data.places||[]){
       if(!CONFIG.categories[p.category]||p.subcategory==='프라이빗룸')continue;
       if(intent.city!=='all'&&placeCityKey(p)!==intent.city)continue;
-      if(intent.category&&p.category!==intent.category)continue;
+      const needsWaxing=(intent.terms||[]).some(term=>/왁싱|waxing/i.test(term));
+      if(intent.category&&p.category!==intent.category&&!(needsWaxing&&['spa','barber'].includes(p.category)))continue;
       if(intent.subcategory){
         if(intent.category==='bar'&&intent.subcategory==='바'){if(p.subcategory==='클럽')continue;}
         else if((p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)!==intent.subcategory)continue;
@@ -77,9 +79,11 @@
       const sources=[{label:'등록 정보',text:[p.name,p.subcategory,(p.tags||[]).join(' '),p.description,p.benefitText].filter(Boolean).join(' · ')},...reviews.filter(r=>r.text).map(r=>({label:'회원 후기',text:String(r.text)}))];
       const evidence=[],missingTerms=[];
       for(const term of intent.terms||[]){
-        const source=sources.find(s=>normalize(s.text).includes(normalize(term)));
-        if(source)evidence.push(quote(source,term));else missingTerms.push(term);
+        const source=sources.find(s=>termAliases(term).some(alias=>normalize(s.text).includes(normalize(alias))));
+        if(source)evidence.push(quote(source,termAliases(term).find(alias=>normalize(source.text).includes(normalize(alias)))));else missingTerms.push(term);
       }
+      // A general massage/barber business is not evidence of a waxing service.
+      if(needsWaxing&&missingTerms.some(term=>/왁싱|waxing/i.test(term)))continue;
       const preferenceHits=[];
       for(const key of intent.preferences||[]){
         const pref=PREFERENCES[key];if(!pref)continue;
@@ -105,7 +109,7 @@
   }
   const form=byId('aiMapForm'),input=byId('aiMapQuestion'),panel=byId('aiMapPanel'),send=byId('aiMapSend');
   if(!form)return;
-  let controller=null,hoursController=null,revision=0,last=null;
+  let controller=null,hoursController=null,googleController=null,revision=0,last=null;
   const clear=byId('aiMapClear');
   const status=byId('aiMapStatus'),list=byId('aiMapResults'),examples=byId('aiMapExamples'),title=byId('aiMapTitle');
   function fitPanel(){
@@ -116,9 +120,9 @@
   }
   function show(){panel.hidden=false;input.setAttribute('aria-expanded','true');fitPanel();}
   function syncInput(){send.disabled=!!controller||input.value.trim().length<2;if(clear)clear.hidden=!input.value;}
-  function cancel(){revision++;controller?.abort();hoursController?.abort();controller=null;hoursController=null;syncInput();form.removeAttribute('aria-busy');}
+  function cancel(){revision++;controller?.abort();hoursController?.abort();googleController?.abort();controller=null;hoursController=null;googleController=null;syncInput();form.removeAttribute('aria-busy');}
   function close(){cancel();panel.hidden=true;input.setAttribute('aria-expanded','false');}
-  function reset(){list.replaceChildren();examples.hidden=false;status.textContent='예시를 누르면 바로 찾아드려요. 직접 질문해도 좋아요.';title.textContent='이렇게 물어보세요';byId('aiMapNote').textContent='등록 정보와 회원 후기를 찾아요.';}
+  function reset(){list.replaceChildren();examples.hidden=false;status.textContent='예시를 누르면 바로 찾아드려요. 직접 질문해도 좋아요.';title.textContent='이렇게 물어보세요';byId('aiMapNote').textContent='회원 등록 업소를 먼저, Google 지도 업소를 함께 찾아요.';}
   function waitForPlaces(signal){
     if(!state.sharedDbLoading)return Promise.resolve();
     status.textContent='등록 업소를 불러오고 있어요. 준비되면 결과를 바로 보여드릴게요.';
@@ -163,9 +167,49 @@
       // list as hours arrive. This preserves direct selection on every row.
     }}).catch(()=>{}).finally(()=>{if(hoursController===work)hoursController=null;});
   }
+  function renderGoogle(entry){
+    const section=byId('aiGoogleSection');if(!section||last!==entry)return;
+    section.replaceChildren();
+    const heading=document.createElement('h3');heading.className='aiSourceHeading';heading.textContent='Google 지도에서 더 찾기';section.append(heading);
+    const message=document.createElement('p');message.className='aiGoogleStatus';message.setAttribute('role','status');section.append(message);
+    if(!entry.google){message.textContent='같은 지역의 평점 높은 업소를 찾고 있어요…';return;}
+    if(entry.google.error){
+      message.textContent='Google 검색에 연결하지 못했어요. 등록 업소는 계속 볼 수 있어요.';
+      const retry=document.createElement('button');retry.type='button';retry.className='aiRetry';retry.textContent='Google 검색 다시 시도';
+      retry.addEventListener('click',()=>{entry.google=null;renderGoogle(entry);searchGoogle(entry);});section.append(retry);return;
+    }
+    const rows=entry.google.rows;
+    message.textContent=rows.length?'Google 평점 4점 이상 · 평점, 후기 수 순':'이 지역에서 조건에 맞는 Google 평점 4점 이상 업소를 찾지 못했어요.';
+    if(entry.intent.benefit||entry.intent.recommended)message.textContent+=' 카페 혜택·회원 강추 여부는 확인되지 않은 업소입니다.';
+    if(rows.length)title.textContent='추천 업소 · '+(entry.memberCount+rows.length)+'곳';
+    const results=document.createElement('ul');results.className='aiGoogleResults';results.setAttribute('aria-label','Google 지도 추천 업소');section.append(results);
+    for(const row of rows){
+      const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='aiResult aiGoogleResult';button.dataset.googlePlaceId=row.placeId;
+      const name=document.createElement('strong');name.textContent=row.name;button.append(name);
+      const rating=document.createElement('span');rating.className='aiRating';rating.textContent='Google ★ '+row.rating.toFixed(1)+' · 후기 '+row.ratingCount.toLocaleString('ko-KR')+'개';button.append(rating);
+      const address=document.createElement('span');address.textContent=row.address;button.append(address);
+      if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
+      if(entry.intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b></b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
+      button.addEventListener('click',()=>{close();input.blur();window.PlaceSearch?.openGoogle(row);});li.append(button);results.append(li);
+      if(row.hours)showHours(button,row.hours);
+      else{
+        const credit=document.createElement('div');credit.className='aiHoursAttributions';
+        for(const a of row.attributions||[]){const uri=googlePhotoSafeUrl(a.providerURI),el=document.createElement(uri?'a':'span');el.textContent=a.provider||'';if(uri){el.href=uri;el.target='_blank';el.rel='noopener noreferrer';}credit.append(el);}
+        if(credit.textContent)li.append(credit);
+      }
+    }
+  }
+  function searchGoogle(entry){
+    if(!window.AIGoogleSearch||entry.google||googleController)return;
+    const token=revision,work=new AbortController();googleController=work;
+    window.AIGoogleSearch.search(entry.intent,{signal:work.signal,boundaries:districtData,nearby:state.nearby,places:db().places}).then(rows=>{
+      if(token!==revision||last!==entry)return;entry.google={rows};renderGoogle(entry);
+    }).catch(error=>{if(error.name!=='AbortError'&&token===revision&&last===entry){entry.google={error:true};renderGoogle(entry);}})
+      .finally(()=>{if(googleController===work)googleController=null;});
+  }
   function render(intent){
     list.replaceChildren();examples.hidden=true;title.textContent='AI 검색 결과';
-    const note=byId('aiMapNote');note.textContent='관련 정보 → 회원 강추 → 회원 평점 순으로 보여드려요. 메뉴·영업시간은 방문 전 확인해 주세요.';
+    const note=byId('aiMapNote');note.textContent='회원 등록 업소 우선 · Google 검색 결과 최대 20곳에서 지역·평점 확인. 회원 평가와 Google 평점은 별개입니다.';
     if(!intent?.relevant){status.textContent='찾고 싶은 업소의 지역, 업종이나 메뉴를 질문해 주세요.';return;}
     const scope=[CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
     if(intent.nearby&&!state.nearby){status.textContent='먼저 지도 아래 ‘주변 찾기’에서 현재 위치나 숙소를 지정한 뒤 다시 질문해 주세요.';return;}
@@ -174,17 +218,19 @@
     const results=buildResults(intent,db(),state.nearby);
     const {rows,fallback,missing}=results;
     title.textContent=(fallback?'대신 살펴볼 등록 업소':'추천 업소')+' · '+rows.length+'곳';
-    status.textContent=scope+(fallback?' — ':rows.length?'':' — ')+(fallback?missing.join('·')+' 조건에 맞는 업소가 없어, 같은 지역·업종의 등록 업소를 추천 순으로 보여드려요.':rows.length?'':'이 지역·업종에 맞는 등록 정보를 아직 찾지 못했어요. 지역이나 업종을 넓혀 보세요.');
+    status.textContent=scope+(fallback?' — ':rows.length?'':' — ')+(fallback?missing.join('·')+' 조건에 맞는 업소가 없어, 같은 지역·업종의 등록 업소를 추천 순으로 보여드려요.':rows.length?'':'맞는 회원 등록 업소가 없어 Google 지도에서도 찾아볼게요.');
     if(intent.preferences?.length)status.textContent+=' '+intent.preferences.map(key=>PREFERENCES[key]?.label).filter(Boolean).join('·')+' 관련 정보 우선.';
-    if(intent.visitToday){status.textContent+=' 오늘 영업시간을 확인합니다.';note.textContent='베트남 현지 날짜 기준입니다. 오늘 정보와 정기시간을 구분하며, 당일 변경은 업소에 확인해 주세요.';}
+    if(intent.visitToday){status.textContent+=' 오늘 영업시간을 확인합니다.';note.textContent+=' 베트남 현지 날짜 기준이며, 당일 변경은 업소에 확인해 주세요.';}
     if(intent.district&&intent.city==='hcmc'&&districtData.length)note.textContent+=' '+intent.district+'군은 기존 행정구역 기준입니다.';
-    if(!rows.length){examples.hidden=false;return;}
+    if(last)last.memberCount=rows.length;
+    if(rows.length){const heading=document.createElement('li');heading.className='aiSourceHeading';heading.textContent='회원 등록 업소 · '+rows.length+'곳';list.append(heading);}
     for(const row of rows){
       const {place,evidence}=row;
-      const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='aiResult';button.dataset.placeId=place.id;
+      const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='aiResult aiMemberResult';button.dataset.placeId=place.id;
       const name=document.createElement('strong');name.textContent=place.name;button.append(name);
       const badges=document.createElement('span');badges.className='aiBadges';
       const badge=(text,kind)=>{const el=document.createElement('span');el.className='aiBadge '+kind;el.textContent=text;badges.append(el);};
+      badge('회원 등록','aiMemberBadge');
       if(place.memberBenefit)badge('혜택업소','aiBenefit');
       if(row.memberRecommendations)badge('회원 강추 '+row.memberRecommendations+'명','aiRecommended');
       if(row.registrantRecommended)badge('등록자 강추','aiRecommended');
@@ -202,8 +248,9 @@
       const result=last?.hours?.get(place.id);if(intent.visitToday&&result)showHours(button,result);
     }
     checkHours(rows,intent);
+    if(window.AIGoogleSearch&&last){const section=document.createElement('li');section.id='aiGoogleSection';list.append(section);renderGoogle(last);searchGoogle(last);}
   }
-  input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
+  input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.google=null;last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
   input.addEventListener('input',()=>{cancel();last=null;reset();show();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();form.requestSubmit();}if(event.key==='Escape'){event.preventDefault();close();input.blur();}});
   examples.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;cancel();last=null;input.value=button.textContent;syncInput();form.requestSubmit();});
@@ -215,7 +262,7 @@
   form.addEventListener('submit',async event=>{
     event.preventDefault();const query=input.value.trim();if(query.length<2||query.length>300||controller)return;
     cancel();const token=revision;controller=new AbortController();const signal=controller.signal;
-    send.disabled=true;form.setAttribute('aria-busy','true');examples.hidden=true;list.replaceChildren();title.textContent='AI가 조건을 찾고 있어요';status.textContent='등록 업소와 회원 후기에서 찾아볼게요…';show();input.blur();
+    send.disabled=true;form.setAttribute('aria-busy','true');examples.hidden=true;list.replaceChildren();title.textContent='AI가 조건을 찾고 있어요';status.textContent='회원 등록 업소와 Google 지도에서 찾아볼게요…';show();input.blur();
     const pending=controller;const timeout=setTimeout(()=>pending.abort(),22000);
     try{
       const response=await fetch('/api/ask-map',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,city:state.city}),signal});
@@ -231,5 +278,5 @@
     finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}
   });
   syncInput();
-  window.AIMapSearch={findMatches,buildResults,districtMatches,inGeometry,close};
+  window.AIMapSearch={findMatches,buildResults,districtMatches,areaMatches,inGeometry,close};
 })();

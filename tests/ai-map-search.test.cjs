@@ -17,6 +17,7 @@ const intent={relevant:true,city:'hcmc',district:'1',area:'',preferences:[],visi
  const wrong=api.validateIntent({...intent,relevant:false,city:'hcmc',district:'',category:'',terms:[],preferences:[]},'hcmc');
  const hanoi=api.clarifyIntent(wrong,'하노이에서 회원들이 강추한 식당 찾아줘');
  assert.equal(hanoi.relevant,true);assert.equal(hanoi.city,'hanoi');assert.equal(hanoi.category,'restaurant');assert.equal(hanoi.recommended,true);
+ const wax=api.clarifyIntent({...wrong,category:'barber'},'12군 왁싱샵 추천해줘');assert.equal(wax.category,'spa');assert.equal(wax.district,'12');assert.equal(wax.city,'hcmc');assert(wax.terms.includes('왁싱'));assert(wax.relevant);
  const date=api.clarifyIntent(wrong,'오늘 여자친구와 갈만한 1군에서 분위기 좋은 바를 찾아줘');
  assert.equal(date.category,'bar');assert.equal(date.subcategory,'바');assert.equal(date.district,'1');assert(date.preferences.includes('date'));assert(date.preferences.includes('atmosphere'));assert(date.visitToday);
 

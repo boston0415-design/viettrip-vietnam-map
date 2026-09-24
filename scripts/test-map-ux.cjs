@@ -11,10 +11,10 @@ getDeviceId=()=>"test-device-id";isOwnerPlace=()=>false;bootstrapSharedDb=async(
 focusLocationAtZoom=async()=>{};
 state.map={getCenter:()=>({lat:()=>10.77,lng:()=>106.7}),getZoom:()=>16,setCenter:empty,panBy:empty,setOptions:empty,get:()=>'',getDiv:()=>document.getElementById('map'),addListener:()=>({remove:empty})};
 class TestMarker{constructor(o){Object.assign(this,o);}setMap(map){this.map=map;}getMap(){return this.map;}addListener(){return {remove:empty}}}
-window.google={maps:{Marker:TestMarker,Circle:TestMarker,Size:class{},Point:class{},event:{trigger:empty},places:{AutocompleteSessionToken:class{},AutocompleteService:class{getPlacePredictions(r,cb){cb([{place_id:'external-ux',structured_formatting:{main_text:'검색한 새 업소',secondary_text:'호치민 주소'}}],'OK')}},PlacesService:class{getDetails(r,cb){cb({place_id:r.placeId,name:'검색한 새 업소',formatted_address:'정확한 주소',geometry:{location:{lat:()=>10.775,lng:()=>106.705}},types:['cafe'],formatted_phone_number:'+84 123 456 789',opening_hours:{weekday_text:['월요일 09:00–21:00'],isOpen:()=>true},rating:4.5,user_ratings_total:22},'OK')}findPlaceFromQuery(r,cb){cb([],'ZERO_RESULTS')}}}}};
+window.google={maps:{Marker:TestMarker,Circle:TestMarker,Size:class{},Point:class{},event:{trigger:empty},places:{AutocompleteSessionToken:class{},AutocompleteService:class{getPlacePredictions(r,cb){cb([{place_id:'external-ux',structured_formatting:{main_text:'검색한 새 업소',secondary_text:'호치민 주소'}}],'OK')}},PlacesService:class{getDetails(r,cb){cb({place_id:r.placeId,name:r.placeId==='google-wax-a'?'Waxing A':'검색한 새 업소',formatted_address:'정확한 주소',geometry:{location:{lat:()=>10.775,lng:()=>106.705}},types:['cafe'],formatted_phone_number:'+84 123 456 789',opening_hours:{weekday_text:['월요일 09:00–21:00'],isOpen:()=>true},rating:4.5,user_ratings_total:22},'OK')}findPlaceFromQuery(r,cb){cb([],'ZERO_RESULTS')}}}}};
 window.aiQuestionCalls=0;
-window.google.maps.places.Place=class{constructor({id}){this.id=id;}async fetchFields(){const p=testData.places.find(p=>p.googlePlaceId===this.id);if(!p)throw Error('NOT_FOUND');Object.assign(this,{displayName:p.name,formattedAddress:p.address,location:{lat:()=>p.lat,lng:()=>p.lng},businessStatus:'OPERATIONAL',currentOpeningHours:{periods:[{open:{day:0,hour:0,minute:0}}]},attributions:[]});}};
-fetch=async(url,options={})=>{if(String(url).includes('/api/ask-map')){window.aiQuestionCalls++;const query=JSON.parse(options.body).query,hanoi=query.includes('하노이'),date=query.includes('여자친구');return {ok:true,json:async()=>({intent:{relevant:true,city:hanoi?'hanoi':'hcmc',district:date?'1':'',area:'',category:hanoi?'restaurant':date?'bar':'cafe',subcategory:'',terms:[],preferences:date?['date','atmosphere']:[],visitToday:date,benefit:!hanoi&&!date,recommended:hanoi,nearby:false,unsupported:[]}})}};if(String(url).includes('api.met.no'))return {ok:true,headers:{get:()=>new Date(Date.now()+3600000).toUTCString()},json:async()=>({properties:{timeseries:[{time:new Date(Math.floor(Date.now()/3600000)*3600000).toISOString(),data:{instant:{details:{air_temperature:27}},next_1_hours:{summary:{symbol_code:'cloudy'}}}}]}})};let req;try{req=JSON.parse(options.body)}catch{};const data=req?.p_action==='badges'?[]:{id:'ux-member',nickname:'시험 회원',total:3,level:1,devices:[{hash:'a'.repeat(64),key:'test-device-key'}],counts:{place:1,review:2,correction:0},activities:[],corrections:[]};return {ok:true,json:async()=>data,text:async()=>'',status:200};};
+window.google.maps.places.Place=class{static async searchByText(request){if(!request.textQuery.includes('waxing'))return {places:[]};return {places:[['google-wax-registered','회원 왁싱샵',4.1,10,'12'],['google-wax-a','Waxing A',4.9,100,'12'],['google-wax-b','Waxing B',4.9,20,'12'],['google-wax-low','낮은 평점',3.8,500,'12'],['google-wax-wrong','다른 군',5,200,'11']].map(([id,displayName,rating,userRatingCount,district])=>({id,displayName,rating,userRatingCount,formattedAddress:'Quận '+district+', Hồ Chí Minh, Vietnam',location:{lat:10.867,lng:106.654},businessStatus:'OPERATIONAL',addressComponents:[{types:['country'],shortText:'VN'}],attributions:[]}))};}constructor({id}){this.id=id;}async fetchFields(){const p=testData.places.find(p=>p.googlePlaceId===this.id);if(!p)throw Error('NOT_FOUND');Object.assign(this,{displayName:p.name,formattedAddress:p.address,location:{lat:()=>p.lat,lng:()=>p.lng},businessStatus:'OPERATIONAL',currentOpeningHours:{periods:[{open:{day:0,hour:0,minute:0}}]},attributions:[]});}};
+fetch=async(url,options={})=>{if(String(url).includes('/api/ask-map')){window.aiQuestionCalls++;const query=JSON.parse(options.body).query,hanoi=query.includes('하노이'),date=query.includes('여자친구');return {ok:true,json:async()=>({intent:{relevant:true,city:hanoi?'hanoi':'hcmc',district:query.includes('왁싱')?'12':date?'1':'',area:'',category:query.includes('왁싱')?'spa':hanoi?'restaurant':date?'bar':'cafe',subcategory:'',terms:query.includes('왁싱')?['왁싱']:[],preferences:date?['date','atmosphere']:[],visitToday:date,benefit:!hanoi&&!date&&!query.includes('왁싱'),recommended:hanoi,nearby:false,unsupported:[]}})}};if(String(url).includes('api.met.no'))return {ok:true,headers:{get:()=>new Date(Date.now()+3600000).toUTCString()},json:async()=>({properties:{timeseries:[{time:new Date(Math.floor(Date.now()/3600000)*3600000).toISOString(),data:{instant:{details:{air_temperature:27}},next_1_hours:{summary:{symbol_code:'cloudy'}}}}]}})};let req;try{req=JSON.parse(options.body)}catch{};const data=req?.p_action==='badges'?[]:{id:'ux-member',nickname:'시험 회원',total:3,level:1,devices:[{hash:'a'.repeat(64),key:'test-device-key'}],counts:{place:1,review:2,correction:0},activities:[],corrections:[]};return {ok:true,json:async()=>data,text:async()=>'',status:200};};
 `;
 const source=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const html=source.replace(/<script[^>]+src="[^"]*(?:online-presence|realtime-|community-stats|10-runtime-guard|home-screen|guide-map-link|transport-guide|business-share|admin-regions)[^"]*"[^>]*><\/script>/g,'').replace(/(<script src="\.\/assets\/js\/09-init-events[^>]*>)/,`<script>${fixture}</script>$1`);
@@ -394,7 +394,7 @@ const server=http.createServer((req,res)=>{
    await checkDoubleClick('#areaPanel','#areaPanelTitle');await page.locator('#areaPanelClose').click();
    await page.evaluate(()=>setMobileLegendExpanded(false));
   }
-  // AI is a separate compact input below ordinary search, using local evidence only.
+  // AI keeps member contributions first and adds attributed Google discoveries.
   await page.evaluate(()=>document.activeElement?.blur());
   await page.waitForTimeout(180); // Compare resting styles after the focus transition.
   const searchBox=await page.locator('.top .search').boundingBox(),aiBox=await page.locator('.aiComposer').boundingBox();
@@ -454,6 +454,28 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#aiMapClear').isVisible(),false);
   assert.equal(await page.locator('.aiResult').count(),0);
   assert(await page.locator('#aiMapExamples').isVisible());
+  await page.locator('#aiMapQuestion').fill('12군 왁싱샵 추천해줘');
+  await page.locator('#aiMapQuestion').press('Enter');
+  await page.locator('.aiGoogleResult').first().waitFor();
+  assert.equal(await page.locator('.aiMemberResult').count(),0,'Google discovery works with zero member matches');
+  assert.equal(await page.locator('.aiGoogleResult').count(),3,'exclude low ratings and other districts');
+  assert.match(await page.locator('.aiGoogleResult').first().innerText(),/Waxing A[\s\S]*Google ★ 4.9[\s\S]*100개/);
+  assert.equal(await page.locator('.aiGoogleResult .aiRecommended,.aiGoogleResult .aiBenefit').count(),0,'never invent member benefits for Google discoveries');
+  if(width<901)await page.locator('.aiGoogleResult').first().tap();else await page.locator('.aiGoogleResult').first().click();
+  await page.waitForFunction(()=>document.querySelector('#detail').textContent.includes('Waxing A'));
+  assert.equal(await page.locator('#aiMapPanel').isVisible(),false,'one tap opens the external detail');
+  await page.waitForTimeout(200);assert(await page.locator('#detail').isVisible(),'external details remain open');
+  await page.evaluate(()=>{closeDetailPanel();testData.places.push({id:'wax-member',googlePlaceId:'google-wax-registered',name:'회원 왁싱샵',category:'spa',subcategory:'스파',address:'Quận 12, Hồ Chí Minh, Vietnam',area:'호치민',lat:10.867,lng:106.654,initialRating:4});});
+  await page.locator('#aiMapQuestion').focus();
+  await page.locator('#aiMapQuestion').fill('12군 왁싱샵 추천해주세요');
+  await page.locator('#aiMapQuestion').press('Enter');
+  await page.locator('.aiGoogleResult').first().waitFor();
+  assert.equal(await page.locator('.aiMemberResult').count(),1);
+  assert.equal(await page.locator('.aiGoogleResult').count(),2,'same Google place is not repeated');
+  assert.match(await page.locator('.aiResult').first().innerText(),/회원 왁싱샵[\s\S]*회원 등록/);
+  const colors=await page.evaluate(()=>['.aiMemberResult','.aiGoogleResult'].map(s=>getComputedStyle(document.querySelector(s)).backgroundColor));
+  assert.notEqual(colors[0],colors[1],'member results have a distinct subtle tint');
+  await page.screenshot({path:path.join(out,`ai-google-${width}.png`)});
   await page.locator('#aiMapClose').click();
   if(width<901)await page.locator('#searchClear').tap();else await page.locator('#searchClear').click();
   assert.equal(await page.locator('#searchInput').inputValue(),'');
