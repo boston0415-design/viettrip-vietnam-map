@@ -88,3 +88,10 @@
 .aiActionButtons a{flex:1;background:#e7f3eb}.aiActionHint{display:block;margin-top:7px;font-size:11px;line-height:1.6;color:#62786c;overflow-wrap:anywhere}.aiActionBox>a{display:block;margin-top:6px;font-size:11px;color:#527364}
 .aiActionIntro{padding:10px 4px;border-bottom:1px solid #e5ece7;margin-bottom:10px}.aiActionIntro strong{font-size:13px}.aiPanel .aiActionIntro p{padding:5px 0;font-size:12px}
 .aiProductAnswer p{padding:0}.aiProductAnswer small{display:block;color:#65786e;font-size:11px;line-height:1.6}.aiProductAnswer{overflow-wrap:anywhere}.aiActionButtons :focus-visible{outline:2px solid #247b72;outline-offset:2px}
+
+/* The answer stays above the complete, directly selectable result list. */
+.aiResults>.aiAnswer{display:block;padding:13px;margin:0 0 12px;border:1px solid #cdddD5;border-radius:12px;background:#f6faf8;overflow-wrap:anywhere}
+.aiAnswerHeading{display:block;font-size:14px;color:#245e50;margin:0 0 6px}
+.aiPanel .aiAnswer p{padding:4px 0 9px;font-size:13px;line-height:1.7;white-space:pre-line}
+.aiAnswerPick{display:block;width:100%;border:0;border-radius:8px;background:transparent;color:#224f42;font:650 14px/1.5 system-ui,sans-serif;text-align:left;min-height:44px;padding:8px 0;cursor:pointer;overflow-wrap:anywhere}
+.aiAnswerPick:hover{background:#eaf3ed}.aiAnswerSource{display:block;font-size:11px;line-height:1.6;color:#6d7e74;border-top:1px solid #e1eae4;padding-top:8px}

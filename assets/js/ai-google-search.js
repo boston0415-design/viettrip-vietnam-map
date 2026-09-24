@@ -54,7 +54,7 @@
   }
   function queryFor(intent,includeRoom=true){
     if(intent.productSearch)return [window.NameSearch?.googleQuery(intent.requestText)||intent.requestText,intent.productKind==='computer'?'computer electronics store':'mobile phone store',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
-    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'햄버거':'burger','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term));
+    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'햄버거':'burger','쌀국수':'pho','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term));
     const specialty=terms.some(waxing);
     return [includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,intent.hotelStars?intent.hotelStars+' star':'',specialty?'':({'베이커리':'bakery','호텔':'hotel','로컬 KTV':'local Vietnamese karaoke'}[intent.subcategory]||SUBS[intent.subcategory]||CATEGORIES[intent.category]||''),
       ...(intent.preferences||[]).filter(p=>['quiet','rooftop','cheap','atmosphere'].includes(p)).map(p=>p==='atmosphere'?'nice atmosphere':p==='cheap'?'affordable':p),

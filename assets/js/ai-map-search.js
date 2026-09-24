@@ -11,6 +11,7 @@
   };
   const AREA_ALIASES=[['푸미흥','phu my hung'],['타오디엔','thao dien'],['호안끼엠','hoan kiem'],['미딩','my dinh'],['서호','tay ho'],['부이비엔','bui vien'],['레탄톤','le thanh ton']];
   const MENU_PATTERNS={
+    '쌀국수':/쌀국수|\bpho\b/i,
     '햄버거':/햄버거|수제\s*버거|버거|\b(?:hamburger|burger|burgers|smashburger)\b/i,
     '고기·구이':/고기\s*[·/]?\s*구이|고[기깃]집|삼겹살|오겹살|목살|갈비(?!\s*치킨)|숯불|불고기|바[베비]큐|비비큐|\bbbq\b|\bbarbe[cq]ue\b|\bgrilled\s+(?:meat|beef|pork)\b|\bthit\s+nuong\b|\bsuon\s+nuong\b/i,
     '회':/초밥\s*[·/]\s*회|횟집|회집|사시미|생선회|활어회|모[둠듬]회|광어회|연어회|참치회|\bsashimi\b|\braw\s+fish\b|\bgoi\s+ca\b|(?:^|\s)회(?=\s|[·/,]|$|(?:를|가|는|도|로|와|랑|만|가\s*아니라))/i,
@@ -203,7 +204,7 @@
   }
   function show(){panel.hidden=false;input.setAttribute('aria-expanded','true');fitPanel();}
   function syncInput(){send.disabled=!!controller||input.value.trim().length<2;if(clear)clear.hidden=!input.value;}
-  function cancel(){revision++;controller?.abort();hoursController?.abort();googleController?.abort();window.AIResultActions?.cancel();controller=null;hoursController=null;googleController=null;syncInput();form.removeAttribute('aria-busy');}
+  function cancel(){revision++;controller?.abort();hoursController?.abort();googleController?.abort();window.AIResultActions?.cancel();window.AIMapAnswer?.cancel();controller=null;hoursController=null;googleController=null;syncInput();form.removeAttribute('aria-busy');}
   function close(){cancel();panel.hidden=true;input.setAttribute('aria-expanded','false');}
   function reset(){list.replaceChildren();examples.hidden=false;status.textContent='예시를 누르면 바로 찾아드려요. 직접 질문해도 좋아요.';title.textContent='이렇게 물어보세요';byId('aiMapNote').textContent='회원 등록 업소를 먼저, Google 지도 업소를 함께 찾아요.';}
   function waitForPlaces(signal){
@@ -246,6 +247,7 @@
       entry.hours.set(row.place.id,result);
       const button=[...list.querySelectorAll('.aiResult')].find(node=>node.dataset.placeId===row.place.id);
       if(button)showHours(button,result);
+      if(entry.google||entry.intent.benefit||entry.intent.recommended){if(entry.answer?.basis==='empty')entry.answer=null;window.AIMapAnswer?.render(list,entry);}
       // Keep each card in place during a touch/scroll instead of rebuilding the
       // list as hours arrive. This preserves direct selection on every row.
     }}).catch(()=>{}).finally(()=>{if(hoursController===work)hoursController=null;});
@@ -260,7 +262,7 @@
     if(entry.google.error){
       message.textContent='Google 검색에 연결하지 못했어요. 등록 업소는 계속 볼 수 있어요.';
       const retry=document.createElement('button');retry.type='button';retry.className='aiRetry';retry.textContent='Google 검색 다시 시도';
-      retry.addEventListener('click',()=>{entry.google=null;render(entry.intent);});section.append(retry);finishRanking(entry);return;
+      retry.addEventListener('click',()=>{entry.google=null;entry.answer=null;window.AIMapAnswer?.cancel();render(entry.intent);});section.append(retry);finishRanking(entry);return;
     }
     const rows=entry.google.rows;
     if(!rows.length&&!entry.memberRows?.length)window.AITravelSearch?.fallback(section,entry.intent.requestText||entry.query);
@@ -333,14 +335,15 @@
       entry.google=result.status==='fulfilled'?{rows:result.value}:{error:true};
       if(result.status==='fulfilled')for(const row of entry.memberRows||[]){const info=result.value.memberUpdates?.get(row.place.id);if(info)row.insights=window.AISearchInsights?.mergeMember(row,info,entry.intent)||info;}
       entry.insights=new Map((entry.memberRows||[]).map(row=>[row.place.id,row.insights]));
-      renderGoogle(entry);
-    }).catch(error=>{if(error.name!=='AbortError'&&token===revision&&last===entry){entry.google={error:true};renderGoogle(entry);}})
+      renderGoogle(entry);window.AIMapAnswer?.render(list,entry);
+    }).catch(error=>{if(error.name!=='AbortError'&&token===revision&&last===entry){entry.google={error:true};renderGoogle(entry);window.AIMapAnswer?.render(list,entry);}})
       .finally(()=>{if(googleController===work)googleController=null;});
   }
   function render(intent){
     list.replaceChildren();examples.hidden=true;title.textContent='AI 검색 결과';
     list.classList.remove('aiRankingPending');
     const note=byId('aiMapNote');note.textContent='질문 조건에 맞는 업소만 표시하고, 그 안에서 회원 등록·강추·혜택 정보를 보여드려요. Google 검색은 최대 20곳의 업종·지역·평점을 확인합니다.';
+    if(intent?.mode==='advice'){title.textContent='AI 답변';status.textContent='';note.textContent='AI의 일반 안내입니다. 현재 가격·영업·예약 정보는 별도 확인이 필요합니다.';window.AIMapAnswer?.advice(list,intent.answer);return;}
     const product=window.AIResultActions?.renderProduct(list,intent||{});if(product){title.textContent=product.title;status.textContent=product.status;note.textContent=product.note;return;}
     const travel=window.AITravelSearch?.render(list,intent||{});if(travel){title.textContent=travel.title;status.textContent=travel.status;note.textContent=travel.note;return;}
     if(intent?.transport||intent?.guideTopic||intent?.travelDestination||intent?.travelHelp){
@@ -413,8 +416,9 @@
     if(window.AIGoogleSearch&&last&&!memberOnly){const section=document.createElement('li');section.id='aiGoogleSection';list.append(section);if(unknownList){const slot=document.createElement('li');slot.id='aiGoogleRoomUnknown';unknownList.append(slot);}}
     if(unknownSection)list.append(unknownSection);
     if(window.AIGoogleSearch&&last&&!memberOnly){list.classList.toggle('aiRankingPending',!!intent.sortBy&&!last.google);renderGoogle(last);searchGoogle(last);}
+    window.AIMapAnswer?.render(list,last,{pending:!!window.AIGoogleSearch&&!memberOnly&&!last?.google});
   }
-  input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.google=null;last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
+  input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.google=null;last.answer=null;window.AIMapAnswer?.cancel();last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
   input.addEventListener('input',()=>{cancel();last=null;reset();show();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();form.requestSubmit();}if(event.key==='Escape'){event.preventDefault();close();input.blur();}});
   examples.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;cancel();last=null;input.value=button.textContent;syncInput();form.requestSubmit();});
@@ -435,7 +439,7 @@
       if(!response.ok)throw Error(payload.error||'AI 검색을 잠시 사용할 수 없어요. 기존 검색창을 이용해 주세요.');
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
       await prepareDistricts(payload.intent,signal);
-      if(!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch&&!payload.intent.travelDestination&&!payload.intent.travelHelp)await waitForPlaces(signal);
+      if(payload.intent.mode!=='advice'&&!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch&&!payload.intent.travelDestination&&!payload.intent.travelHelp)await waitForPlaces(signal);
       if(token!==revision)return;
       last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
     }catch(error){if(token!==revision)return;window.AITravelSearch?.fallback(list,query);title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}
