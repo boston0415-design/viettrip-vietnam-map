@@ -60,7 +60,7 @@ export function validateIntent(value,city){
 // irrelevant classification. The model still interprets dishes and other context.
 export function clarifyIntent(intent,query){
   const next={...intent,preferences:[...intent.preferences]};
-  const cityNames={hcmc:/호치민|hochiminh|ho chi minh/i,hanoi:/하노이|hanoi|ha noi/i,danang:/다낭|da nang/i,nhatrang:/나트랑|nha trang/i,phuquoc:/푸꾸옥|phu quoc/i,dalat:/달랏|da lat/i,hoian:/호이안|hoi an/i,vungtau:/붕따우|호짬|vung tau/i,muine:/무이네|mui ne/i};
+  const cityNames={hcmc:/호치민|hochiminh|ho chi minh/i,hanoi:/하노이|hanoi|ha noi/i,danang:/다낭|da nang/i,nhatrang:/나트랑|nha trang/i,phuquoc:/푸꾸옥|푸꿕|phu quoc/i,dalat:/달랏|da lat/i,hoian:/호이안|hoi an/i,vungtau:/붕따우|호짬|vung tau/i,muine:/무이네|mui ne/i};
   const cities=Object.keys(cityNames).filter(key=>cityNames[key].test(query));
   if(cities.length===1)next.city=cities[0];
   const categoryNames={restaurant:/식당|맛집|한식|일식|중식|쌀국수|고[기깃]집|횟집|회집|사시미|바[베비]큐|\bBBQ\b/i,spa:/마사지|스파|왁싱|waxing/i,barber:/이발소|미용실/,stay:/호텔|숙소|아파트/,karaoke:/가라오케|KTV/i,cafe:/카페|커피숍/,exchange:/환전/,shopping:/쇼핑|과일가게/,market:/시장/,bar:/(?:^|[\s])바(?:[\s를에가도는]|$)|루프탑|펍|클럽/,golf:/골프/,pharmacy:/약국/,hospital:/병원|치과/};
@@ -128,6 +128,28 @@ export function clarifyIntent(intent,query){
   if(/푸꾸옥|푸꿕|phu\s*quoc/i.test(query)&&/배를|배편|페리|선박|승선|ferry/i.test(query)&&(/호치민|ho chi minh/i.test(query)||(!cities.length&&intent.city==='hcmc'))){next.guide='hcmc_phuquoc_ferry';next.relevant=true;next.unsupported=[];next.terms=[];next.city='hcmc';}
   return next;
 }
+// Fully understood routine questions need no model round trip. This narrow
+// grammar refuses every leftover word, number and constraint; an unknown area,
+// named dish, exclusion or follow-up still goes to the model unchanged.
+export function literalIntent(query,city){
+  const intent=clarifyIntent({relevant:false,city,district:'',area:'',category:'',subcategory:'',terms:[],preferences:[],benefit:false,recommended:false,nearby:false,visitToday:false,unsupported:[]},query);
+  if(!intent.relevant||(!intent.category&&!intent.service&&!intent.guide))return null;
+  if(/말고|제외|아닌|않|지금|현재|내일|주말|예약해/.test(query))return null;
+  const cities=query.match(/호치민|하노이|다낭|나트랑|푸꾸옥|푸꿕|달랏|호이안|붕따우|무이네/g)||[];
+  if(new Set(cities).size>1&&!intent.guide)return null;
+  let remaining=query
+    .replace(/호치민|하노이|다낭|나트랑|푸꾸옥|푸꿕|달랏|호이안|붕따우|무이네|푸미흥/g,' ')
+    .replace(/(?:[1-9]|1\d|2[0-2])\s*군|[1-5]\s*성급/g,' ')
+    .replace(/[\d,]+(?:\.\d+)?\s*(?:만|천|k|m)?\s*(?:동|vnd|달러|usd|불|원|krw)/gi,' ')
+    .replace(/반미집?|빵집|베이커리|한식당?|일식당?|중식당?|식당|맛집|고[기깃]집|횟집|회집|호텔|숙소|가라오케|KTV|카페|커피숍|마사지|스파|왁싱샵?|이발소|미용실|루프탑|클럽|펍|골프|약국|병원|치과|환전소?|과일가게|쇼핑|시장|(?:^|\s)바(?=\s|를|$)/gi,' ')
+    .replace(/오토바이|스쿠터|빌리(?:고|는|기)?|빌릴|빌려|대여|렌트/g,' ')
+    .replace(/로컬|현지|룸|별실|개인실|개별실|독립실|프라이빗룸/g,' ')
+    .replace(/여자\s*친구|남자\s*친구|연인|데이트|분위기|조용한?|야경|전망|가격대?|예산|비용|후기|평점|유명한?|인기|저렴한?|가성비|맛있는|좋은|가장|최고|혜택|제휴|강추|회원들이|회원/g,' ')
+    .replace(/오늘밤?|정도로?|놀만한|갈만한|추천해(?:주세요|줘)?|찾아(?:주세요|줘)?|알려(?:주세요|줘)?|어디(?:서|야|에)?|가야해|있는|싶어|싶은데|중에서|에서|으로|까지|중|곳|좀|많은|높은|낮은/g,' ');
+  if(intent.guide)remaining=remaining.replace(/배를|배편|페리|타고|표를|표|사야해|사는|사/g,' ');
+  remaining=remaining.replace(/(?:^|\s)(?:에|의|을|를|은|는|이|가|와|과|로|도|한|부터)(?=\s|$)/g,' ').replace(/[\s?.!,~]/g,'');
+  return remaining?null:intent;
+}
 async function readBody(request){
   if(Number(request.headers.get('content-length'))>4096)throw Error('large');
   const reader=request.body?.getReader();if(!reader)throw Error('empty');
@@ -156,9 +178,10 @@ export async function onRequest(context){
   if(!body||typeof body!=='object'||Array.isArray(body))return json({error:'질문을 확인해 주세요.'},400);
   const query=typeof body.query==='string'?body.query.trim():'';
   if(query.length<2||query.length>300)return json({error:'질문을 2~300자로 입력해 주세요.'},400);
-  if(!env.AI?.run)return json({error:'AI 연결을 준비하고 있어요. 기존 검색창을 이용해 주세요.'},503);
   try{if(await throttle(request,context))return json({error:'질문이 많아요. 1분 뒤 다시 시도해 주세요.'},429);}catch{return json({error:'잠시 후 다시 질문해 주세요.'},503);}
   const city=CITIES.includes(body.city)?body.city:'all';let timer;
+  const literal=literalIntent(query,city);if(literal)return json({intent:literal});
+  if(!env.AI?.run)return json({error:'AI 연결을 준비하고 있어요. 기존 검색창을 이용해 주세요.'},503);
   try{
     const result=await Promise.race([
       env.AI.run('@cf/qwen/qwen3-30b-a3b-fp8',{messages:[{role:'system',content:SYSTEM},{role:'user',content:JSON.stringify({city,question:query})+' /no_think'}],max_tokens:850,temperature:0.1,response_format:{type:'json_object'}}),

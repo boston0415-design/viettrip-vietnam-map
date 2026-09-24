@@ -12,6 +12,13 @@ const {JSDOM}=require('jsdom'),root=path.join(__dirname,'..'),read=p=>fs.readFil
  const budget=parse('로컬 가라오케 중 500만동 정도로 놀만한 곳 찾아줘',{category:'karaoke',terms:['로컬','500만동'],unsupported:['500만동']});assert.equal(budget.subcategory,'로컬 KTV');assert.deepEqual(budget.budget,{amount:5000000,currency:'VND'});assert.equal(budget.unsupported.length,0);assert.equal(budget.terms.length,0);
  const cheap=parse('호치민에서 가격 저렴한 식당 찾아줘');assert.equal(cheap.sortBy,'cheap');assert(cheap.showPrice);
  const atmosphere=parse('분위기 좋은 1군 식당 찾아줘');assert.equal(atmosphere.sortBy,'atmosphere');
+ for(const question of ['로컬 가라오케 중 500만동 정도로 놀만한 곳 찾아줘','1군에 있는 4성급 호텔 후기 좋은 호텔 중에서 가장 좋은 곳','호치민에서 푸꿕으로 배를 타고 싶어 어디서 표를 사','오토바이 빌리고 싶은데 어디 가야해?','호치민 가장 유명한 반미집?','호치민에서 가장 유명한 빵집 어디야?','1군에서 분위기 좋은 식당 찾아줘','1군에서 가격 저렴한 식당 찾아줘']){
+   assert(api.literalIntent(question,'hcmc'),question);
+   const response=await api.onRequest({request:new Request('https://map.test/api/ask-map',{method:'POST',headers:{origin:'https://map.test','content-type':'application/json'},body:JSON.stringify({query:question,city:'hcmc'})}),env:{AI:{run:()=>{throw Error('MODEL_UNAVAILABLE')}}}});
+   assert.equal(response.status,200,'fully understood question works during model failure');
+ }
+ for(const question of ['부산에서 유명한 빵집','지금 영업 중인 빵집','호치민과 하노이에서 빵집 찾아줘','1군 말고 저렴한 식당','2명이 20만동 이하 식당','주말에 문 여는 빵집','글루텐 없는 빵집','1군에서 동태탕 식당'])assert.equal(api.literalIntent(question,'hcmc'),null,'never drop unknown constraint: '+question);
+ assert.equal(api.literalIntent('푸꿕 호텔 찾아줘','hcmc').city,'phuquoc');
  const dom=new JSDOM(read('index.html'),{url:'https://map.test',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window,run=s=>vm.runInContext(s,dom.getInternalVMContext());w.matchMedia=()=>({matches:false});
  for(const f of fs.readdirSync(path.join(root,'assets/js')).filter(n=>/^0[1-8]-/.test(n)).sort())run(read('assets/js/'+f));
  for(const f of ['place-photos','ai-search-insights','ai-google-search','ai-map-search'])run(read('assets/js/'+f+'.js'));
