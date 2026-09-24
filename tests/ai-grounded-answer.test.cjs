@@ -12,7 +12,7 @@ const {JSDOM}=require('jsdom'),read=p=>fs.readFileSync(p,'utf8'),asURL=s=>'data:
  const request=(body,origin='https://map.test')=>new Request('https://map.test/api/answer-map',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)});
  const body={query:'호치민 쌀국수 원탑은?',pickOne:true,candidates:[{id:'c0',name:'Phở Test',address:'Quận 1, Hồ Chí Minh',source:'google',rating:4.8,count:500,menuNamed:true,member:false,reviews:[{text:'SECRET REVIEW',createdBy:'PRIVATE_ID'}],token:'SECRET_TOKEN'}]};
  let calls=0;
- const env={AI:{run:async(model,args)=>{calls++;assert(!JSON.stringify(args).includes('SECRET'));assert(!JSON.stringify(args).includes('PRIVATE_ID'));return {response:{picks:[{id:'c0',reasons:['specialty','rating','reviews']}]}};}}};
+ const env={AI:{run:async(model,args)=>{calls++;assert(Array.isArray(args.input),'OpenAI binding receives Responses API input');assert(!args.messages);assert.equal(args.reasoning.effort,'low');assert(args.max_output_tokens>0);assert(!JSON.stringify(args).includes('SECRET'));assert(!JSON.stringify(args).includes('PRIVATE_ID'));return {response:{picks:[{id:'c0',reasons:['specialty','rating','reviews']}]}};}}};
  let res=await answer.onRequest({request:request(body),env});assert.equal(res.status,200);assert.equal((await res.json()).picks[0].id,'c0');
  res=await answer.onRequest({request:request(body,'https://evil.test'),env});assert.equal(res.status,403);assert.equal(calls,1);
  res=await answer.onRequest({request:request({...body,candidates:[]}),env});assert.equal(res.status,200);assert.deepEqual((await res.json()).picks,[]);assert.equal(calls,1,'empty results never spend an AI call or invent places');

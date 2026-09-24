@@ -312,6 +312,11 @@ export function modelJSON(result){
   if(!value||typeof value!=='object'||Array.isArray(value))throw Error('Invalid model JSON');
   return value;
 }
+// Workers AI's OpenAI open-model binding uses Responses API input/output.
+// Chat-completions messages/max_tokens can fail before the intended model runs.
+export function modelInput(system,question,tokens){
+  return {input:[{role:'system',content:system},{role:'user',content:question}],reasoning:{effort:'low'},max_output_tokens:tokens};
+}
 export function failureReason(error){
   const text=String(error?.message||'').toLowerCase();
   if(text.includes('timeout'))return 'timeout';
@@ -339,11 +344,11 @@ export async function onRequest(context){
   const failures=[];
   // At most one recovery call, within the client's 30-second deadline. Invalid
   // JSON is a provider failure, not evidence that no matching businesses exist.
-  for(const [model,tokens,timeout] of [['@cf/zai-org/glm-5.3-flash',2400,14000],['@cf/zai-org/glm-4.7-flash',2000,11000]]){
+  for(const [model,tokens,timeout] of [['@cf/openai/gpt-oss-120b',3200,18000],['@cf/openai/gpt-oss-20b',1800,7000]]){
     let timer;
     try{
       const result=await Promise.race([
-        env.AI.run(model,{messages:[{role:'system',content:SYSTEM},{role:'user',content:JSON.stringify({city,question:query})}],...(model.includes('glm')?{max_completion_tokens:tokens,reasoning_effort:'low'}:{max_tokens:tokens}),temperature:0.1,response_format:{type:'json_object'}}),
+        env.AI.run(model,modelInput(SYSTEM,JSON.stringify({city,question:query}),tokens)),
         new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('timeout')),timeout);})
       ]);
       const intent=validateIntent(modelJSON(result),city);

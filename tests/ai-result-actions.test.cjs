@@ -9,7 +9,7 @@ const load=async path=>import('data:text/javascript;base64,'+Buffer.from(read(pa
  const quick=await api.onRequest({request:req('맛있는 햄버거집 찾아서 그랩푸드로 연결해줘'),env:{AI:{run(){fastCalls++;throw Error('down')}}}});
  assert.equal(quick.status,200);assert.equal((await quick.json()).intent.action,'grabfood');assert.equal(fastCalls,0,'fully understood food action is independent of inference availability');
  const used=[];const recovered=await api.onRequest({request:req('동태탕 메뉴 있는 한식당'),env:{AI:{run:async model=>{used.push(model);if(used.length===1)return {response:'not JSON'};return {response:JSON.stringify({...base,subcategory:'한식',terms:['동태탕']})};}}}});
- assert.equal(recovered.status,200);assert.equal(used.length,2);assert.equal(used[0],'@cf/zai-org/glm-5.3-flash');assert.equal(used[1],'@cf/zai-org/glm-4.7-flash');assert.equal((await recovered.json()).model,used[1],'response identifies the model that actually succeeded');
+ assert.equal(recovered.status,200);assert.equal(used.length,2);assert.equal(used[0],'@cf/openai/gpt-oss-120b');assert.equal(used[1],'@cf/openai/gpt-oss-20b');assert.equal((await recovered.json()).model,used[1],'response identifies the model that actually succeeded');
  for(const q of ['맛있는 햄버거집 찾아서 그랩푸드로 연결해줘','1군 수제버거 그랩 푸드 주문','find a burger and connect to GrabFood']){
   const result=api.extendIntent({...base,terms:['햄버거집','그랩푸드','배달'],unsupported:['그랩푸드 연결']},q,'hcmc');
   assert.equal(result.action,'grabfood');assert.equal(result.category,'restaurant');assert.deepEqual(result.terms,['햄버거']);assert.deepEqual(result.unsupported,[]);
