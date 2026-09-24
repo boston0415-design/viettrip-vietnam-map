@@ -11,6 +11,7 @@
   };
   const AREA_ALIASES=[['푸미흥','phu my hung'],['타오디엔','thao dien'],['호안끼엠','hoan kiem'],['미딩','my dinh'],['서호','tay ho'],['부이비엔','bui vien'],['레탄톤','le thanh ton']];
   const MENU_PATTERNS={
+    '햄버거':/햄버거|수제\s*버거|버거|\b(?:hamburger|burger|burgers|smashburger)\b/i,
     '고기·구이':/고기\s*[·/]?\s*구이|고[기깃]집|삼겹살|오겹살|목살|갈비(?!\s*치킨)|숯불|불고기|바[베비]큐|비비큐|\bbbq\b|\bbarbe[cq]ue\b|\bgrilled\s+(?:meat|beef|pork)\b|\bthit\s+nuong\b|\bsuon\s+nuong\b/i,
     '회':/초밥\s*[·/]\s*회|횟집|회집|사시미|생선회|활어회|모[둠듬]회|광어회|연어회|참치회|\bsashimi\b|\braw\s+fish\b|\bgoi\s+ca\b|(?:^|\s)회(?=\s|[·/,]|$|(?:를|가|는|도|로|와|랑|만|가\s*아니라))/i,
     '반미':/반미|banh\s*mi/i,
@@ -202,7 +203,7 @@
   }
   function show(){panel.hidden=false;input.setAttribute('aria-expanded','true');fitPanel();}
   function syncInput(){send.disabled=!!controller||input.value.trim().length<2;if(clear)clear.hidden=!input.value;}
-  function cancel(){revision++;controller?.abort();hoursController?.abort();googleController?.abort();controller=null;hoursController=null;googleController=null;syncInput();form.removeAttribute('aria-busy');}
+  function cancel(){revision++;controller?.abort();hoursController?.abort();googleController?.abort();window.AIResultActions?.cancel();controller=null;hoursController=null;googleController=null;syncInput();form.removeAttribute('aria-busy');}
   function close(){cancel();panel.hidden=true;input.setAttribute('aria-expanded','false');}
   function reset(){list.replaceChildren();examples.hidden=false;status.textContent='예시를 누르면 바로 찾아드려요. 직접 질문해도 좋아요.';title.textContent='이렇게 물어보세요';byId('aiMapNote').textContent='회원 등록 업소를 먼저, Google 지도 업소를 함께 찾아요.';}
   function waitForPlaces(signal){
@@ -287,6 +288,7 @@
       if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
       if(entry.intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b></b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
       button.addEventListener('click',()=>{close();input.blur();window.PlaceSearch?.openGoogle(row);});li.append(button);(row.room?.kind==='unknown'&&unknownResults?unknownResults:results).append(li);
+      window.AIResultActions?.appendDelivery(li,row,entry.intent);
       for(const review of new Set([row.room?.review,...(row.proofs||[]).map(p=>p.source.review)].filter(Boolean)))appendReviewAttribution(li,review);
       if(row.hours)showHours(button,row.hours);
       else{
@@ -339,6 +341,7 @@
     list.replaceChildren();examples.hidden=true;title.textContent='AI 검색 결과';
     list.classList.remove('aiRankingPending');
     const note=byId('aiMapNote');note.textContent='질문 조건에 맞는 업소만 표시하고, 그 안에서 회원 등록·강추·혜택 정보를 보여드려요. Google 검색은 최대 20곳의 업종·지역·평점을 확인합니다.';
+    const product=window.AIResultActions?.renderProduct(list,intent||{});if(product){title.textContent=product.title;status.textContent=product.status;note.textContent=product.note;return;}
     const travel=window.AITravelSearch?.render(list,intent||{});if(travel){title.textContent=travel.title;status.textContent=travel.status;note.textContent=travel.note;return;}
     if(!intent?.relevant){note.textContent='확인되지 않은 내용을 답으로 만들지 않고, 원래 질문과 관련된 정보를 더 찾을 수 있게 연결합니다.';status.textContent='질문에 답할 장소·여행 정보를 아직 확인하지 못했어요.';window.AITravelSearch?.fallback(list,intent?.requestText||input.value);return;}
     if(window.AISearchInsights?.renderGuide(list,intent)){title.textContent='이동·예약 안내';status.textContent='출발 항구와 공식 예매처';note.textContent='공식 선사 안내를 바탕으로 작성했습니다. 아래 링크에서 실제 출발일 정보를 확인하세요.';return;}
@@ -346,6 +349,8 @@
     if(intent.nearby&&!state.nearby){status.textContent='먼저 지도 아래 ‘주변 찾기’에서 현재 위치나 숙소를 지정한 뒤 다시 질문해 주세요.';return;}
     if(intent.unsupported?.length){status.textContent='확인이 필요한 조건: '+intent.unsupported.join(', ');window.AITravelSearch?.fallback(list,intent.requestText||input.value);return;}
     if(state.sharedDbLoading){status.textContent='등록 업소를 불러오는 중이에요. 잠시 후 질문창을 다시 눌러 주세요.';return;}
+    window.AIResultActions?.deliveryIntro(list,intent);
+    if(intent.action==='grabfood')note.textContent='음식 조건에 맞는 업소를 찾습니다. GrabFood 등록·배달 가능 여부는 별도이며, 확인된 주문 링크가 없으면 업소명을 복사해 찾을 수 있습니다.';
     const results=buildResults(intent,db(),state.nearby);
     const {rows}=results;
     if(last?.insights)for(const row of rows)if(last.insights.has(row.place.id))row.insights=last.insights.get(row.place.id);
@@ -398,6 +403,7 @@
       if(unconfirmed.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=unconfirmed.join(' · ');button.append(info);}
       button.addEventListener('click',()=>{if(!db().places.some(p=>p.id===place.id)){render(intent);return;}close();input.blur();window.PlaceSearch?.openMember(place.id);});
       li.append(button);(row.room?.kind==='unknown'&&unknownList?unknownList:list).append(li);
+      window.AIResultActions?.appendDelivery(li,row,intent);
       const result=last?.hours?.get(place.id);if(intent.visitToday&&result)showHours(button,result);
     }
     checkHours(rows,intent);
@@ -418,7 +424,7 @@
     event.preventDefault();const query=input.value.trim();if(query.length<2||query.length>300||controller)return;
     cancel();const token=revision;controller=new AbortController();const signal=controller.signal;
     send.disabled=true;form.setAttribute('aria-busy','true');examples.hidden=true;list.replaceChildren();title.textContent='AI가 조건을 찾고 있어요';status.textContent='회원 등록 업소와 Google 지도에서 찾아볼게요…';show();input.blur();
-    const pending=controller;const timeout=setTimeout(()=>pending.abort(),22000);
+    const pending=controller;const timeout=setTimeout(()=>pending.abort(),30000);
     try{
       const response=await fetch('/api/ask-map',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,city:state.city}),signal});
       const payload=await response.json();
@@ -426,7 +432,7 @@
       if(!response.ok)throw Error(payload.error||'AI 검색을 잠시 사용할 수 없어요. 기존 검색창을 이용해 주세요.');
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
       await prepareDistricts(payload.intent,signal);
-      if(!payload.intent.transport&&!payload.intent.guideTopic)await waitForPlaces(signal);
+      if(!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch)await waitForPlaces(signal);
       if(token!==revision)return;
       last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
     }catch(error){if(token!==revision)return;window.AITravelSearch?.fallback(list,query);title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}

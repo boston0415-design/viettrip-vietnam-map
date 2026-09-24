@@ -48,12 +48,13 @@
     return !intent.category||(CATEGORY_TYPES[intent.category]||[]).some(type=>types.includes(type));
   }
   function termProof(place,term){
+    if(term==='햄버거'&&(place.types||[]).includes('hamburger_restaurant'))return {evidence:'Google 업종 · 햄버거',source:{label:'Google 업종'}};
     if(term==='고기·구이'&&(place.types||[]).some(type=>['barbecue_restaurant','korean_barbecue_restaurant'].includes(type)))return {evidence:'Google 업종 · 고기·구이',source:{label:'Google 업종'}};
     return window.AIMapSearch.evidenceFor(sourcesFor(place),term);
   }
   function queryFor(intent,includeRoom=true){
     if(intent.productSearch)return [window.NameSearch?.googleQuery(intent.requestText)||intent.requestText,intent.productKind==='computer'?'computer electronics store':'mobile phone store',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
-    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term));
+    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'햄버거':'burger','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term));
     const specialty=terms.some(waxing);
     return [includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,intent.hotelStars?intent.hotelStars+' star':'',specialty?'':({'베이커리':'bakery','호텔':'hotel','로컬 KTV':'local Vietnamese karaoke'}[intent.subcategory]||SUBS[intent.subcategory]||CATEGORIES[intent.category]||''),
       ...(intent.preferences||[]).filter(p=>['quiet','rooftop','cheap','atmosphere'].includes(p)).map(p=>p==='atmosphere'?'nice atmosphere':p==='cheap'?'affordable':p),
@@ -120,7 +121,7 @@
       if(intent.nearby&&(!nearby||geoDistanceMeters(position,nearby)>nearby.radius))continue;
       const termMatch=!!intent.terms?.length&&intent.terms.every(term=>window.AIMapSearch.menuKeyword(place.name,term));
       const cuisineProof=intent.cuisineAsMenu&&!p.types?.includes(CUISINES[intent.subcategory]?.[1])?window.AIMapSearch.cuisineEvidence(sourcesFor(p),intent.subcategory):null;
-      const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',attributions:p.attributions||[],cuisineByMenu:!!cuisineProof,
+      const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',...(intent.action==='grabfood'?{websiteURI:p.websiteURI||''}:{}),attributions:p.attributions||[],cuisineByMenu:!!cuisineProof,
         proofs:[...(cuisineProof?[cuisineProof]:[]),...proofs].slice(0,2).map(proof=>({...proof,evidence:proof.source.label==='Google 업소 설명'?'Google 업소 설명 · '+p.editorialSummary:proof.evidence}))};
       row.insights=window.AISearchInsights?.inspect(p,intent,sourcesFor(p));
       if(row.insights?.hotelClass?.kind==='different')continue;
@@ -150,6 +151,7 @@
     if(typeof Place?.searchByText!=='function')throw Error('GOOGLE_UNAVAILABLE');
     const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','types','attributions'];
     if(!intent.productSearch)fields.push('priceLevel','priceRange');
+    if(intent.action==='grabfood')fields.push('websiteURI');
     const roomSearch=window.AIMapSearch.wantsRoom(intent);
     if(intent.terms?.length||roomSearch||intent.cuisineAsMenu||intent.sortBy==='atmosphere'||intent.hotelStars)fields.push('editorialSummary','reviews');
     if(intent.visitToday)fields.push('currentOpeningHours');
