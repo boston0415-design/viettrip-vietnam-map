@@ -334,7 +334,7 @@ function renderRatingFilterState(){
 function matchesBusinessQuery(p,query){
   const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/\s+/g,' ').trim();
   const text=normalize(`${p.name} ${p.area} ${p.address} ${catLabel(p.category)} ${p.subcategory} ${(p.tags||[]).join(' ')}`);
-  return normalize(query).split(' ').filter(Boolean).every(token=>text.includes(token));
+  return window.NameSearch?.matches(p.name,query,text) || normalize(query).split(' ').filter(Boolean).every(token=>text.includes(token));
 }
 function items({ratingFilter=state.ratingFilter,forList=false}={}){
   const hiddenView=window.PersonalPlaces?.getView()==='hidden';

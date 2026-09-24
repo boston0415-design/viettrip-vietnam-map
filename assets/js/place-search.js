@@ -13,8 +13,9 @@
       .map(p=>{
         const name=text(p.name),haystack=text([p.name,p.address,p.area,catLabel(p.category),p.subcategory,(p.tags||[]).join(' ')].join(' '));
         const compact=key.replace(/ /g,'');
-        const match=words.every(word=>haystack.includes(word)) || (compact.length>=3 && name.replace(/ /g,'').includes(compact));
-        return {p,match,rank:name===key?0:name.startsWith(key)?1:name.includes(key)?2:3};
+        const aliasRank=window.NameSearch?.score(p.name,q,haystack)??-1;
+        const match=aliasRank>=0 || words.every(word=>haystack.includes(word)) || (compact.length>=3 && name.replace(/ /g,'').includes(compact));
+        return {p,match,rank:aliasRank>=0?aliasRank:name===key?0:name.startsWith(key)?1:name.includes(key)?2:5};
       }).filter(x=>x.match).sort((a,b)=>a.rank-b.rank||String(a.p.name).localeCompare(String(b.p.name),'ko'))
       .slice(0,8).map(({p})=>({id:p.id,name:p.name,address:[CITY_DATA[placeCityKey(p)]?.label,p.address||p.area].filter(Boolean).join(' · '),source:'member'}));
   }
@@ -57,7 +58,7 @@
       try{
         const center=position(state.map.getCenter?.())||currentCity()?.center;
         const predictions=await googlePhotoRequest(service,'getPlacePredictions',{
-          input:q,componentRestrictions:{country:'vn'},sessionToken:session,
+          input:window.NameSearch?.googleQuery(q)||q,componentRestrictions:{country:'vn'},sessionToken:session,
           ...(center?{locationBias:{center,radius:50000}}:{})
         });
         if(version!==revision || q!==input().value.trim())return [];
@@ -158,7 +159,7 @@
     // Explicit submit fallback only: no text-search/nearby calls on every keystroke.
     const svc=services();if(!svc)return;
     try{
-      const result=await googlePhotoRequest(svc,'findPlaceFromQuery',{query:q+' Vietnam',fields:['place_id','name','formatted_address','geometry'],...(currentCity()?.center?{locationBias:{center:currentCity().center,radius:50000}}:{})});
+      const result=await googlePhotoRequest(svc,'findPlaceFromQuery',{query:(window.NameSearch?.googleQuery(q)||q)+' Vietnam',fields:['place_id','name','formatted_address','geometry'],...(currentCity()?.center?{locationBias:{center:currentCity().center,radius:50000}}:{})});
       if(version!==revision)return;
       rows=(result||[]).map(p=>({placeId:p.place_id,name:p.name,address:p.formatted_address,position:p.geometry?.location,source:'google'}));
       if(rows.length===1)return select(rows[0]);show();

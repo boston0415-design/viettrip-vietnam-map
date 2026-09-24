@@ -81,3 +81,5 @@
 .aiRoomCredit a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 
 .aiPrice{display:block;font-weight:700;color:#365d57;font-size:12px}.aiRankingPending>li:not(#aiGoogleSection){display:none}.aiTravelAnswer{padding:14px;border:1px solid #dbe6e2;border-radius:14px;background:#f7faf8;line-height:1.65}.aiTravelAnswer h3{margin:0 0 8px;font-size:15px}.aiTravelAnswer p{margin:8px 0}.aiTravelAnswer a{display:block;padding:12px;margin:8px 0;background:#fff;border:1px solid #d3e1dc;border-radius:10px;color:#247b72;font-weight:700;text-decoration:none}.aiRankingPending .aiGoogleStatus{min-height:55px}
+
+.aiTravelAnswer+ .aiTravelAnswer{margin-top:12px}.aiTravelPlace{display:block;width:100%;text-align:left;padding:12px;margin:8px 0;border:1px solid #d3e1dc;border-radius:10px;background:white;color:#247b72;font:inherit;font-weight:650;cursor:pointer}.aiTravelAnswer a:focus-visible,.aiTravelPlace:focus-visible{outline:3px solid #247b72;outline-offset:2px}

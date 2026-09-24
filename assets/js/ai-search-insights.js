@@ -51,6 +51,7 @@
   }
   function inspect(raw,intent,sources=[]){
     const preferences=preferenceEvidence(sources,intent);
+    if(intent.productSearch)return {price:{known:false,label:'제품별 판매가 미확인'},preferenceHits:[],proofs:[],hotelClass:null};
     return {price:price(raw),preferenceHits:preferences.hits,proofs:preferences.proofs,hotelClass:hotelInfo(sources,intent.hotelStars),googleRating:Number(raw.rating)||null,googleCount:Number(raw.userRatingCount)||0};
   }
   function mergeMember(row,info,intent){
@@ -84,6 +85,7 @@
   }
   const sortLabel=intent=>({cheap:'확인된 금액 낮은 순 · 금액 없는 곳은 가격 수준순 · 미확인은 마지막',atmosphere:'요청한 분위기 관련 근거 우선',popular:'후기 수 많은 순 · 유명도 확정은 아님',top_rated:'이용자 평점 높은 순 · 같은 평점은 후기 수 순'}[intent.sortBy]||'');
   function append(button,row,intent){
+    if(intent.productSearch)return;
     const info=row.insights||{},p=info.price;
     if(row.place&&intent.sortBy&&info.googleRating){const line=document.createElement('span');line.className='aiRating aiGoogleRank';line.textContent='Google ★ '+info.googleRating.toFixed(1)+' · 후기 '+info.googleCount.toLocaleString('ko-KR')+'개';button.append(line);}
     if(p?.known||intent.showPrice){const line=document.createElement('span');line.className='aiPrice';line.textContent=p?.known?p.source+' · '+p.label:'가격 정보 미확인 · 업소에 문의';button.append(line);}
