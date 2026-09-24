@@ -302,7 +302,8 @@
     resultTitle(entry);
     for(const row of entry.memberRows||[]){
       const button=[...list.querySelectorAll('.aiMemberResult')].find(b=>b.dataset.placeId===row.place.id);if(!button)continue;
-      button.querySelectorAll('.aiPrice,.aiHotelClass,.aiAudienceInfo,.aiBudgetInfo,.aiEnrichedProof').forEach(n=>n.remove());
+      button.querySelectorAll('.aiPrice,.aiHotelClass,.aiAudienceInfo,.aiBudgetInfo,.aiEnrichedProof,.aiGoogleRank').forEach(n=>n.remove());
+      if(row.insights?.preferenceHits?.length)button.querySelectorAll('.aiAlternativeNote').forEach(n=>{if(n.textContent==='분위기·방문 목적은 직접 확인해 주세요')n.remove();});
       if(entry.intent.hotelStars&&row.insights?.hotelClass?.kind!=='confirmed')button.querySelectorAll('.aiBenefit,.aiRecommended,.aiBenefitCopy').forEach(n=>n.remove());
       window.AISearchInsights?.append(button,row,entry.intent);
       for(const proof of row.insights?.proofs||[]){const p=document.createElement('span');p.className='aiEvidence aiEnrichedProof';p.textContent=proof.evidence;button.append(p);if(proof.source.review)appendReviewAttribution(button.parentElement,proof.source.review);}

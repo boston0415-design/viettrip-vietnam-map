@@ -25,6 +25,8 @@ const {JSDOM}=require('jsdom'),root=path.join(__dirname,'..'),read=p=>fs.readFil
  for(const f of ['place-photos','ai-search-insights','ai-google-search','ai-map-search'])run(read('assets/js/'+f+'.js'));
  const I=w.AISearchInsights;
  assert.equal(I.price({priceRange:{startPrice:{units:'50000',currencyCode:'VND'},endPrice:{units:'100000',currencyCode:'VND'}}}).label,'50,000 VND–100,000 VND');
+ assert.equal(I.price({priceRange:{startPrice:{units:'1',currencyCode:'VND'},endPrice:{units:'100000',currencyCode:'VND'}}}).label,'100,000 VND 이하','Google lowest price bucket is not a one-dong menu price');
+ assert(I.compare({insights:{price:{known:true,currency:'VND',low:100000,high:200000}}},{insights:{price:{known:true,currency:'VND',low:100000,high:500000}}},cheap)<0,'equal starting prices use lower upper range first');
  assert.equal(I.price({priceRange:{startPrice:{units:'100',currencyCode:'USD'},endPrice:{units:'1',currencyCode:'USD'}}}).known,false);
  assert.equal(I.price({priceLevel:'INEXPENSIVE'}).label,'저렴');assert.equal(I.price({priceLevel:'VeryExpensive'}).label,'매우 높은 가격대');assert.equal(I.price({}).known,false);
  const priced=(low,currency='VND',level=null)=>({insights:{price:{known:true,low,currency,level}}});

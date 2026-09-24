@@ -21,7 +21,7 @@
     const low=money(raw.priceRange?.startPrice),high=money(raw.priceRange?.endPrice);
     const key=String(raw.priceLevel||'').replace(/^PRICE_LEVEL_/,'').replace(/([a-z])([A-Z])/g,'$1_$2').toUpperCase();
     const level=LEVELS[key];
-    if(low&&(!high||(high.currency===low.currency&&high.amount>=low.amount)))return {known:true,low:low.amount,high:high?.amount??null,currency:low.currency,level:level?.[0]??null,label:high?formatMoney(low)+'–'+formatMoney(high):formatMoney(low)+'부터',source:'Google 가격대'};
+    if(low&&(!high||(high.currency===low.currency&&high.amount>=low.amount)))return {known:true,low:low.amount,high:high?.amount??null,currency:low.currency,level:level?.[0]??null,label:high?(low.currency==='VND'&&low.amount===1?formatMoney(high)+' 이하':formatMoney(low)+'–'+formatMoney(high)):formatMoney(low)+'부터',source:'Google 가격대'};
     if(level)return {known:true,level:level[0],label:level[1],source:'Google 가격 수준'};
     return {known:false,level:null,label:'가격 정보 없음',source:''};
   }
@@ -63,6 +63,7 @@
       if(an&&bn){
         if(ap.currency!==bp.currency)return Number(bp.currency==='VND')-Number(ap.currency==='VND')||ap.currency.localeCompare(bp.currency);
         if(ap.low!==bp.low)return ap.low-bp.low;
+        const ah=ap.high??Infinity,bh=bp.high??Infinity;if(ah!==bh)return ah-bh;
       }else if(ap.level!=null&&bp.level!=null&&ap.level!==bp.level)return ap.level-bp.level;
     }
     if(intent.sortBy==='atmosphere'){
@@ -77,6 +78,7 @@
   const sortLabel=intent=>({cheap:'확인된 금액 낮은 순 · 금액 없는 곳은 가격 수준순 · 미확인은 마지막',atmosphere:'요청한 분위기 관련 근거 우선',popular:'후기 수 많은 순 · 유명도 확정은 아님',top_rated:'이용자 평점 높은 순 · 같은 평점은 후기 수 순'}[intent.sortBy]||'');
   function append(button,row,intent){
     const info=row.insights||{},p=info.price;
+    if(row.place&&intent.sortBy&&info.googleRating){const line=document.createElement('span');line.className='aiRating aiGoogleRank';line.textContent='Google ★ '+info.googleRating.toFixed(1)+' · 후기 '+info.googleCount.toLocaleString('ko-KR')+'개';button.append(line);}
     if(p?.known||intent.showPrice){const line=document.createElement('span');line.className='aiPrice';line.textContent=p?.known?p.source+' · '+p.label:'가격 정보 미확인 · 업소에 문의';button.append(line);}
     if(intent.budget){const line=document.createElement('span');line.className='aiAlternativeNote aiBudgetInfo';line.textContent='일행 전체 총액·포함 항목 미확인 · 예산에 맞는지 문의 필요';button.append(line);}
     if(info.hotelClass){const line=document.createElement('span');line.className='aiAlternativeNote aiHotelClass';line.textContent=info.hotelClass.kind==='confirmed'?info.hotelClass.stars+'성급 안내 있음 · 예약 전 확인':info.hotelClass.stars+'성급 여부 미확인 · 이용자 별점과 별개';button.append(line);}
