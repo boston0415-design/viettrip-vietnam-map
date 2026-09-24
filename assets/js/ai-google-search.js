@@ -19,12 +19,17 @@
   const cuisineWords=cuisine=>CUISINES[cuisine]?[CUISINES[cuisine][0]]:[];
   const sourcesFor=place=>[{label:'Google 업소명',text:place.displayName||''},{label:'Google 업소 설명',text:place.editorialSummary||''},...(place.reviews||[]).filter(r=>r.authorAttribution?.displayName).map(review=>({label:'Google 후기',text:review.text||review.originalText||'',review}))];
   function includedType(intent){
+    if(intent.subcategory==='베이커리')return 'bakery';
+    if(intent.subcategory==='호텔')return 'hotel';
     if(intent.category==='restaurant')return intent.cuisineAsMenu?'restaurant':CUISINES[intent.subcategory]?.[1]||'restaurant';
     if(intent.category==='bar'&&intent.subcategory==='클럽')return 'night_club';
     return '';
   }
   function typeMatches(place,intent){
     const types=place.types||[];
+    if(intent.subcategory==='베이커리')return types.includes('bakery');
+    if(intent.subcategory==='호텔')return types.includes('hotel')||types.includes('lodging');
+    if(intent.subcategory==='로컬 KTV'&&/한인|한국식|korean karaoke|일본식|japanese karaoke|중국식|chinese karaoke/i.test([place.displayName,place.editorialSummary].join(' ')))return false;
     if(intent.category==='restaurant'&&intent.subcategory){
       const cuisine=CUISINES[intent.subcategory];
       if(!cuisine)return false;
@@ -44,10 +49,10 @@
     return window.AIMapSearch.evidenceFor(sourcesFor(place),term);
   }
   function queryFor(intent,includeRoom=true){
-    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'고기·구이':'BBQ','회':'sashimi'}[term]||term));
+    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||term));
     const specialty=terms.some(waxing);
-    return [includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,specialty?'':SUBS[intent.subcategory]||CATEGORIES[intent.category]||'',
-      ...(intent.preferences||[]).filter(p=>['quiet','rooftop'].includes(p)),
+    return [includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,intent.hotelStars?intent.hotelStars+' star':'',specialty?'':({'베이커리':'bakery','호텔':'hotel','로컬 KTV':'local Vietnamese karaoke'}[intent.subcategory]||SUBS[intent.subcategory]||CATEGORIES[intent.category]||''),
+      ...(intent.preferences||[]).filter(p=>['quiet','rooftop','cheap','atmosphere'].includes(p)).map(p=>p==='atmosphere'?'nice atmosphere':p==='cheap'?'affordable':p),
       AREAS[intent.area]||intent.area,intent.district?'Quận '+intent.district:'',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
   }
   function boundsFor(intent,boundaries,nearby){
@@ -68,7 +73,7 @@
       (typeof googlePhotoSavedId==='function'&&googlePhotoSavedId(googlePhotoKey(p))===row.placeId)||
       (typeof googlePhotoBranchMatches==='function'&&googlePhotoBranchMatches(p,raw)))||null;
   }
-  function rowsFrom(raw,intent,{boundaries=[],nearby=null,places=[]}={}){
+  function rowsFrom(raw,intent,{boundaries=[],nearby=null,places=[],memberUpdates=new Map()}={}){
     // Google cannot establish community-only endorsements or partner benefits.
     if(intent.benefit||intent.recommended)return [];
     const seen=new Set(),rows=[];
@@ -88,6 +93,9 @@
       const cuisineProof=intent.cuisineAsMenu&&!p.types?.includes(CUISINES[intent.subcategory]?.[1])?window.AIMapSearch.cuisineEvidence(sourcesFor(p),intent.subcategory):null;
       const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',attributions:p.attributions||[],cuisineByMenu:!!cuisineProof,
         proofs:[...(cuisineProof?[cuisineProof]:[]),...proofs].slice(0,2).map(proof=>({...proof,evidence:proof.source.label==='Google 업소 설명'?'Google 업소 설명 · '+p.editorialSummary:proof.evidence}))};
+      row.insights=window.AISearchInsights?.inspect(p,intent,sourcesFor(p));
+      if(row.insights?.hotelClass?.kind==='different')continue;
+      row.proofs=[...(row.insights?.proofs||[]),...row.proofs].slice(0,3).map(proof=>({...proof,evidence:proof.source.label==='Google 업소 설명'?'Google 업소 설명 · '+p.editorialSummary:proof.evidence}));
       if(window.AIMapSearch.wantsRoom(intent)){
         const sources=[{label:'Google 업소 설명',text:p.editorialSummary||''},...(p.reviews||[]).filter(r=>r.authorAttribution?.displayName).map(review=>({label:'Google 후기',text:review.text||review.originalText||'',review}))];
         row.room=window.AIMapSearch.roomInfo(sources);
@@ -99,20 +107,21 @@
           else row.room.evidence='Google 업소 설명 · '+p.editorialSummary;
         }
       }
-      if(!row.name||registeredMatch(row,places))continue;
+      if(!row.name)continue;
+      const member=registeredMatch(row,places);if(member){memberUpdates.set(member.id,row.insights);continue;}
       if(intent.visitToday&&window.AIPlaceHours)row.hours={...window.AIPlaceHours.summarize(p),attributions:row.attributions};
       seen.add(p.id);rows.push(row);
     }
-    return rows.sort((a,b)=>Number(b.room?.kind==='confirmed')-Number(a.room?.kind==='confirmed')||Number(b.termMatch)-Number(a.termMatch)||b.rating-a.rating||b.ratingCount-a.ratingCount||a.name.localeCompare(b.name));
+    return rows.sort((a,b)=>Number(b.room?.kind==='confirmed')-Number(a.room?.kind==='confirmed')||(window.AISearchInsights?.compare(a,b,intent)||0)||Number(b.termMatch)-Number(a.termMatch)||b.rating-a.rating||b.ratingCount-a.ratingCount||a.name.localeCompare(b.name));
   }
   async function search(intent,{signal,boundaries=[],nearby=null,places=[]}={}){
     if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
     if(intent.benefit||intent.recommended)return [];
     const Place=window.google?.maps?.places?.Place;
     if(typeof Place?.searchByText!=='function')throw Error('GOOGLE_UNAVAILABLE');
-    const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','types','attributions'];
+    const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','types','attributions','priceLevel','priceRange'];
     const roomSearch=window.AIMapSearch.wantsRoom(intent);
-    if(intent.terms?.length||roomSearch||intent.cuisineAsMenu)fields.push('editorialSummary','reviews');
+    if(intent.terms?.length||roomSearch||intent.cuisineAsMenu||intent.sortBy==='atmosphere'||intent.hotelStars)fields.push('editorialSummary','reviews');
     if(intent.visitToday)fields.push('currentOpeningHours');
     const bounds=boundsFor(intent,boundaries,nearby);
     const type=includedType(intent);
@@ -131,15 +140,15 @@
       }finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}
     }
     const raw=await fetchPlaces(request.textQuery);
-    let rows=rowsFrom(raw,intent,{boundaries,nearby,places});
+    const memberUpdates=new Map();let rows=rowsFrom(raw,intent,{boundaries,nearby,places,memberUpdates});
     // One bounded supplemental request prevents sparse amenity search text
     // hiding the same-area/cuisine inquiry leads. Never loosen type or geography.
     const menuQuery=intent.terms?.includes('고기·구이')?request.textQuery.replace('BBQ','grilled meat'):intent.terms?.includes('회')?request.textQuery.replace('sashimi','횟집 sashimi'):null;
     if((roomSearch||menuQuery)&&rows.length<5){
-      try{rows=rowsFrom([...raw,...await fetchPlaces(roomSearch?queryFor(intent,false):menuQuery)],intent,{boundaries,nearby,places});}
+      try{rows=rowsFrom([...raw,...await fetchPlaces(roomSearch?queryFor(intent,false):menuQuery)],intent,{boundaries,nearby,places,memberUpdates});}
       catch(error){if(error.name==='AbortError'||!rows.length)throw error;}
     }
-    return rows.slice(0,20);
+    const result=rows.slice(0,20);result.memberUpdates=memberUpdates;return result;
   }
   window.AIGoogleSearch={search,queryFor,rowsFrom,boundsFor,typeMatches,includedType,cuisineWords};
 })();
