@@ -13,7 +13,8 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
  const place=(id,rating=4.5,count=100,address='Quận 12, Hồ Chí Minh')=>({id,displayName:'Waxing '+id,formattedAddress:address,location:{lat:10.867,lng:106.654},rating,userRatingCount:count,businessStatus:'OPERATIONAL',addressComponents:[{types:['country'],shortText:'VN'}],attributions:[]});
  const raw=[place('five',5,10),place('many',5,200),place('low',3.9),place('norating',undefined,0),place('eleven',5,200,'Quận 11, Hồ Chí Minh'),{...place('closed'),businessStatus:'CLOSED_PERMANENTLY'},place('many',5,200),{...place('foreign'),addressComponents:[{types:['country'],shortText:'US'}]}];
  const rows=w.AIGoogleSearch.rowsFrom(raw,intent,{boundaries});
- assert.deepEqual(Array.from(rows,r=>r.placeId),['many','five']);
+ assert.deepEqual(Array.from(rows,r=>r.placeId),['many','five']);assert.equal(rows[0].name,'Waxing many','preserve original business name');
+ const specific=w.AIGoogleSearch.rowsFrom([{...place('broad',5,999),displayName:'일반 스파'},place('specific',4.5,20)],intent,{boundaries});assert.equal(specific[0].placeId,'specific','explicit service in the name precedes broad related results');
  assert.match(w.AIGoogleSearch.queryFor(intent),/waxing Quận 12 Ho Chi Minh City Vietnam/);assert(!w.AIGoogleSearch.queryFor(intent).includes('barber'));
  const bounds=w.AIGoogleSearch.boundsFor(intent,boundaries);assert(bounds.north>10.867&&bounds.south<10.867&&bounds.west<106.654&&bounds.east>106.654);
  assert.equal(w.AIGoogleSearch.rowsFrom([place('duplicate')],intent,{places:[{id:'registered',googlePlaceId:'duplicate'}]}).length,0);

@@ -40,16 +40,17 @@
       if(['CLOSED_PERMANENTLY','CLOSED_TEMPORARILY','FUTURE_OPENING'].includes(p.businessStatus))continue;
       const country=p.addressComponents?.find(c=>c.types?.includes('country'));
       if(country&&country.shortText!=='VN')continue;
-      const place={name:googlePhotoText(p.displayName),address:p.formattedAddress||'',...position};
+      const place={name:String(p.displayName||'').trim(),address:p.formattedAddress||'',...position};
       if(intent.city!=='all'&&placeCityKey(place)!==intent.city)continue;
       if(!window.AIMapSearch.districtMatches(place,intent.district,boundaries)||!window.AIMapSearch.areaMatches(place,intent.area))continue;
       if(intent.nearby&&(!nearby||geoDistanceMeters(position,nearby)>nearby.radius))continue;
-      const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,source:'google',attributions:p.attributions||[]};
+      const termMatch=!!intent.terms?.length&&intent.terms.every(term=>waxing(term)?/왁싱|waxing|wax long/.test(normalize(place.name)):normalize(place.name).includes(normalize(term)));
+      const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',attributions:p.attributions||[]};
       if(!row.name||registeredMatch(row,places))continue;
       if(intent.visitToday&&window.AIPlaceHours)row.hours={...window.AIPlaceHours.summarize(p),attributions:row.attributions};
       seen.add(p.id);rows.push(row);
     }
-    return rows.sort((a,b)=>b.rating-a.rating||b.ratingCount-a.ratingCount||a.name.localeCompare(b.name));
+    return rows.sort((a,b)=>Number(b.termMatch)-Number(a.termMatch)||b.rating-a.rating||b.ratingCount-a.ratingCount||a.name.localeCompare(b.name));
   }
   async function search(intent,{signal,boundaries=[],nearby=null,places=[]}={}){
     if(signal?.aborted)throw new DOMException('Cancelled','AbortError');

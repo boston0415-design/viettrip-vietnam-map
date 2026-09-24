@@ -179,7 +179,7 @@
       retry.addEventListener('click',()=>{entry.google=null;renderGoogle(entry);searchGoogle(entry);});section.append(retry);return;
     }
     const rows=entry.google.rows;
-    message.textContent=rows.length?'Google 평점 4점 이상 · 평점, 후기 수 순':'이 지역에서 조건에 맞는 Google 평점 4점 이상 업소를 찾지 못했어요.';
+    message.textContent=rows.length?(entry.intent.terms.length?'업소명에 검색어가 있는 곳 우선 · ':'')+'Google 평점 4점 이상 · 평점, 후기 수 순':'이 지역에서 조건에 맞는 Google 평점 4점 이상 업소를 찾지 못했어요.';
     if(entry.intent.benefit||entry.intent.recommended)message.textContent+=' 카페 혜택·회원 강추 여부는 확인되지 않은 업소입니다.';
     if(rows.length)title.textContent='추천 업소 · '+(entry.memberCount+rows.length)+'곳';
     const results=document.createElement('ul');results.className='aiGoogleResults';results.setAttribute('aria-label','Google 지도 추천 업소');section.append(results);
