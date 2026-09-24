@@ -16,7 +16,7 @@ function app(local=new Map(),session=new Map(),blocked=false){
   const c=vm.createContext({console:{log(){},warn(){},error(){}},URL,Map,Set,Promise,setTimeout:()=>0,clearTimeout(){},setInterval:()=>0,clearInterval(){}});
   c.window=c;c.localStorage=storage(local);c.sessionStorage=storage(session);
   c.addEventListener=(name,fn)=>{const list=events.get(name)||[];list.push(fn);events.set(name,list)};
-  c.document={visibilityState:'visible',addEventListener:c.addEventListener,querySelector:node,querySelectorAll:()=>[]};
+  c.document={visibilityState:'visible',addEventListener:c.addEventListener,querySelector:node,querySelectorAll:()=>[],getElementById:id=>node('#'+id)};
   for(const file of fs.readdirSync(root).filter(f=>/^0[1-8]-/.test(f)).sort())vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),c,{filename:file});
   const run=code=>vm.runInContext(code,c);
   run('renderDetail=()=>{};');
@@ -54,6 +54,16 @@ async function login(a){a.node('#adminPassword').value=password;await a.run('sub
   pending.c.supaRpc=()=>new Promise(resolve=>{complete=resolve});
   const restoring=pending.run('restoreAdminSession()');await pending.run('toggleAdminMode()');complete(true);await restoring;
   assert.equal(pending.run('state.isAdmin'),false);assert.equal(pending.run('adminKey()'),'','late verification cannot reverse logout');
+
+  const canceled=app();let finishLogin;
+  canceled.c.supaRpc=()=>new Promise(resolve=>{finishLogin=resolve});
+  canceled.node('#adminPassword').value=password;
+  const loggingIn=canceled.run('submitAdminPassword()');
+  canceled.run("closeModalById('adminLoginModal')");finishLogin(true);await loggingIn;
+  assert.equal(canceled.run('state.isAdmin'),false,'a canceled login cannot silently grant admin access later');
+  assert.equal(canceled.run('adminKey()'),'');assert.equal(canceled.node('#adminLoginSubmit').disabled,false);
+  const opened=app();let operatorOpened=0;opened.c.MapMembership={openOperator(){operatorOpened++}};await login(opened);
+  assert.equal(operatorOpened,1,'successful login opens the actual operator screen');
 
   const deniedLogin=app();deniedLogin.c.supaRpc=async()=>{throw Error('offline')};await login(deniedLogin);
   assert.equal(deniedLogin.run('state.isAdmin'),false);assert.equal(deniedLogin.run('adminKey()'),'');

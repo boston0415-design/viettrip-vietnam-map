@@ -4,6 +4,22 @@
 .rank0{color:#66756b;background:#f4f6f4}.rank1{color:#347951;background:#edf7ef}.rank2{color:#256aa0;background:#edf5fc}.rank3{color:#266965;background:#eaf6f3}.rank4{color:#634b99;background:#f3effa}.rank5{color:#895b16;background:#fbf5e8}
 .rankPending{color:#718079;border-color:#dfe7e2}.rankBars{display:inline-flex;flex-direction:column;gap:2px;min-width:10px}.rankBars:empty{width:7px;height:7px;min-width:7px;border:1px solid currentColor;border-radius:50%}.rankBars i{width:11px;height:2px;background:currentColor}.rankStars{font-size:8px;letter-spacing:-1px}
 .memberDialog{width:min(560px,calc(100% - 24px));box-sizing:border-box;padding:24px;max-height:calc(100dvh - 28px);overflow-y:auto;overscroll-behavior:contain;color:#263e3c}
+.operatorDialog{width:min(720px,calc(100% - 24px));max-height:calc(100dvh - 28px);padding:0;overflow:hidden;color:#263e3c}
+.operatorDialog[open]{display:flex;flex-direction:column}
+body dialog.operatorDialog.desktopWindowSized{overflow:hidden!important}
+.operatorDialog .travellerDialogHead{flex:none;margin:0;padding:18px 20px;border-bottom:1px solid #e0e9e4;background:#fff}
+.operatorDialog .travellerDialogHead>button{width:44px;height:44px}
+.operatorBody{padding:18px 20px;overflow-y:auto;min-height:0;overscroll-behavior:contain;touch-action:pan-y pinch-zoom}
+.operatorCounts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 16px}
+.operatorCounts>div{background:#f3f7f4;border:1px solid #deE8e1;border-radius:10px;padding:12px}
+.operatorCounts dt{font-size:12px;color:#65796f}.operatorCounts dd{margin:6px 0 0;font-size:23px;font-weight:700}
+.operatorActions{display:flex;gap:8px;flex-wrap:wrap}.operatorDialog button{font:inherit;cursor:pointer}
+.operatorActions button,.operatorLogout{min-height:44px;padding:9px 14px;border:1px solid #cdded4;border-radius:9px;background:#f2f8f4;color:#275b46}
+.operatorDialog #memberAdminTools[hidden]{display:none!important}.operatorDialog .memberSection{margin-top:16px}.operatorDialog h3{font-size:17px}
+.operatorDialog #memberModeration article{overflow-wrap:anywhere}.operatorDialog #memberModeration button{white-space:normal}
+.operatorLogout{margin-top:20px;background:#fff;color:#65776f}.operatorDialog button:disabled{opacity:.6;cursor:wait}
+.operatorDialog :focus-visible{outline:2px solid #247f78;outline-offset:3px}
+@media(max-width:600px){.operatorCounts{grid-template-columns:repeat(2,minmax(0,1fr))}.operatorDialog .travellerDialogHead,.operatorBody{padding:14px}.operatorDialog .travellerDialogHead h2{font-size:20px}}
 .memberDialog .travellerDialogHead{align-items:center}.memberDialog h2{font-size:21px!important}.memberDialog h3{font-size:16px;margin:0 0 12px}.memberDialog h3 small{font-size:11px;font-weight:400;color:#718079}
 .memberDialog button:not(.travellerDialogHead button){font-family:inherit;cursor:pointer}.memberDialog button:disabled{opacity:.6;cursor:wait}
 .memberHero{border:1px solid #d5e6dd;border-radius:16px;background:linear-gradient(130deg,#eff7f2,#f9fcfa);padding:22px;text-align:center}

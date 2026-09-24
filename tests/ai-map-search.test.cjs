@@ -7,7 +7,7 @@ const intent={relevant:true,city:'hcmc',district:'1',area:'',preferences:[],visi
  let aiCalls=0;
  const env={AI:{run:async(model,body)=>{aiCalls++;assert(!JSON.stringify(body).includes('비공개 닉네임'));return {choices:[{message:{content:JSON.stringify(intent)}}]};}}};
  const req=(body,extra={})=>new Request('https://map.test/api/ask-map',{method:'POST',headers:{origin:'https://map.test','content-type':'application/json',...extra},body:JSON.stringify(body)});
- let response=await api.onRequest({request:req({query:'1군 동태탕 한식당',city:'hcmc'}),env});assert.equal(response.status,200);assert.deepEqual((await response.json()).intent,intent);
+ let response=await api.onRequest({request:req({query:'1군 동태탕 한식당',city:'hcmc'}),env});assert.equal(response.status,200);assert.deepEqual((await response.json()).intent,{...intent,requestText:'1군 동태탕 한식당'});
  response=await api.onRequest({request:req({query:'동태탕'}, {origin:'https://other.test'}),env});assert.equal(response.status,403);
  response=await api.onRequest({request:req({query:'가'.repeat(301)}),env});assert.equal(response.status,400);
  response=await api.onRequest({request:req({query:'동태탕'}),env:{}});assert.equal(response.status,503);

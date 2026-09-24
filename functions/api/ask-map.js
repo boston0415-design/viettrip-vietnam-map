@@ -141,6 +141,31 @@ export function clarifyIntent(intent,query){
 // A route query is not a simultaneous two-city business filter. The renderer
 // uses reviewed gateways and official booking links, never model-made fares.
 const ROUTE_CITIES={hcmc:['호치민','ho chi minh','saigon'],hanoi:['하노이','ha noi','hanoi'],danang:['다낭','da nang'],nhatrang:['나트랑','nha trang'],phuquoc:['푸꾸옥','푸꿕','phu quoc'],dalat:['달랏','dalat','da lat'],hoian:['호이안','hoi an'],vungtau:['붕따우','vung tau'],muine:['무이네','mui ne']};
+const DIRECTIONS=/어떻게.{0,12}(?:가|가야|갈|이동)|가는\s*(?:법|방법|길|교통)|가려면|교통편|이동\s*방법|how\s+(?:do|can|to).{0,30}(?:get|go|travel)|getting\s+to/i;
+export function destinationIntent(query,city){
+  const son=/(?:꼰|콘|껀)\s*(?:선|손)(?:\s*섬)?|c[oôồ]n\s+s[oơ]n/i.test(query);
+  const dao=/꼰다오|콘다오|꼰따오|c[oô]n\s+[dđ][aả]o/i.test(query);
+  if(!son&&!dao||!DIRECTIONS.test(query)&&!/교통|배편|페리|항공|비행기|ferry|flight/i.test(query))return null;
+  // Cồn Sơn in Cần Thơ and Côn Sơn in Côn Đảo are different places.
+  // Unaccented/Korean names alone cannot safely identify which island is meant.
+  const cantho=/껀터|껀토|깐토|칸토|can\s*tho|cần\s*thơ|cồn\s*sơn/i.test(query);
+  const condao=dao||/côn\s*sơn/i.test(query);
+  const origins=Object.entries(ROUTE_CITIES).filter(([,names])=>names.some(n=>query.toLowerCase().includes(n)));
+  const origin=origins.length===1?origins[0][0]:city;
+  return {relevant:true,city:CITIES.includes(origin)?origin:'all',terms:[],unsupported:[],preferences:[],requestText:query,
+    travelDestination:cantho&&!condao?'conson-cantho':condao&&!cantho?'condao':'conson-choice',
+    originExplicit:origins.length===1,originLabel:origins.length===1?ROUTE_CITIES[origin][0]:''};
+}
+const GUIDE_EVIDENCE={
+  'airport-arrival':/공항|입국|airport/i,'airport-options':/공항|airport/i,
+  'grab-green':/그랩|그린\s*SM|grab|green sm/i,exchange:/환전|exchange|currency/i,
+  'stay-choice':/숙소|호텔|accommodation|hotel/i,'member-benefits':/회원|혜택|제휴|benefit/i,
+  'before-flight':/입국|비자|출국|여권|visa|passport/i,'sim-data':/유심|이심|e-?sim|sim card/i,
+  'river-trip':/사이공\s*강|saigon\s*river|워터\s*버스|수상\s*버스|디너\s*크루즈|유람선/i,
+  'city-bus':/시내\s*버스|버스\s*(?:타는|이용|노선)|city\s*bus/i,
+  'food-reviews':/후기|리뷰|review/i,'useful-phrases':/베트남어|vietnamese\s*(?:phrase|language)/i,
+  help:/긴급|응급|분실|도난|도움|emergency|lost|help/i
+};
 export function routeIntent(query,city){
   const q=query.toLowerCase();
   if(!/교통|이동|가는\s*(?:법|방법)|어떻게.{0,8}가|버스|리무진|항공|비행기|기차|철도|배편|페리|배를|flight|train|transport|ferry|\bbus\b/.test(q))return null;
@@ -172,8 +197,20 @@ export function guideIntent(query,city){
   return {relevant:true,city,district:'',area:'',category:'',subcategory:'',terms:[],preferences:[],benefit:false,recommended:false,nearby:false,visitToday:false,unsupported:[],guideTopic:matches[0][0]};
 }
 export function extendIntent(intent,query,city){
+  const destination=destinationIntent(query,city);if(destination)return destination;
   const route=routeIntent(query,city);if(route)return {...route,requestText:query};
-  const next={...intent};
+  const next={...intent,requestText:query};
+  // An allowed topic ID is not proof that an article answers this question.
+  const rejectedGuide=next.guideTopic&&!GUIDE_EVIDENCE[next.guideTopic]?.test(query);
+  if(rejectedGuide)delete next.guideTopic;
+  if(next.transport){
+    const t=next.transport,q=query.toLowerCase();
+    if(!ROUTE_CITIES[t.destination]?.some(name=>q.includes(name))||t.originExplicit&&!ROUTE_CITIES[t.origin]?.some(name=>q.includes(name))){delete next.transport;next.travelHelp=true;}
+  }
+  // Never turn an unresolved itinerary into every business in the current city.
+  if(DIRECTIONS.test(query)&&!next.transport&&!next.guideTopic){
+    next.travelHelp=true;next.relevant=true;next.terms=[];next.category='';delete next.guide;
+  }
   // Actions are separate from place filters. A restaurant is not a taxi or a
   // delivery provider, and an order instruction is not a menu keyword.
   const foodRequest=/그랩\s*푸드|grab\s*food/i.test(query)&&/찾|추천|먹|연결|주문|배달|시켜|order|deliver|connect|find|recommend/i.test(query)&&!/그랩\s*푸드\s*(?:말고|제외)|without\s+grab/i.test(query);
@@ -204,6 +241,10 @@ export function extendIntent(intent,query,city){
     next.terms=[];delete next.sortBy;delete next.budget;next.showPrice=false;
     next.preferences=(next.preferences||[]).filter(p=>p!=='cheap');
     next.unsupported=next.unsupported.filter(t=>!/가격|재고|최저|저렴|싸|상품|제품|모델|price|stock/i.test(t));
+  }
+  if(!next.transport&&!next.guideTopic&&!next.guide&&!next.travelHelp&&!next.productSearch&&!next.category&&!next.terms.length&&!next.area&&!next.district&&!/업소|업체|가게|장소|places|businesses/i.test(query)){
+    next.relevant=false;
+    if(rejectedGuide)next.travelHelp=true;
   }
   return next;
 }
@@ -261,7 +302,7 @@ export async function onRequest(context){
   if(query.length<2||query.length>300)return json({error:'질문을 2~300자로 입력해 주세요.'},400);
   try{if(await throttle(request,context))return json({error:'질문이 많아요. 1분 뒤 다시 시도해 주세요.'},429);}catch{return json({error:'잠시 후 다시 질문해 주세요.'},503);}
   const city=CITIES.includes(body.city)?body.city:'all';
-  const literal=routeIntent(query,city)||guideIntent(query,city)||literalIntent(query,city);if(literal)return json({intent:extendIntent(literal,query,city)});
+  const literal=destinationIntent(query,city)||routeIntent(query,city)||guideIntent(query,city)||literalIntent(query,city);if(literal)return json({intent:extendIntent(literal,query,city)});
   if(!env.AI?.run)return json({error:'AI 연결을 준비하고 있어요. 기존 검색창을 이용해 주세요.'},503);
   // At most one recovery call, within the client's 30-second deadline. Invalid
   // JSON is a provider failure, not evidence that no matching businesses exist.

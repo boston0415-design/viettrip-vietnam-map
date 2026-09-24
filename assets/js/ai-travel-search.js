@@ -27,6 +27,12 @@
     field.value=query+' Vietnam';field.dispatchEvent(new Event('input',{bubbles:true}));window.PlaceSearch?.submit();
   }
   function render(list,intent){
+    if(intent.travelDestination)return destination(list,intent);
+    if(intent.travelHelp){
+      const li=element('li','','aiTravelAnswer');li.append(element('h3','출발지와 목적지를 확인해 주세요'),element('p','이 질문에 맞는 이동 경로를 아직 확인하지 못했어요. 출발 도시와 목적지의 지역·영문명을 함께 적어주세요.'));
+      link(li,'질문 그대로 교통편 찾아보기','https://www.google.com/search?q='+encodeURIComponent(intent.requestText||''));list.append(li);
+      return {title:'이동 경로 확인',status:'목적지에 맞는 경로 확인이 필요해요',note:'다른 지역의 여행가이드나 관련 없는 업소를 대신 추천하지 않습니다.'};
+    }
     if(intent.unsupported?.length)return null;
     if(intent.transport){
       const t=intent.transport,cards=routeCards(t);if(!cards.length)return null;
@@ -49,6 +55,39 @@
       list.append(li);return {title:'여행 안내',status:'질문과 관련된 여행가이드',note:'일반 안내입니다. 질문의 날짜·요금·개인별 조건은 공식 안내에서 확인하세요. 가이드 검토: '+window.VietGuideData.updated};
     }
     return null;
+  }
+  function destination(list,intent){
+    const chosen=intent.travelDestination;
+    if(chosen==='conson-choice'){
+      const li=element('li','','aiTravelAnswer');li.append(element('h3','어느 꼰선섬으로 가시나요?'),element('p','이름이 비슷한 두 곳이 있어요. 지역을 선택하면 그곳으로 가는 방법을 보여드릴게요.'));
+      for(const [label,name] of [['껀터의 꼰선섬 · Cồn Sơn','껀터의 Cồn Sơn'],['꼰다오의 꼰선섬 · Côn Sơn','꼰다오의 Côn Sơn']]){
+        const button=element('button',label,'aiTravelPlace');button.type='button';button.addEventListener('click',()=>{
+          const field=document.getElementById('aiMapQuestion'),form=document.getElementById('aiMapForm');
+          if(!field||!form)return;field.value=(intent.requestText||'꼰선섬 어떻게 가야해?').replace(/\s*\[목적지:.*?\]$/,'')+' [목적지: '+name+']';
+          field.dispatchEvent(new Event('input',{bubbles:true}));form.requestSubmit();
+        });li.append(button);
+      }
+      list.append(li);return {title:'꼰선섬 · 지역 선택',status:'목적지를 확인하면 이동 방법을 안내해요',note:'껀터의 Cồn Sơn과 꼰다오의 Côn Sơn은 서로 다른 곳입니다.'};
+    }
+    const cantho=chosen==='conson-cantho';if(!cantho&&chosen!=='condao')return null;
+    const li=element('li','','aiTravelAnswer');
+    li.append(element('h3',cantho?'껀터 꼰선섬 · Cồn Sơn 가는 방법':'꼰다오 꼰선섬 · Côn Sơn 가는 방법'));
+    const steps=element('ol','','aiTravelSteps');
+    const texts=cantho?[
+      (intent.originLabel?intent.originLabel+'에서 출발한다면, ':'')+'먼저 껀터(Cần Thơ)로 이동하세요. 호치민 출발은 버스·차량 이동을 비교하고, 다른 출발지는 껀터까지의 연결편을 확인하세요.',
+      '껀터 시내에서 꼬박 선착장(Bến đò Cô Bắc, Bình Thủy)으로 이동하세요.',
+      '선착장에서 꼰선섬으로 가는 배를 타세요. 베트남 관광청 안내 기준 강을 건너는 데 약 5~10분입니다. 귀환 배편과 현장 요금은 타기 전에 확인하세요.'
+    ]:[
+      '항공편은 꼰다오 공항(VCS) 도착편을 확인하세요. 호치민 출발 항공편은 베트남 관광청이 안내하는 접근 방법입니다. 운항일과 좌석은 항공사에서 확인하세요.',
+      '배편을 이용한다면 속짱(Sóc Trăng)으로 육로 이동 후 꼰다오행 연결편을 확인하세요. 날짜·출항 항구·기상에 따른 운항 여부를 선사에서 확인해야 합니다.',
+      '섬 도착 후 숙소까지 차량 이동을 별도로 준비하세요.'
+    ];for(const text of texts)steps.append(element('li',text));li.append(steps);
+    const places=cantho?[['꼬박 선착장','Bến đò Cô Bắc Bình Thủy Cần Thơ'],['꼰선섬','Cồn Sơn Cần Thơ']]:[['꼰다오 공항','Côn Đảo Airport VCS'],['꼰다오 섬','Côn Đảo Côn Sơn']];
+    for(const [label,query] of places){const button=element('button',label+' · 지도에서 보기','aiTravelPlace');button.type='button';button.addEventListener('click',()=>searchPlace(query));li.append(button);}
+    if(cantho)link(li,'껀터행 버스 조회 · FUTA',URLS.bus);
+    else{link(li,'항공편 조회 · Vietnam Airlines',URLS.air);link(li,'배편 조회 · Superdong',URLS.superdong);}
+    link(li,'안내 출처 · 베트남 관광청',cantho?'https://vietnam.travel/things-to-do/can-tho-glimpse-river-and-garden':'https://vietnam.travel/places-to-go/southern-vietnam/con-dao');
+    list.append(li);return {title:cantho?'껀터 → 꼰선섬':'꼰다오 · 꼰선섬',status:intent.originExplicit?intent.originLabel+' 출발 질문 · 목적지 접근 안내':'출발지 미지정 · 목적지 접근 안내',note:'공식 관광청 안내 확인: 2026-09-24. 실시간 운항·요금·좌석 조회 결과는 아니며, 예약처에서 방문 날짜로 확인하세요.'};
   }
   function fallback(list,query){
     if(!query)return;

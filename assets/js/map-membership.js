@@ -6,7 +6,7 @@
   const CORRECTION={address:'주소·위치',hours:'영업시간',closed:'폐업·휴업',other:'기타 정보'};
   const STATUS={pending:'확인 중',approved:'기여 인정',rejected:'인정되지 않음'};
   const badges=new Map(),credentials=new Map();
-  let profile=null,profileRequest=null,badgeRequest=null,refreshTimer=null,revision=0,busy=false;
+  let profile=null,profileRequest=null,badgeRequest=null,refreshTimer=null,revision=0,busy=false,moderationRevision=0;
   const el=id=>document.getElementById(id);
   const validHash=h=>/^[a-f0-9]{64}$/.test(String(h||''));
   const grade=n=>GRADES[Math.max(0,Math.min(5,Number(n)||0))];
@@ -29,7 +29,7 @@
       return data;
     }finally{clearTimeout(timer)}
   }
-  function message(text,error=false){const node=el('memberStatus');if(node){node.textContent=text;node.classList.toggle('isError',error)}}
+  function message(text,error=false){const node=el(el('operatorDialog')?.open?'operatorStatus':'memberStatus');if(node){node.textContent=text;node.classList.toggle('isError',error)}}
   function adopt(data){
     if(!data?.id)return;
     profile=data;credentials.clear();
@@ -114,6 +114,12 @@
     if(el('openMapMembership'))el('openMapMembership').hidden=admin;
     el('memberDialog')?.classList.toggle('isAdministrator',admin);
     if(el('memberAdminTools'))el('memberAdminTools').hidden=!admin;
+    if(!admin){
+      moderationRevision++;
+      if(el('operatorDialog')?.open)el('operatorDialog').close();
+      el('memberModeration')?.replaceChildren();
+      document.querySelectorAll('[data-operator-count]').forEach(n=>{n.textContent='—';});
+    }
     if(el('memberTitle'))el('memberTitle').textContent=admin?'관리자 · 맵 운영':'내 맵 등급 · 활동';
     if(el('memberBarLabel'))el('memberBarLabel').textContent=admin?'맵 관리':'내 맵 등급';
     if(admin){
@@ -129,6 +135,7 @@
     if(el('memberDeviceStatus'))el('memberDeviceStatus').textContent=linked?'기기 연결됨 · 같은 회원 기록으로 등급을 확인합니다.':'PC·모바일 등급이 다르면 두 기기를 한 번 연결해 주세요.';
   }
   async function open(){
+    if(state.isAdmin)return openOperator();
     const dialog=el('memberDialog');if(!dialog.open)dialog.showModal();
     el('memberAdminTools').hidden=!state.isAdmin;
     message('활동 정보를 확인하고 있어요.');
@@ -147,14 +154,41 @@
   }
   async function showPlace(id){
     el('memberDialog').close();
+    el('operatorDialog')?.close();
     const place=db().places.find(p=>p.id===id);
     if(place){await window.PlaceSearch?.openMember(id);return}
     message('업소 정보를 새로 불러온 뒤 다시 열어주세요.',true);
     el('memberDialog').showModal();
   }
   async function moderation(){
-    const rows=await rpc('moderation',{admin_key:adminKey()});
+    if(!state.isAdmin)return;
+    const version=++moderationRevision,key=adminKey();
+    const rows=await rpc('moderation',{admin_key:key});
+    if(!state.isAdmin||version!==moderationRevision||key!==adminKey()||!el('operatorDialog')?.open)return;
+    if(!Array.isArray(rows))throw Error('정보 수정 제안 응답을 확인하지 못했어요. 다시 불러와 주세요.');
     el('memberModeration').innerHTML=(rows||[]).map(c=>`<article><strong>${esc(c.name)}</strong><p>${esc(c.nickname||'회원')} · ${esc(CORRECTION[c.kind])} · ${esc(STATUS[c.status])}</p><p>${esc(c.body)}</p><div><button type="button" data-member-place="${esc(c.place_id)}">업소 확인·수정</button>${c.status!=='approved'?`<button type="button" data-correction-id="${esc(c.id)}" data-correction-status="approved">정보 확인 후 인정</button>`:''}${c.status!=='rejected'?`<button type="button" data-correction-id="${esc(c.id)}" data-correction-status="rejected">${c.status==='approved'?'인정 취소':'반려'}</button>`:''}</div></article>`).join('')||'<p>접수된 정보 수정 제안이 없습니다.</p>';
+  }
+  function operatorCounts(){
+    if(!state.isAdmin||!el('operatorDialog')?.open)return;
+    document.querySelectorAll('[data-operator-count]').forEach(node=>{
+      const value=el(node.dataset.operatorCount)?.textContent||'—';if(node.textContent!==value)node.textContent=value;
+    });
+  }
+  async function loadModeration(){
+    if(!state.isAdmin)return;
+    const button=el('memberModerationLoad');button.disabled=true;
+    const status=el('operatorStatus');status.textContent='정보 수정 제안을 불러오고 있어요.';status.classList.remove('isError');
+    try{await moderation();if(state.isAdmin&&el('operatorDialog').open)status.textContent='업소·후기 내용은 각 업소 상세에서 확인하고 수정할 수 있어요.';}
+    catch(error){if(state.isAdmin&&el('operatorDialog').open){status.textContent=error.name==='AbortError'?'연결이 지연돼요. 제안 불러오기를 눌러 다시 확인해 주세요.':'정보 수정 제안을 불러오지 못했어요. 제안 불러오기를 눌러 다시 확인해 주세요.';status.classList.add('isError');}}
+    finally{button.disabled=false;}
+  }
+  async function openOperator(){
+    if(!state.isAdmin)return;
+    paintRole();if(el('memberDialog').open)el('memberDialog').close();
+    const dialog=el('operatorDialog');if(!dialog.open)dialog.showModal();
+    dialog.querySelector('.operatorBody').scrollTop=0;
+    window.CommunityStats?.syncRole();operatorCounts();
+    await loadModeration();
   }
   function openCorrection(id){
     const place=db().places.find(p=>p.id===id);if(!place)return;
@@ -164,7 +198,15 @@
   }
   function init(){
     el('openMapMembership').addEventListener('click',open);
-    el('openOperatorTools')?.addEventListener('click',open);
+    el('openOperatorTools')?.addEventListener('click',openOperator);
+    el('operatorClose').onclick=()=>el('operatorDialog').close();
+    el('operatorDialog').addEventListener('close',()=>{moderationRevision++;el('memberModeration').replaceChildren();});
+    el('operatorRefresh').onclick=()=>{window.CommunityStats?.syncRole();operatorCounts();loadModeration();};
+    el('operatorLogout').onclick=()=>clearAdminSession();
+    el('operatorPlaces').onclick=()=>{el('operatorDialog').close();el('browseShowList')?.click();};
+    el('operatorReviews').onclick=()=>{el('operatorDialog').close();el('openCommunityReviews')?.click();};
+    const statsObserver=new MutationObserver(operatorCounts);
+    const stats=document.querySelector('.communityStats');if(stats)statsObserver.observe(stats,{childList:true,subtree:true,characterData:true});
     el('memberDeviceLinkButton')?.addEventListener('click',()=>{const section=el('memberDeviceLink');if(section){section.open=true;section.scrollIntoView({block:'start'});section.querySelector('button')?.focus({preventScroll:true});}});
     window.addEventListener('focus',schedule);
     setInterval(()=>{if(!document.hidden&&el('memberDialog')?.open)schedule();},30000);
@@ -191,7 +233,7 @@
       });
     };
     el('memberDialog').addEventListener('close',()=>{el('memberCode').value='';el('memberCodeBox').hidden=true;el('memberConnectCode').value=''});
-    el('memberModerationLoad').onclick=event=>perform(event.currentTarget,moderation);
+    el('memberModerationLoad').onclick=loadModeration;
     document.addEventListener('click',event=>{
       const place=event.target.closest('[data-member-place]');if(place){showPlace(place.dataset.memberPlace);return}
       const correction=event.target.closest('[data-map-correction]');if(correction){openCorrection(correction.dataset.mapCorrection);return}
@@ -219,7 +261,7 @@
     for(const id of ['detail','communityReviewFeed'])if(el(id))observer.observe(el(id),{childList:true,subtree:true});
     refresh().then(()=>loadBadges());
   }
-  window.MapMembership={GRADES,levelFor,badgeHtml,loadBadges,refresh,schedule,open,syncRole:paint,
+  window.MapMembership={GRADES,levelFor,badgeHtml,loadBadges,refresh,schedule,open,openOperator,syncRole:paint,
     ownsHash:hash=>credentials.has(hash),credentialFor:hash=>credentials.get(hash)||null,
     memberFor:hash=>badges.get(hash)?.member||hash,
     correctionButton:id=>`<button type="button" class="mapCorrectionButton" data-map-correction="${esc(id)}">정보 수정 제안</button>`,

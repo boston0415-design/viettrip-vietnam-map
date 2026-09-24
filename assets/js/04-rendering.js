@@ -28,13 +28,14 @@ function renderMarkers(){
 }
 
 async function verifyAdminKey(key){
+  let timer;
   try{
-    const ok=await supaRpc('admin_verify',{p_admin_key:key});
+    const ok=await Promise.race([supaRpc('admin_verify',{p_admin_key:key}),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('timeout')),12000);})]);
     return ok===true;
   }catch(err){
     console.error('admin verify failed',err);
     return null;
-  }
+  }finally{clearTimeout(timer);}
 }
 
 let adminSessionRevision=0;
@@ -87,8 +88,8 @@ async function submitAdminPassword(){
 
   const revision=++adminSessionRevision;
   const ok=await verifyAdminKey(key);
-  $('#adminLoginSubmit').disabled=false;
   if(revision!==adminSessionRevision)return;
+  $('#adminLoginSubmit').disabled=false;
 
   if(ok===null){
     $('#adminLoginStatus').textContent='서버에 연결하지 못했습니다. 연결 후 다시 확인해 주세요.';
@@ -111,6 +112,7 @@ async function submitAdminPassword(){
   syncAdminButton();
   $('#adminLoginModal').classList.remove('open');
   renderDetail();
+  window.MapMembership?.openOperator?.();
 }
 
 async function restoreAdminSession(){
@@ -676,6 +678,9 @@ function closeModalById(id){
   }else if(id==='reviewModal'){
     resetReviewDraftUi();
   }else if(id==='adminLoginModal'){
+    // Closing a pending login cancels its authority to establish a session.
+    adminSessionRevision++;
+    if($('#adminLoginSubmit'))$('#adminLoginSubmit').disabled=false;
     if($('#adminPassword')){
       $('#adminPassword').value='';
       $('#adminPassword').disabled=true;

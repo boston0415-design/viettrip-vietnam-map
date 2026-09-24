@@ -343,6 +343,9 @@
     const note=byId('aiMapNote');note.textContent='질문 조건에 맞는 업소만 표시하고, 그 안에서 회원 등록·강추·혜택 정보를 보여드려요. Google 검색은 최대 20곳의 업종·지역·평점을 확인합니다.';
     const product=window.AIResultActions?.renderProduct(list,intent||{});if(product){title.textContent=product.title;status.textContent=product.status;note.textContent=product.note;return;}
     const travel=window.AITravelSearch?.render(list,intent||{});if(travel){title.textContent=travel.title;status.textContent=travel.status;note.textContent=travel.note;return;}
+    if(intent?.transport||intent?.guideTopic||intent?.travelDestination||intent?.travelHelp){
+      title.textContent='이동·여행 정보 확인';status.textContent='질문의 목적지와 조건에 맞는 안내를 아직 확인하지 못했어요.';note.textContent='관련 없는 업소를 대신 표시하지 않습니다.';window.AITravelSearch?.fallback(list,intent.requestText||input.value);return;
+    }
     if(!intent?.relevant){note.textContent='확인되지 않은 내용을 답으로 만들지 않고, 원래 질문과 관련된 정보를 더 찾을 수 있게 연결합니다.';status.textContent='질문에 답할 장소·여행 정보를 아직 확인하지 못했어요.';window.AITravelSearch?.fallback(list,intent?.requestText||input.value);return;}
     if(window.AISearchInsights?.renderGuide(list,intent)){title.textContent='이동·예약 안내';status.textContent='출발 항구와 공식 예매처';note.textContent='공식 선사 안내를 바탕으로 작성했습니다. 아래 링크에서 실제 출발일 정보를 확인하세요.';return;}
     const scope=[CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,intent.service==='motorbike_rental'?'오토바이 대여':intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
@@ -432,7 +435,7 @@
       if(!response.ok)throw Error(payload.error||'AI 검색을 잠시 사용할 수 없어요. 기존 검색창을 이용해 주세요.');
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
       await prepareDistricts(payload.intent,signal);
-      if(!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch)await waitForPlaces(signal);
+      if(!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch&&!payload.intent.travelDestination&&!payload.intent.travelHelp)await waitForPlaces(signal);
       if(token!==revision)return;
       last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
     }catch(error){if(token!==revision)return;window.AITravelSearch?.fallback(list,query);title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}

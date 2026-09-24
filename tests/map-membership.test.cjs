@@ -77,11 +77,13 @@ for(const width of [360,768,1440]){
  assert.equal(d.getElementById('memberProgress').value,1);
  await w.MapMembership.open();failed=true;await w.MapMembership.refresh();assert.match(d.getElementById('memberStatus').textContent,/연결 실패/);
  assert.match(d.getElementById('memberBarRank').textContent,/대장/,'offline state must not demote');failed=false;
- run('state.isAdmin=true');await w.MapMembership.open();assert(!d.getElementById('memberAdminTools').hidden);
+ run('state.isAdmin=true');await w.MapMembership.open();assert(!d.getElementById('memberAdminTools').hidden);assert(d.getElementById('operatorDialog').open);assert(!d.getElementById('memberDialog').open);assert(d.getElementById('memberModeration').textContent.includes('접수된'));
  assert.equal(d.getElementById('memberBarRank').textContent,'관리자');assert.equal(d.getElementById('memberHeroRank').textContent,'관리자');
  assert(d.getElementById('openMapMembership').hidden,'no administrator role banner above the map');
  assert(d.getElementById('memberDialog').classList.contains('isAdministrator'));
- run('state.isAdmin=false');w.MapMembership.syncRole();assert.match(d.getElementById('memberBarRank').textContent,/대장/);
+ failed=true;await w.MapMembership.openOperator();assert(d.getElementById('operatorDialog').open);assert(d.getElementById('operatorStatus').textContent.includes('불러오지 못'));assert.equal(d.getElementById('memberModerationLoad').disabled,false);failed=false;await w.MapMembership.openOperator();assert(d.getElementById('memberModeration').textContent.includes('접수된'));
+
+ run('state.isAdmin=false');w.MapMembership.syncRole();assert(!d.getElementById('operatorDialog').open);assert.equal(d.getElementById('memberModeration').textContent,'');assert.match(d.getElementById('memberBarRank').textContent,/대장/);
  assert(!d.getElementById('openMapMembership').hidden,'member progress remains accessible');
  for(const req of calls)if(req.p_action==='badges')assert.equal(req.p_device_id,null,'public requests contain no credential');
  await w.MapMembership.loadBadges();await flush();
