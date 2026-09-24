@@ -312,6 +312,16 @@ export function modelJSON(result){
   if(!value||typeof value!=='object'||Array.isArray(value))throw Error('Invalid model JSON');
   return value;
 }
+export function failureReason(error){
+  const text=String(error?.message||'').toLowerCase();
+  if(text.includes('timeout'))return 'timeout';
+  if(/5035|403|paid|permission|unauthorized|not authorized/.test(text))return 'access';
+  if(/not found|unknown model|model not|no such/.test(text))return 'model_unavailable';
+  if(/429|quota|rate limit|capacity/.test(text))return 'capacity';
+  if(error instanceof SyntaxError||/invalid intent|invalid advice|invalid model json|invalid category|invalid district/.test(text))return 'invalid_response';
+  if(/400|invalid|unsupported|parameter|schema/.test(text))return 'request_format';
+  return 'provider_error';
+}
 export async function onRequest(context){
   const {request,env}=context;
   if(request.method!=='POST')return json({error:'POST 요청만 지원합니다.'},405);
@@ -326,6 +336,7 @@ export async function onRequest(context){
   const city=CITIES.includes(body.city)?body.city:'all';
   const literal=destinationIntent(query,city)||routeIntent(query,city)||guideIntent(query,city)||literalIntent(query,city);if(literal)return json({intent:extendIntent(literal,query,city)});
   if(!env.AI?.run)return json({error:'AI 연결을 준비하고 있어요. 기존 검색창을 이용해 주세요.'},503);
+  const failures=[];
   // At most one recovery call, within the client's 30-second deadline. Invalid
   // JSON is a provider failure, not evidence that no matching businesses exist.
   for(const [model,tokens,timeout] of [['@cf/zai-org/glm-5.3-flash',2400,14000],['@cf/zai-org/glm-4.7-flash',2000,11000]]){
@@ -337,8 +348,8 @@ export async function onRequest(context){
       ]);
       const intent=validateIntent(modelJSON(result),city);
       return json({intent:intent.mode==='advice'?{...intent,requestText:query}:extendIntent(clarifyIntent(intent,query),query,city),model});
-    }catch{/* A bounded second model may recover transient failures. */}
+    }catch(error){failures.push({model,reason:failureReason(error)});}
     finally{clearTimeout(timer);}
   }
-  return json({error:'AI 연결 또는 응답 처리에 실패했어요. 잠시 후 다시 질문해 주세요. 검색 결과가 없다는 뜻은 아닙니다.'},503);
+  return json({error:'AI 연결 또는 응답 처리에 실패했어요. 잠시 후 다시 질문해 주세요. 검색 결과가 없다는 뜻은 아닙니다.',failures},503);
 }

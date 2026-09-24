@@ -436,7 +436,7 @@
       const response=await fetch('/api/ask-map',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,city:state.city}),signal});
       const payload=await response.json();
       if(token!==revision)return;
-      if(!response.ok)throw Error(payload.error||'AI 검색을 잠시 사용할 수 없어요. 기존 검색창을 이용해 주세요.');
+      if(!response.ok){if(payload.failures)console.warn('Map AI providers: '+JSON.stringify(payload.failures));throw Error(payload.error||'AI 검색을 잠시 사용할 수 없어요. 기존 검색창을 이용해 주세요.');}
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
       await prepareDistricts(payload.intent,signal);
       if(payload.intent.mode!=='advice'&&!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch&&!payload.intent.travelDestination&&!payload.intent.travelHelp)await waitForPlaces(signal);
