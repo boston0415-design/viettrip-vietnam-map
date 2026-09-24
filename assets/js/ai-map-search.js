@@ -119,6 +119,17 @@
   function cancel(){revision++;controller?.abort();hoursController?.abort();controller=null;hoursController=null;syncInput();form.removeAttribute('aria-busy');}
   function close(){cancel();panel.hidden=true;input.setAttribute('aria-expanded','false');}
   function reset(){list.replaceChildren();examples.hidden=false;status.textContent='예시를 누르면 바로 찾아드려요. 직접 질문해도 좋아요.';title.textContent='이렇게 물어보세요';byId('aiMapNote').textContent='등록 정보와 회원 후기를 찾아요.';}
+  function waitForPlaces(signal){
+    if(!state.sharedDbLoading)return Promise.resolve();
+    status.textContent='등록 업소를 불러오고 있어요. 준비되면 결과를 바로 보여드릴게요.';
+    return new Promise((resolve,reject)=>{
+      const started=Date.now();let timer;
+      const done=error=>{clearTimeout(timer);signal.removeEventListener('abort',abort);error?reject(error):resolve();};
+      const abort=()=>done(new DOMException('Cancelled','AbortError'));
+      const poll=()=>{if(signal.aborted)return abort();if(!state.sharedDbLoading)return done();if(Date.now()-started>=12000)return done(Error('업소 정보를 불러오지 못했어요. 연결을 확인하고 다시 질문해 주세요.'));timer=setTimeout(poll,100);};
+      signal.addEventListener('abort',abort,{once:true});poll();
+    });
+  }
   function showHours(button,result){
     const slot=button.querySelector('.aiHours');if(!slot)return;
     slot.className='aiHours aiHours-'+result.kind;
@@ -213,6 +224,7 @@
       if(!response.ok)throw Error(payload.error||'AI 검색을 잠시 사용할 수 없어요. 기존 검색창을 이용해 주세요.');
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
       await prepareDistricts(payload.intent,signal);
+      await waitForPlaces(signal);
       if(token!==revision)return;
       last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
     }catch(error){if(token!==revision)return;title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}

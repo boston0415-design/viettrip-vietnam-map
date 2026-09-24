@@ -67,5 +67,6 @@ const intent={relevant:true,city:'hcmc',district:'1',area:'',preferences:[],visi
  finish({ok:true,json:async()=>({intent})});await new Promise(r=>setTimeout(r,5));assert.equal(w.document.querySelectorAll('.aiResult').length,0,'clear cancels an in-flight question');
  let sampleCalls=0;w.fetch=async url=>{if(String(url).includes('/api/ask-map'))sampleCalls++;return {ok:true,json:async()=>({intent})}};
  w.document.querySelector('#aiMapExamples button').click();await new Promise(r=>setTimeout(r,5));assert.equal(sampleCalls,1,'sample selection submits without a second button');assert.equal(w.document.querySelectorAll('.aiResult').length,1);
+ w.document.getElementById('aiMapClear').click();run('state.sharedDbLoading=true');w.document.querySelector('#aiMapExamples button').click();await new Promise(r=>setTimeout(r,5));assert.match(w.document.getElementById('aiMapStatus').textContent,/준비되면 결과/);run('state.sharedDbLoading=false');await new Promise(r=>setTimeout(r,120));assert.equal(w.document.querySelectorAll('.aiResult').length,1,'first-visit search resumes automatically when places load');
  dom.window.close();console.log('PASS AI endpoint validation, grounded district/review matching, stale response, failure and detail selection');
 })().catch(e=>{console.error(e);process.exitCode=1});
