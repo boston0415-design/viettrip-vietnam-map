@@ -184,6 +184,7 @@
   }
   function resultTitle(entry){
     const rows=[...(entry.memberRows||[]),...(entry.google?.rows||[])];
+    if(entry.intent.productSearch){title.textContent='판매점 문의 후보 · '+rows.length+'곳';return;}
     if(entry.intent.hotelStars){const count=rows.filter(r=>r.insights?.hotelClass?.kind==='confirmed').length;title.textContent=entry.intent.hotelStars+'성급 안내 '+count+'곳 · 성급 문의 '+(rows.length-count)+'곳';return;}
     if(entry.intent.subcategory==='로컬 KTV'){title.textContent='로컬 등록 '+rows.filter(r=>r.place).length+'곳 · 운영 문의 '+rows.filter(r=>!r.place).length+'곳';return;}
     title.textContent=wantsRoom(entry.intent)?'룸 안내 '+rows.filter(r=>r.room?.kind==='confirmed').length+'곳 · 문의 필요 '+rows.filter(r=>r.room?.kind==='unknown').length+'곳':'추천 업소 · '+rows.length+'곳';
@@ -428,7 +429,7 @@
       if(!payload.intent.transport&&!payload.intent.guideTopic)await waitForPlaces(signal);
       if(token!==revision)return;
       last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
-    }catch(error){if(token!==revision)return;title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}
+    }catch(error){if(token!==revision)return;window.AITravelSearch?.fallback(list,query);title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}
     finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}
   });
   syncInput();

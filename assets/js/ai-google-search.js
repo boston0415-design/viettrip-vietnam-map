@@ -71,6 +71,22 @@
     }
     return null;
   }
+  function cityMatches(raw,place,city){
+    if(city==='all')return true;
+    // A nearest-city fallback alone includes adjacent provinces (e.g. Biên Hòa
+    // in a Ho Chi Minh query). Google's explicit province must agree first.
+    const province=normalize(raw.addressComponents?.find(c=>c.types?.includes('administrative_area_level_1'))?.longText||'');
+    const regions={hcmc:/ho chi minh|호치민/,hanoi:/ha noi|hanoi|하노이/,danang:/da nang|다낭/,hoian:/da nang|quang nam|다낭|꽝남/,nhatrang:/khanh hoa|칸호아|카인호아/,dalat:/lam dong|럼동|람동/,muine:/lam dong|binh thuan|람동|럼동|빈투언/,vungtau:/ho chi minh|ba ria|vung tau|호치민|붕따우/,phuquoc:/an giang|kien giang|안장|끼엔장/};
+    if(province&&regions[city]&&!regions[city].test(province))return false;
+    const address=normalize(place.address);
+    if(city==='hcmc'&&/dong nai|bien hoa|동나이|비엔호아/.test(address))return false;
+    const explicit=typeof explicitPlaceCityKey==='function'?explicitPlaceCityKey(place):null;
+    if(explicit)return explicit===city;
+    if(province&&regions[city]?.test(province))return placeCityKey(place)===city;
+    // Without an explicit city/province, retain only nearby coordinate-backed
+    // candidates. Never assign an arbitrary distant place to its nearest city.
+    return !!CITY_DATA[city]?.center&&geoDistanceMeters(place,CITY_DATA[city].center)<=25000&&placeCityKey(place)===city;
+  }
   function registeredMatch(row,places){
     const raw={place_id:row.placeId,name:row.name,formatted_address:row.address,geometry:{location:row.position}};
     // Numeric street names (e.g. Đường số 9A) have no name tokens in the
@@ -99,7 +115,7 @@
       const proofs=(intent.terms||[]).map(term=>termProof(p,term));
       if(!typeMatches(p,intent)||proofs.some(proof=>!proof))continue;
       const place={name:String(p.displayName||'').trim(),address:p.formattedAddress||'',...position};
-      if(intent.city!=='all'&&placeCityKey(place)!==intent.city)continue;
+      if(!cityMatches(p,place,intent.city))continue;
       if(!window.AIMapSearch.districtMatches(place,intent.district,boundaries)||!window.AIMapSearch.areaMatches(place,intent.area))continue;
       if(intent.nearby&&(!nearby||geoDistanceMeters(position,nearby)>nearby.radius))continue;
       const termMatch=!!intent.terms?.length&&intent.terms.every(term=>window.AIMapSearch.menuKeyword(place.name,term));
@@ -165,5 +181,5 @@
     }
     const result=rows.slice(0,20);result.memberUpdates=memberUpdates;return result;
   }
-  window.AIGoogleSearch={search,queryFor,rowsFrom,boundsFor,typeMatches,includedType,cuisineWords};
+  window.AIGoogleSearch={search,queryFor,rowsFrom,boundsFor,cityMatches,typeMatches,includedType,cuisineWords};
 })();
