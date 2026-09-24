@@ -11,11 +11,12 @@
   };
   const AREA_ALIASES=[['푸미흥','phu my hung'],['타오디엔','thao dien'],['호안끼엠','hoan kiem'],['미딩','my dinh'],['서호','tay ho'],['부이비엔','bui vien'],['레탄톤','le thanh ton']];
   const MENU_PATTERNS={
-    '고기·구이':/고기\s*[·/]?\s*구이|고[기깃]집|삼겹살|목살|갈비|숯불|불고기|바[베비]큐|\bbbq\b|\bbarbe[cq]ue\b|\bgrilled\s+(?:meat|beef|pork)\b|\bthit\s+nuong\b|\bsuon\s+nuong\b/i,
+    '고기·구이':/고기\s*[·/]?\s*구이|고[기깃]집|삼겹살|오겹살|목살|갈비(?!\s*치킨)|숯불|불고기|바[베비]큐|비비큐|\bbbq\b|\bbarbe[cq]ue\b|\bgrilled\s+(?:meat|beef|pork)\b|\bthit\s+nuong\b|\bsuon\s+nuong\b/i,
     '회':/초밥\s*[·/]\s*회|횟집|회집|사시미|생선회|활어회|모[둠듬]회|광어회|연어회|참치회|\bsashimi\b|\braw\s+fish\b|\bgoi\s+ca\b|(?:^|\s)회(?=\s|[·/,]|$|(?:를|가|는|도|로|와|랑|만|가\s*아니라))/i
   };
   function menuKeyword(text,term){
-    const value=normalize(text),pattern=MENU_PATTERNS[term];
+    let value=normalize(text);const pattern=MENU_PATTERNS[term];
+    if(term==='고기·구이')value=value.replace(/\bbbq\s*chicken\b|비비큐\s*치킨|치킨\s*비비큐/gi,'');
     if(pattern)return value.match(pattern)?.[0]?.trim()||'';
     return (/왁싱|waxing/i.test(term)?['왁싱','waxing','wax long']:[term]).find(alias=>value.includes(normalize(alias)))||'';
   }
@@ -30,7 +31,7 @@
     return null;
   }
   function cuisineEvidence(sources,cuisine){
-    const aliases=[cuisine,...(window.AIGoogleSearch?.cuisineWords(cuisine)||[]),...({'프랑스':['프렌치'],'이탈리아':['이탈리안'],'한식':['한국'],'일식':['일본'],'중식':['중국']}[cuisine]||[])];
+    const aliases=[cuisine,...(window.AIGoogleSearch?.cuisineWords?.(cuisine)||[]),...({'프랑스':['프렌치'],'이탈리아':['이탈리안'],'한식':['한국'],'일식':['일본'],'중식':['중국']}[cuisine]||[])];
     for(const source of sources){
       for(const clause of String(source.text||'').split(/[.!?。\n]/)){
         const text=normalize(clause);
