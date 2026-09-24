@@ -105,7 +105,8 @@
   }
   const form=byId('aiMapForm'),input=byId('aiMapQuestion'),panel=byId('aiMapPanel'),send=byId('aiMapSend');
   if(!form)return;
-  let controller=null,revision=0,last=null;
+  let controller=null,hoursController=null,revision=0,last=null;
+  const clear=byId('aiMapClear');
   const status=byId('aiMapStatus'),list=byId('aiMapResults'),examples=byId('aiMapExamples'),title=byId('aiMapTitle');
   function fitPanel(){
     if(panel.hidden)return;
@@ -114,9 +115,37 @@
     panel.style.setProperty('--ai-panel-space',Math.max(80,bottom-panel.getBoundingClientRect().top-12)+'px');
   }
   function show(){panel.hidden=false;input.setAttribute('aria-expanded','true');fitPanel();}
-  function cancel(){revision++;controller?.abort();controller=null;send.disabled=input.value.trim().length<2;form.removeAttribute('aria-busy');}
+  function syncInput(){send.disabled=!!controller||input.value.trim().length<2;if(clear)clear.hidden=!input.value;}
+  function cancel(){revision++;controller?.abort();hoursController?.abort();controller=null;hoursController=null;syncInput();form.removeAttribute('aria-busy');}
   function close(){cancel();panel.hidden=true;input.setAttribute('aria-expanded','false');}
-  function reset(){list.replaceChildren();examples.hidden=false;status.textContent='예시를 누른 뒤 원하는 조건으로 바꿔도 좋아요.';title.textContent='이렇게 물어보세요';}
+  function reset(){list.replaceChildren();examples.hidden=false;status.textContent='예시를 누르면 바로 찾아드려요. 직접 질문해도 좋아요.';title.textContent='이렇게 물어보세요';byId('aiMapNote').textContent='등록 정보와 회원 후기를 찾아요.';}
+  function showHours(button,result){
+    const slot=button.querySelector('.aiHours');if(!slot)return;
+    slot.className='aiHours aiHours-'+result.kind;
+    const label=slot.querySelector('b');label.textContent=result.label+(result.source==='regular'?' · 정기시간 기준':'');
+    const times=slot.querySelector('.aiHoursTimes');times.textContent=result.hours;times.hidden=!result.hours;
+    const credit=slot.querySelector('.aiHoursSource');
+    const checked=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Ho_Chi_Minh',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(result.checkedAt));
+    credit.textContent=result.source==='unknown'?'영업시간 정보가 없거나 연결하지 못했어요.':'Google Maps · '+checked+' 확인'+(result.source==='regular'?' · 임시 휴무 미확인':'');
+    for(const attribution of result.attributions||[]){
+      if(typeof attribution==='string'){const el=document.createElement('span');el.textContent=new DOMParser().parseFromString(attribution,'text/html').body.textContent;slot.append(el);}
+      else if(attribution.provider){const el=document.createElement('span');el.textContent=attribution.provider;slot.append(el);}
+    }
+  }
+  function checkHours(rows,intent){
+    if(!intent.visitToday||!window.AIPlaceHours||!last||hoursController)return;
+    const entry=last,token=revision;entry.hours ||= new Map();
+    const pending=rows.filter(row=>!entry.hours.has(row.place.id));if(!pending.length)return;
+    const work=new AbortController();hoursController=work;
+    window.AIPlaceHours.checkAll(pending,{signal:work.signal,onResult:(row,result)=>{
+      if(token!==revision||last!==entry||panel.hidden)return;
+      entry.hours.set(row.place.id,result);
+      const button=[...list.querySelectorAll('.aiResult')].find(node=>node.dataset.placeId===row.place.id);
+      if(button)showHours(button,result);
+      // Keep each card in place during a touch/scroll instead of rebuilding the
+      // list as hours arrive. This preserves direct selection on every row.
+    }}).catch(()=>{}).finally(()=>{if(hoursController===work)hoursController=null;});
+  }
   function render(intent){
     list.replaceChildren();examples.hidden=true;title.textContent='AI 검색 결과';
     const note=byId('aiMapNote');note.textContent='관련 정보 → 회원 강추 → 회원 평점 순으로 보여드려요. 메뉴·영업시간은 방문 전 확인해 주세요.';
@@ -130,7 +159,7 @@
     title.textContent=(fallback?'대신 살펴볼 등록 업소':'추천 업소')+' · '+rows.length+'곳';
     status.textContent=scope+' — '+(fallback?missing.join('·')+' 조건에 맞는 업소가 없어, 같은 지역·업종의 등록 업소를 추천 순으로 보여드려요.':rows.length?'업소를 누르면 상세정보를 볼 수 있어요.':'이 지역·업종에 맞는 등록 정보를 아직 찾지 못했어요. 지역이나 업종을 넓혀 보세요.');
     if(intent.preferences?.length)status.textContent+=' '+intent.preferences.map(key=>PREFERENCES[key]?.label).filter(Boolean).join('·')+' 관련 정보가 있는 곳을 먼저 보여드려요.';
-    if(intent.visitToday)status.textContent+=' 오늘 영업 여부는 방문 전 확인해 주세요.';
+    if(intent.visitToday){status.textContent+=' 오늘 영업시간을 확인해 각 업소에 표시합니다.';note.textContent='베트남 현지 날짜 기준입니다. 오늘 정보와 정기시간을 구분하며, 당일 변경은 업소에 확인해 주세요.';}
     if(intent.district&&intent.city==='hcmc'&&districtData.length)note.textContent+=' '+intent.district+'군은 기존 행정구역 기준입니다.';
     if(!rows.length){examples.hidden=false;return;}
     for(const row of rows){
@@ -146,6 +175,7 @@
       const meta=document.createElement('span');meta.className='aiMeta';meta.textContent=[placeRegionLabel(place),CONFIG.categories[place.category]?.label,place.subcategory].filter(Boolean).join(' · ');button.append(meta);
       if(row.rating!=null){const rating=document.createElement('span');rating.className='aiRating';rating.textContent='★ '+row.rating.toFixed(1)+' · 회원 평가 '+row.ratingCount+'개';button.append(rating);}
       const address=document.createElement('span');address.textContent=place.address||'주소 미등록';button.append(address);
+      if(intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b>오늘 영업시간 확인 중…</b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);const result=last?.hours?.get(place.id);if(result)showHours(button,result);}
       if(place.memberBenefit&&place.benefitText){const benefit=document.createElement('span');benefit.className='aiBenefitCopy';benefit.textContent=place.benefitText;button.append(benefit);}
       for(const text of evidence.slice(0,2)){const proof=document.createElement('span');proof.className='aiEvidence';proof.textContent=text;button.append(proof);}
       const unconfirmed=[intent.recommended&&!row.recommended?'강추 지정 없음':'',intent.benefit&&!place.memberBenefit?'등록된 혜택 없음':'',...row.missingTerms.map(term=>term+' 정보 미확인'),intent.preferences?.length&&!row.preferenceHits.length?'분위기·방문 목적은 직접 확인해 주세요':''].filter(Boolean);
@@ -153,11 +183,13 @@
       button.addEventListener('click',()=>{if(!db().places.some(p=>p.id===place.id)){render(intent);return;}close();input.blur();window.PlaceSearch?.openMember(place.id);});
       li.append(button);list.append(li);
     }
+    checkHours(rows,intent);
   }
   input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim())render(last.intent);else reset();show();});
   input.addEventListener('input',()=>{cancel();last=null;reset();show();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();form.requestSubmit();}if(event.key==='Escape'){event.preventDefault();close();input.blur();}});
-  examples.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;cancel();input.value=button.textContent;send.disabled=false;input.focus();input.setSelectionRange(input.value.length,input.value.length);});
+  examples.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;cancel();last=null;input.value=button.textContent;syncInput();form.requestSubmit();});
+  clear?.addEventListener('click',()=>{input.value='';cancel();last=null;reset();input.focus();show();});
   byId('aiMapClose').addEventListener('click',()=>{input.focus();close();});
   document.addEventListener('pointerdown',event=>{if(!event.target.closest('.aiMapSearch'))close();});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){input.focus();close();}});
@@ -175,9 +207,10 @@
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
       await prepareDistricts(payload.intent,signal);
       if(token!==revision)return;
-      last={query,intent:payload.intent};render(payload.intent);panel.scrollTop=0;fitPanel();
+      last={query,intent:payload.intent,hours:new Map()};render(payload.intent);panel.scrollTop=0;fitPanel();
     }catch(error){if(token!==revision)return;title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}
-    finally{clearTimeout(timeout);if(token===revision){controller=null;send.disabled=input.value.trim().length<2;form.removeAttribute('aria-busy');}}
+    finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}
   });
+  syncInput();
   window.AIMapSearch={findMatches,buildResults,districtMatches,inGeometry,close};
 })();

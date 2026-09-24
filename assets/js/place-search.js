@@ -4,6 +4,7 @@
   const text=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').normalize('NFC').replace(/đ/gi,'d').toLowerCase().replace(/[^a-z0-9가-힣]+/g,' ').trim();
   let revision=0,timer=null,session=null,service=null,rows=[],active=-1,query='',request=null,composing=false,external=null;
   const input=()=>byId('searchInput');
+  const syncClear=()=>{const button=byId('searchClear');if(button)button.hidden=!input()?.value;};
   const rowKey=row=>row.source+':'+(row.id||row.placeId);
   const position=p=>typeof googlePhotoPosition==='function'?googlePhotoPosition(p):null;
   function localMatches(q){
@@ -72,6 +73,7 @@
     request={q,version,promise};return promise;
   }
   function changed(event){
+    syncClear();
     if(event?.type==='input' && external?.loading)closeDetailPanel();
     revision++;clearTimeout(timer);request=null;query=input().value.trim();active=-1;
     if(!query){session=null;dismiss();return;}
@@ -90,7 +92,7 @@
   async function openMember(id){
     const p=db().places.find(p=>p.id===id);if(!p)return;
     dismiss();session=null;input().blur();clearSearchMarker();resetScope();
-    state.city=placeCityKey(p)||'all';input().value=p.name;
+    state.city=placeCityKey(p)||'all';input().value=p.name;syncClear();
     renderCityControls();renderAreaList();renderPopularAreas();renderAll();renderHierarchyNav();
     const selection=selectPlace(p.id,true,false);setDetailExpanded(true);await selection;
   }
@@ -126,7 +128,7 @@
       entry.raw=raw;entry.place=resultPlace(raw,row);entry.loading=false;entry.version++;
       const p=entry.place,registered=findRegisteredMatchForSearch(p);
       if(registered){await openMember(registered.id);return true;}
-      input().value=p.name;state.searchCandidate=p;
+      input().value=p.name;syncClear();state.searchCandidate=p;
       if(position(p)){
         state.searchMarker=new google.maps.Marker({map:state.map,position:position(p),title:p.name,zIndex:9998});
         state.searchMarker.addListener('click',()=>{if(external===entry){renderDetail();setDetailExpanded(true)}});
@@ -213,6 +215,8 @@
     field.addEventListener('compositionstart',()=>{composing=true;revision++;clearTimeout(timer)});
     field.addEventListener('compositionend',()=>{composing=false;changed()});
     field.addEventListener('input',changed);
+    byId('searchClear')?.addEventListener('click',()=>{field.value='';changed();field.focus();});
+    syncClear();
     field.addEventListener('focus',()=>{if(field.value.trim())changed()});
     field.addEventListener('keydown',event=>{
       if(event.isComposing||composing||event.keyCode===229)return;

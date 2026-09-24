@@ -41,3 +41,12 @@ AI가 현재 메뉴 판매, 실시간 가격/영업 여부를 확인한 것으�
 기본 pages.dev 주소와 Pages 무료 플랜을 사용합니다. Google Maps와 Supabase 사용량 한도는 별도입니다. 결제 또는 유료 전환은 이 설정에 포함되지 않습니다.
 
 AI 질문은 분위기·데이트 같은 선호 조건을 정렬에 사용합니다. 강추/혜택/메뉴 조건에 일치하는 업소가 없으면 동일 지역·업종의 등록 업소를 별도 대안으로 표시하며, 확인되지 않은 배지를 생성하지 않습니다. 호치민의 숫자 군 검색은 주소와 기존 2020년 참고 경계(assets/data/admin/hcmc.geojson)를 함께 이용합니다.
+
+
+### AI today-hours lookup
+- `ai-place-hours.js` checks Google Places `currentOpeningHours` only for a submitted today question; the model never invents hours.
+- Existing confirmed place IDs are reused; otherwise the same branch-name/address/coordinate validation used for photos applies. Lookups run with three workers and stop when the question changes or closes.
+- Today's exceptional hours are preferred. If Places API (New) is unavailable, the legacy regular timetable is explicitly labeled `정기시간 기준 · 임시 휴무 미확인`. Missing or ambiguous data stays unknown.
+- The date/time calculation uses Vietnam UTC+7, handles split hours, overnight/week rollover, 24-hour venues and temporary/permanent closure. Google content remains in the current result only; no review/place writes.
+- Both inputs use a 44px visual height, explicit clear buttons, and sample questions execute on selection.
+- Google reference: https://developers.google.com/maps/documentation/javascript/reference/place (checked 2026-09-24).

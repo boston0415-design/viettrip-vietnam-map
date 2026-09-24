@@ -62,5 +62,10 @@ const intent={relevant:true,city:'hcmc',district:'1',area:'',preferences:[],visi
  const rendered=w.document.querySelector('.aiResult').textContent;assert.match(rendered,/회원 후기/);assert.match(rendered,/없다고/);
  let opened;w.PlaceSearch={openMember:id=>{opened=id},dismiss:()=>{}};w.document.querySelector('.aiResult').click();assert.equal(opened,'one');assert.equal(panel.hidden,true);
  w.fetch=async()=>({ok:false,json:async()=>({error:'잠시 후 다시 시도해 주세요.'})});input.focus();form.dispatchEvent(new w.Event('submit',{cancelable:true}));await new Promise(r=>setTimeout(r,5));assert.match(w.document.getElementById('aiMapStatus').textContent,/잠시 후/);
+ w.fetch=()=>new Promise(resolve=>{finish=resolve});input.value='아직 처리 중인 질문';input.dispatchEvent(new w.Event('input'));form.dispatchEvent(new w.Event('submit',{cancelable:true}));
+ const clear=w.document.getElementById('aiMapClear');assert.equal(clear.hidden,false);clear.click();assert.equal(input.value,'');assert.equal(clear.hidden,true);assert.equal(w.document.activeElement,input);assert.equal(w.document.getElementById('aiMapSend').disabled,true);
+ finish({ok:true,json:async()=>({intent})});await new Promise(r=>setTimeout(r,5));assert.equal(w.document.querySelectorAll('.aiResult').length,0,'clear cancels an in-flight question');
+ let sampleCalls=0;w.fetch=async url=>{if(String(url).includes('/api/ask-map'))sampleCalls++;return {ok:true,json:async()=>({intent})}};
+ w.document.querySelector('#aiMapExamples button').click();await new Promise(r=>setTimeout(r,5));assert.equal(sampleCalls,1,'sample selection submits without a second button');assert.equal(w.document.querySelectorAll('.aiResult').length,1);
  dom.window.close();console.log('PASS AI endpoint validation, grounded district/review matching, stale response, failure and detail selection');
 })().catch(e=>{console.error(e);process.exitCode=1});

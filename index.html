@@ -37,7 +37,7 @@
 <link rel="stylesheet" href="./assets/css/map-ux.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/panel-comfort.css?v=20260921-sticky-header1">
 <link rel="stylesheet" href="./assets/css/browse-experience.css?v=20260924-list-gesture1">
-<link rel="stylesheet" href="./assets/css/ai-map-search.css?v=20260924-ai2">
+<link rel="stylesheet" href="./assets/css/ai-map-search.css?v=20260924-ai3">
 </head>
 <body>
 <div class="app">
@@ -47,11 +47,12 @@
       <small>회원의 경험으로 함께 만드는 베트남 로컬지도</small>
       <div class="brandLinks"><a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a><a id="mapGuideLink" class="mapGuideLink" href="./guide/">여행가이드 ↗</a></div>
     </div>
-    <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" type="search" autocomplete="off" spellcheck="false" maxlength="200" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeSearchList" aria-label="업소명 또는 주소 검색" placeholder="업소명·주소·지역 검색"><button id="searchBtn" type="button">검색</button><div id="placeSearchResults" class="placeSearchResults" hidden><div id="placeSearchList" role="listbox" aria-label="추천 장소"></div><p id="placeSearchStatus" role="status" aria-live="polite"></p><div id="placeSearchCredit" translate="no" hidden>Google Maps</div></div></div>
+    <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" type="search" autocomplete="off" spellcheck="false" maxlength="200" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeSearchList" aria-label="업소명 또는 주소 검색" placeholder="업소명·주소·지역 검색"><button id="searchClear" class="searchClear" type="button" aria-label="검색어 지우기" hidden>×</button><button id="searchBtn" type="button">검색</button><div id="placeSearchResults" class="placeSearchResults" hidden><div id="placeSearchList" role="listbox" aria-label="추천 장소"></div><p id="placeSearchStatus" role="status" aria-live="polite"></p><div id="placeSearchCredit" translate="no" hidden>Google Maps</div></div></div>
     <section class="aiMapSearch" aria-label="AI에게 업소 질문하기">
       <form id="aiMapForm" class="aiComposer">
         <label for="aiMapQuestion">AI</label>
         <input id="aiMapQuestion" type="text" maxlength="300" autocomplete="off" aria-label="AI에게 찾고 싶은 업소 질문하기" aria-controls="aiMapPanel" aria-expanded="false" placeholder="오늘 여자친구와 갈 만한 1군 분위기 좋은 바 찾아줘">
+        <button id="aiMapClear" class="searchClear" type="button" aria-label="AI 질문 지우기" hidden>×</button>
         <button id="aiMapSend" type="submit" aria-label="AI에게 질문 보내기" disabled>질문</button>
       </form>
       <section id="aiMapPanel" class="aiPanel" aria-label="AI 업소 검색" hidden>
@@ -420,7 +421,7 @@
 <script src="./assets/js/06-save-motion.js?v=20260923-ux1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260923-ux1"></script>
-<script src="./assets/js/place-search.js?v=20260920-ux3"></script>
+<script src="./assets/js/place-search.js?v=20260924-ai3"></script>
 <script src="./assets/js/09-init-events.js?v=20260920-ux3"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260918-all-cities1"></script>
 <script src="./assets/js/community-stats.js?v=20260924-clean1"></script>
@@ -440,6 +441,7 @@
 <script src="./assets/js/map-weather.js?v=20260924-clean1"></script>
 <script src="./assets/js/panel-history.js?v=20260920-ux3"></script>
 <script src="./assets/js/desktop-window-size.js?v=20260924-clean2"></script>
-<script src="./assets/js/ai-map-search.js?v=20260924-ai2"></script>
+<script src="./assets/js/ai-place-hours.js?v=20260924-ai3"></script>
+<script src="./assets/js/ai-map-search.js?v=20260924-ai3"></script>
 </body>
 </html>
