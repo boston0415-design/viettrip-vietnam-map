@@ -76,6 +76,73 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "e29a5622-8556-4fee-9814-85089929cbd7",
+    "name": "THREE TABOM SPA",
+    "category": "spa",
+    "address": "Tầng 1, TTTM The Garden, Đ. Mễ Trì, Từ Liêm, Hà Nội, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.threetabomspa.com/",
+    "note": "The Garden Shopping Mall G+1층의 Three Tabom Spa 공식 예약 문의입니다. 원하는 서비스와 날짜·시간을 알리고 업소의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://web.facebook.com/threetabomspa"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84384308587",
+        "display": "+84 38 430 8587"
+      }
+    ],
+    "verifiedOn": "2026-09-24"
+  },
+  {
+    "id": "500ccf1c-201f-4837-abd1-f465c4317a21",
+    "name": "Phở Thìn Mỹ Đình",
+    "category": "restaurant",
+    "address": "CT9 Mỹ Đình Sông Đà, Từ Liêm, Hà Nội, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/61579495108369/",
+    "note": "CT9 Mỹ Đình 지점의 공식 예약 문의입니다. 방문 날짜·시간·인원을 알리고 업소의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/61579495108369/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842432006379",
+        "display": "+84 24 3200 6379"
+      }
+    ],
+    "verifiedOn": "2026-09-24"
+  },
+  {
+    "id": "f5bdf96e-c292-46ae-bbd6-4b5bdebe25d7",
+    "name": "오니스시 초밥&참치 (하노이점)",
+    "category": "restaurant",
+    "address": "21 Ngõ 39 Đ. Đình Thôn, Từ Liêm, Hà Nội, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/onisushihanoi/",
+    "note": "21 Ngõ 39 Đình Thôn의 오니스시 하노이점 공식 예약 문의입니다. 카카오 오픈채팅 참여코드는 onisushi이며, 날짜·시간·인원을 알리고 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "kakao",
+        "url": "https://open.kakao.com/o/gxpspU3b"
+      },
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/onisushihanoi/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84364682281",
+        "display": "+84 36 468 2281"
+      }
+    ],
+    "verifiedOn": "2026-09-24"
+  },
+  {
     "id": "12579ac9-0154-40f9-b58c-bc666ed78451",
     "name": "NJ184 Vietnam Head Spa & Massage | 호치민 마사지 | 越式洗頭按摩",
     "category": "barber",
@@ -608,7 +675,7 @@ function bookingIdentity(value){return String(value||'').normalize('NFKC').trim(
 const BOOKING_CONTACT_TYPES=Object.freeze({
   zalo:{label:'Zalo로 문의',hosts:['zalo.me']},
   messenger:{label:'메신저로 문의',hosts:['m.me','www.messenger.com','messenger.com']},
-  facebook:{label:'페이스북으로 문의',hosts:['www.facebook.com','facebook.com','m.facebook.com']},
+  facebook:{label:'페이스북으로 문의',hosts:['www.facebook.com','facebook.com','m.facebook.com','web.facebook.com']},
   tiktok:{label:'틱톡 예약 안내',hosts:['www.tiktok.com','tiktok.com']},
   kakao:{label:'카카오톡으로 문의',hosts:['pf.kakao.com','open.kakao.com']},
   whatsapp:{label:'WhatsApp으로 문의',hosts:['wa.me','api.whatsapp.com']},

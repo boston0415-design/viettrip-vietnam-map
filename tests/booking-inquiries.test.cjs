@@ -31,6 +31,17 @@ async function check(mobile){
     assert.equal(nj184.sourceUrl,'https://nj184barbershop.com/lien-he');
     assert.deepEqual(nj184.channels.map(c=>c.kind),['zalo','whatsapp','facebook','phone']);
     assert(nj184.channels.some(c=>c.url==='tel:+84708999184'));
+    for(const expected of [
+      {id:'e29a5622-8556-4fee-9814-85089929cbd7',kinds:['facebook','phone'],phone:'tel:+84384308587'},
+      {id:'500ccf1c-201f-4837-abd1-f465c4317a21',kinds:['facebook','phone'],phone:'tel:+842432006379'},
+      {id:'f5bdf96e-c292-46ae-bbd6-4b5bdebe25d7',kinds:['kakao','facebook','phone'],phone:'tel:+84364682281'}
+    ]){
+      const entry=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id===expected.id);
+      assert(entry,'new 2026-09-24 inquiry route');
+      assert.equal(entry.verifiedOn,'2026-09-24');
+      assert.deepEqual(entry.channels.map(c=>c.kind),expected.kinds);
+      assert(entry.channels.some(c=>c.url===expected.phone));
+    }
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);
@@ -57,6 +68,7 @@ async function check(mobile){
     assert(validBookingContact({kind:'tiktok',url:'https://www.tiktok.com/@example.venue_1'}));
     assert(validBookingContact({kind:'tiktok',url:'https://tiktok.com/@example_venue/'}));
     assert(validBookingContact({kind:'whatsapp',url:'https://wa.me/84888545767'}));
+    assert(validBookingContact({kind:'facebook',url:'https://web.facebook.com/threetabomspa'}));
     assert(!openBookingInquiry('unregistered'));
   `);
   // Real history/MutationObserver, emulated native dialog presentation only.
