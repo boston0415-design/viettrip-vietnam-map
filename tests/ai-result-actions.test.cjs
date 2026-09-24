@@ -4,6 +4,12 @@ const load=async path=>import('data:text/javascript;base64,'+Buffer.from(read(pa
 (async()=>{
  const api=await load('functions/api/ask-map.js'),products=await load('functions/api/product-info.js');
  const base={relevant:true,city:'hcmc',district:'',area:'',category:'restaurant',subcategory:'',terms:[],preferences:[],unsupported:[]};
+ const req=query=>new Request('https://map.test/api/ask-map',{method:'POST',headers:{origin:'https://map.test','content-type':'application/json'},body:JSON.stringify({query,city:'hcmc'})});
+ let fastCalls=0;
+ const quick=await api.onRequest({request:req('맛있는 햄버거집 찾아서 그랩푸드로 연결해줘'),env:{AI:{run(){fastCalls++;throw Error('down')}}}});
+ assert.equal(quick.status,200);assert.equal((await quick.json()).intent.action,'grabfood');assert.equal(fastCalls,0,'fully understood food action is independent of inference availability');
+ const used=[];const recovered=await api.onRequest({request:req('동태탕 메뉴 있는 한식당'),env:{AI:{run:async model=>{used.push(model);if(used.length===1)return {response:'not JSON'};return {response:JSON.stringify({...base,subcategory:'한식',terms:['동태탕']})};}}}});
+ assert.equal(recovered.status,200);assert.equal(used.length,2);assert(used[0].includes('gpt-oss-120b'));assert(used[1].includes('qwen'));
  for(const q of ['맛있는 햄버거집 찾아서 그랩푸드로 연결해줘','1군 수제버거 그랩 푸드 주문','find a burger and connect to GrabFood']){
   const result=api.extendIntent({...base,terms:['햄버거집','그랩푸드','배달'],unsupported:['그랩푸드 연결']},q,'hcmc');
   assert.equal(result.action,'grabfood');assert.equal(result.category,'restaurant');assert.deepEqual(result.terms,['햄버거']);assert.deepEqual(result.unsupported,[]);

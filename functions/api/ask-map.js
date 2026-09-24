@@ -116,6 +116,7 @@ export function clarifyIntent(intent,query){
   // Common service/menu words are deterministic, not model guesses about cuisine.
   if(!/말고|제외|아닌/.test(query)){
     const strip=pattern=>{next.terms=next.terms.filter(t=>!pattern.test(t));};
+    if(/햄버거|수제\s*버거|버거집|\bburgers?\b/i.test(query)){next.relevant=true;next.category='restaurant';strip(/햄버거|수제\s*버거|버거집|\bburgers?\b/i);next.terms.push('햄버거');}
     if(/반미|b[aá]nh\s*m[iì]/i.test(query)){next.relevant=true;next.category='restaurant';next.subcategory='';strip(/반미|banh\s*mi|중식|베트남|샌드위치/i);next.terms.push('반미');}
     if(/빵집|베이커리|bakery/i.test(query)){next.relevant=true;next.category='cafe';next.subcategory='베이커리';strip(/^(빵|빵집|베이커리|bakery)$/i);}
     if(/오토바이|스쿠터|motorbike|motorcycle|scooter/i.test(query)&&/빌리|빌릴|빌려|대여|렌트|rental|rent/i.test(query)){next.relevant=true;next.category='';next.subcategory='';next.service='motorbike_rental';strip(/오토바이|스쿠터|대여|렌트|motorbike|motorcycle|scooter|rent/i);next.terms.push('오토바이 대여');}
@@ -175,7 +176,7 @@ export function extendIntent(intent,query,city){
   const next={...intent};
   // Actions are separate from place filters. A restaurant is not a taxi or a
   // delivery provider, and an order instruction is not a menu keyword.
-  const foodRequest=/그랩\s*푸드|grab\s*food/i.test(query)&&!/그랩\s*푸드\s*(?:말고|제외)|without\s+grab/i.test(query);
+  const foodRequest=/그랩\s*푸드|grab\s*food/i.test(query)&&/찾|추천|먹|연결|주문|배달|시켜|order|deliver|connect|find|recommend/i.test(query)&&!/그랩\s*푸드\s*(?:말고|제외)|without\s+grab/i.test(query);
   if(foodRequest||next.action==='grabfood'){
     next.action='grabfood';next.relevant=true;delete next.guideTopic;
     if(!next.category)next.category='restaurant';
@@ -217,6 +218,7 @@ export function literalIntent(query,city){
   const cities=query.match(/호치민|하노이|다낭|나트랑|푸꾸옥|푸꿕|달랏|호이안|붕따우|무이네/g)||[];
   if(new Set(cities).size>1&&!intent.guide)return null;
   let remaining=query
+    .replace(/그랩\s*푸드(?:로)?|grab\s*food|연결해(?:주세요|줘)|주문해(?:주세요|줘)|찾아서|햄버거집?|수제\s*버거|버거집/gi,' ')
     .replace(/호치민|하노이|다낭|나트랑|푸꾸옥|푸꿕|달랏|호이안|붕따우|무이네|푸미흥/g,' ')
     .replace(/(?:[1-9]|1\d|2[0-2])\s*군|[1-5]\s*성급/g,' ')
     .replace(/[\d,]+(?:\.\d+)?\s*(?:만|천|k|m)?\s*(?:동|vnd|달러|usd|불|원|krw)/gi,' ')
@@ -258,17 +260,23 @@ export async function onRequest(context){
   const query=typeof body.query==='string'?body.query.trim():'';
   if(query.length<2||query.length>300)return json({error:'질문을 2~300자로 입력해 주세요.'},400);
   try{if(await throttle(request,context))return json({error:'질문이 많아요. 1분 뒤 다시 시도해 주세요.'},429);}catch{return json({error:'잠시 후 다시 질문해 주세요.'},503);}
-  const city=CITIES.includes(body.city)?body.city:'all';let timer;
+  const city=CITIES.includes(body.city)?body.city:'all';
   const literal=routeIntent(query,city)||guideIntent(query,city)||literalIntent(query,city);if(literal)return json({intent:extendIntent(literal,query,city)});
   if(!env.AI?.run)return json({error:'AI 연결을 준비하고 있어요. 기존 검색창을 이용해 주세요.'},503);
-  try{
-    const result=await Promise.race([
-      env.AI.run('@cf/openai/gpt-oss-120b',{messages:[{role:'system',content:SYSTEM},{role:'user',content:JSON.stringify({city,question:query})}],max_tokens:1800,temperature:0.1,response_format:{type:'json_object'}}),
-      new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('timeout')),25000);})
-    ]);
-    let value=result?.response??result?.choices?.[0]?.message?.content;
-    if(typeof value==='string')value=JSON.parse(value.replace(/<think>[\s\S]*?<\/think>/g,'').replace(/^```(?:json)?\s*|\s*```$/g,'').trim());
-    return json({intent:extendIntent(clarifyIntent(validateIntent(value,city),query),query,city)});
-  }catch{return json({error:'AI가 질문을 처리하지 못했어요. 잠시 후 다시 시도하거나 기존 검색창을 이용해 주세요.'},503);}
-  finally{clearTimeout(timer);}
+  // At most one recovery call, within the client's 30-second deadline. Invalid
+  // JSON is a provider failure, not evidence that no matching businesses exist.
+  for(const [model,tokens,timeout] of [['@cf/openai/gpt-oss-120b',2400,17000],['@cf/qwen/qwen3-30b-a3b-fp8',850,8000]]){
+    let timer;
+    try{
+      const result=await Promise.race([
+        env.AI.run(model,{messages:[{role:'system',content:SYSTEM},{role:'user',content:JSON.stringify({city,question:query})+(model.includes('qwen')?' /no_think':'')}],max_tokens:tokens,temperature:0.1,response_format:{type:'json_object'}}),
+        new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('timeout')),timeout);})
+      ]);
+      let value=result?.response??result?.choices?.[0]?.message?.content;
+      if(typeof value==='string')value=JSON.parse(value.replace(/<think>[\s\S]*?<\/think>/g,'').replace(/^```(?:json)?\s*|\s*```$/g,'').trim());
+      return json({intent:extendIntent(clarifyIntent(validateIntent(value,city),query),query,city)});
+    }catch{/* A bounded second model may recover transient failures. */}
+    finally{clearTimeout(timer);}
+  }
+  return json({error:'AI 연결 또는 응답 처리에 실패했어요. 잠시 후 다시 질문해 주세요. 검색 결과가 없다는 뜻은 아닙니다.'},503);
 }
