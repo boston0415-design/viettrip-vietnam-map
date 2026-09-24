@@ -48,7 +48,7 @@
 .aiResult .aiAlternativeNote{font-size:11px;color:#829087;margin-top:7px}
 .aiResult{scroll-margin-top:60px;touch-action:pan-y}
 
-.top .searchClear{flex:0 0 30px;width:30px;height:40px;min-height:40px;margin:0;padding:0;border:0;border-radius:10px;background:transparent;color:#7b9187;font:400 22px/1 system-ui;cursor:pointer}
+.top .search>.searchClear,.top .aiComposer>.searchClear{flex:0 0 32px;width:32px;height:40px;min-height:40px;margin:0;padding:0;border:0;border-radius:10px;background:transparent;color:#7b9187;font:400 22px/1 system-ui;cursor:pointer}
 .top .searchClear:hover{background:#e8f0eb;color:#285d4d}
 .top .searchClear[hidden]{display:none!important}
 .top #searchInput::-webkit-search-cancel-button{display:none}
@@ -57,3 +57,5 @@
 .aiResult .aiHours-open,.aiResult .aiHours-later{background:#eaf5ee;color:#266b4a}
 .aiResult .aiHours-closed{background:#f9efed;color:#926357}
 .aiResult .aiHours .aiHoursSource{font-size:10px;font-weight:400;opacity:.85}
+
+.aiHoursAttributions{font-size:10px;color:#6d7d76;padding:0 8px 6px;display:flex;gap:6px}

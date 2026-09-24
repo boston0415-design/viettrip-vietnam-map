@@ -42,8 +42,9 @@
       signal?.addEventListener('abort',abort,{once:true});
     })]);}finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}
   }
-  async function lookup(place,{signal,now=new Date()}={}){
-    const unavailable={...unknown(),source:'unknown',checkedAt:now.toISOString()};
+  async function lookup(place,{signal,now}={}){
+    const checked=()=>now||new Date();
+    const unavailable={...unknown(),source:'unknown',checkedAt:checked().toISOString()};
     const active=()=>{if(signal?.aborted)throw new DOMException('Cancelled','AbortError');};
     try{
       active();
@@ -66,7 +67,7 @@
           active();
           if(!googlePhotoBranchMatches(place,{place_id:id,name:detail.displayName,formatted_address:detail.formattedAddress,geometry:{location:detail.location}}))return unavailable;
           googlePhotoSavedId(key,id);
-          const result=summarize(detail,now,'current');
+          const result=summarize(detail,checked(),'current');
           if(result.kind!=='unknown')return {...result,placeId:id,attributions:detail.attributions||[]};
         }catch(error){if(error.name==='AbortError')throw error;}
       }
@@ -77,13 +78,13 @@
       active();
       if(!googlePhotoBranchMatches(place,detail)||detail.place_id!==id)return unavailable;
       googlePhotoSavedId(key,id);
-      return {...summarize(detail,now,'regular'),placeId:id,attributions:detail.html_attributions||[]};
+      return {...summarize(detail,checked(),'regular'),placeId:id,attributions:detail.html_attributions||[]};
     }catch(error){if(error.name==='AbortError')throw error;return unavailable;}
   }
   async function checkAll(rows,{signal,onResult}={}){
-    let cursor=0;const now=new Date();
+    let cursor=0;
     await Promise.all(Array.from({length:Math.min(3,rows.length)},async()=>{
-      while(cursor<rows.length&&!signal?.aborted){const row=rows[cursor++];try{const result=await lookup(row.place,{signal,now});if(!signal?.aborted)onResult(row,result);}catch(error){if(error.name!=='AbortError')throw error;}}
+      while(cursor<rows.length&&!signal?.aborted){const row=rows[cursor++];try{const result=await lookup(row.place,{signal});if(!signal?.aborted)onResult(row,result);}catch(error){if(error.name!=='AbortError')throw error;}}
     }));
   }
   window.AIPlaceHours={lookup,summarize,checkAll};

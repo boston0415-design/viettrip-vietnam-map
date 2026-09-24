@@ -127,9 +127,15 @@
     const credit=slot.querySelector('.aiHoursSource');
     const checked=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Ho_Chi_Minh',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(result.checkedAt));
     credit.textContent=result.source==='unknown'?'영업시간 정보가 없거나 연결하지 못했어요.':'Google Maps · '+checked+' 확인'+(result.source==='regular'?' · 임시 휴무 미확인':'');
-    for(const attribution of result.attributions||[]){
-      if(typeof attribution==='string'){const el=document.createElement('span');el.textContent=new DOMParser().parseFromString(attribution,'text/html').body.textContent;slot.append(el);}
-      else if(attribution.provider){const el=document.createElement('span');el.textContent=attribution.provider;slot.append(el);}
+    const row=button.parentElement;
+    if(row){
+      row.querySelector('.aiHoursAttributions')?.remove();
+      const sources=document.createElement('div');sources.className='aiHoursAttributions';
+      for(const attribution of result.attributions||[]){
+        if(typeof attribution==='string')sources.append(googlePhotoAttribution(attribution));
+        else if(attribution.provider){const uri=googlePhotoSafeUrl(attribution.providerURI),el=document.createElement(uri?'a':'span');el.textContent=attribution.provider;if(uri){el.href=uri;el.target='_blank';el.rel='noopener noreferrer';}sources.append(el);}
+      }
+      if(sources.childNodes.length)row.append(sources);
     }
   }
   function checkHours(rows,intent){
@@ -157,9 +163,9 @@
     const results=buildResults(intent,db(),state.nearby);
     const {rows,fallback,missing}=results;
     title.textContent=(fallback?'대신 살펴볼 등록 업소':'추천 업소')+' · '+rows.length+'곳';
-    status.textContent=scope+' — '+(fallback?missing.join('·')+' 조건에 맞는 업소가 없어, 같은 지역·업종의 등록 업소를 추천 순으로 보여드려요.':rows.length?'업소를 누르면 상세정보를 볼 수 있어요.':'이 지역·업종에 맞는 등록 정보를 아직 찾지 못했어요. 지역이나 업종을 넓혀 보세요.');
-    if(intent.preferences?.length)status.textContent+=' '+intent.preferences.map(key=>PREFERENCES[key]?.label).filter(Boolean).join('·')+' 관련 정보가 있는 곳을 먼저 보여드려요.';
-    if(intent.visitToday){status.textContent+=' 오늘 영업시간을 확인해 각 업소에 표시합니다.';note.textContent='베트남 현지 날짜 기준입니다. 오늘 정보와 정기시간을 구분하며, 당일 변경은 업소에 확인해 주세요.';}
+    status.textContent=scope+(fallback?' — ':rows.length?'':' — ')+(fallback?missing.join('·')+' 조건에 맞는 업소가 없어, 같은 지역·업종의 등록 업소를 추천 순으로 보여드려요.':rows.length?'':'이 지역·업종에 맞는 등록 정보를 아직 찾지 못했어요. 지역이나 업종을 넓혀 보세요.');
+    if(intent.preferences?.length)status.textContent+=' '+intent.preferences.map(key=>PREFERENCES[key]?.label).filter(Boolean).join('·')+' 관련 정보 우선.';
+    if(intent.visitToday){status.textContent+=' 오늘 영업시간을 확인합니다.';note.textContent='베트남 현지 날짜 기준입니다. 오늘 정보와 정기시간을 구분하며, 당일 변경은 업소에 확인해 주세요.';}
     if(intent.district&&intent.city==='hcmc'&&districtData.length)note.textContent+=' '+intent.district+'군은 기존 행정구역 기준입니다.';
     if(!rows.length){examples.hidden=false;return;}
     for(const row of rows){
@@ -175,17 +181,18 @@
       const meta=document.createElement('span');meta.className='aiMeta';meta.textContent=[placeRegionLabel(place),CONFIG.categories[place.category]?.label,place.subcategory].filter(Boolean).join(' · ');button.append(meta);
       if(row.rating!=null){const rating=document.createElement('span');rating.className='aiRating';rating.textContent='★ '+row.rating.toFixed(1)+' · 회원 평가 '+row.ratingCount+'개';button.append(rating);}
       const address=document.createElement('span');address.textContent=place.address||'주소 미등록';button.append(address);
-      if(intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b>오늘 영업시간 확인 중…</b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);const result=last?.hours?.get(place.id);if(result)showHours(button,result);}
+      if(intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b>오늘 영업시간 확인 중…</b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
       if(place.memberBenefit&&place.benefitText){const benefit=document.createElement('span');benefit.className='aiBenefitCopy';benefit.textContent=place.benefitText;button.append(benefit);}
       for(const text of evidence.slice(0,2)){const proof=document.createElement('span');proof.className='aiEvidence';proof.textContent=text;button.append(proof);}
       const unconfirmed=[intent.recommended&&!row.recommended?'강추 지정 없음':'',intent.benefit&&!place.memberBenefit?'등록된 혜택 없음':'',...row.missingTerms.map(term=>term+' 정보 미확인'),intent.preferences?.length&&!row.preferenceHits.length?'분위기·방문 목적은 직접 확인해 주세요':''].filter(Boolean);
       if(unconfirmed.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=unconfirmed.join(' · ');button.append(info);}
       button.addEventListener('click',()=>{if(!db().places.some(p=>p.id===place.id)){render(intent);return;}close();input.blur();window.PlaceSearch?.openMember(place.id);});
       li.append(button);list.append(li);
+      const result=last?.hours?.get(place.id);if(intent.visitToday&&result)showHours(button,result);
     }
     checkHours(rows,intent);
   }
-  input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim())render(last.intent);else reset();show();});
+  input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
   input.addEventListener('input',()=>{cancel();last=null;reset();show();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();form.requestSubmit();}if(event.key==='Escape'){event.preventDefault();close();input.blur();}});
   examples.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;cancel();last=null;input.value=button.textContent;syncInput();form.requestSubmit();});
@@ -207,7 +214,7 @@
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
       await prepareDistricts(payload.intent,signal);
       if(token!==revision)return;
-      last={query,intent:payload.intent,hours:new Map()};render(payload.intent);panel.scrollTop=0;fitPanel();
+      last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
     }catch(error){if(token!==revision)return;title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}
     finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}
   });
