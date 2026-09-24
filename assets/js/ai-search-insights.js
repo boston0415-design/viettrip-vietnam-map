@@ -53,6 +53,12 @@
     const preferences=preferenceEvidence(sources,intent);
     return {price:price(raw),preferenceHits:preferences.hits,proofs:preferences.proofs,hotelClass:hotelInfo(sources,intent.hotelStars),googleRating:Number(raw.rating)||null,googleCount:Number(raw.userRatingCount)||0};
   }
+  function mergeMember(row,info,intent){
+    const local=inspect({},intent,row.sources||[]),proofs=[...(local.proofs||[]),...(info.proofs||[])];
+    let hotelClass=info.hotelClass;
+    if(local.hotelClass?.kind==='confirmed')hotelClass=info.hotelClass?.kind==='different'?{...local.hotelClass,kind:'unknown'}:local.hotelClass;
+    return {...info,hotelClass,preferenceHits:[...new Set([...local.preferenceHits,...(info.preferenceHits||[])])],proofs:proofs.filter((p,i)=>proofs.findIndex(other=>other.evidence===p.evidence)===i)};
+  }
   function compare(a,b,intent){
     const aa=a.insights||{},bb=b.insights||{};
     const hotel=Number(bb.hotelClass?.kind==='confirmed')-Number(aa.hotelClass?.kind==='confirmed');if(hotel)return hotel;
@@ -118,5 +124,5 @@
     for(const [label,url] of [['Phú Quốc Express 공식 배편·가격 확인','https://online.phuquocexpress.com/'],['Superdong 공식 배편 확인','https://superdong.com.vn/']]){const a=document.createElement('a');a.textContent=label+' ↗';a.href=url;a.target='_blank';a.rel='noopener noreferrer';li.append(a);}
     const note=document.createElement('p');note.className='aiAlternativeNote';note.textContent='출발일·항구·인원을 선택해 운항편과 최종 금액을 확인하세요. 시간표·잔여 좌석·요금은 이 화면에서 실시간 확인한 값이 아닙니다. 안내 확인: 2026-09-24.';li.append(note);list.append(li);return true;
   }
-  window.AISearchInsights={money,price,inspect,compare,sortLabel,append,enrich,preferenceEvidence,hotelInfo,renderGuide,formatMoney};
+  window.AISearchInsights={money,price,inspect,mergeMember,compare,sortLabel,append,enrich,preferenceEvidence,hotelInfo,renderGuide,formatMoney};
 })();

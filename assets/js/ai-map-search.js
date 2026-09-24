@@ -322,10 +322,10 @@
   function searchGoogle(entry){
     if(!window.AIGoogleSearch||entry.google||googleController)return;
     const token=revision,work=new AbortController();googleController=work;
-    Promise.allSettled([window.AIGoogleSearch.search(entry.intent,{signal:work.signal,boundaries:districtData,nearby:state.nearby,places:db().places}),window.AISearchInsights?.enrich(entry.memberRows||[],entry.intent,{signal:work.signal})]).then(([result])=>{
+    Promise.allSettled([window.AIGoogleSearch.search(entry.intent,{signal:work.signal,boundaries:districtData,nearby:state.nearby,places:(entry.memberRows||[]).map(row=>row.place)}),window.AISearchInsights?.enrich(entry.memberRows||[],entry.intent,{signal:work.signal})]).then(([result])=>{
       if(token!==revision||last!==entry||work.signal.aborted)return;
       entry.google=result.status==='fulfilled'?{rows:result.value}:{error:true};
-      if(result.status==='fulfilled')for(const row of entry.memberRows||[]){const info=result.value.memberUpdates?.get(row.place.id);if(info)row.insights=info;}
+      if(result.status==='fulfilled')for(const row of entry.memberRows||[]){const info=result.value.memberUpdates?.get(row.place.id);if(info)row.insights=window.AISearchInsights?.mergeMember(row,info,entry.intent)||info;}
       entry.insights=new Map((entry.memberRows||[]).map(row=>[row.place.id,row.insights]));
       renderGoogle(entry);
     }).catch(error=>{if(error.name!=='AbortError'&&token===revision&&last===entry){entry.google={error:true};renderGoogle(entry);}})
