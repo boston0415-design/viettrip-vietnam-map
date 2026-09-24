@@ -393,6 +393,8 @@ const server=http.createServer((req,res)=>{
    await page.evaluate(()=>setMobileLegendExpanded(false));
   }
   // AI is a separate compact input below ordinary search, using local evidence only.
+  await page.evaluate(()=>document.activeElement?.blur());
+  await page.waitForTimeout(180); // Compare resting styles after the focus transition.
   const searchBox=await page.locator('.top .search').boundingBox(),aiBox=await page.locator('.aiComposer').boundingBox();
   assert(aiBox.y>=searchBox.y+searchBox.height,'AI composer sits below the existing search');
   assert(aiBox.x>=0&&aiBox.x+aiBox.width<=width+1,'composer fits the viewport');
