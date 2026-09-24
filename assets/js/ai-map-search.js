@@ -430,7 +430,7 @@
   form.addEventListener('submit',async event=>{
     event.preventDefault();const query=input.value.trim();if(query.length<2||query.length>300||controller)return;
     cancel();const token=revision;controller=new AbortController();const signal=controller.signal;
-    send.disabled=true;form.setAttribute('aria-busy','true');examples.hidden=true;list.replaceChildren();title.textContent='AI가 조건을 찾고 있어요';status.textContent='회원 등록 업소와 Google 지도에서 찾아볼게요…';show();input.blur();
+    send.disabled=true;form.setAttribute('aria-busy','true');examples.hidden=true;list.replaceChildren();title.textContent='질문을 이해하고 있어요';status.textContent='필요한 정보와 추천 근거를 확인할게요…';show();input.blur();
     const pending=controller;const timeout=setTimeout(()=>pending.abort(),30000);
     try{
       const response=await fetch('/api/ask-map',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,city:state.city}),signal});
