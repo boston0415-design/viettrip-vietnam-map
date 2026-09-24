@@ -12,6 +12,7 @@ const {JSDOM}=require('jsdom'),root=path.join(__dirname,'..'),read=p=>fs.readFil
  const budget=parse('로컬 가라오케 중 500만동 정도로 놀만한 곳 찾아줘',{category:'karaoke',terms:['로컬','500만동'],unsupported:['500만동']});assert.equal(budget.subcategory,'로컬 KTV');assert.deepEqual(budget.budget,{amount:5000000,currency:'VND'});assert.equal(budget.unsupported.length,0);assert.equal(budget.terms.length,0);
  const cheap=parse('호치민에서 가격 저렴한 식당 찾아줘');assert.equal(cheap.sortBy,'cheap');assert(cheap.showPrice);
  const atmosphere=parse('분위기 좋은 1군 식당 찾아줘');assert.equal(atmosphere.sortBy,'atmosphere');
+ assert.deepEqual(parse('1군 후기 좋은 호텔 중 가장 좋은 곳',{unsupported:['후기 좋은','가장 좋은 곳','평점 5점 이상']}).unsupported,['평점 5점 이상'],'soft rankings cannot block search; hard rating condition survives');
  for(const question of ['로컬 가라오케 중 500만동 정도로 놀만한 곳 찾아줘','1군에 있는 4성급 호텔 후기 좋은 호텔 중에서 가장 좋은 곳','호치민에서 푸꿕으로 배를 타고 싶어 어디서 표를 사','오토바이 빌리고 싶은데 어디 가야해?','호치민 가장 유명한 반미집?','호치민에서 가장 유명한 빵집 어디야?','1군에서 분위기 좋은 식당 찾아줘','1군에서 가격 저렴한 식당 찾아줘']){
    assert(api.literalIntent(question,'hcmc'),question);
    const response=await api.onRequest({request:new Request('https://map.test/api/ask-map',{method:'POST',headers:{origin:'https://map.test','content-type':'application/json'},body:JSON.stringify({query:question,city:'hcmc'})}),env:{AI:{run:()=>{throw Error('MODEL_UNAVAILABLE')}}}});

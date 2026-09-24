@@ -121,6 +121,7 @@ export function clarifyIntent(intent,query){
   next.sortBy=sorting.cheap.test(query)?'cheap':/분위기|조용|야경|전망|루프탑|데이트/.test(query)?'atmosphere':sorting.popular.test(query)?'popular':sorting.top_rated.test(query)?'top_rated':'';
   if(!next.sortBy)delete next.sortBy;
   next.terms=next.terms.filter(t=>!/^(?:가장\s*)?(?:유명한?|인기|인기 있는|후기 좋은|후기|평점|좋은|최고|저렴한?|가격 저렴한|싼|가성비|가격대|가격|예산|비용|cheap|popular|famous|best)$/i.test(t));
+  next.unsupported=next.unsupported.filter(t=>!/^(?:(?:가장\s*)?(?:후기\s*좋은|평점\s*높은|좋은|유명한?|인기(?:\s*있는)?|저렴한?|가성비|분위기\s*좋은|조용한|야경|전망|데이트|최고)(?:\s*(?:곳|업소|식당|호텔|추천))?|가격(?:대|\s*정보|\s*확인)?|예산|비용)$/i.test(t.trim()));
   const money=query.match(/([\d,]+(?:\.\d+)?)\s*(만|천|k|m)?\s*(동|vnd|달러|usd|불|원|krw)/i);
   if(money){const amount=Number(money[1].replaceAll(',',''))*({만:10000,천:1000,k:1000,m:1000000}[money[2]?.toLowerCase()]||1);if(Number.isFinite(amount)&&amount>0&&amount<1e12){next.budget={amount,currency:/동|vnd/i.test(money[3])?'VND':/원|krw/i.test(money[3])?'KRW':'USD'};next.terms=next.terms.filter(t=>!/[\d,]+\s*(?:만|천|k|m)?\s*(?:동|vnd|달러|usd|불|원|krw)|^(예산|가격|비용)/i.test(t));next.unsupported=next.unsupported.filter(t=>!/가격|예산|비용|동|vnd|달러|usd|krw|원|price|budget/i.test(t));}}
   if(/가격|가격대|얼마|예산|저렴|가성비|싼|비용/.test(query)||money)next.showPrice=true;
