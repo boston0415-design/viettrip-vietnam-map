@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="./assets/css/map-ux.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/panel-comfort.css?v=20260921-sticky-header1">
 <link rel="stylesheet" href="./assets/css/browse-experience.css?v=20260924-list-gesture1">
+<link rel="stylesheet" href="./assets/css/ai-map-search.css?v=20260924-ai1">
 </head>
 <body>
 <div class="app">
@@ -47,6 +48,24 @@
       <div class="brandLinks"><a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a><a id="mapGuideLink" class="mapGuideLink" href="./guide/">여행가이드 ↗</a></div>
     </div>
     <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" type="search" autocomplete="off" spellcheck="false" maxlength="200" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeSearchList" aria-label="업소명 또는 주소 검색" placeholder="업소명·주소·지역 검색"><button id="searchBtn" type="button">검색</button><div id="placeSearchResults" class="placeSearchResults" hidden><div id="placeSearchList" role="listbox" aria-label="추천 장소"></div><p id="placeSearchStatus" role="status" aria-live="polite"></p><div id="placeSearchCredit" translate="no" hidden>Google Maps</div></div></div>
+    <section class="aiMapSearch" aria-label="AI에게 업소 질문하기">
+      <form id="aiMapForm" class="aiComposer">
+        <label for="aiMapQuestion">AI</label>
+        <textarea id="aiMapQuestion" rows="2" maxlength="300" autocomplete="off" aria-label="AI에게 찾고 싶은 업소 질문하기" aria-controls="aiMapPanel" aria-expanded="false" placeholder="1군에서 동태탕 먹을 수 있는 한식당 찾아줘"></textarea>
+        <button id="aiMapSend" type="submit" aria-label="AI에게 질문 보내기" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button>
+      </form>
+      <section id="aiMapPanel" class="aiPanel" aria-label="AI 업소 검색" hidden>
+        <div class="aiPanelHead"><strong id="aiMapTitle">이렇게 물어보세요</strong><button id="aiMapClose" type="button" aria-label="AI 검색 결과 닫기">×</button></div>
+        <div id="aiMapExamples" class="aiExamples">
+          <button type="button">1군에서 동태탕 먹을 수 있는 한식당 찾아줘</button>
+          <button type="button">호치민에서 회원 혜택이 있는 마사지 찾아줘</button>
+          <button type="button">하노이에서 회원들이 강추한 식당 찾아줘</button>
+        </div>
+        <p id="aiMapStatus" role="status" aria-live="polite"></p>
+        <ul id="aiMapResults" class="aiResults" aria-label="조건에 맞는 등록 업소"></ul>
+        <p class="aiNote">등록 정보와 회원 후기를 찾아요. 메뉴·가격·영업 여부는 방문 전 업소에 확인해 주세요.</p>
+      </section>
+    </section>
     <div class="actions">
       <button id="locBtn" class="btn primary">현재 위치</button>
       <button id="addBtn" class="btn">업체 등록</button>
@@ -421,5 +440,6 @@
 <script src="./assets/js/map-weather.js?v=20260924-clean1"></script>
 <script src="./assets/js/panel-history.js?v=20260920-ux3"></script>
 <script src="./assets/js/desktop-window-size.js?v=20260924-clean2"></script>
+<script src="./assets/js/ai-map-search.js?v=20260924-ai1"></script>
 </body>
 </html>

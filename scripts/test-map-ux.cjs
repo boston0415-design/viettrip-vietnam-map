@@ -12,7 +12,7 @@ focusLocationAtZoom=async()=>{};
 state.map={getCenter:()=>({lat:()=>10.77,lng:()=>106.7}),getZoom:()=>16,setCenter:empty,panBy:empty,setOptions:empty,get:()=>'',getDiv:()=>document.getElementById('map'),addListener:()=>({remove:empty})};
 class TestMarker{constructor(o){Object.assign(this,o);}setMap(map){this.map=map;}getMap(){return this.map;}addListener(){return {remove:empty}}}
 window.google={maps:{Marker:TestMarker,Circle:TestMarker,Size:class{},Point:class{},event:{trigger:empty},places:{AutocompleteSessionToken:class{},AutocompleteService:class{getPlacePredictions(r,cb){cb([{place_id:'external-ux',structured_formatting:{main_text:'검색한 새 업소',secondary_text:'호치민 주소'}}],'OK')}},PlacesService:class{getDetails(r,cb){cb({place_id:r.placeId,name:'검색한 새 업소',formatted_address:'정확한 주소',geometry:{location:{lat:()=>10.775,lng:()=>106.705}},types:['cafe'],formatted_phone_number:'+84 123 456 789',opening_hours:{weekday_text:['월요일 09:00–21:00'],isOpen:()=>true},rating:4.5,user_ratings_total:22},'OK')}findPlaceFromQuery(r,cb){cb([],'ZERO_RESULTS')}}}}};
-fetch=async(url,options={})=>{if(String(url).includes('api.met.no'))return {ok:true,headers:{get:()=>new Date(Date.now()+3600000).toUTCString()},json:async()=>({properties:{timeseries:[{time:new Date(Math.floor(Date.now()/3600000)*3600000).toISOString(),data:{instant:{details:{air_temperature:27}},next_1_hours:{summary:{symbol_code:'cloudy'}}}}]}})};let req;try{req=JSON.parse(options.body)}catch{};const data=req?.p_action==='badges'?[]:{id:'ux-member',nickname:'시험 회원',total:3,level:1,devices:[{hash:'a'.repeat(64),key:'test-device-key'}],counts:{place:1,review:2,correction:0},activities:[],corrections:[]};return {ok:true,json:async()=>data,text:async()=>'',status:200};};
+fetch=async(url,options={})=>{if(String(url).includes('/api/ask-map'))return {ok:true,json:async()=>({intent:{relevant:true,city:'hcmc',district:'',category:'cafe',subcategory:'',terms:[],benefit:true,recommended:false,nearby:false,unsupported:[]}})};if(String(url).includes('api.met.no'))return {ok:true,headers:{get:()=>new Date(Date.now()+3600000).toUTCString()},json:async()=>({properties:{timeseries:[{time:new Date(Math.floor(Date.now()/3600000)*3600000).toISOString(),data:{instant:{details:{air_temperature:27}},next_1_hours:{summary:{symbol_code:'cloudy'}}}}]}})};let req;try{req=JSON.parse(options.body)}catch{};const data=req?.p_action==='badges'?[]:{id:'ux-member',nickname:'시험 회원',total:3,level:1,devices:[{hash:'a'.repeat(64),key:'test-device-key'}],counts:{place:1,review:2,correction:0},activities:[],corrections:[]};return {ok:true,json:async()=>data,text:async()=>'',status:200};};
 `;
 const source=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const html=source.replace(/<script[^>]+src="[^"]*(?:online-presence|realtime-|community-stats|10-runtime-guard|home-screen|guide-map-link|transport-guide|business-share|admin-regions)[^"]*"[^>]*><\/script>/g,'').replace(/(<script src="\.\/assets\/js\/09-init-events[^>]*>)/,`<script>${fixture}</script>$1`);
@@ -392,9 +392,30 @@ const server=http.createServer((req,res)=>{
    await checkDoubleClick('#areaPanel','#areaPanelTitle');await page.locator('#areaPanelClose').click();
    await page.evaluate(()=>setMobileLegendExpanded(false));
   }
+  // AI is a separate compact input below ordinary search, using local evidence only.
+  const searchBox=await page.locator('.top .search').boundingBox(),aiBox=await page.locator('.aiComposer').boundingBox();
+  assert(aiBox.y>=searchBox.y+searchBox.height,'AI composer sits below the existing search');
+  assert(aiBox.x>=0&&aiBox.x+aiBox.width<=width+1,'composer fits the viewport');
+  await page.locator('#aiMapQuestion').focus();
+  assert(await page.locator('#aiMapExamples').isVisible());
+  await page.locator('#aiMapExamples button').first().click();
+  assert.match(await page.locator('#aiMapQuestion').inputValue(),/동태탕/);
+  await page.locator('#aiMapQuestion').fill('호치민 혜택 있는 카페 찾아줘');
+  await page.locator('#aiMapQuestion').press('Enter');
+  await page.locator('.aiResult').waitFor();
+  assert.equal(await page.locator('.aiResult').count(),1,'AI conditions search real fixture records');
+  assert.equal(await page.locator('#aiMapExamples').isVisible(),false,'examples do not cover results');
+  assert.match(await page.locator('.aiResult').innerText(),/혜택 있는 카페/);
+  await page.screenshot({path:path.join(out,`ai-search-${width}.png`)});
+  await page.locator('.aiResult').click();
+  assert.equal(await page.locator('#aiMapPanel').isVisible(),false);
+  assert.match(await page.locator('#detail').innerText(),/혜택 있는 카페/);
+  await page.waitForTimeout(300);
+  assert(await page.locator('#detail').isVisible(),'selected detail does not disappear');
+  await page.evaluate(()=>closeDetailPanel());
   await page.screenshot({path:path.join(out,`overview-${width}.png`)});
   assert.deepEqual(errors,[],`no runtime error at ${width}px`);
-  results.push({width,passed:true,checks:['list-only quick filters','no public dashboard counts','operator controls in list options','desktop double-click max/min and mobile drag preservation','readable list under half height','expand-first title drag with anchored header and grip','nearby collapse/close/reopen','drag-to-collapse','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','membership height','search registration','manual location validation']});
+  results.push({width,passed:true,checks:['AI composer, examples, grounded results and stable detail','list-only quick filters','no public dashboard counts','operator controls in list options','desktop double-click max/min and mobile drag preservation','readable list under half height','expand-first title drag with anchored header and grip','nearby collapse/close/reopen','drag-to-collapse','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','membership height','search registration','manual location validation']});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'map-ux-results.json'),JSON.stringify(results,null,2));console.log('PASS Map UX browser regression',JSON.stringify(results));

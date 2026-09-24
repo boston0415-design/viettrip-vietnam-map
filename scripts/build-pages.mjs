@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const output=resolve(root,'dist-pages');
-const files=['index.html','guide','assets','_headers','manifest.webmanifest','sw.js'];
+const files=['index.html','guide','assets','_headers','_routes.json','manifest.webmanifest','sw.js'];
 for(const file of files)await access(resolve(root,file));
 await rm(output,{recursive:true,force:true});
 await mkdir(output,{recursive:true});
