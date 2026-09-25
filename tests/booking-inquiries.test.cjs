@@ -79,12 +79,12 @@ async function check(mobile){
   for(const entry of entries){
     await action(`state.selected=${JSON.stringify(entry.id)};renderDetail()`);
     const triggers=[...w.document.querySelectorAll('#detail [data-booking-inquiry]')];
-    assert.equal(triggers.length,2,'compact/mobile and desktop actions are both present');
+    assert.equal(triggers.length,1,'one booking action is shared by mobile and desktop');
     assert(w.document.querySelector('#detail .detailQuickActions').classList.contains('hasBooking'));
     assert.equal(w.document.getElementById('detailBody').hidden,mobile,'mobile details stay compact; desktop details stay visible');
     const depth=w.history.state.viettripPanelBack.depth,url=w.location.href;
     // Repeat opening is idempotent and never creates duplicate dialog history.
-    triggers[mobile?0:1].click();await pause();assert(dialog.open);
+    triggers[0].click();await pause();assert(dialog.open);
     assert.equal(w.history.state.viettripPanelBack.depth,depth+1);
     assert(run(`openBookingInquiry(${JSON.stringify(entry.id)})`));await pause();
     assert.equal(w.history.state.viettripPanelBack.depth,depth+1);

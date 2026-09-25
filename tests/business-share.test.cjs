@@ -41,6 +41,11 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     assert(!f.w.document.querySelector('.businessShare script'));
     let clipboard;Object.defineProperty(f.w,'isSecureContext',{value:true});Object.defineProperty(f.w.navigator,'clipboard',{value:{writeText:async value=>clipboard=value}});
     f.w.handleCopyButton({preventDefault(){},stopPropagation(){},stopImmediatePropagation(){}},buttons[0]);await tick();assert.equal(clipboard,copied);assert.equal(buttons[0].textContent,'복사됨 ✓');
+    const details=f.w.document.querySelectorAll('.detailCopyActions .copyBtn');
+    assert.equal(details.length,3);
+    for(const [index,value] of ['테스트 <업소>','나트랑 테스트 주소','테스트 <업소>\n나트랑 테스트 주소'].entries()){
+      f.w.handleCopyButton({preventDefault(){},stopPropagation(){},stopImmediatePropagation(){}},details[index]);await tick();assert.equal(clipboard,value);
+    }
     f.run(`closeDetailPanel();assert.equal(state.markers.length,0);assert.equal(PersonalPlaces.isHidden('shared-1'),true);assert.equal(BusinessShare.url({id:'bad?id'}),'')`);
     f.close();
   }

@@ -17,7 +17,7 @@
   }
   function html(place){
     if(!url(place))return '';
-    return `<section class="businessShare" aria-label="업소 위치 공유"><div class="businessShareActions">${copyButtonHtml('카페에 공유',text(place))}${copyButtonHtml('위치 링크 복사',url(place))}</div><p>카페에 공유를 누르면 업소명·주소·지도 링크가 복사됩니다. 카페 글에 붙여넣어 주세요.</p></section>`;
+    return `<section class="businessShare" aria-label="업소 위치 공유"><div class="businessShareActions">${copyButtonHtml('카페에 공유',text(place))}${copyButtonHtml('위치 링크 복사',url(place))}</div></section>`;
   }
   const isSharedSelection=place=>Boolean(openedId && place?.id===openedId && state.selected===openedId);
   function includeSelectedPlace(visible){

@@ -24,7 +24,7 @@ run(`
   for(const p of fixture.places){
     state.selected=p.id;renderDetail();
     const links=[...document.querySelectorAll('#detail .bookingButton')];
-    assert.equal(links.length,2,'phone summary and desktop detail contain booking links');
+    assert.equal(links.length,1,'phone and desktop share one booking action');
     assert(document.querySelector('.detailQuickActions').classList.contains('hasBooking'));
     assert(document.getElementById('detailBody').hidden,'booking does not force expanded mobile sheet');
     for(const a of links){

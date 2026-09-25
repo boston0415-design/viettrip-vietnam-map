@@ -526,14 +526,13 @@ function renderDetail(){
     ${booking}
   </div>
   <div id="detailBody" class="detailBody">
+  <div class="detailUtilities" role="group" aria-label="공유 및 정보 복사">
   ${window.BusinessShare?.html(p)||''}
-  <div class="copyRow">
-    ${businessDirectionsLinkHtml(p)}
-    ${booking}
+  <div class="copyRow detailCopyActions">
     ${copyButtonHtml('업체명 복사',p.name)}
     ${p.address?copyButtonHtml('주소 복사',p.address):''}
-    <button type="button" class="copyBtn grabButton" data-grab-place="${esc(p.id)}">그랩으로 이동</button>
     ${p.address?copyButtonHtml('이름+주소 복사',combinedCopy):''}
+  </div>
   </div>
   ${bookingNote}
   ${p.registrantNickname?`<p class="placeRegistrant">등록자 <span>${esc(p.registrantNickname)}</span>${window.MapMembership?.badgeHtml(p.ownerKeyHash)||''}</p>`:''}

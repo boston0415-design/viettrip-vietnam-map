@@ -1,8 +1,25 @@
-.businessShare{margin:8px 0 12px;padding:10px;background:#f2f8f5;border:1px solid #dce8e1;border-radius:12px}
-.businessShareActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-#detail .businessShare .copyBtn{justify-content:center;min-width:0;min-height:44px;padding:8px 6px;font:600 12px/1.4 system-ui,sans-serif;white-space:normal;text-align:center}
-#detail .businessShare .copyBtn:first-child{color:#247f78;border-color:#b8d6cb}
-.businessShare p{margin:8px 0 0;font-size:11px;line-height:1.6;color:#62736d;overflow-wrap:anywhere}
+/* One navigation row and one quiet utility area, shared by phone and desktop. */
+#detail .detailQuickActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:6px 0;padding:3px;background:#f3f6f4;border-radius:11px}
+#detail.detailExpanded .detailQuickActions{margin:6px 0}
+#detail .detailQuickActions button,#detail .detailQuickActions a{display:inline-flex;align-items:center;justify-content:center;min-width:0;min-height:44px;box-sizing:border-box;padding:6px 4px;border:0;border-radius:8px;background:transparent;color:#38584f;font:600 12px/1.4 system-ui,sans-serif;text-decoration:none;white-space:normal;text-align:center;cursor:pointer}
+#detail .detailQuickActions .directionsButton{background:#247f78;color:#fff}
+#detail .detailQuickActions .grabButton,#detail .detailQuickActions .bookingButton{color:#25734a}
+#detail .detailQuickActions.hasBooking{grid-template-columns:repeat(4,minmax(0,1fr))}
+#detail .detailQuickActions.hasBooking button,#detail .detailQuickActions.hasBooking a{font-size:11px}
+#detail .detailBody{border-top:0;padding-top:0}
+#detail .detailUtilities{margin:0 0 10px;padding:0 0 2px;border-bottom:1px solid #e7ede9}
+#detail .businessShare{margin:0;padding:0;border:0;background:transparent}
+#detail .businessShareActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
+#detail .detailCopyActions{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0;margin:0;padding:0;border-top:1px solid #edf1ee}
+#detail .detailUtilities .copyBtn{display:inline-flex;align-items:center;justify-content:center;min-width:0;min-height:44px;box-sizing:border-box;padding:6px 3px;border:0;border-radius:7px;background:transparent;color:#52635b;font:500 12px/1.4 system-ui,sans-serif;white-space:normal;text-align:center}
+#detail .businessShare .copyBtn{color:#24756c;font-weight:600}
+#detail .detailUtilities .copyBtn.copied{background:#eef7f2;color:#24756c}
+@media(hover:hover){#detail .detailUtilities .copyBtn:hover,#detail .detailQuickActions button:hover,#detail .detailQuickActions a:not(.directionsButton):hover{background:#e9f1ec}}
+@media(min-width:901px){
+ #detail:not(.externalDetail) .detailQuickActions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #detail:not(.externalDetail) .detailQuickActions.hasBooking{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #detail:not(.externalDetail) #detailExpandBtn{display:none}
+}
 .businessShareNotice{position:absolute;z-index:110;top:55px;left:12px;right:12px;display:flex;align-items:center;gap:8px;width:fit-content;max-width:calc(100% - 24px);margin:auto;padding:10px 12px;background:#fff;border:1px solid #d4e1d7;border-radius:12px;box-shadow:0 3px 15px #28483915;font:12px/1.6 system-ui,sans-serif;color:#426352}
 .businessShareNotice span{min-width:0;overflow-wrap:anywhere}
 .businessShareNotice[hidden],.businessShareNotice button[hidden]{display:none}

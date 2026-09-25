@@ -219,6 +219,18 @@ const server=http.createServer((req,res)=>{
   await page.locator('[data-browse-prev]').click();assert.equal(await page.evaluate(()=>state.selected),'ux-0');
   // Photo tap opens a separate layer and never collapses the place panel.
   await page.evaluate(()=>setDetailExpanded(true));
+  // Compact actions retain full touch targets and every copy option on all layouts.
+  const utilities=await page.locator('#detail .detailUtilities').boundingBox();
+  assert(utilities.height<=94,'share/copy controls use two compact rows');
+  assert.equal(await page.locator('#detail .directionsButton').count(),1,'one route action for both layouts');
+  assert.equal(await page.locator('#detail [data-grab-place]').count(),1,'one Grab action for both layouts');
+  assert.equal(await page.locator('#detail .detailUtilities .copyBtn').count(),5,'all share/copy options remain directly visible');
+  for(const control of await page.locator('#detail .detailUtilities .copyBtn, #detail .detailQuickActions button, #detail .detailQuickActions a').all()){
+    if(!await control.isVisible())continue;
+    const box=await control.boundingBox();assert(box.height>=44&&box.width>=44,'action retains a full touch target');
+    assert(box.x>=utilities.x-1&&box.x+box.width<=utilities.x+utilities.width+1,'actions stay inside the panel');
+  }
+  await page.screenshot({path:path.join(out,`detail-actions-${width}.png`)});
   const readingPanel=await page.locator('#detail').boundingBox(),readingMap=await page.locator('.mapwrap').boundingBox();
   assert(readingPanel.y<=readingMap.y+readingMap.height*.23,'expanded detail uses the upper reading space on both layouts');
   const heading=await page.locator('#detail .detailHeader').boundingBox(),closeButton=await page.locator('#detailCloseBtn').boundingBox();
