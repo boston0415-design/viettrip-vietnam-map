@@ -57,7 +57,7 @@ assert.equal(criteria(),originalCriteria);
  assert(!wrap.classList.contains('listOpen'));assert(wrap.classList.contains('detailOpen'));
  assert(nodes.get('#areaLegendBody').hidden);assert(detail.innerHTML.includes('회원 후기 1개 보기'));
  assert(detail.innerHTML.includes('테스트 &lt;업체&gt;'));
- assert.equal((detail.innerHTML.match(/class="directionsButton/g)||[]).length,2,'directions available in the phone summary and desktop actions');assert(!detail.innerHTML.includes('id="adminDeleteBtn"'));
+ assert.equal((detail.innerHTML.match(/class="directionsButton/g)||[]).length,1,'one directions action shared by phone and desktop');assert(!detail.innerHTML.includes('id="adminDeleteBtn"'));
  run('assert.equal(lastPan.y,74);assert.equal(lastPan.x,0);assert.equal(criteria(),originalCriteria)');
  for(let i=0;i<3;i++){
   nodes.get('#detailExpandBtn').onclick();flush();assert.equal(nodes.get('#detailBody').hidden,false);
