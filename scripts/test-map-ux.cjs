@@ -492,6 +492,9 @@ const server=http.createServer((req,res)=>{
   assert(!await page.locator('#aiMapPanel').isVisible(),'ordinary search replaces AI results');
   assert(await page.locator('#placeSearchResults').isVisible());
   assert(!await page.locator('#businessSide').isVisible());
+  // On narrow screens the dropdown covers this map button; close it first,
+  // exactly as a user would, rather than force-clicking through the results.
+  await page.locator('#searchInput').press('Escape');
   await page.locator('#browseShowList').click();
   assert(await page.locator('#businessSide').isVisible(),'explicit list entry remains available');
   assert(!await page.locator('#placeSearchResults').isVisible(),'opening the list dismisses suggestions');
