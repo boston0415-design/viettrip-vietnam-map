@@ -4,7 +4,7 @@ import {readBody,throttle,modelJSON,modelInput} from './ask-map.js';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const clean=(v,max)=>typeof v==='string'?v.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,max):'';
 const finite=(v,min,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max?v:null;
-const PREFS=['date','atmosphere','quiet','view','rooftop'];
+const PREFS=['group','date','atmosphere','quiet','view','rooftop'];
 export function facts(body){
   const question=clean(body?.query,301);if(question.length<2||question.length>300)throw Error('question');
   if(!Array.isArray(body.candidates)||body.candidates.length>24)throw Error('candidates');
@@ -18,7 +18,7 @@ export function facts(body){
       preferences:Array.isArray(c.preferences)?c.preferences.filter(x=>PREFS.includes(x)).slice(0,5):[],
       price:clean(c.price,100),member:c.member===true,recommended:c.recommended===true,benefit:c.benefit===true};
   });
-  return {question,sortBy:['cheap','atmosphere','popular','top_rated'].includes(body.sortBy)?body.sortBy:'',pickOne:body.pickOne===true,candidates};
+  return {question,sortBy:['cheap','atmosphere','purpose','popular','top_rated'].includes(body.sortBy)?body.sortBy:'',pickOne:body.pickOne===true,candidates};
 }
 export function validatePicks(value,data){
   if(!Array.isArray(value?.picks)||!value.picks.length||value.picks.length>3)throw Error('picks');

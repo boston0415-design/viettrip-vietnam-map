@@ -61,7 +61,7 @@
     const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'꽃집':'florist','라멘':'ramen','햄버거':'burger','쌀국수':'pho','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term));
     const specialty=terms.some(waxing)||intent.terms?.includes('꽃집');
     return [intent.flowerGift?'flower bouquet':'',includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,intent.hotelStars?intent.hotelStars+' star':'',specialty?'':({'베이커리':'bakery','호텔':'hotel','로컬 KTV':'local Vietnamese karaoke'}[intent.subcategory]||SUBS[intent.subcategory]||CATEGORIES[intent.category]||''),
-      ...(intent.preferences||[]).filter(p=>['quiet','rooftop','cheap','atmosphere'].includes(p)).map(p=>p==='atmosphere'?'nice atmosphere':p==='cheap'?'affordable':p),
+      ...(intent.preferences||[]).filter(p=>['quiet','rooftop','cheap','atmosphere','group'].includes(p)).map(p=>p==='group'?'group dining':p==='atmosphere'?'nice atmosphere':p==='cheap'?'affordable':p),
       AREAS[intent.area]||intent.area,intent.district?'Quận '+intent.district:'',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
   }
   function boundsFor(intent,boundaries,nearby){
@@ -117,7 +117,7 @@
       if(['CLOSED_PERMANENTLY','CLOSED_TEMPORARILY','FUTURE_OPENING'].includes(p.businessStatus))continue;
       const country=p.addressComponents?.find(c=>c.types?.includes('country'));
       if(country&&country.shortText!=='VN')continue;
-      const proofs=(intent.terms||[]).map(term=>termProof(p,term));
+      const proofs=intent.exploratory?[]:(intent.terms||[]).map(term=>termProof(p,term));
       if(!typeMatches(p,intent)||proofs.some(proof=>!proof)||window.AIMapSearch.flowerPurposeMatches?.(p.displayName,intent)===false)continue;
       const place={name:String(p.displayName||'').trim(),address:p.formattedAddress||'',...position};
       if(!cityMatches(p,place,intent.city))continue;
@@ -157,7 +157,7 @@
     if(!intent.productSearch)fields.push('priceLevel','priceRange');
     if(intent.action==='grabfood')fields.push('websiteURI');
     const roomSearch=window.AIMapSearch.wantsRoom(intent);
-    if(intent.terms?.length||roomSearch||intent.cuisineAsMenu||intent.sortBy==='atmosphere'||intent.hotelStars)fields.push('editorialSummary','reviews');
+    if(intent.preferences?.includes('group')||intent.terms?.length||roomSearch||intent.cuisineAsMenu||['atmosphere','purpose'].includes(intent.sortBy)||intent.hotelStars)fields.push('editorialSummary','reviews');
     if(intent.visitToday)fields.push('currentOpeningHours');
     const bounds=boundsFor(intent,boundaries,nearby);
     const type=includedType(intent);

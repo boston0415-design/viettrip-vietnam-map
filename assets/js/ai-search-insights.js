@@ -4,6 +4,7 @@
   const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').normalize('NFC').toLowerCase();
   const LEVELS={FREE:[0,'무료'],INEXPENSIVE:[1,'저렴'],MODERATE:[2,'중간 가격대'],EXPENSIVE:[3,'높은 가격대'],VERY_EXPENSIVE:[4,'매우 높은 가격대']};
   const PREFS={
+    group:/단체|모임|회식|연회|group dining|large groups|gathering|party|tiec|nhom/i,
     atmosphere:/분위기.{0,12}(좋|괜찮|멋|최고)|감성|아늑|(?:great|good|lovely|beautiful|nice|cozy|elegant|romantic).{0,20}(?:atmosphere|ambien|interior)|(?:atmosphere|ambien).{0,20}(?:great|good|lovely|beautiful|nice)|khong gian.{0,20}(?:dep|am cung)/i,
     quiet:/조용|차분|\bquiet\b|tranquil|yen tinh/i,
     date:/데이트|연인|커플|romantic|date night/i,
@@ -74,7 +75,7 @@
         const ah=ap.high??Infinity,bh=bp.high??Infinity;if(ah!==bh)return ah-bh;
       }else if(ap.level!=null&&bp.level!=null&&ap.level!==bp.level)return ap.level-bp.level;
     }
-    if(intent.sortBy==='atmosphere'){
+    if(['atmosphere','purpose'].includes(intent.sortBy)){
       const hit=(bb.preferenceHits?.length??b.preferenceHits?.length??0)-(aa.preferenceHits?.length??a.preferenceHits?.length??0);if(hit)return hit;
     }
     const ar=aa.googleRating||a.rating||0,br=bb.googleRating||b.rating||0,ac=aa.googleCount||a.ratingCount||0,bc=bb.googleCount||b.ratingCount||0;
@@ -83,7 +84,7 @@
     if(intent.sortBy&&ac!==bc)return bc-ac;
     return 0;
   }
-  const sortLabel=intent=>({cheap:'확인된 금액 낮은 순 · 금액 없는 곳은 가격 수준순 · 미확인은 마지막',atmosphere:'요청한 분위기 관련 근거 우선',popular:'후기 수 많은 순 · 유명도 확정은 아님',top_rated:'이용자 평점 높은 순 · 같은 평점은 후기 수 순'}[intent.sortBy]||'');
+  const sortLabel=intent=>({purpose:'단체 모임 관련 안내 우선 · 인원별 예약 가능 여부 문의',cheap:'확인된 금액 낮은 순 · 금액 없는 곳은 가격 수준순 · 미확인은 마지막',atmosphere:'요청한 분위기 관련 근거 우선',popular:'후기 수 많은 순 · 유명도 확정은 아님',top_rated:'이용자 평점 높은 순 · 같은 평점은 후기 수 순'}[intent.sortBy]||'');
   function append(button,row,intent){
     if(intent.productSearch)return;
     const info=row.insights||{},p=info.price;
@@ -109,7 +110,7 @@
         try{
           const raw=new Place({id,requestedLanguage:'ko',requestedRegion:'vn'});
           const fields=['displayName','formattedAddress','location','rating','userRatingCount','priceRange','priceLevel','attributions'];
-          if(intent.sortBy==='atmosphere'||intent.hotelStars)fields.push('editorialSummary','reviews');
+          if(['atmosphere','purpose'].includes(intent.sortBy)||intent.hotelStars)fields.push('editorialSummary','reviews');
           await bounded(raw.fetchFields({fields}),signal);if(signal?.aborted)return;
           if(!googlePhotoBranchMatches(p,{place_id:id,name:raw.displayName,formatted_address:raw.formattedAddress,geometry:{location:raw.location}}))continue;
           const sources=[...(row.sources||[]),{label:'Google 업소 설명',text:raw.editorialSummary||''},...(raw.reviews||[]).filter(r=>r.authorAttribution?.displayName).map(review=>({label:'Google 후기',text:review.text||review.originalText||'',review}))];

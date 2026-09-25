@@ -50,3 +50,9 @@ AI 질문은 분위기·데이트 같은 선호 조건을 정렬에 사용합니
 - The date/time calculation uses Vietnam UTC+7, handles split hours, overnight/week rollover, 24-hour venues and temporary/permanent closure. Google content remains in the current result only; no review/place writes.
 - Both inputs use a 44px visual height, explicit clear buttons, and sample questions execute on selection.
 - Google reference: https://developers.google.com/maps/documentation/javascript/reference/place (checked 2026-09-24).
+
+### Context search recovery (2026-09-25)
+- Routine meetup, work, food and related requests share pure intent rules in the server and browser. `node scripts/build-query-intent.mjs` generates `assets/js/ai-query-intent.js`; the Pages build invokes it automatically.
+- A group request without an explicit venue type starts with restaurant candidates and offers restaurant/bar/cafe switches. Cuisine, dishes and geography remain hard constraints. Group size and tomorrow/weekend reservation availability stay visibly unverified inquiry conditions.
+- Network/provider/JSON failures continue with local recovery or a labelled exploratory Google search. Clearing or editing a question cancels all stale responses. Search summaries fall back to available evidence instead of blocking the venue list.
+- Only transient search state is changed. No place, review, membership or database writes are part of this change.

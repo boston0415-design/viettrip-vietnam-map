@@ -1,3 +1,4 @@
+import './build-query-intent.mjs';
 import { cp, mkdir, rm, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
