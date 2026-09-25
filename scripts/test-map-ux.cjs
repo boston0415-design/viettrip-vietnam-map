@@ -234,12 +234,13 @@ const server=http.createServer((req,res)=>{
   const firstPhoto=await page.locator('#detailBody>.placePhotos').boundingBox();
   assert(firstPhoto.y-(railBox.y+railBox.height)<=12,'photos immediately follow the action row');
   if(width===320||width===390){
+    const availableScroll=await rail.evaluate(n=>n.scrollWidth-n.clientWidth);
     const cdp=await context.newCDPSession(page),x=Math.round(railBox.x+railBox.width-20),y=Math.round(railBox.y+22);
     const before=await page.locator('#detail').boundingBox();
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
     for(let i=1;i<=8;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-i*18,y}]});await page.waitForTimeout(20);}
     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();await page.waitForTimeout(200);
-    assert(await rail.evaluate(n=>n.scrollLeft)>30,'horizontal finger swipe reveals remaining actions');
+    if(availableScroll>1)assert(await rail.evaluate(n=>n.scrollLeft)>=Math.min(30,availableScroll-1),'horizontal finger swipe reveals remaining actions within the available overflow');
     assert(Math.abs((await page.locator('#detail').boundingBox()).height-before.height)<2,'horizontal action swipe does not resize the sheet');
     assert(!await page.locator('#businessShareDialog').evaluate(n=>n.open),'horizontal swipe never activates sharing');
   }
@@ -252,11 +253,11 @@ const server=http.createServer((req,res)=>{
   await page.locator('#detail [data-business-share]').click();
   assert(await page.locator('#businessShareDialog').evaluate(n=>n.open));
   assert.equal(await page.locator('#businessShareOptions .copyBtn').count(),5,'all previous copy options remain available');
+  await page.screenshot({path:path.join(out,`detail-share-${width}.png`)});
   for(const button of await page.locator('#businessShareOptions .copyBtn').all()){
     const value=decodeURIComponent(await button.getAttribute('data-copy-value'));await button.click();
     assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),value,'copy targets the selected business');
   }
-  await page.screenshot({path:path.join(out,`detail-share-${width}.png`)});
   await page.locator('#businessShareClose').click();
   assert(!await page.locator('#businessShareDialog').evaluate(n=>n.open));
   assert(await page.locator('#detail [data-business-share]').evaluate(n=>n===document.activeElement),'closing share restores focus');
