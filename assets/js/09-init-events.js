@@ -390,6 +390,10 @@ $('#pAddress').addEventListener('keydown',e=>{
   }
 });
 
+// This form isolates venue fields from unrelated map controls for browser
+// autofill. Saving still uses the explicit button / Ctrl+Enter flow below.
+$('#placeEditorForm').addEventListener('submit',e=>e.preventDefault());
+
 $('#placeModal').addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey) && e.key==='Enter'){
     e.preventDefault();
