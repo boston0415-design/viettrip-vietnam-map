@@ -431,7 +431,24 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#pName').inputValue(),'검색한 새 업소');
   await checkDoubleClick('#placeModal .modal','#placeModal h3');
   assert.equal(await page.locator('#pName').inputValue(),'검색한 새 업소','resizing preserves registration draft');
-  await page.evaluate(()=>closeModalById('placeModal'));
+  // A Chrome profile used to combine unowned venue fields with map selectors
+  // (including "경계 불러오기…") into a false personal address. Native browser
+  // save bubbles depend on profile settings; verify form isolation and UX here.
+  const venueForm=await page.locator('#placeEditorForm').evaluate(form=>({
+    fields:['pName','pArea','pAddress','pNickname'].map(id=>({id,owner:document.getElementById(id).form?.id})),
+    autocomplete:form.autocomplete,
+    unrelated:[...form.elements].filter(el=>['adminRegionSelect','searchInput','rName'].includes(el.id)).length
+  }));
+  assert.equal(venueForm.autocomplete,'off');assert.equal(venueForm.unrelated,0);
+  assert(venueForm.fields.every(field=>field.owner==='placeEditorForm'),'only venue fields belong to the registration form');
+  const registrationOriginal=await page.evaluate(()=>JSON.stringify(testData));
+  const registrationUrl=page.url();
+  await page.locator('#pName').press('Enter');
+  assert.equal(page.url(),registrationUrl,'Enter must not navigate or submit venue data');
+  assert.equal(await page.evaluate(()=>JSON.stringify(testData)),registrationOriginal,'Enter must not register an incomplete draft');
+  assert(await page.locator('#placeModal').isVisible());
+  await page.locator('#placeModal [data-close="placeModal"]').click();
+  assert.equal(await page.evaluate(()=>JSON.stringify(testData)),registrationOriginal,'cancel preserves places and reviews');
   // Failed lookup still offers a manual form, without assigning the map center as location.
   await page.locator('#searchInput').fill('직접 등록할 업소');
   await page.locator('#searchRegisterManually').click();

@@ -49,7 +49,7 @@
     </div>
     <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" type="search" autocomplete="off" spellcheck="false" maxlength="200" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeSearchList" aria-label="업소명 또는 주소 검색" placeholder="업소명·주소·지역 검색"><button id="searchClear" class="searchClear" type="button" aria-label="검색어 지우기" hidden>×</button><button id="searchBtn" type="button">검색</button><div id="placeSearchResults" class="placeSearchResults" hidden><div id="placeSearchList" role="listbox" aria-label="추천 장소"></div><p id="placeSearchStatus" role="status" aria-live="polite"></p><div id="placeSearchCredit" translate="no" hidden>Google Maps</div></div></div>
     <section class="aiMapSearch" aria-label="AI에게 업소 질문하기">
-      <form id="aiMapForm" class="aiComposer">
+      <form id="aiMapForm" class="aiComposer" autocomplete="off">
         <label for="aiMapQuestion">AI</label>
         <input id="aiMapQuestion" type="text" maxlength="300" autocomplete="off" aria-label="AI에게 찾고 싶은 업소 질문하기" aria-controls="aiMapPanel" aria-expanded="false" placeholder="오늘 여자친구와 갈 만한 1군 분위기 좋은 바 찾아줘">
         <button id="aiMapClear" class="searchClear" type="button" aria-label="AI 질문 지우기" hidden>×</button>
@@ -238,20 +238,22 @@
 </div>
 
 <div id="placeModal" class="modalback">
-  <div class="modal">
+  <!-- Venue details are not the visitor's personal address. Keep these fields
+       out of the browser's synthetic form containing map filters and reviews. -->
+  <form id="placeEditorForm" class="modal" autocomplete="off" novalidate aria-labelledby="placeModalTitle">
     <h3 id="placeModalTitle">업체 등록</h3>
     <div class="field"><label id="pNicknameLabel" for="pNickname">등록자 닉네임 · 필수</label><input id="pNickname" name="nickname" autocomplete="nickname" maxlength="30" required placeholder="카페에서 사용하는 닉네임을 적어주세요" aria-describedby="pNicknameHelp"><div id="pNicknameHelp" class="inlineHelp">업체 상세에 공개됩니다. 이 브라우저에 기억해 다음 등록·후기에 자동 입력합니다.</div></div>
-    <div class="field"><label>업체명</label><input id="pName" placeholder="예: Uraetei Japanese BBQ"><div class="inlineHelp">주소가 아니라 실제 상호명을 입력해주세요. Google 업체를 선택하면 상호명이 자동 입력됩니다.</div></div>
+    <div class="field"><label for="pName">업체명</label><input id="pName" name="venue-title" autocomplete="off" placeholder="예: Uraetei Japanese BBQ"><div class="inlineHelp">주소가 아니라 실제 상호명을 입력해주세요. Google 업체를 선택하면 상호명이 자동 입력됩니다.</div></div>
     <div class="grid2"><div class="field"><label>업종</label><select id="pCat"></select></div><div class="field"><label id="pSubLabel">세부분류</label><select id="pSub"></select></div></div>
     <div id="restaurantTagField" class="field hiddenField">
       <label>메뉴·특징 <span style="font-size:11px;color:#64748b">여러 개 선택 가능</span></label>
       <div id="restaurantTagOptions" class="tagChoiceGrid"></div>
       <div class="inlineHelp">나라별 음식 1개와 메뉴·특징 여러 개를 조합하세요. 식단 정보는 업소에서 직접 확인한 항목만 선택해주세요.</div>
     </div>
-    <div class="field"><label>지역</label><input id="pArea" placeholder="예: 1군"></div>
-    <div class="field"><label>주소</label>
+    <div class="field"><label for="pArea">업소 지역</label><input id="pArea" name="venue-region" autocomplete="off" placeholder="예: 1군"></div>
+    <div class="field"><label for="pAddress">업소 주소</label>
       <div class="addressLookup">
-        <input id="pAddress" placeholder="예: 2 Đ. Lê Duẩn, Bến Nghé, Quận 1">
+        <input id="pAddress" name="venue-location" autocomplete="off" spellcheck="false" placeholder="예: 2 Đ. Lê Duẩn, Bến Nghé, Quận 1">
         <button id="findAddressBtn" class="btn" type="button">주소로 위치 찾기</button>
       </div>
       <div id="addressLookupStatus" class="lookupStatus">지도에서 업체를 클릭하거나 주소를 입력해 위치를 찾을 수 있습니다.</div>
@@ -279,8 +281,8 @@
       <div id="pPhotoCount" class="placePhotoCount"></div>
     </div>
     <div id="selectedMapPlace" class="placeHint">지도에서 선택한 위치로 등록됩니다.</div>
-    <div id="placeSaveStatus" class="inlineHelp" style="margin-top:8px;min-height:18px"></div><div class="modalactions"><button class="btn" data-close="placeModal">취소</button><button id="savePlace" class="btn primary" type="button">등록</button></div>
-  </div>
+    <div id="placeSaveStatus" class="inlineHelp" style="margin-top:8px;min-height:18px"></div><div class="modalactions"><button class="btn" data-close="placeModal" type="button">취소</button><button id="savePlace" class="btn primary" type="button">등록</button></div>
+  </form>
 </div>
 
 <div id="reviewModal" class="modalback" role="dialog" aria-modal="true" aria-labelledby="reviewEditorTitle">
@@ -441,7 +443,7 @@
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260925-search-panels1"></script>
 <script src="./assets/js/place-search.js?v=20260925-search-panels1"></script>
-<script src="./assets/js/09-init-events.js?v=20260920-ux3"></script>
+<script src="./assets/js/09-init-events.js?v=20260925-autofill1"></script>
 <script src="./assets/js/10-runtime-guard.js?v=20260918-all-cities1"></script>
 <script src="./assets/js/community-stats.js?v=20260924-clean1"></script>
 <script defer src="./assets/vendor/realtime-2.116.0.min.js"></script>
