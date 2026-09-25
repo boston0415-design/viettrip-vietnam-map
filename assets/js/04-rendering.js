@@ -309,7 +309,8 @@ function fallbackCopyText(value){
   ta.style.opacity='0';
   ta.style.pointerEvents='none';
   ta.style.fontSize='16px';
-  document.body.appendChild(ta);
+  // A modal makes the rest of the document inert; copy inside the active dialog.
+  (active?.closest?.('dialog[open]')||document.querySelector('dialog[open]')||document.body).appendChild(ta);
 
   ta.focus({preventScroll:true});
   ta.select();
@@ -508,7 +509,6 @@ function renderDetail(){
       <div class="ownerNote">${state.isAdmin?'관리자 권한으로 모든 업체의 정보·사진 수정 및 삭제가 가능합니다.':'이 업체를 등록한 기기이므로 이름, 분류, 주소, 설명, 혜택, 사진을 직접 수정할 수 있습니다.'}</div>`
     : '';
 
-  const combinedCopy=[p.name,p.address].filter(Boolean).join('\n');
   const booking=typeof bookingLinkHtml==='function'?bookingLinkHtml(p):'';
   const bookingNote=booking && typeof bookingNoteHtml==='function'?bookingNoteHtml(p):'';
 
@@ -519,25 +519,18 @@ function renderDetail(){
     <div class="detailSummaryMeta"><span>${catLabel(p.category)}${p.subcategory?' · '+esc(p.subcategory):''}</span><span class="detailSummaryRating">${st.rating==null?'평가 없음':`★ ${st.rating.toFixed(1)} <small>(${st.count})</small>`}</span></div>
     ${p.address?`<p class="detailSummaryAddress" title="${esc(p.address)}">${esc(p.address)}</p>`:''}
   </div>
-  <div class="detailQuickActions${booking?' hasBooking':''}">
-    <button type="button" id="detailExpandBtn" aria-expanded="false" aria-controls="detailBody">상세보기 ▴</button>
+  <div class="detailQuickActions${booking?' hasBooking':''}" role="group" aria-label="업소 기능 · 좌우로 이동" tabindex="0">
     ${businessDirectionsLinkHtml(p,true)}
-    <button type="button" class="grabButton" data-grab-place="${esc(p.id)}">그랩으로 이동</button>
+    <button type="button" class="grabButton" data-grab-place="${esc(p.id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 10 2-5h10l2 5M4 10h16v8H4zM7 18v2m10-2v2M7 13h1m8 0h1"/></svg><span>그랩</span></button>
+    ${window.BusinessShare?.html(p)||''}
     ${booking}
+    <button type="button" id="detailExpandBtn" aria-expanded="false" aria-controls="detailBody">상세보기 ▴</button>
   </div>
   <div id="detailBody" class="detailBody">
-  <div class="detailUtilities" role="group" aria-label="공유 및 정보 복사">
-  ${window.BusinessShare?.html(p)||''}
-  <div class="copyRow detailCopyActions">
-    ${copyButtonHtml('업체명 복사',p.name)}
-    ${p.address?copyButtonHtml('주소 복사',p.address):''}
-    ${p.address?copyButtonHtml('이름+주소 복사',combinedCopy):''}
-  </div>
-  </div>
-  ${bookingNote}
-  ${p.registrantNickname?`<p class="placeRegistrant">등록자 <span>${esc(p.registrantNickname)}</span>${window.MapMembership?.badgeHtml(p.ownerKeyHash)||''}</p>`:''}
   ${(p.photoUrls||[]).length?`<div class="placePhotos">${p.photoUrls.slice(0,5).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="${esc(p.name)} 업체 사진"></a>`).join('')}</div>`:''}
   <div id="googlePlacePhotoSlot"></div>
+  ${bookingNote}
+  ${p.registrantNickname?`<p class="placeRegistrant">등록자 <span>${esc(p.registrantNickname)}</span>${window.MapMembership?.badgeHtml(p.ownerKeyHash)||''}</p>`:''}
   <div class="badges"><span class="badge main">${businessGlyph(p.category,p.subcategory)} ${catLabel(p.category)}</span><span class="badge">${esc(p.category==='restaurant'?normalizedRestaurantSub(p.subcategory):p.subcategory)}</span>${restaurantTagsHtml(p)}${recommendationBadges(p)}${owner?'<span class="badge">내가 등록</span>':''}${benefitInlineBadgeHtml(p)}${p.deleteRequested?'<span class="badge deleteRequest">삭제요청</span>':''}</div><div class="desc">${esc(p.address||'')}<br>${p.description?`<div class="registrantDescription"><small>등록할 때 남긴 소개</small><p>${esc(p.description)}</p></div>`:''}</div>${p.memberBenefit?`<div class="benefitRow"><strong>${benefitInfoLabel(p)}</strong><div class="benefitText">${esc(p.benefitText||'카페 회원 전용 혜택 제공')}</div></div>`:''}<div class="scorebox"><div><div class="scorebig">${st.rating==null?'—':st.rating.toFixed(1)}</div><div style="font-size:11px;color:#6b7280">우리 회원 평균</div></div><div style="font-size:12px;color:#6b7280">평가 ${st.count}개</div></div>${management}${window.MapMembership?.correctionButton(p.id)||''}${window.MapMembership?.moderationButton('place',p.id)||''}<button id="writeReview" class="btn primary">${owner||db().reviews.some(r=>r.placeId===p.id&&isOwnReview(r))?'내 별점·후기 수정':'별점·후기 남기기'}</button><div style="margin-top:12px">${reviewConnectionNote}${ratingRecords}${st.reviews.length?st.reviews.map(r=>`<div class="review"><div class="reviewtop"><span>${esc(r.nickname)}</span>${window.MapMembership?.badgeHtml(r.createdByHash)||''}${r.recommended?'<span class="badge recommendationBadge">👍 강추</span>':''}${r.rating==null?'':`<span>★ ${r.rating}</span>`}</div><div class="reviewtxt">${esc(r.text)}</div>${window.MapMembership?.moderationButton('review',r.id)||''}${normalizeCafeReviewUrl(r.cafeUrl)?`<a class="cafeOriginalLink" href="${esc(normalizeCafeReviewUrl(r.cafeUrl))}" target="_blank" rel="noopener noreferrer">카페 후기 원문 보기 ↗</a>`:''}${(r.photoUrls||[]).length?`<div class="reviewPhotos">${r.photoUrls.slice(0,3).map(url=>`<a href="${esc(url)}" target="_blank" rel="noopener"><img src="${esc(url)}" loading="lazy" alt="회원 후기 사진"></a>`).join('')}</div>`:''}</div>`).join(''):'<div class="empty">아직 회원 후기가 없습니다.</div>'}</div></div>`;
 
   syncDetailPanelLayout();

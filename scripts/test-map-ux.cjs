@@ -219,18 +219,53 @@ const server=http.createServer((req,res)=>{
   await page.locator('[data-browse-prev]').click();assert.equal(await page.evaluate(()=>state.selected),'ux-0');
   // Photo tap opens a separate layer and never collapses the place panel.
   await page.evaluate(()=>setDetailExpanded(true));
-  // Compact actions retain full touch targets and every copy option on all layouts.
-  const utilities=await page.locator('#detail .detailUtilities').boundingBox();
-  assert(utilities.height<=94,'share/copy controls use two compact rows');
-  assert.equal(await page.locator('#detail .directionsButton').count(),1,'one route action for both layouts');
-  assert.equal(await page.locator('#detail [data-grab-place]').count(),1,'one Grab action for both layouts');
-  assert.equal(await page.locator('#detail .detailUtilities .copyBtn').count(),5,'all share/copy options remain directly visible');
-  for(const control of await page.locator('#detail .detailUtilities .copyBtn, #detail .detailQuickActions button, #detail .detailQuickActions a').all()){
+  // One action row, with secondary choices in a modal instead of persistent rows.
+  const rail=page.locator('#detail .detailQuickActions');
+  const railBox=await rail.boundingBox();assert(railBox.height<=64,'all actions occupy one row');
+  assert.equal(await page.locator('#detail .directionsButton').count(),1);
+  assert.equal(await page.locator('#detail [data-grab-place]').count(),1);
+  assert.equal(await page.locator('#detail [data-copy-value]').count(),0,'copy options do not occupy detail rows');
+  const actionBoxes=[];
+  for(const control of await rail.locator('button,a').all()){
     if(!await control.isVisible())continue;
-    const box=await control.boundingBox();assert(box.height>=44&&box.width>=44,'action retains a full touch target');
-    assert(box.x>=utilities.x-1&&box.x+box.width<=utilities.x+utilities.width+1,'actions stay inside the panel');
+    const box=await control.boundingBox();assert(box.height>=44&&box.width>=44,'action retains a full touch target');actionBoxes.push(box);
   }
+  assert(actionBoxes.every(box=>Math.abs(box.y-actionBoxes[0].y)<1),'actions never wrap');
+  const firstPhoto=await page.locator('#detailBody>.placePhotos').boundingBox();
+  assert(firstPhoto.y-(railBox.y+railBox.height)<=12,'photos immediately follow the action row');
+  if(width===320||width===390){
+    const cdp=await context.newCDPSession(page),x=Math.round(railBox.x+railBox.width-20),y=Math.round(railBox.y+22);
+    const before=await page.locator('#detail').boundingBox();
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+    for(let i=1;i<=8;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-i*18,y}]});await page.waitForTimeout(20);}
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();await page.waitForTimeout(200);
+    assert(await rail.evaluate(n=>n.scrollLeft)>30,'horizontal finger swipe reveals remaining actions');
+    assert(Math.abs((await page.locator('#detail').boundingBox()).height-before.height)<2,'horizontal action swipe does not resize the sheet');
+    assert(!await page.locator('#businessShareDialog').evaluate(n=>n.open),'horizontal swipe never activates sharing');
+  }
+  await rail.evaluate(n=>n.scrollLeft=0);
+  await dragAt('#detail [data-business-share]',40);
+  assert(!await page.locator('#businessShareDialog').evaluate(n=>n.open),'vertical drag on Share moves the sheet without opening it');
+  await page.evaluate(()=>setDetailExpanded(true));
   await page.screenshot({path:path.join(out,`detail-actions-${width}.png`)});
+  await context.grantPermissions(['clipboard-read','clipboard-write']);
+  await page.locator('#detail [data-business-share]').click();
+  assert(await page.locator('#businessShareDialog').evaluate(n=>n.open));
+  assert.equal(await page.locator('#businessShareOptions .copyBtn').count(),5,'all previous copy options remain available');
+  for(const button of await page.locator('#businessShareOptions .copyBtn').all()){
+    const value=decodeURIComponent(await button.getAttribute('data-copy-value'));await button.click();
+    assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),value,'copy targets the selected business');
+  }
+  await page.screenshot({path:path.join(out,`detail-share-${width}.png`)});
+  await page.locator('#businessShareClose').click();
+  assert(!await page.locator('#businessShareDialog').evaluate(n=>n.open));
+  assert(await page.locator('#detail [data-business-share]').evaluate(n=>n===document.activeElement),'closing share restores focus');
+  await page.locator('#detail [data-business-share]').click();await page.keyboard.press('Escape');
+  assert(!await page.locator('#businessShareDialog').evaluate(n=>n.open));
+  assert(await page.locator('#detailBody').isVisible(),'Escape only closes sharing');
+  await page.locator('#detail [data-business-share]').click();await page.goBack();
+  await page.waitForFunction(()=>!document.getElementById('businessShareDialog').open);
+  assert(await page.locator('#detailBody').isVisible(),'Back only closes sharing');
   const readingPanel=await page.locator('#detail').boundingBox(),readingMap=await page.locator('.mapwrap').boundingBox();
   assert(readingPanel.y<=readingMap.y+readingMap.height*.23,'expanded detail uses the upper reading space on both layouts');
   const heading=await page.locator('#detail .detailHeader').boundingBox(),closeButton=await page.locator('#detailCloseBtn').boundingBox();

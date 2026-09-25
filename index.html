@@ -37,7 +37,7 @@
 <link rel="stylesheet" href="./assets/css/panel-comfort.css?v=20260921-sticky-header1">
 <link rel="stylesheet" href="./assets/css/browse-experience.css?v=20260924-list-gesture1">
 <link rel="stylesheet" href="./assets/css/ai-map-search.css?v=20260924-ai12">
-<link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions1">
+<link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
 </head>
 <body>
 <div class="app">
@@ -331,6 +331,13 @@
   <p id="bookingInquiryStatus" role="status" aria-live="polite"></p>
 </dialog>
 
+<dialog id="businessShareDialog" class="travellerDialog businessShareDialog" aria-labelledby="businessShareTitle" aria-describedby="businessShareHint">
+  <div class="travellerDialogHead"><h2 id="businessShareTitle">공유·복사</h2><button id="businessShareClose" type="button" aria-label="공유 창 닫기">×</button></div>
+  <p id="businessSharePlace"></p>
+  <div id="businessShareOptions" role="group" aria-label="공유·복사 방법"></div>
+  <p id="businessShareHint">카페에 공유를 누르면 업소명·주소·지도 링크가 복사됩니다. 카페 글에 붙여넣어 주세요.</p>
+</dialog>
+
 <dialog id="homeScreenDialog" class="travellerDialog homeScreenDialog" aria-labelledby="homeScreenTitle" aria-describedby="homeScreenIntro">
   <div class="travellerDialogHead">
     <div class="homeScreenIdentity"><img src="./assets/icons/vietmap-192.png?v=20260918-vm1" alt="베트남맵 홈 화면 아이콘" width="62" height="62"><div><h2 id="homeScreenTitle">베트남맵을 홈 화면에</h2><p>일상탈출 · 언제든, 한 번에</p></div></div>
@@ -424,8 +431,8 @@
 <script src="./assets/js/03-business-ui.js?v=ai9-20260924-rating1"></script>
 <script src="./assets/js/booking-links.js?v=20260924-routes3"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
-<script src="./assets/js/business-share.js?v=20260925-actions1"></script>
-<script src="./assets/js/04-rendering.js?v=20260925-actions1"></script>
+<script src="./assets/js/business-share.js?v=20260925-actions2"></script>
+<script src="./assets/js/04-rendering.js?v=20260925-actions2"></script>
 <script src="./assets/js/body-sheet-drag.js?v=20260924-list-gesture1"></script>
 <script src="./assets/js/detail-resize.js?v=20260924-detail1"></script>
 <script src="./assets/js/menu-resize.js?v=20260924-list-gesture1"></script>

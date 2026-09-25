@@ -17,7 +17,37 @@
   }
   function html(place){
     if(!url(place))return '';
-    return `<section class="businessShare" aria-label="업소 위치 공유"><div class="businessShareActions">${copyButtonHtml('카페에 공유',text(place))}${copyButtonHtml('위치 링크 복사',url(place))}</div></section>`;
+    return `<button type="button" class="businessShareButton" data-business-share="${esc(place.id)}" aria-haspopup="dialog" aria-controls="businessShareDialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/><path d="m9 10 6-3m-6 7 6 3"/></svg><span>공유</span></button>`;
+  }
+  let shareTrigger=null;
+  function open(id,trigger){
+    const place=db().places.find(p=>p.id===id),dialog=document.getElementById('businessShareDialog');
+    if(!place || !url(place) || !dialog)return false;
+    shareTrigger=trigger;
+    dialog.querySelector('#businessSharePlace').textContent=place.name;
+    dialog.querySelector('#businessShareOptions').innerHTML=[
+      copyButtonHtml('카페에 공유',text(place)),
+      copyButtonHtml('위치 링크 복사',url(place)),
+      copyButtonHtml('업체명 복사',place.name),
+      place.address?copyButtonHtml('주소 복사',place.address):'',
+      place.address?copyButtonHtml('이름+주소 복사',[place.name,place.address].join('\n')):''
+    ].join('');
+    if(!dialog.open)dialog.showModal();
+    return true;
+  }
+  function initControls(){
+    const dialog=document.getElementById('businessShareDialog');
+    if(!dialog || dialog.dataset.bound)return;
+    dialog.dataset.bound='true';
+    document.addEventListener('click',event=>{
+      const trigger=event.target.closest?.('[data-business-share]');
+      if(trigger){event.preventDefault();open(trigger.dataset.businessShare,trigger);}
+    });
+    dialog.querySelector('#businessShareClose').addEventListener('click',()=>dialog.close());
+    dialog.addEventListener('close',()=>{
+      const target=shareTrigger?.isConnected?shareTrigger:document.querySelector('#detail [data-business-share]');
+      target?.focus({preventScroll:true});shareTrigger=null;
+    });
   }
   const isSharedSelection=place=>Boolean(openedId && place?.id===openedId && state.selected===openedId);
   function includeSelectedPlace(visible){
@@ -27,6 +57,7 @@
   }
 
   function init(){
+    initControls();
     const params=new URL(location.href).searchParams;
     if(!params.has('place'))return;
     const id=params.get('place');
