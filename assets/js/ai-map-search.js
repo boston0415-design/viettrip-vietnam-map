@@ -11,6 +11,7 @@
   };
   const AREA_ALIASES=[['푸미흥','phu my hung'],['타오디엔','thao dien'],['호안끼엠','hoan kiem'],['미딩','my dinh'],['서호','tay ho'],['부이비엔','bui vien'],['레탄톤','le thanh ton']];
   const MENU_PATTERNS={
+    '꽃집':/꽃집|꽃\s*가게|(?:꽃|꽃다발|꽃바구니)\s*(?:판매|배달|주문|예약)|\bflorists?\b|\bflower\s*shops?\b|\b(?:shop|tiem|cua\s*hang)\s+hoa\b|\bhoa\s+tuoi\b/i,
     '라멘':/라멘|라아멘|\bramen\b|ラーメン/i,
     '쌀국수':/쌀국수|\bpho\b/i,
     '햄버거':/햄버거|수제\s*버거|버거|\b(?:hamburger|burger|burgers|smashburger)\b/i,
@@ -151,7 +152,7 @@
       if(insights?.hotelClass?.kind==='different')continue;
       const evidence=cuisineProof?[cuisineProof.evidence]:[],missingTerms=[];
       for(const term of intent.terms||[]){
-        const proof=evidenceFor(sources,term);
+        const proof=evidenceFor(term==='꽃집'?sources.filter(s=>s.label==='등록 정보'):sources,term);
         if(proof)evidence.push(proof.evidence);else missingTerms.push(term);
       }
       // A general massage/barber business is not evidence of a waxing service.
@@ -356,7 +357,7 @@
     }
     if(!intent?.relevant){note.textContent='확인되지 않은 내용을 답으로 만들지 않고, 원래 질문과 관련된 정보를 더 찾을 수 있게 연결합니다.';status.textContent='질문에 답할 장소·여행 정보를 아직 확인하지 못했어요.';window.AITravelSearch?.fallback(list,intent?.requestText||input.value);return;}
     if(window.AISearchInsights?.renderGuide(list,intent)){title.textContent='이동·예약 안내';status.textContent='출발 항구와 공식 예매처';note.textContent='공식 선사 안내를 바탕으로 작성했습니다. 아래 링크에서 실제 출발일 정보를 확인하세요.';return;}
-    const scope=[CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,intent.service==='motorbike_rental'?'오토바이 대여':intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
+    const scope=[CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,({'florist':'꽃집','motorbike_rental':'오토바이 대여'}[intent.service])||intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
     if(intent.nearby&&!state.nearby){status.textContent='먼저 지도 아래 ‘주변 찾기’에서 현재 위치나 숙소를 지정한 뒤 다시 질문해 주세요.';return;}
     if(intent.unsupported?.length){status.textContent='확인이 필요한 조건: '+intent.unsupported.join(', ');window.AITravelSearch?.fallback(list,intent.requestText||input.value);return;}
     if(state.sharedDbLoading){status.textContent='등록 업소를 불러오는 중이에요. 잠시 후 질문창을 다시 눌러 주세요.';return;}
@@ -369,6 +370,7 @@
     if(last){last.memberRows=rows;resultTitle(last);}
     status.textContent=scope+(intent.recommended?' · 회원 강추':'')+(intent.benefit?' · 혜택·제휴':'')+(rows.length?'':memberOnly?' — 모든 조건을 충족하는 회원 등록 업소를 찾지 못했어요. 다른 업종이나 혜택 미확인 업소로 대체하지 않습니다.':' — 맞는 회원 등록 업소가 없어 같은 조건으로 Google 지도에서도 찾아볼게요.');
     if(intent.productSearch){status.textContent=scope+' · 판매점 문의 후보';note.textContent='요청: '+intent.requestText+' — 제품명은 입력한 그대로 사용합니다. 판매점 평점은 제품별 가격·재고의 근거가 아닙니다. 원하는 모델·용량·보증·최종 가격은 매장에 문의해 주세요.';}
+    if(intent.service==='florist')note.textContent='꽃집을 선택하면 위치·길찾기와 공개된 전화·웹사이트를 볼 수 있어요. 원하는 꽃·꽃다발 가격·배달 지역과 시간은 꽃집에 문의해 주세요.';
     const preferenceLabels=(intent.preferences||[]).map(key=>PREFERENCES[key]?.label).filter(Boolean);if(preferenceLabels.length)status.textContent+=' '+preferenceLabels.join('·')+' 관련 정보 우선.';
     if(intent.sortBy)status.textContent+=' '+(window.AISearchInsights?.sortLabel(intent)||'');
     if(intent.budget){status.textContent+=' 요청 예산 '+window.AISearchInsights?.formatMoney({amount:intent.budget.amount,currency:intent.budget.currency})+'. 표시 가격은 일행 전체 이용 총액이 아닐 수 있어요.';note.textContent+=' 인원·이용시간·포함 항목에 따라 총액이 달라져 예산 충족 여부는 업소에 확인해야 합니다.';}

@@ -604,6 +604,7 @@ function inferCategory(name='',types=[]){
   if(t.has('supermarket')||t.has('grocery_store')) return ['shopping','마트'];
   if(t.has('shopping_mall')) return ['shopping','쇼핑몰'];
   if(t.has('fruit_and_vegetable_store')) return ['shopping','과일가게'];
+  if(t.has('florist')) return ['shopping','꽃집'];
   if(t.has('juice_shop') || /\b(?:fruit|fruits|juice)\b|과일|주스/.test(n)) return ['cafe','과일·주스'];
   if(t.has('bakery') || /\bbakery\b|베이커리|파리바게트/.test(n)) return ['cafe','베이커리'];
   if(t.has('dessert_shop')||t.has('ice_cream_shop')) return ['cafe','디저트'];

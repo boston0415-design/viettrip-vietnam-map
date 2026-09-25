@@ -19,6 +19,7 @@
   const cuisineWords=cuisine=>CUISINES[cuisine]?[CUISINES[cuisine][0]]:[];
   const sourcesFor=place=>[{label:'Google 업소명',text:place.displayName||''},{label:'Google 업소 설명',text:place.editorialSummary||''},...(place.reviews||[]).filter(r=>r.authorAttribution?.displayName).map(review=>({label:'Google 후기',text:review.text||review.originalText||'',review}))];
   function includedType(intent){
+    if(intent.terms?.includes('꽃집'))return 'florist';
     if(intent.productSearch)return intent.productKind==='computer'?'electronics_store':'cell_phone_store';
     if(intent.subcategory==='베이커리')return 'bakery';
     if(intent.subcategory==='호텔')return 'hotel';
@@ -28,6 +29,7 @@
   }
   function typeMatches(place,intent){
     const types=place.types||[];
+    if(intent.terms?.includes('꽃집'))return types.includes('florist');
     if(intent.productSearch)return types.includes(intent.productKind==='computer'?'electronics_store':'cell_phone_store');
     if(intent.subcategory==='베이커리')return types.includes('bakery');
     if(intent.subcategory==='호텔')return types.includes('hotel')||types.includes('lodging');
@@ -48,6 +50,7 @@
     return !intent.category||(CATEGORY_TYPES[intent.category]||[]).some(type=>types.includes(type));
   }
   function termProof(place,term){
+    if(term==='꽃집'&&(place.types||[]).includes('florist'))return {evidence:'Google 업종 · 꽃집',source:{label:'Google 업종'}};
     if(term==='라멘'&&(place.types||[]).includes('ramen_restaurant'))return {evidence:'Google 업종 · 라멘',source:{label:'Google 업종'}};
     if(term==='햄버거'&&(place.types||[]).includes('hamburger_restaurant'))return {evidence:'Google 업종 · 햄버거',source:{label:'Google 업종'}};
     if(term==='고기·구이'&&(place.types||[]).some(type=>['barbecue_restaurant','korean_barbecue_restaurant'].includes(type)))return {evidence:'Google 업종 · 고기·구이',source:{label:'Google 업종'}};
@@ -55,8 +58,8 @@
   }
   function queryFor(intent,includeRoom=true){
     if(intent.productSearch)return [window.NameSearch?.googleQuery(intent.requestText)||intent.requestText,intent.productKind==='computer'?'computer electronics store':'mobile phone store',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
-    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'라멘':'ramen','햄버거':'burger','쌀국수':'pho','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term));
-    const specialty=terms.some(waxing);
+    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'꽃집':'florist','라멘':'ramen','햄버거':'burger','쌀국수':'pho','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term));
+    const specialty=terms.some(waxing)||intent.terms?.includes('꽃집');
     return [includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,intent.hotelStars?intent.hotelStars+' star':'',specialty?'':({'베이커리':'bakery','호텔':'hotel','로컬 KTV':'local Vietnamese karaoke'}[intent.subcategory]||SUBS[intent.subcategory]||CATEGORIES[intent.category]||''),
       ...(intent.preferences||[]).filter(p=>['quiet','rooftop','cheap','atmosphere'].includes(p)).map(p=>p==='atmosphere'?'nice atmosphere':p==='cheap'?'affordable':p),
       AREAS[intent.area]||intent.area,intent.district?'Quận '+intent.district:'',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');

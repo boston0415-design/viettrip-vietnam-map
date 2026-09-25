@@ -1,0 +1,43 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const {JSDOM}=require('jsdom'),root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+(async()=>{
+ const api=await import('data:text/javascript;base64,'+Buffer.from(read('functions/api/ask-map.js')).toString('base64'));
+ const query='여자친구에게 꽃을 선물해주고 싶어';
+ const base={relevant:true,city:'hcmc',district:'',area:'',category:'shopping',subcategory:'',terms:[],preferences:[],unsupported:[]};
+ for(const q of [query,'여자친구한테 꽃 선물하고 싶어','여친한테 꽃다발 사주고 싶어','꽃집 찾아줘','1군에서 꽃다발 사고 싶어','하노이에서 꽃집 찾아줘','푸미흥 꽃가게 알려줘']){
+  const i=api.literalIntent(q,'hcmc');assert(i,q);assert.equal(i.category,'shopping');assert.equal(i.service,'florist');assert.deepEqual(i.terms,['꽃집']);assert(!i.preferences.includes('date'));assert(!i.productSearch);
+ }
+ assert.equal(api.literalIntent('하노이에서 꽃집 찾아줘','hcmc').city,'hanoi');assert.equal(api.literalIntent('1군에서 꽃다발 사고 싶어','hcmc').district,'1');
+ for(const q of ['꽃말이 뭐야?','꽃다발 오래 보관하는 방법 알려줘','여자친구에게 꽃 선물할 때 카드 문구 써줘','꽃 선물은 왜 하는 거야?','꽃집 창업하려면?','꽃을 선물하고 싶어 영어로 번역해줘','꽃이 예쁜 카페 추천해줘'])assert(!api.wantsFlorist(q),q+' stays outside florist search');
+ for(const q of ['다낭에서 내일 배달 가능한 꽃집 찾아줘','여자친구에게 장미 꽃다발 선물하고 싶어','타오디엔 꽃집 찾아줘','꽃집 말고 케이크 가게 찾아줘'])assert.equal(api.literalIntent(q,'hcmc'),null,'do not swallow unknown/negative/specific constraints: '+q);
+ const req=q=>new Request('https://map.test/api/ask-map',{method:'POST',headers:{origin:'https://map.test','content-type':'application/json'},body:JSON.stringify({query:q,city:'hcmc'})});
+ let calls=0;
+ let response=await api.onRequest({request:req(query),env:{AI:{run:async()=>{calls++;throw Error('must not infer a fully understood flower gift')}}}});
+ assert.equal(response.status,200);assert.equal(calls,0);const intent=(await response.json()).intent;assert.equal(intent.mode,undefined);assert.deepEqual(intent.terms,['꽃집']);
+ const specific=api.extendIntent(api.clarifyIntent({...base,category:'cafe',terms:['꽃다발','장미'],action:'purchase',preferences:['date']},'여자친구에게 장미 꽃다발 선물하고 싶어'),'여자친구에게 장미 꽃다발 선물하고 싶어','hcmc');
+ assert.equal(specific.category,'shopping');assert.deepEqual(specific.terms,['장미','꽃집']);assert(!specific.action);assert(!specific.productSearch);
+ assert(!api.extendIntent({...base,action:'purchase',terms:['꽃집']},query,'hcmc').productSearch,'flower purchase never becomes a phone store');
+ const complex='다낭에서 내일 배달 가능한 꽃집 찾아줘';let recovery=0;
+ response=await api.onRequest({request:req(complex),env:{AI:{run:async(model,args)=>{recovery++;assert(args.input[0].content.includes('This request needs a florist search'));return {response:recovery===1?{mode:'advice',answer:'카페에서도 꽃 배달 서비스를 제공합니다.'}:{...base,city:'danang',terms:['꽃다발'],unsupported:['내일 배달 가능 여부']}}}}}});
+ assert.equal(recovery,2);assert.equal(response.status,200);const guarded=(await response.json()).intent;assert.equal(guarded.mode,undefined);assert.equal(guarded.city,'danang');assert.deepEqual(guarded.unsupported,['내일 배달 가능 여부']);
+ response=await api.onRequest({request:req('꽃다발 오래 보관하는 방법 알려줘'),env:{AI:{run:async()=>({response:{mode:'advice',answer:'깨끗한 물로 바꾸고 직사광선을 피해서 보관하세요.'}})}}});assert.equal((await response.json()).intent.mode,'advice');
+ const dom=new JSDOM(read('index.html'),{url:'https://map.test',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window,run=s=>vm.runInContext(s,dom.getInternalVMContext());w.matchMedia=()=>({matches:false});
+ for(const f of fs.readdirSync(path.join(root,'assets/js')).filter(n=>/^0[1-8]-/.test(n)).sort())run(read('assets/js/'+f));
+ run(read('assets/js/place-photos.js'));run(read('assets/js/ai-google-search.js'));run(read('assets/js/ai-map-search.js'));
+ assert.deepEqual(Array.from(w.inferCategory('Blossom',['florist','store'])),['shopping','꽃집'],'registration preserves florist identity');
+ const place=(id,name,extra={})=>({id,name,category:'shopping',address:'Quận 1, Hồ Chí Minh',lat:10.779,lng:106.702,initialRating:4,...extra});
+ const data={places:[place('flower','회원 꽃집',{memberBenefit:true,tags:['강추업소']}),place('vn','Tiệm Hoa Tươi'),place('ordinary','일반 선물 가게'),place('review-only','옷가게'),place('cafe','꽃이 예쁜 카페',{category:'cafe',description:'꽃 장식과 디저트'}),place('no','판매 중단',{description:'꽃다발 판매하지 않습니다.'})],reviews:[{id:'r1',placeId:'review-only',text:'꽃집에서 꽃을 사고 여기에 왔어요.',recommended:true}]};
+ const before=JSON.stringify(data);
+ assert.deepEqual(Array.from(w.AIMapSearch.findMatches(intent,data,null),r=>r.place.id).sort(),['flower','vn']);
+ assert.deepEqual(Array.from(w.AIMapSearch.findMatches({...intent,benefit:true,recommended:true},data,null),r=>r.place.id),['flower']);
+ const raw=(id,name,extra={})=>({id,displayName:name,types:['florist','store'],formattedAddress:'Quận 1, Hồ Chí Minh',location:{lat:10.779,lng:106.702},rating:4.8,userRatingCount:80,...extra});
+ const records=[raw('florist','Blossom'),raw('cafe','Flower Cafe',{types:['cafe','store']}),raw('mall','Gift Mall',{types:['shopping_mall','store']}),raw('low','낮은 평점 꽃집',{rating:3}),raw('closed','폐업 꽃집',{businessStatus:'CLOSED_PERMANENTLY'}),raw('hanoi','Hanoi Flower Shop',{formattedAddress:'Hà Nội',location:{lat:21.03,lng:105.84}})];
+ let request;w.google={maps:{places:{Place:{searchByText:async r=>{request=r;return {places:records}}}}}};
+ assert.deepEqual(Array.from(await w.AIGoogleSearch.search(intent),r=>r.placeId),['florist']);
+ assert.equal(request.includedType,'florist');assert.equal(request.useStrictTypeFiltering,true);assert.match(request.textQuery,/^florist Ho Chi Minh City Vietnam$/);assert(!/cafe|girlfriend|gift|date|shopping/.test(request.textQuery));
+ w.data=data;run('db=()=>data;state.sharedDbLoading=false;state.city="hcmc";');w.fetch=async()=>({ok:true,json:async()=>({intent})});
+ const input=w.document.getElementById('aiMapQuestion');input.value=query;input.dispatchEvent(new w.Event('input'));w.document.getElementById('aiMapForm').dispatchEvent(new w.Event('submit',{cancelable:true}));await new Promise(resolve=>setTimeout(resolve,20));
+ assert.equal(w.document.querySelectorAll('.aiMemberResult').length,2);assert.equal(w.document.querySelectorAll('.aiGoogleResult').length,1);assert(!w.document.getElementById('aiMapResults').textContent.includes('Flower Cafe'));assert.match(w.document.getElementById('aiMapNote').textContent,/공개된 전화·웹사이트/);assert.match(w.document.getElementById('aiMapNote').textContent,/배달 지역과 시간은 꽃집에 문의/);
+ let opened;w.PlaceSearch={openGoogle:row=>{opened=row.placeId}};w.document.querySelector('.aiGoogleResult').click();assert.equal(opened,'florist');assert.equal(w.document.getElementById('aiMapPanel').hidden,true);assert.equal(JSON.stringify(data),before);
+ dom.window.close();console.log('PASS flower gift goals -> florist search, advice separation, hard constraints, bounded mode recovery, precise member/Google eligibility, no phone/cafe fallback, direct selection and preserved reviews');
+})().catch(error=>{console.error(error);process.exitCode=1});
