@@ -42,6 +42,7 @@
   function dismiss(){
     revision++;clearTimeout(timer);timer=null;request=null;
     byId('placeSearchResults').hidden=true;input().setAttribute('aria-expanded','false');input().removeAttribute('aria-activedescendant');active=-1;
+    window.MapUX?.endSearch('place');
   }
   function services(){
     const lib=window.google?.maps?.places;
@@ -78,6 +79,7 @@
     if(event?.type==='input' && external?.loading)closeDetailPanel();
     revision++;clearTimeout(timer);request=null;query=input().value.trim();active=-1;
     if(!query){session=null;dismiss();return;}
+    window.MapUX?.beginSearch('place');
     rows=localMatches(query);show(composing?'입력 중…':query.length<2?'두 글자 이상 입력하면 Google 장소도 찾아드려요.':'Google 장소 확인 중…');
     if(composing||query.length<2)return;
     const version=revision,q=query;timer=setTimeout(()=>suggestions(q,version),350);
@@ -111,6 +113,7 @@
     return {name:raw?.name||fallback.name||'선택한 장소',address:raw?.formatted_address||fallback.address||'',placeId:raw?.place_id||fallback.placeId,types:raw?.types||[],...pos};
   }
   async function openGoogle(row){
+    window.MapUX?.dismissSearch();
     if(external?.place.placeId===row.placeId){dismiss();input().blur();setDetailExpanded(true);return true;}
     const searchSession=session;session=null;dismiss();input().blur();
     closeDetailPanel();clearSearchMarker();resetScope();state.selected=null;
@@ -218,7 +221,7 @@
     field.addEventListener('input',changed);
     byId('searchClear')?.addEventListener('click',()=>{field.value='';changed();field.focus();});
     syncClear();
-    field.addEventListener('focus',()=>{if(field.value.trim())changed()});
+    field.addEventListener('focus',()=>{window.MapUX?.beginSearch('place');if(field.value.trim())changed()});
     field.addEventListener('keydown',event=>{
       if(event.isComposing||composing||event.keyCode===229)return;
       if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();dismiss();return;}

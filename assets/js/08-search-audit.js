@@ -727,6 +727,7 @@ function closeMobileBusinessList(){
 
 function openMobileBusinessList(){
   if(!isMobileMapLayout())return;
+  window.MapUX?.dismissSearch();
   collapseMobileLegend();
   if($('#detail')?.classList.contains('show'))closeDetailPanel();
   closeAreaPanel();

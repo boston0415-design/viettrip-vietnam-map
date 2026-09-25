@@ -54,7 +54,8 @@
     const id={city:'browseCity',category:'browseCategory',rating:'browseRating',benefit:'browseBenefit'}[key];el(id)?.focus({preventScroll:true});
   }
   function showList(){
-    if(state.selected)closeDetailPanel();
+    window.MapUX?.dismissSearch();
+    if(state.selected||window.PlaceSearch?.currentPlace())closeDetailPanel();
     if(isMobileMapLayout())openMobileBusinessList();else if(document.querySelector('.content')?.classList.contains('desktopListCollapsed'))el('desktopListToggle')?.click();
     // A previously minimized sheet must show actual businesses when explicitly opened.
     const side=el('businessSide'),available=document.querySelector('.content').getBoundingClientRect().height;

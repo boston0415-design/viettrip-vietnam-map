@@ -202,10 +202,10 @@
     const bottom=(viewport?.offsetTop||0)+(viewport?.height||innerHeight);
     panel.style.setProperty('--ai-panel-space',Math.max(80,bottom-panel.getBoundingClientRect().top-12)+'px');
   }
-  function show(){panel.hidden=false;input.setAttribute('aria-expanded','true');fitPanel();}
+  function show(){window.MapUX?.beginSearch('ai');panel.hidden=false;input.setAttribute('aria-expanded','true');fitPanel();}
   function syncInput(){send.disabled=!!controller||input.value.trim().length<2;if(clear)clear.hidden=!input.value;}
   function cancel(){revision++;controller?.abort();hoursController?.abort();googleController?.abort();window.AIResultActions?.cancel();window.AIMapAnswer?.cancel();controller=null;hoursController=null;googleController=null;syncInput();form.removeAttribute('aria-busy');}
-  function close(){cancel();panel.hidden=true;input.setAttribute('aria-expanded','false');}
+  function close(){cancel();panel.hidden=true;input.setAttribute('aria-expanded','false');window.MapUX?.endSearch('ai');}
   function reset(){list.replaceChildren();examples.hidden=false;status.textContent='예시를 누르면 바로 찾아드려요. 직접 질문해도 좋아요.';title.textContent='이렇게 물어보세요';byId('aiMapNote').textContent='회원 등록 업소를 먼저, Google 지도 업소를 함께 찾아요.';}
   function waitForPlaces(signal){
     if(!state.sharedDbLoading)return Promise.resolve();

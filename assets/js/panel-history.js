@@ -28,6 +28,8 @@
     add('detail-expanded',detail,()=>mobile() && detail.classList.contains('show') && detail.classList.contains('detailExpanded'),()=>setDetailExpanded(false));
     add('map-info',byId('map'),()=>Boolean(state.clickInfo),()=>closeSystemInfo());
     add('registration',byId('regHint'),()=>state.registerMode,cancelRegisterMode);
+    add('place-search',byId('placeSearchResults'),()=>!byId('placeSearchResults').hidden,()=>{window.PlaceSearch?.dismiss();byId('searchInput')?.blur();});
+    add('ai-search',byId('aiMapPanel'),()=>!byId('aiMapPanel').hidden,()=>{window.AIMapSearch?.close();byId('aiMapQuestion')?.blur();});
     document.querySelectorAll('.modalback').forEach(node=>{
       add(node.id,node,()=>node.classList.contains('open'),()=>closeModalById(node.id));
     });

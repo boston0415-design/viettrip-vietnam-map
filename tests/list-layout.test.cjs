@@ -15,7 +15,7 @@ let click,collapsed=false,desktop=true,resizes=0;
 const attrs={},center={lat:10,lng:106},state={city:'hcmc',cat:'stay',selected:'old',map:{getCenter:()=>center,setCenter:c=>assert.equal(c,center)}};
 const before=JSON.stringify({city:state.city,cat:state.cat,selected:state.selected});
 const button={addEventListener:(event,fn)=>click=fn,setAttribute:(k,v)=>attrs[k]=v};
-const browser={document:{addEventListener:(e,fn)=>fn(),getElementById:()=>button,querySelector:()=>({classList:{toggle:()=>collapsed=!collapsed}})},window:{matchMedia:()=>({matches:desktop}),google:{maps:{event:{trigger:()=>resizes++}}}},state,requestAnimationFrame:fn=>fn()};browser.google=browser.window.google;
+const browser={document:{addEventListener:(e,fn)=>fn(),getElementById:()=>button,querySelector:()=>({classList:{contains:()=>collapsed,toggle:(name,value)=>collapsed=value??!collapsed}})},window:{matchMedia:()=>({matches:desktop}),google:{maps:{event:{trigger:()=>resizes++}}}},state,requestAnimationFrame:fn=>fn()};browser.google=browser.window.google;
 vm.runInNewContext(fs.readFileSync(path.join(root,'list-layout.js'),'utf8'),browser);
 click();assert.equal(attrs['aria-expanded'],'false');click();assert.equal(attrs['aria-expanded'],'true');assert.equal(resizes,2);
 desktop=false;click();assert.equal(resizes,2);assert.equal(JSON.stringify({city:state.city,cat:state.cat,selected:state.selected}),before);

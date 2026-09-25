@@ -4,6 +4,7 @@
   const el=id=>document.getElementById(id);
   let browse=null,opening=false,closing=false,nearbyKey='',nearbyHTML='';
   let nearbyMode='expanded',nearbyOrigin=null;
+  let activeSearch=null;
   const scope=()=>JSON.stringify([state.city,state.cat,state.sub,state.sort,state.query,state.benefitFilter,state.ratingFilter,state.restaurantTag,state.nearby,window.PersonalPlaces?.getView()]);
   const mobile=()=>typeof isMobileMapLayout==='function'&&isMobileMapLayout();
   const collection=()=>typeof items==='function'?items({forList:true}):[];
@@ -20,7 +21,24 @@
     const meta=info(p);return `<small class="searchMemberMeta">${esc(meta.category)} · ${esc(meta.score)}</small>${benefit(p)}`;
   }
   function validBrowse(){return browse&&browse.scope===scope()&&browse.ids.includes(state.selected)}
-  function onSelection(){if(!opening)browse=null;}
+  function beginSearch(kind){
+    if(activeSearch===kind)return;
+    activeSearch=kind;
+    document.querySelector('.content')?.classList.add('searchActive');
+    if(kind==='ai')window.PlaceSearch?.dismiss();else window.AIMapSearch?.close();
+    // Close the old view without resetting its filters, places or reviews.
+    window.BodySheetDrag?.cancel(el('businessSide'));
+    closeMobileBusinessList();window.ListLayout?.setCollapsed(true);
+    if(el('detail')?.classList.contains('show')||state.selected||window.PlaceSearch?.currentPlace())closeDetailPanel();
+    closeAreaPanel();closeSystemInfo();setMobileLegendExpanded(false);
+    syncNearby();
+  }
+  function endSearch(kind){
+    if(activeSearch!==kind)return;
+    activeSearch=null;document.querySelector('.content')?.classList.remove('searchActive');syncNearby();
+  }
+  function dismissSearch(){window.AIMapSearch?.close();window.PlaceSearch?.dismiss();}
+  function onSelection(){dismissSearch();if(!opening)browse=null;}
   function onDetailClosed(){if(!closing)browse=null;}
   function openBusiness(id,source='list'){
     const available=collection();if(!available.some(p=>p.id===id))return;
@@ -68,7 +86,7 @@
     const key=JSON.stringify(origin);
     if(!origin||origin!==nearbyOrigin||key!==nearbyKey){nearbyMode='expanded';nearbyOrigin=origin;}
     const listOpen=mobile()?el('businessSide')?.classList.contains('mobileOpen'):!document.querySelector('.content')?.classList.contains('desktopListCollapsed');
-    const blocked=!origin||Boolean(state.selected)||Boolean(state.registerMode)||Boolean(window.PlaceSearch?.currentPlace())||Boolean(origin&&listOpen);
+    const blocked=Boolean(activeSearch)||!origin||Boolean(state.selected)||Boolean(state.registerMode)||Boolean(window.PlaceSearch?.currentPlace())||Boolean(origin&&listOpen);
     tray.hidden=blocked||nearbyMode==='closed';
     const reopen=el('nearbyReopen');if(reopen)reopen.hidden=blocked||nearbyMode!=='closed';
     tray.classList.toggle('isCollapsed',nearbyMode==='collapsed');
@@ -217,7 +235,7 @@
       paint();if(!dialog.open)dialog.showModal();el('memberPhotoClose').focus({preventScroll:true});
     },true);
   }
-  window.MapUX={openBusiness,closeDetail,decorateDetail,onSelection,onDetailClosed,syncNearby,searchMeta,syncSearchAction,registerFromSearch,toggleNearbySize};
+  window.MapUX={openBusiness,closeDetail,decorateDetail,onSelection,onDetailClosed,syncNearby,searchMeta,syncSearchAction,registerFromSearch,toggleNearbySize,beginSearch,endSearch,dismissSearch};
   // Register the photo dialog before panel-history collects dialog layers.
   init();
 })();

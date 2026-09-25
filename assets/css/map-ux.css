@@ -1,4 +1,6 @@
 /* 20260920: compact information, predictable panel navigation and native scrolling. */
+/* Search owns the reading space; the nearby tools return when it closes. */
+.content.searchActive #areaLegend,.content.searchActive #nearbyResults,.content.searchActive #nearbyReopen{display:none!important}
 [hidden].nearbyResults,[hidden].statLabelShort{display:none!important}
 .cardReviewLink{display:block;border:0;background:none;color:#647a71;font-size:11px;padding:5px 0;min-height:28px;text-align:left}
 .cardBenefit{margin-top:10px;padding:10px 11px;border:1px solid #bad9cd;border-radius:10px;background:#eef7f2;font-size:12px;line-height:1.6;color:#225d46;overflow-wrap:anywhere;white-space:pre-line}

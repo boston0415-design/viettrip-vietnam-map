@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('mobileListClose')?.addEventListener('click',()=>{
     if(window.matchMedia('(min-width:901px)').matches&&!content.classList.contains('desktopListCollapsed'))button.click();
   });
-  button.addEventListener('click',()=>{
-    if(!window.matchMedia('(min-width:901px)').matches)return;
-    const collapsed=content.classList.toggle('desktopListCollapsed');
+  function setCollapsed(collapsed){
+    if(!collapsed)window.MapUX?.dismissSearch();
+    content.classList.toggle('desktopListCollapsed',collapsed);
     button.textContent=collapsed?'›':'‹';
     button.setAttribute('aria-expanded',String(!collapsed));
     const label=collapsed?'업체 목록 펼치기':'업체 목록 접기';
@@ -27,5 +27,9 @@ document.addEventListener('DOMContentLoaded',()=>{
         if(center)state.map.setCenter(center);
       }
     });
+  }
+  window.ListLayout={setCollapsed};
+  button.addEventListener('click',()=>{
+    if(window.matchMedia('(min-width:901px)').matches)setCollapsed(!content.classList.contains('desktopListCollapsed'));
   });
 });
