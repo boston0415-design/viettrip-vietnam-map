@@ -199,7 +199,7 @@
     if(entry.intent.productSearch){title.textContent='판매점 문의 후보 · '+rows.length+'곳';return;}
     if(entry.intent.hotelStars){const count=rows.filter(r=>r.insights?.hotelClass?.kind==='confirmed').length;title.textContent=entry.intent.hotelStars+'성급 안내 '+count+'곳 · 성급 문의 '+(rows.length-count)+'곳';return;}
     if(entry.intent.subcategory==='로컬 KTV'){title.textContent='로컬 등록 '+rows.filter(r=>r.place).length+'곳 · 운영 문의 '+rows.filter(r=>!r.place).length+'곳';return;}
-    title.textContent=entry.intent.exploratory?'질문 관련 장소 후보 · '+rows.length+'곳':wantsRoom(entry.intent)?'룸 안내 '+rows.filter(r=>r.room?.kind==='confirmed').length+'곳 · 문의 필요 '+rows.filter(r=>r.room?.kind==='unknown').length+'곳':'추천 업소 · '+rows.length+'곳';
+    title.textContent=entry.intent.exploratory?'질문 관련 장소 후보 · '+rows.length+'곳':wantsRoom(entry.intent)?'룸 안내 '+rows.filter(r=>r.room?.kind==='confirmed').length+'곳 · 문의 필요 '+rows.filter(r=>r.room?.kind==='unknown').length+'곳':(entry.intent.purpose==='group'?'모임 장소 후보 · ':'추천 업소 · ')+rows.length+'곳';
   }
   const form=byId('aiMapForm'),input=byId('aiMapQuestion'),panel=byId('aiMapPanel'),send=byId('aiMapSend');
   if(!form)return;
@@ -358,7 +358,7 @@
     text.textContent=intent.exploratory?'질문과 관련된 장소 후보를 찾아보고 있어요.':(labels[intent.purpose]||'방문 목적')+'에 맞는 '+(CONFIG.categories[intent.category]?.label||'장소')+' 후보를 찾습니다.';
     if(intent.purpose==='group')text.textContent+=' 모임 관련 안내가 있는 곳을 우선하며, 인원·날짜·예약 가능 여부는 업소에 확인해 주세요.';
     box.append(text);
-    if(intent.purpose==='group'&&!intent.subcategory&&!intent.terms?.length){
+    if(intent.purpose==='group'&&!intent.subcategory&&!intent.terms?.length&&!intent.features?.length){
       const options=document.createElement('div');options.className='aiContextOptions';options.setAttribute('aria-label','모임 장소 종류');
       for(const [category,label] of [['restaurant','식사 모임'],['bar','술집·펍'],['cafe','카페 모임']]){
         const button=document.createElement('button');button.type='button';button.textContent=label;button.setAttribute('aria-pressed',String(intent.category===category));
