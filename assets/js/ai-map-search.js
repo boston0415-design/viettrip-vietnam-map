@@ -11,6 +11,7 @@
   };
   const AREA_ALIASES=[['푸미흥','phu my hung'],['타오디엔','thao dien'],['호안끼엠','hoan kiem'],['미딩','my dinh'],['서호','tay ho'],['부이비엔','bui vien'],['레탄톤','le thanh ton']];
   const MENU_PATTERNS={
+    '라멘':/라멘|라아멘|\bramen\b|ラーメン/i,
     '쌀국수':/쌀국수|\bpho\b/i,
     '햄버거':/햄버거|수제\s*버거|버거|\b(?:hamburger|burger|burgers|smashburger)\b/i,
     '고기·구이':/고기\s*[·/]?\s*구이|고[기깃]집|삼겹살|오겹살|목살|갈비(?!\s*치킨)|숯불|불고기|바[베비]큐|비비큐|\bbbq\b|\bbarbe[cq]ue\b|\bgrilled\s+(?:meat|beef|pork)\b|\bthit\s+nuong\b|\bsuon\s+nuong\b/i,
@@ -19,14 +20,18 @@
     '베이커리':/빵집|베이커리|bakery|boulangerie|patisserie|tiem\s*banh/i,
     '오토바이 대여':/(?:오토바이|스쿠터).{0,10}(?:대여|렌트)|(?:motorbike|motorcycle|scooter).{0,15}rent|rent.{0,15}(?:motorbike|motorcycle|scooter)|cho\s*thue\s*xe\s*may/i
   };
+  // Registration's combined noodle tag does not establish a specific dish.
+  // Keep genuine ramen names/menu notes, regardless of the venue's cuisine.
+  const menuText=(text,term)=>term==='라멘'?String(text||'').replace(/국수\s*[·ㆍ•/|]\s*라멘|라멘\s*[·ㆍ•/|]\s*국수/gi,''):String(text||'');
   function menuKeyword(text,term){
-    let value=normalize(text);const pattern=MENU_PATTERNS[term];
+    let value=normalize(menuText(text,term));const pattern=MENU_PATTERNS[term];
     if(term==='고기·구이')value=value.replace(/\bbbq\s*chicken\b|비비큐\s*치킨|치킨\s*비비큐/gi,'');
     if(pattern)return value.match(pattern)?.[0]?.trim()||'';
     return (/왁싱|waxing/i.test(term)?['왁싱','waxing','wax long']:[term]).find(alias=>value.includes(normalize(alias))||window.NameSearch?.matches(text,alias))||'';
   }
   function evidenceFor(sources,term){
-    for(const source of sources){
+    for(const original of sources){
+      const source={...original,text:menuText(original.text,term)};
       for(const clause of String(source.text||'').split(/[.!?。\n]/)){
         const keyword=menuKeyword(clause,term);if(!keyword)continue;
         if(MENU_PATTERNS[term]&&/없|안\s*팔|팔지\s*않|판매하지|제공하지|먹지\s*못|있는지|있나요|확인\s*필요|문의|예정|옆집|다른\s*식당|\b(?:no|not|without|whether|wish|maybe)\b|khong\s+(?:co|ban)/i.test(normalize(clause)))continue;

@@ -30,6 +30,7 @@ category: restaurant=식당/맛집, spa=마사지/스파/왁싱, barber=이발�
 subcategory: restaurant must preserve ONLY an explicitly requested cuisine from ${Object.keys(CUISINES).join('/')}; 프렌치/French=프랑스, 이탈리안/Italian=이탈리아. Otherwise "". NEVER infer a nationality from a dish: 횟집/회/sashimi is NOT necessarily Japanese, BBQ is NOT necessarily Korean. A requested cuisine can be supplied by a mixed-menu restaurant with evidence; it does not describe the owner's nationality. For bar: use 바 for a bar/pub/rooftop bar request, 클럽 for a nightclub request. For other categories leave empty and preserve narrower types as terms (except rooftop, which is a preference).
 terms: only specific dishes, business names or essential features explicitly asked for. ALL terms must match. Do not add city, district, area, category, subcategory, companion, date or subjective adjectives to terms. Do not invent synonyms or business names.
 Normalize broad 고기집/고깃집/고기구이/바베큐/BBQ requests to terms=["고기·구이"], 횟집/회집/회/사시미 to terms=["회"]. Keep a specifically named dish such as 삼겹살/광어회/동태탕 as that dish, not the broad group. 맛있는/맛집 is a ranking preference, never a literal term. Do not invent dishes the user did not specify.
+라멘/라멘집/ramen/ラーメン means terms=["라멘"], not generic noodles, 짬뽕, 라면 or the combined registration tag 국수·라멘. Preserve specifically requested ramen styles as additional terms; do not infer a cuisine unless explicitly requested.
 features: restaurant private dining rooms (룸/별실/개인실/프라이빗룸) use ["private_room"], NOT terms or unsupported. Room information is often missing: the client separates source-backed room information from clearly labelled same-area/cuisine candidates requiring inquiry; it never claims unknown rooms exist. For other features keep the existing terms/unsupported rules. Never infer a private room from a date, quietness, or atmosphere alone.
 preferences: "date"=연인/여자친구/데이트, "atmosphere"=분위기 좋은, "quiet"=조용한, "view"=야경/전망, "rooftop"=루프탑, "cheap"=저렴/가성비, "popular"=유명/인기, "top_rated"=후기 좋은/평점 높은. These rank results, NOT mandatory filters or literal terms. A girlfriend is context, not a menu keyword.
 benefit=true for member benefits/discount/제휴 requests. recommended=true for 강추/회원 추천, NOT a generic 추천해줘. These are required filters only when explicitly asked; never add them just because a user asks for recommendations. Do not replace any required condition with alternatives.
@@ -83,7 +84,7 @@ export function clarifyIntent(intent,query){
   const cityNames={hcmc:/호치민|hochiminh|ho chi minh/i,hanoi:/하노이|hanoi|ha noi/i,danang:/다낭|da nang/i,nhatrang:/나트랑|nha trang/i,phuquoc:/푸꾸옥|푸꿕|phu quoc/i,dalat:/달랏|da lat/i,hoian:/호이안|hoi an/i,vungtau:/붕따우|호짬|vung tau/i,muine:/무이네|mui ne/i};
   const cities=Object.keys(cityNames).filter(key=>cityNames[key].test(query));
   if(cities.length===1)next.city=cities[0];
-  const categoryNames={restaurant:/식당|맛집|한식|일식|중식|쌀국수|고[기깃]집|횟집|회집|사시미|바[베비]큐|\bBBQ\b/i,spa:/마사지|스파|왁싱|waxing/i,barber:/이발소|미용실/,stay:/호텔|숙소|아파트/,karaoke:/가라오케|KTV/i,cafe:/카페|커피숍/,exchange:/환전/,shopping:/쇼핑|과일가게/,market:/시장/,bar:/(?:^|[\s])바(?:[\s를에가도는]|$)|루프탑|펍|클럽/,golf:/골프/,pharmacy:/약국/,hospital:/병원|치과/};
+  const categoryNames={restaurant:/식당|맛집|한식|일식|중식|쌀국수|라멘|라아멘|\bramen\b|ラーメン|고[기깃]집|횟집|회집|사시미|바[베비]큐|\bBBQ\b/i,spa:/마사지|스파|왁싱|waxing/i,barber:/이발소|미용실/,stay:/호텔|숙소|아파트/,karaoke:/가라오케|KTV/i,cafe:/카페|커피숍/,exchange:/환전/,shopping:/쇼핑|과일가게/,market:/시장/,bar:/(?:^|[\s])바(?:[\s를에가도는]|$)|루프탑|펍|클럽/,golf:/골프/,pharmacy:/약국/,hospital:/병원|치과/};
   const categories=Object.keys(categoryNames).filter(key=>categoryNames[key].test(query));
   if(categories.length===1&&!/말고|제외|아닌/.test(query)){
     next.category=categories[0];
@@ -129,6 +130,7 @@ export function clarifyIntent(intent,query){
   if(!/말고|제외|아닌/.test(query)){
     if(/쌀국수|\bph[oở]\b/i.test(query)){next.relevant=true;next.category='restaurant';next.terms=[...next.terms.filter(t=>!/^(?:쌀국수(?:집)?|ph[oở])$/i.test(t)),'쌀국수'];}
     const strip=pattern=>{next.terms=next.terms.filter(t=>!pattern.test(t));};
+    if(/라멘|라아멘|\bramen\b|ラーメン/i.test(query)){next.relevant=true;next.category='restaurant';strip(/^(?:라멘(?:집)?|라아멘|ramen(?:\s+restaurants?)?|ラーメン|국수\s*[·/]\s*라멘)$/i);next.terms.push('라멘');}
     if(/햄버거|수제\s*버거|버거집|\bburgers?\b/i.test(query)){next.relevant=true;next.category='restaurant';strip(/햄버거|수제\s*버거|버거집|\bburgers?\b/i);next.terms.push('햄버거');}
     if(/반미|b[aá]nh\s*m[iì]/i.test(query)){next.relevant=true;next.category='restaurant';next.subcategory='';strip(/반미|banh\s*mi|중식|베트남|샌드위치/i);next.terms.push('반미');}
     if(/빵집|베이커리|bakery/i.test(query)){next.relevant=true;next.category='cafe';next.subcategory='베이커리';strip(/^(빵|빵집|베이커리|bakery)$/i);}
@@ -138,7 +140,7 @@ export function clarifyIntent(intent,query){
   }
   const stars=query.match(/([1-5])\s*(?:성급|성\s*호텔|[- ]star)/i);
   if(next.category==='stay'&&stars){next.hotelStars=Number(stars[1]);next.terms=next.terms.filter(t=>!/(?:[1-5]\s*성|star)/i.test(t));next.unsupported=next.unsupported.filter(t=>!/성급|호텔 등급|star/i.test(t));}
-  const sorting={cheap:/저렴|싼|싸고|가성비|가격.{0,5}낮|가격순|cheap|affordable/i,popular:/유명|인기|후기.{0,5}많|popular/i,top_rated:/후기.{0,6}좋|평점.{0,6}높|평점순|가장\s*좋|best rated|원탑|끝판왕|제일|최고|베스트|\bbest\b/i};
+  const sorting={cheap:/저렴|싼|싸고|가성비|가격.{0,5}낮|가격순|cheap|affordable/i,popular:/유명|인기|후기.{0,5}많|popular/i,top_rated:/후기.{0,6}좋|평점.{0,6}높|평점순|가장\s*좋|가장[\s.]*맛있는|best rated|원탑|끝판왕|제일|최고|베스트|\bbest\b/i};
   for(const [key,pattern] of Object.entries(sorting))if(pattern.test(query)&&!next.preferences.includes(key))next.preferences.push(key);
   next.sortBy=sorting.cheap.test(query)?'cheap':/분위기|조용|야경|전망|루프탑|데이트/.test(query)?'atmosphere':sorting.popular.test(query)?'popular':sorting.top_rated.test(query)?'top_rated':'';
   if(/원탑|끝판왕|딱\s*(?:한\s*곳|하나)|하나만|한\s*곳만|제일|최고|\bbest\b/i.test(query))next.pickOne=true;
@@ -277,10 +279,10 @@ export function literalIntent(query,city){
     .replace(/호치민|하노이|다낭|나트랑|푸꾸옥|푸꿕|달랏|호이안|붕따우|무이네|푸미흥/g,' ')
     .replace(/(?:[1-9]|1\d|2[0-2])\s*군|[1-5]\s*성급/g,' ')
     .replace(/[\d,]+(?:\.\d+)?\s*(?:만|천|k|m)?\s*(?:동|vnd|달러|usd|불|원|krw)/gi,' ')
-    .replace(/쌀국수집?|반미집?|빵집|베이커리|한식당?|일식당?|중식당?|식당|맛집|고[기깃]집|횟집|회집|호텔|숙소|가라오케|KTV|카페|커피숍|마사지|스파|왁싱샵?|이발소|미용실|루프탑|클럽|펍|골프|약국|병원|치과|환전소?|과일가게|쇼핑|시장|(?:^|\s)바(?=\s|를|$)/gi,' ')
+    .replace(/쌀국수집?|반미집?|라멘집?|라아멘|\bramen\b|ラーメン|빵집|베이커리|한식당?|일식당?|중식당?|식당|맛집|고[기깃]집|횟집|회집|호텔|숙소|가라오케|KTV|카페|커피숍|마사지|스파|왁싱샵?|이발소|미용실|루프탑|클럽|펍|골프|약국|병원|치과|환전소?|과일가게|쇼핑|시장|(?:^|\s)바(?=\s|를|$)/gi,' ')
     .replace(/오토바이|스쿠터|빌리(?:고|는|기)?|빌릴|빌려|대여|렌트/g,' ')
     .replace(/로컬|현지|룸|별실|개인실|개별실|독립실|프라이빗룸/g,' ')
-    .replace(/여자\s*친구|남자\s*친구|연인|데이트|분위기|조용한?|야경|전망|가격대?|예산|비용|후기|평점|유명한?|인기|저렴한?|가성비|맛있는|좋은|가장|최고|원탑|끝판왕|제일|베스트|혜택|제휴|강추|회원들이|회원/g,' ')
+    .replace(/여자\s*친구|남자\s*친구|연인|데이트|분위기|조용한?|야경|전망|가격대?|예산|비용|후기|평점|유명한?|인기|저렴한?|가성비|맛있는(?:\s*집)?|좋은|가장|최고|원탑|끝판왕|제일|베스트|혜택|제휴|강추|회원들이|회원/g,' ')
     .replace(/오늘밤?|정도로?|놀만한|갈만한|추천해(?:주세요|줘)?|찾아(?:주세요|줘)?|알려(?:주세요|줘)?|어디(?:서|야|에)?|가야해|있는|싶어|싶은데|중에서|에서|으로|까지|중|곳|좀|많은|높은|낮은/g,' ');
   if(intent.guide)remaining=remaining.replace(/배를|배편|페리|타고|표를|표|사야해|사는|사/g,' ');
   remaining=remaining.replace(/[?.!,~]/g,' ').replace(/(?:^|\s)(?:에|의|을|를|은|는|이|가|와|과|로|도|한|부터)(?=\s|$)/g,' ').replace(/[\s?.!,~]/g,'');
