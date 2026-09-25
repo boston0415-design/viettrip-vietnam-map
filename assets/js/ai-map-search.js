@@ -24,6 +24,8 @@
   // Registration's combined noodle tag does not establish a specific dish.
   // Keep genuine ramen names/menu notes, regardless of the venue's cuisine.
   const menuText=(text,term)=>term==='라멘'?String(text||'').replace(/국수\s*[·ㆍ•/|]\s*라멘|라멘\s*[·ㆍ•/|]\s*국수/gi,''):String(text||'');
+  // Preserve accents: Vietnamese "tặng" (gift) is not "tang" (funeral).
+  const flowerPurposeMatches=(name,intent)=>!intent.flowerGift||!/장례|근조|추모|\b(?:funeral|sympathy|memorial)\b|hoa\s+(?:đám\s+tang|dam\s+tang|viếng|vieng|tang\b)/i.test(String(name||'').normalize('NFC'));
   function menuKeyword(text,term){
     let value=normalize(menuText(text,term));const pattern=MENU_PATTERNS[term];
     if(term==='고기·구이')value=value.replace(/\bbbq\s*chicken\b|비비큐\s*치킨|치킨\s*비비큐/gi,'');
@@ -125,6 +127,7 @@
     const found=[];
     for(const p of data.places||[]){
       if(!CONFIG.categories[p.category]||p.subcategory==='프라이빗룸')continue;
+      if(!flowerPurposeMatches(p.name,intent))continue;
       if(intent.city!=='all'&&placeCityKey(p)!==intent.city)continue;
       const needsWaxing=(intent.terms||[]).some(term=>/왁싱|waxing/i.test(term));
       if(intent.productSearch&&!/휴대폰|핸드폰|스마트폰|아이폰|애플|갤럭시|삼성|노트북|컴퓨터|전자|phone|apple|samsung|computer|laptop|electronics/i.test([p.name,p.subcategory,p.description,...(p.tags||[])].join(' ')))continue;
@@ -293,7 +296,7 @@
       window.AISearchInsights?.append(button,row,entry.intent);
       for(const proof of row.proofs||[]){const label=document.createElement('span');label.className='aiEvidence';label.textContent=proof.evidence;button.append(label);}
       if(entry.intent.productSearch){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent='판매점 후보 · 요청 모델 취급·재고·판매가 미확인';button.append(info);}
-      if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
+      if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.service==='florist'?'꽃 종류·가격·배달 가능 여부는 꽃집에 확인해 주세요.':entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
       if(entry.intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b></b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
       button.addEventListener('click',()=>{close();input.blur();window.PlaceSearch?.openGoogle(row);});li.append(button);(row.room?.kind==='unknown'&&unknownResults?unknownResults:results).append(li);
       window.AIResultActions?.appendDelivery(li,row,entry.intent);
@@ -454,5 +457,5 @@
     finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}
   });
   syncInput();
-  window.AIMapSearch={findMatches,buildResults,districtMatches,areaMatches,inGeometry,wantsRoom,roomInfo,menuKeyword,evidenceFor,cuisineEvidence,close};
+  window.AIMapSearch={findMatches,buildResults,districtMatches,areaMatches,inGeometry,wantsRoom,roomInfo,menuKeyword,evidenceFor,cuisineEvidence,flowerPurposeMatches,close};
 })();

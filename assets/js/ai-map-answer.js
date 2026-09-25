@@ -25,15 +25,15 @@
         return score(b)-score(a);
       }).slice(0,24).map((c,i)=>({...c,id:'c'+i}));
   }
-  function reason(c,key){
+  function reason(c,key,intent){
     switch(key){
-      case 'specialty':return c.menuNamed?'업소명에서 요청한 메뉴 확인':'';
+      case 'specialty':return c.menuNamed?(intent.service==='florist'?'업소명에서 꽃집 확인':'업소명에서 요청한 메뉴 확인'):'';
       case 'rating':case 'reviews':return c.rating!=null?(c.source==='google'?'Google':'회원')+' 평점 '+Number(c.rating).toFixed(1)+' · 평가 '+c.count.toLocaleString('ko-KR')+'개':'';
       case 'preference':return c.preferences.length?c.preferences.map(p=>PREFS[p]).join('·')+' 관련 안내 확인':'';
       case 'price':return c.price?'Google 참고 가격대 · '+c.price:'';
       case 'recommended':return c.recommended?'회원 또는 등록자 강추 표시 있음':'';
       case 'benefit':return c.benefit?'등록된 회원 혜택 있음':'';
-      case 'match':return '요청한 지역·업종·메뉴 조건에 맞는 검색 결과';
+      case 'match':return intent.service==='florist'?'요청한 지역의 꽃집 검색 결과':'요청한 지역·업종·메뉴 조건에 맞는 검색 결과';
       default:return '';
     }
   }
@@ -49,7 +49,7 @@
       const button=node('button',(i===0?'먼저 추천 · ':'함께 비교 · ')+c.name,'aiAnswerPick');button.type='button';
       button.addEventListener('click',()=>{window.AIMapSearch?.close();document.getElementById('aiMapQuestion')?.blur();if(c.row.place)window.PlaceSearch?.openMember(c.row.place.id);else window.PlaceSearch?.openGoogle(c.row);});
       box.append(button);
-      const reasons=[...new Set((p.reasons||[]).map(key=>reason(c,key)).filter(Boolean))];box.append(node('p',reasons.join(' / '),'aiAnswerReason'));
+      const reasons=[...new Set((p.reasons||[]).map(key=>reason(c,key,entry.intent)).filter(Boolean))];box.append(node('p',reasons.join(' / '),'aiAnswerReason'));
     }
     box.append(node('small',entry.intent.pickOne?'찾은 후보 중 메뉴·평점·후기 수를 비교한 AI 추천입니다. 누구에게나 절대적인 1위라는 뜻은 아니에요.':'현재 검색 자료를 바탕으로 한 AI 추천입니다. 가격·영업·예약 가능 여부는 업소에 확인해 주세요.','aiAnswerSource'));
   }

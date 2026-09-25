@@ -162,6 +162,7 @@ export function clarifyIntent(intent,query){
   if(/푸꾸옥|푸꿕|phu\s*quoc/i.test(query)&&/배를|배편|페리|선박|승선|ferry/i.test(query)&&(/호치민|ho chi minh/i.test(query)||(!cities.length&&intent.city==='hcmc'))){next.guide='hcmc_phuquoc_ferry';next.relevant=true;next.unsupported=[];next.terms=[];next.city='hcmc';}
   if(wantsFlorist(query)&&!/말고|제외|아닌|않|without|instead of/i.test(query)){
     next.relevant=true;next.category='shopping';next.subcategory='';next.service='florist';
+    next.flowerGift=/선물|여자\s*친구|남자\s*친구|여친|남친|아내|남편|\b(?:gift|girlfriend|boyfriend)\b/i.test(query)&&!/장례|근조|추모|funeral|sympathy/i.test(query);
     next.terms=[...next.terms.filter(t=>!/^(?:꽃|꽃집|꽃\s*가게|꽃다발|꽃바구니|선물|여자친구|남자친구|florists?|flowers?|flower\s*shops?|bouquet|gift)$/i.test(t)),'꽃집'];
     next.preferences=next.preferences.filter(p=>p!=='date');
     // A florist is not an electronics seller or a GrabFood merchant.
