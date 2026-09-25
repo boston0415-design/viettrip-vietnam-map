@@ -89,10 +89,13 @@
     link(li,'안내 출처 · 베트남 관광청',cantho?'https://vietnam.travel/things-to-do/can-tho-glimpse-river-and-garden':'https://vietnam.travel/places-to-go/southern-vietnam/con-dao');
     list.append(li);return {title:cantho?'껀터 → 꼰선섬':'꼰다오 · 꼰선섬',status:intent.originExplicit?intent.originLabel+' 출발 질문 · 목적지 접근 안내':'출발지 미지정 · 목적지 접근 안내',note:'공식 관광청 안내 확인: 2026-09-24. 실시간 운항·요금·좌석 조회 결과는 아니며, 예약처에서 방문 날짜로 확인하세요.'};
   }
-  function fallback(list,query){
+  function fallback(list,query,intent){
     if(!query)return;
     const li=element('li','','aiTravelAnswer');li.append(element('p','질문의 조건을 확인할 정보가 부족해요. 원래 질문을 유지한 채 직접 찾아볼 수 있어요.'));
-    link(li,'Google 지도에서 질문 그대로 검색','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query));
+    const plan=intent||window.AIQueryIntent?.recoveryIntent(query,typeof state!=='undefined'?state.city:'all');
+    const search=plan&&window.AIGoogleSearch?window.AIGoogleSearch.queryFor(plan):query;
+    if(plan)li.firstChild.textContent='같은 검색 조건으로 Google 지도에서 더 많은 장소를 확인할 수 있어요.';
+    link(li,plan?'Google 지도에서 관련 장소 더 찾기':'Google 지도에서 질문 그대로 검색','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(search));
     link(li,'여행가이드 보기','./guide/');list.append(li);
   }
   window.AITravelSearch={routeCards,render,fallback,searchPlace};

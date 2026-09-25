@@ -10,9 +10,9 @@ const intent={relevant:true,city:'hcmc',district:'1',area:'',preferences:[],visi
  let response=await api.onRequest({request:req({query:'1군 동태탕 한식당',city:'hcmc'}),env});assert.equal(response.status,200);assert.deepEqual((await response.json()).intent,{...intent,requestText:'1군 동태탕 한식당'});
  response=await api.onRequest({request:req({query:'동태탕'}, {origin:'https://other.test'}),env});assert.equal(response.status,403);
  response=await api.onRequest({request:req({query:'가'.repeat(301)}),env});assert.equal(response.status,400);
- response=await api.onRequest({request:req({query:'동태탕'}),env:{}});assert.equal(response.status,503);
+ response=await api.onRequest({request:req({query:'동태탕'}),env:{}});assert.equal(response.status,200);assert.equal((await response.json()).intent.exploratory,true);
  assert.equal(aiCalls,1,'invalid input and unavailable binding never invoke AI');
- response=await api.onRequest({request:req({query:'동태탕'}),env:{AI:{run:async()=>({response:'{"relevant":true}'})}}});assert.equal(response.status,503,'invalid model response is not reported as search results');
+ response=await api.onRequest({request:req({query:'동태탕'}),env:{AI:{run:async()=>({response:'{"relevant":true}'})}}});assert.equal(response.status,200);assert.equal((await response.json()).intent.exploratory,true,'invalid model output becomes explicitly unverified exploratory search');
  assert.throws(()=>api.validateIntent({...intent,district:'1|11'},'hcmc'));
  const wrong=api.validateIntent({...intent,relevant:false,city:'hcmc',district:'',category:'',terms:[],preferences:[]},'hcmc');
  const hanoi=api.clarifyIntent(wrong,'하노이에서 회원들이 강추한 식당 찾아줘');

@@ -3,6 +3,7 @@
   const byId=id=>document.getElementById(id);
   const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').normalize('NFC').toLowerCase().replace(/\s+/g,' ').trim();
   const PREFERENCES={
+    group:{label:'단체 모임',pattern:/단체|모임|회식|연회|group dining|large groups|gathering|party|tiec|nhom/i},
     date:{label:'데이트',pattern:/데이트|연인|커플|romantic|date night/i},
     atmosphere:{label:'분위기',pattern:/분위기.{0,8}(좋|괜찮|멋|최고)|좋.{0,8}분위기|감성|아늑|분위기 맛집|atmosphere|ambien/i},
     quiet:{label:'조용함',pattern:/조용|차분|quiet|tranquil/i},
@@ -163,7 +164,7 @@
       const preferenceHits=[];
       for(const key of intent.preferences||[]){
         const pref=PREFERENCES[key];if(!pref)continue;
-        const source=sources.find(s=>pref.pattern.test(s.text)&&!/(분위기|데이트|조용).{0,12}(별로|않|없|최악|안 좋)/.test(s.text));
+        const source=sources.find(s=>pref.pattern.test(s.text)&&!/(분위기|데이트|조용|단체|모임|회식).{0,12}(별로|않|없|최악|안 좋|불가)/.test(s.text));
         if(source){preferenceHits.push(key);const word=source.text.match(pref.pattern)?.[0]||pref.label;evidence.push(quote(source,word));}
       }
       found.push({place:p,room,insights,sources,evidence:[...new Set(evidence)],missingTerms,preferenceHits,memberRecommendations,registrantRecommended,recommended:memberRecommendations>0||registrantRecommended,rating,ratingCount:ratingValues.length,reviewCount:reviews.filter(r=>r.text?.trim()).length});
@@ -198,7 +199,7 @@
     if(entry.intent.productSearch){title.textContent='판매점 문의 후보 · '+rows.length+'곳';return;}
     if(entry.intent.hotelStars){const count=rows.filter(r=>r.insights?.hotelClass?.kind==='confirmed').length;title.textContent=entry.intent.hotelStars+'성급 안내 '+count+'곳 · 성급 문의 '+(rows.length-count)+'곳';return;}
     if(entry.intent.subcategory==='로컬 KTV'){title.textContent='로컬 등록 '+rows.filter(r=>r.place).length+'곳 · 운영 문의 '+rows.filter(r=>!r.place).length+'곳';return;}
-    title.textContent=wantsRoom(entry.intent)?'룸 안내 '+rows.filter(r=>r.room?.kind==='confirmed').length+'곳 · 문의 필요 '+rows.filter(r=>r.room?.kind==='unknown').length+'곳':'추천 업소 · '+rows.length+'곳';
+    title.textContent=entry.intent.exploratory?'질문 관련 장소 후보 · '+rows.length+'곳':wantsRoom(entry.intent)?'룸 안내 '+rows.filter(r=>r.room?.kind==='confirmed').length+'곳 · 문의 필요 '+rows.filter(r=>r.room?.kind==='unknown').length+'곳':'추천 업소 · '+rows.length+'곳';
   }
   const form=byId('aiMapForm'),input=byId('aiMapQuestion'),panel=byId('aiMapPanel'),send=byId('aiMapSend');
   if(!form)return;
@@ -269,15 +270,16 @@
     const message=document.createElement('p');message.className='aiGoogleStatus';message.setAttribute('role','status');section.append(message);
     if(!entry.google){message.textContent='같은 지역의 평점 높은 업소를 찾고 있어요…';return;}
     if(entry.google.error){
+      window.AITravelSearch?.fallback(section,entry.intent.requestText||entry.query,entry.intent);
       message.textContent='Google 검색에 연결하지 못했어요. 등록 업소는 계속 볼 수 있어요.';
       const retry=document.createElement('button');retry.type='button';retry.className='aiRetry';retry.textContent='Google 검색 다시 시도';
       retry.addEventListener('click',()=>{entry.google=null;entry.answer=null;window.AIMapAnswer?.cancel();render(entry.intent);});section.append(retry);finishRanking(entry);return;
     }
     const rows=entry.google.rows;
-    if(!rows.length&&!entry.memberRows?.length)window.AITravelSearch?.fallback(section,entry.intent.requestText||entry.query);
+    if(!rows.length&&!entry.memberRows?.length)window.AITravelSearch?.fallback(section,entry.intent.requestText||entry.query,entry.intent);
     const confirmed=rows.filter(row=>row.room?.kind==='confirmed'),unknown=rows.filter(row=>row.room?.kind==='unknown');
     message.textContent=roomSearch?(confirmed.length?'룸 안내를 확인한 Google 업소 · '+confirmed.length+'곳':'Google 정보에서 룸 안내를 확인한 업소는 없어요.'):
-      rows.length?(entry.intent.terms.length?'업소명에 검색어가 있는 곳 우선 · ':'')+'Google 평점 4점 이상 · 평점, 후기 수 순':'이 지역에서 조건에 맞는 Google 평점 4점 이상 업소를 찾지 못했어요.';
+      rows.length?(entry.intent.exploratory?'관련 장소 후보 · 세부 조건 미확인 · ':entry.intent.terms.length?'업소명에 검색어가 있는 곳 우선 · ':'')+'Google 평점 4점 이상 · 평점, 후기 수 순':'이 지역에서 조건에 맞는 Google 평점 4점 이상 업소를 찾지 못했어요.';
     resultTitle(entry);
     const results=document.createElement('ul');results.className='aiGoogleResults';results.setAttribute('aria-label','Google 지도 추천 업소');section.append(results);
     let unknownResults;
@@ -348,11 +350,29 @@
     }).catch(error=>{if(error.name!=='AbortError'&&token===revision&&last===entry){entry.google={error:true};renderGoogle(entry);window.AIMapAnswer?.render(list,entry);}})
       .finally(()=>{if(googleController===work)googleController=null;});
   }
+  function appendSearchContext(intent){
+    if(!intent.purpose&&!intent.exploratory)return;
+    const box=document.createElement('li');box.className='aiSearchContext';
+    const text=document.createElement('p');
+    const labels={group:'정모·단체 모임',work:'작업·대화',date:'데이트',food:'식사',drink:'가볍게 한잔',rest:'휴식',hair:'헤어 관리',explore:'구경·나들이'};
+    text.textContent=intent.exploratory?'질문과 관련된 장소 후보를 찾아보고 있어요.':(labels[intent.purpose]||'방문 목적')+'에 맞는 '+(CONFIG.categories[intent.category]?.label||'장소')+' 후보를 찾습니다.';
+    if(intent.purpose==='group')text.textContent+=' 모임 관련 안내가 있는 곳을 우선하며, 인원·날짜·예약 가능 여부는 업소에 확인해 주세요.';
+    box.append(text);
+    if(intent.purpose==='group'&&!intent.subcategory&&!intent.terms?.length){
+      const options=document.createElement('div');options.className='aiContextOptions';options.setAttribute('aria-label','모임 장소 종류');
+      for(const [category,label] of [['restaurant','식사 모임'],['bar','술집·펍'],['cafe','카페 모임']]){
+        const button=document.createElement('button');button.type='button';button.textContent=label;button.setAttribute('aria-pressed',String(intent.category===category));
+        button.onclick=()=>{cancel();const next={...intent,category,subcategory:category==='bar'?'바':''};last={query:input.value.trim(),intent:next,hours:new Map(),checkedAt:Date.now()};render(next);fitPanel();};options.append(button);
+      }
+      box.append(options);
+    }
+    list.append(box);
+  }
   function render(intent){
     list.replaceChildren();examples.hidden=true;title.textContent='AI 검색 결과';
     list.classList.remove('aiRankingPending');
     const note=byId('aiMapNote');note.textContent='질문 조건에 맞는 업소만 표시하고, 그 안에서 회원 등록·강추·혜택 정보를 보여드려요. Google 검색은 최대 20곳의 업종·지역·평점을 확인합니다.';
-    if(intent?.mode==='advice'){title.textContent='AI 답변';status.textContent='';note.textContent='AI의 일반 안내입니다. 현재 가격·영업·예약 정보는 별도 확인이 필요합니다.';window.AIMapAnswer?.advice(list,intent.answer,intent.answerModel);return;}
+    if(intent?.mode==='advice'){title.textContent='AI 답변';status.textContent='';note.textContent='AI의 일반 안내입니다. 현재 가격·영업·예약 정보는 별도 확인이 필요합니다.';window.AIMapAnswer?.advice(list,intent.answer,intent.answerModel,intent.relatedSearches);return;}
     const product=window.AIResultActions?.renderProduct(list,intent||{});if(product){title.textContent=product.title;status.textContent=product.status;note.textContent=product.note;return;}
     const travel=window.AITravelSearch?.render(list,intent||{});if(travel){title.textContent=travel.title;status.textContent=travel.status;note.textContent=travel.note;return;}
     if(intent?.transport||intent?.guideTopic||intent?.travelDestination||intent?.travelHelp){
@@ -363,7 +383,8 @@
     const scope=[CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,({'florist':'꽃집','motorbike_rental':'오토바이 대여'}[intent.service])||intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
     if(intent.nearby&&!state.nearby){status.textContent='먼저 지도 아래 ‘주변 찾기’에서 현재 위치나 숙소를 지정한 뒤 다시 질문해 주세요.';return;}
     if(intent.unsupported?.length){status.textContent='확인이 필요한 조건: '+intent.unsupported.join(', ');window.AITravelSearch?.fallback(list,intent.requestText||input.value);return;}
-    if(state.sharedDbLoading){status.textContent='등록 업소를 불러오는 중이에요. 잠시 후 질문창을 다시 눌러 주세요.';return;}
+    if(state.sharedDbLoading)note.textContent+=' 회원 업소는 아직 불러오는 중이며, 준비된 자료와 Google 검색을 먼저 표시합니다.';
+    appendSearchContext(intent);
     window.AIResultActions?.deliveryIntro(list,intent);
     if(intent.action==='grabfood')note.textContent='음식 조건에 맞는 업소를 찾습니다. GrabFood 등록·배달 가능 여부는 별도이며, 확인된 주문 링크가 없으면 업소명을 복사해 찾을 수 있습니다.';
     const results=buildResults(intent,db(),state.nearby);
@@ -383,6 +404,8 @@
       status.textContent=scope+(intent.recommended?' · 회원 강추':'')+(intent.benefit?' · 혜택·제휴':'')+' — 룸 안내가 있는 곳을 먼저, 룸 정보가 없는 곳은 아래 문의 후보로 구분했어요.';
       note.textContent='지역·음식 종류는 그대로 적용합니다. ‘룸 여부 문의 필요’는 룸 보유가 확인된 추천이 아닙니다. 룸 안내가 있어도 오늘 예약 가능한지는 업소에 확인해 주세요.';
     }
+    if(intent.exploratory){status.textContent='질문의 핵심어로 장소를 검색했어요. 아래 후보는 세부 조건 확인이 필요합니다.';note.textContent='검색어: '+intent.terms.join(' · ')+' — 관련 장소 후보이며, 요청한 모든 조건을 확인한 추천은 아닙니다.';}
+    if(intent.inquiryConditions?.length)note.textContent+=' 확인할 조건: '+intent.inquiryConditions.join(' · ')+'.';
     if(intent.visitToday){status.textContent+=' 오늘 영업시간을 확인합니다.';note.textContent+=' 베트남 현지 날짜 기준이며, 당일 변경은 업소에 확인해 주세요.';}
     if(intent.district&&intent.city==='hcmc'&&districtData.length)note.textContent+=' '+intent.district+'군은 기존 행정구역 기준입니다.';
     if(last)last.memberCount=rows.length;
@@ -448,12 +471,23 @@
       if(token!==revision)return;
       if(!response.ok){if(payload.failures)console.warn('Map AI providers: '+JSON.stringify(payload.failures));throw Error(payload.error||'AI 검색을 잠시 사용할 수 없어요. 기존 검색창을 이용해 주세요.');}
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
+      const context=window.AIQueryIntent?.contextualIntent(query,state.city);
+      if(context&&(payload.intent.mode==='advice'||!payload.intent.relevant))payload.intent=context;
       await prepareDistricts(payload.intent,signal);
       if(payload.intent.mode!=='advice'&&!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch&&!payload.intent.travelDestination&&!payload.intent.travelHelp)await waitForPlaces(signal);
       if(token!==revision)return;
       if(payload.model&&payload.intent.mode==='advice')payload.intent.answerModel=payload.model;
       last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
-    }catch(error){if(token!==revision)return;window.AITravelSearch?.fallback(list,query);title.textContent='다시 질문해 주세요';status.textContent=error.name==='AbortError'?'응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.':error.message;}
+    }catch(error){
+      if(token!==revision)return;
+      const recovered=window.AIQueryIntent?.recoveryIntent(query,state.city)||window.AIQueryIntent?.exploratoryIntent(query,state.city);
+      if(recovered){
+        clearTimeout(timeout);controller=new AbortController();
+        try{await prepareDistricts(recovered,controller.signal);}catch{}
+        if(token!==revision)return;
+        last={query,intent:recovered,hours:new Map(),checkedAt:Date.now()};render(recovered);fitPanel();
+      }else{window.AITravelSearch?.fallback(list,query);title.textContent='장소 검색 연결';status.textContent=error.message;}
+    }
     finally{clearTimeout(timeout);if(token===revision){controller=null;syncInput();form.removeAttribute('aria-busy');}}
   });
   syncInput();
