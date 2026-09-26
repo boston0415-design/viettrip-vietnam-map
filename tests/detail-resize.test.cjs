@@ -45,6 +45,15 @@ for(const mobile of [true,false]){
  // An upward body swipe scrolls natively and never changes the sheet height.
  const small=height();event(body,'down',500);assert.equal(event(body,'move',400).defaultPrevented,true);advance(16);assert(height()>small,'compact body drag expands before scrolling');event(body,'cancel',400);
  p.querySelector('#detailBody').scrollTop=0;
+ // Reading an expanded panel must not resize it at an intermediate height.
+ Object.defineProperty(p,'scrollHeight',{get:()=>1600});
+ Object.defineProperty(p,'clientHeight',{get:()=>p.getBoundingClientRect().height});
+ p.classList.add('detailExpanded');p.scrollTop=100;
+ const readingHeight=height();event(body,'down',300);event(body,'move',460);event(body,'cancel',460);
+ assert.equal(height(),readingHeight);assert.equal(p.scrollTop,0,'read back to the top without folding');
+ event(body,'down',500);event(body,'move',400);event(body,'cancel',400);
+ assert.equal(height(),readingHeight);assert.equal(p.scrollTop,100,'read down without expanding again');
+ p.classList.remove('detailExpanded');p.scrollTop=0;
  // Reset/close cancels all frames, including in-flight inertia.
  event(handle,'down',500);event(handle,'move',250);event(handle,'up',250);w.DetailSheetResize.reset();advance(500);
  assert.equal(p.style.getPropertyValue('--sheet-height'),'');assert.equal(w.DetailSheetResize.isInteracting(),false);

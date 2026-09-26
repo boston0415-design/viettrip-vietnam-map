@@ -119,7 +119,7 @@
     closeDetailPanel();clearSearchMarker();resetScope();state.selected=null;
     const entry={place:resultPlace(null,row),loading:true,raw:null,error:false,version:0,rendered:-1};external=entry;
     detailPlaceId='google:'+row.placeId;detailExpanded=true;
-    renderAll();renderHierarchyNav();
+    renderAll();byId('detail').scrollTop=0;renderHierarchyNav();
     const svc=services();
     try{
       if(!svc)throw Error('UNAVAILABLE');

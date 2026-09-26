@@ -3,7 +3,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const {JSDOM}=require('jsdom');
 for(const kind of ['touch','pointer'])for(const separateResizeAndScroll of [false,true]){
  const dom=new JSDOM('<section id="panel"><header><button><span>업소 이름</span></button></header><article><p>본문</p><a href="#photo"><img></a><button>예약</button><input><textarea></textarea></article></section>',{runScripts:'outside-only'});
- const w=dom.window,p=w.document.getElementById('panel');let h=100,ends=0;
+ const w=dom.window,p=w.document.getElementById('panel');let h=100,ends=0,reading=false;
  let now=1000,id=0,reduced=false;const frames=new Map();w.performance.now=()=>now;w.matchMedia=()=>({matches:reduced});
  w.requestAnimationFrame=fn=>{frames.set(++id,fn);return id};w.cancelAnimationFrame=id=>frames.delete(id);
  const advance=ms=>{now+=ms;const tasks=[...frames.values()];frames.clear();tasks.forEach(fn=>fn(now))};
@@ -11,7 +11,7 @@ for(const kind of ['touch','pointer'])for(const separateResizeAndScroll of [fals
  p.setPointerCapture=()=>{};p.hasPointerCapture=()=>false;
  Object.defineProperty(p,'scrollHeight',{get:()=>1200});Object.defineProperty(p,'clientHeight',{get:()=>h});
  vm.runInContext(fs.readFileSync('assets/js/body-sheet-drag.js','utf8'),dom.getInternalVMContext());
- w.BodySheetDrag.bind(p,{anywhere:true,separateResizeAndScroll,headerSelector:'header',bounds:()=>({min:60,max:500}),size:value=>h=value,end:()=>ends++});
+ w.BodySheetDrag.bind(p,{anywhere:true,separateResizeAndScroll,preferContentScroll:()=>reading,headerSelector:'header',bounds:()=>({min:60,max:500}),size:value=>h=value,end:()=>ends++});
  function event(target,type,y=500,x=100,extra={}){
   const e=new w.Event(kind==='touch'?({down:'touchstart',move:'touchmove',up:'touchend',cancel:'touchcancel'})[type]:'pointer'+type,{bubbles:true,cancelable:true});
   const t={identifier:1,clientX:x,clientY:y};Object.assign(e,kind==='touch'?{touches:['up','cancel'].includes(type)?[]:[t],changedTouches:[t]}:{pointerId:1,clientX:x,clientY:y,button:0,isPrimary:true,pointerType:'mouse'},extra);target.dispatchEvent(e);return e;
@@ -32,6 +32,16 @@ for(const kind of ['touch','pointer'])for(const separateResizeAndScroll of [fals
    event(body,'down',500);event(body,'move',450);assert.equal(p.scrollTop,130,'a new body gesture scrolls at full height');
    event(body,'move',700);assert.equal(p.scrollTop,0);assert.equal(h,500,'reading back to the top does not also collapse the window');event(body,'cancel',700);
    event(body,'down',500);event(body,'move',550);event(body,'up',550);assert.equal(h,450,'a new downward gesture at the top can fold the window');
+   // Expanded detail is readable before it reaches the sheet's maximum height.
+   reading=true;h=350;p.scrollTop=120;
+   event(body,'down',300);event(body,'move',380);assert.equal(p.scrollTop,40);
+   assert.equal(h,350,'reading upward at intermediate height must not fold the detail');
+   event(body,'move',600);assert.equal(p.scrollTop,0);assert.equal(h,350,'reading past the top stays a content gesture');event(body,'cancel',600);
+   event(body,'down',300);event(body,'move',400);event(body,'up',400);assert.equal(h,350,'expanded detail stays open on a fresh body pull at the top');
+   event(body,'down',500);advance(60);event(body,'move',410);event(body,'up',410);
+   const readingScroll=p.scrollTop;advance(16);assert(p.scrollTop>readingScroll,'reading-mode inertia works below maximum height');assert.equal(h,350);
+   event(title,'down',400);event(title,'move',460);event(title,'cancel',460);assert.equal(h,290,'the title still moves an expanded reading panel');
+   reading=false;
  }
  h=500;p.scrollTop=150;event(title,'down');event(title,'move',600);event(title,'up',600);assert.equal(h,400,'title folds even when full-size body is scrolled');
  for(const selector of ['input','textarea']){h=100;const el=p.querySelector(selector);event(el,'down');assert(!event(el,'move',350).defaultPrevented);event(el,'up');assert.equal(h,100,'typing and native fields stay usable');}

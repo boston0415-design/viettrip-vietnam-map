@@ -33,14 +33,18 @@ for(const width of [390,768,1440]){
  const session=run('predictions[0].r.sessionToken');
  run(`predictions[0].cb([{place_id:'nj184',structured_formatting:{main_text:'NJ184 Vietnam Head Spa',secondary_text:'184 Trần Hưng Đạo'}}],'OK')`);await tick();
  assert.equal(list.children.length,1);assert(list.textContent.includes('184 Trần'));
+ panel.scrollTop=170; // A previous place was read to its address/photos.
  list.firstElementChild.click();assert(panel.classList.contains('show'));assert(panel.textContent.includes('불러오는 중'));
+ assert.equal(panel.scrollTop,0,'a new Google place starts at the title/actions, not the previous place scroll position');
  assert.equal(run('details.length'),1);assert.equal(run('details[0].r.sessionToken'),session);
  assert(!run('details[0].r.fields').includes('ALL'));
  run(`details[0].cb(raw('nj184'),'OK')`);await tick();
  assert(panel.classList.contains('show'));assert(panel.textContent.includes('영업 중'));assert(panel.textContent.includes('Google 후기 2,372'));
  assert(panel.querySelector('a[href="tel:+84708999184"]'));assert.equal(run('photoCalls'),1);
  const photos=panel.querySelector('#externalPhotos img');
+ panel.scrollTop=120;
  for(let i=0;i<4;i++)run('renderAll()');assert(panel.classList.contains('show'),'DB/filter refresh never dismisses Google detail');assert.equal(panel.querySelector('#externalPhotos img'),photos);assert.equal(run('photoCalls'),1);
+ assert.equal(panel.scrollTop,120,'refreshing the same place preserves the reading position');
  assert.equal(run('cameraCalls'),1);
  d.getElementById('detailExpandBtn').click();assert(d.getElementById('detailBody').hidden,'map view collapses on desktop as well as mobile');
  d.getElementById('detailExpandBtn').click();assert(!d.getElementById('detailBody').hidden);
