@@ -32,13 +32,15 @@ async function check(mobile){
     assert.deepEqual(nj184.channels.map(c=>c.kind),['zalo','whatsapp','facebook','phone']);
     assert(nj184.channels.some(c=>c.url==='tel:+84708999184'));
     for(const expected of [
+      {id:'2508c6e3-494f-43b9-811f-fcd4096894c9',kinds:['facebook','phone'],phone:'tel:+84705089598',date:'2026-09-26'},
+      {id:'af1acd65-08fc-4f97-8040-83aa2b90f1d2',kinds:['facebook','phone'],phone:'tel:+84338044646',date:'2026-09-26'},
       {id:'e29a5622-8556-4fee-9814-85089929cbd7',kinds:['facebook','phone'],phone:'tel:+84384308587'},
       {id:'500ccf1c-201f-4837-abd1-f465c4317a21',kinds:['facebook','phone'],phone:'tel:+842432006379'},
       {id:'f5bdf96e-c292-46ae-bbd6-4b5bdebe25d7',kinds:['kakao','facebook','phone'],phone:'tel:+84364682281'}
     ]){
       const entry=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id===expected.id);
-      assert(entry,'new 2026-09-24 inquiry route');
-      assert.equal(entry.verifiedOn,'2026-09-24');
+      assert(entry,'new verified inquiry route');
+      assert.equal(entry.verifiedOn,expected.date||'2026-09-24');
       assert.deepEqual(entry.channels.map(c=>c.kind),expected.kinds);
       assert(entry.channels.some(c=>c.url===expected.phone));
     }
