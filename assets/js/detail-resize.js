@@ -71,7 +71,8 @@
   function sync(){
     const p=panel();if(!p?.classList.contains('show'))return;
     window.BodySheetDrag?.bind(p,{
-      anywhere:true,includeHeaders:true,headerSelector:'.detailResizeHandle,.detailHeader',bounds,
+      anywhere:true,separateResizeAndScroll:true,preferContentScroll:()=>p.classList.contains('detailExpanded')&&(height===null||detailExpanded),
+      includeHeaders:true,headerSelector:'.detailResizeHandle,.detailHeader',bounds,
       prepare(){stopAnimation();flush();tracking=true},
       start(){bottom=null;dragBounds=bounds();dragging=true;p.classList.add('detailDragging')},
       size:queue,flush,end:settle,
@@ -82,7 +83,7 @@
       handle=document.createElement('div');handle.className='detailResizeHandle';handle.tabIndex=0;
       handle.setAttribute('role','separator');handle.setAttribute('aria-orientation','horizontal');
       handle.setAttribute('aria-label','상세창 높이 조절');handle.setAttribute('aria-controls','detailBody');
-      handle.title='제목·본문을 끌어 높이 조절 · 손잡이 방향키도 사용 가능';
+      handle.title='제목·손잡이로 높이 조절 · 펼친 본문은 스크롤 · 방향키도 사용 가능';
       handle.innerHTML='<span aria-hidden="true"></span>';p.prepend(handle);
       handle.addEventListener('keydown',event=>{
         const b=bounds(),current=height??p.getBoundingClientRect().height;

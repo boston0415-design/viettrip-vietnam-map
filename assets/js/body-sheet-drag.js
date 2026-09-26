@@ -32,7 +32,7 @@
         else options.end?.({canceled:true,kind:g.kind,velocity:0});
       }
       if(g.prepared)options.afterEnd?.();
-      if(!canceled&&g.active&&g.mode!=='resize'&&g.height>=g.bounds.max-1&&performance.now()-g.lastTime<120)coast(g.scroller,g.scrollVelocity||0);
+      if(!canceled&&g.active&&(g.mode==='scroll'||(g.mode!=='resize'&&g.height>=g.bounds.max-1))&&performance.now()-g.lastTime<120)coast(g.scroller,g.scrollVelocity||0);
     }
     function begin(event,point,kind){
       // A fresh deliberate contact must never be blocked by the preceding drag.
@@ -52,7 +52,10 @@
         if(Math.abs(dx)>Math.abs(total)||!event.cancelable){g.axis='x';return;}
         g.active=true;g.axis='y';
         if(options.separateResizeAndScroll){
-          g.mode=g.force||g.height<g.bounds.max-1||(total<0&&!(g.scroller?.scrollTop>0))?'resize':'scroll';
+          // An opened detail is a reading surface even below maximum height.
+          // Lock the gesture so reaching the content edge cannot fold the sheet.
+          const reading=options.preferContentScroll?.();
+          g.mode=!g.force&&(reading||(g.height>=g.bounds.max-1&&(total>0||g.scroller?.scrollTop>0)))?'scroll':'resize';
         }
         options.start?.();
         if(g.kind==='pointer')try{panel.setPointerCapture(g.id)}catch{}
