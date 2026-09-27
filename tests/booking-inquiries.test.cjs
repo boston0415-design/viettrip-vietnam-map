@@ -32,6 +32,9 @@ async function check(mobile){
     assert.deepEqual(nj184.channels.map(c=>c.kind),['zalo','whatsapp','facebook','phone']);
     assert(nj184.channels.some(c=>c.url==='tel:+84708999184'));
     for(const expected of [
+      {id:'5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc',kinds:['facebook','phone'],phone:'tel:+84919021994',date:'2026-09-27'},
+      {id:'0a6fd58f-dc5b-4fda-a975-45e5c98c0929',kinds:['zalo','phone'],phone:'tel:+842838201237',date:'2026-09-27'},
+      {id:'16846a28-1150-4a14-9502-484af685e13f',kinds:['facebook','phone'],phone:'tel:+84944565557',date:'2026-09-27'},
       {id:'2508c6e3-494f-43b9-811f-fcd4096894c9',kinds:['facebook','phone'],phone:'tel:+84705089598',date:'2026-09-26'},
       {id:'af1acd65-08fc-4f97-8040-83aa2b90f1d2',kinds:['facebook','phone'],phone:'tel:+84338044646',date:'2026-09-26'},
       {id:'e29a5622-8556-4fee-9814-85089929cbd7',kinds:['facebook','phone'],phone:'tel:+84384308587'},
@@ -44,6 +47,10 @@ async function check(mobile){
       assert.deepEqual(entry.channels.map(c=>c.kind),expected.kinds);
       assert(entry.channels.some(c=>c.url===expected.phone));
     }
+    const blossom=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='0de5fe8b-8033-4b7c-a6c8-085d826f8e51');
+    assert(blossom,'Blossom Dental official appointment inquiry');
+    assert.equal(blossom.verifiedOn,'2026-09-27');
+    assert.deepEqual(blossom.channels.map(c=>c.kind),['facebook']);
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);

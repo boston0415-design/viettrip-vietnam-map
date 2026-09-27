@@ -1,5 +1,39 @@
 # 예약 경로 점검 기록
 
+## 2026-09-27
+
+기준 main: `91a7d0fc2aeecc68419e590e016b3fe77890bb64`. 공개 업체는 164곳이며 2026-09-26 기록 이후 신규 등록 5곳을 먼저 조사했다. 재확인일이 지난 기존 보류 7곳도 이어서 점검했다. 회원·후기 정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.
+
+### 반영한 경로
+
+아래 5곳은 2026-09-27 확인했다. Vinpearl Landmark 81만 공식 숙박 예약 화면으로 직접 연결하며, 나머지는 업체의 확정 답변이 필요한 **예약 문의**다.
+
+| 업체 / ID | 변경 및 지점 대조 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| Vinpearl Landmark 81, Autograph Collection / `91b696af-588e-4a13-af5a-d50fb363172f` | Marriott 공식 호텔 페이지의 주소가 등록 주소 `720A Điện Biên Phủ`와 일치하고 객실·날짜·인원 선택 예약 화면을 제공한다. 공식 직접 예약을 추가했다. | https://www.marriott.com/en-us/hotels/sgnak-vinpearl-landmark-81-autograph-collection/overview/ · 2026-10-27 또는 업체명·주소 변경 시 |
+| Shan Dimsum / `5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc` | 공식 Facebook의 주소가 `57-59 Phù Đổng Thiên Vương`와 일치하고 대표 문의 전화 `+84 919 021 994`를 게시한다. Facebook·전화를 추가했다. | https://www.facebook.com/p/SHAN-DIMSUM-61555667754674/ · 2026-10-27 또는 업체명·주소 변경 시 |
+| Phở Việt Nam / `0a6fd58f-dc5b-4fda-a975-45e5c98c0929` | 공식 사이트가 1군 `14 Phạm Hồng Thái` 지점과 공통 전화·Zalo 목적지를 함께 게시한다. 해당 지점을 지정하도록 안내하고 전화·Zalo 문의를 추가했다. | https://phovietnam.vn/mach-ban-quan-pho-dem-giua-trung-tam-quan-1 · 2026-10-27 또는 업체명·주소 변경 시 |
+| Nha Khoa Blossom / `0de5fe8b-8033-4b7c-a6c8-085d826f8e51` | 2026-09-06 공식 Facebook 게시물이 등록 주소 `119-121 Võ Văn Tần`과 진료 예약 안내를 함께 게시한다. 공식 Facebook 문의를 추가했다. | https://www.facebook.com/NhaKhoaBlossom/photos/1558879026251799/ · 2026-10-27 또는 업체명·주소 변경 시 |
+| Steak Love The Villa / `16846a28-1150-4a14-9502-484af685e13f` | 공식 사이트가 The Villa 지점 주소 `290 Điện Biên Phủ`와 지점 전화 `+84 944 565 557`, 공식 Facebook을 게시한다. Facebook·전화를 추가했다. | https://steaklove.vn/blogs/khuyen-mai/bo-viet-chuan-nhat · 2026-10-27 또는 업체명·주소 변경 시 |
+
+### 이번 조사 — 미반영
+
+검색 결과가 없거나 공식 페이지에 예약 안내가 없다는 이유만으로 폐업·예약 불가라고 판단하지 않았다. BORNGA는 오래된 공식 예약 안내와 최근 제3자 폐업 표기가 충돌하여 현재 운영자 확인 전에는 연결하지 않는다.
+
+| 업체 / ID | 확인하지 못한 부분 | 후보 출처 / 재확인일 |
+| --- | --- | --- |
+| Every Half Coffee Roasters - Vinhomes Central Park / `05a66481-b681-4396-a6e4-a26a52dee87b` | 공식 Facebook은 확인했으나 `208 Nguyễn Hữu Cảnh` 지점의 예약·주문 문의 안내를 확인하지 못함. | https://www.facebook.com/everyhalf/ · 2026-10-04 |
+| XLIII Specialty Coffee / `b028e325-1bbf-41a7-967a-384cfe78b4d9` | 공식 사이트의 연락처는 확인했으나 `178A Pasteur` 지점 주소와 예약 문의 목적지를 함께 대조하지 못함. | https://xliiicoffee.com/lien-he/ · 2026-10-04 |
+| 산수갑산 / `fa132895-394c-4ccc-b375-e3664ee4d49c` | `214 Phạm Thái Bường` 지점의 운영자 공식 예약 목적지를 다시 찾지 못함. | 없음 · 2026-10-04 |
+| Bun Moc Thanh Mai / `b0519cbc-5bbe-41f6-a5c3-9c963a1e089e` | `14 Trương Định` 지점의 운영자 공식 예약·주문 안내를 다시 확인하지 못함. | 없음 · 2026-10-04 |
+| BORNGA LÝ TỰ TRỌNG / `6eedea50-86b9-4597-8947-a116200ad934` | 과거 공식 Facebook은 Book Now와 전화번호를 게시하지만 최근 제3자 목록은 지점을 폐업으로 표시한다. 최신 운영자 공지로 현재 영업·예약 경로를 확정하지 못해 연결하지 않음. | https://www.facebook.com/borngaltt/ · 2026-10-04 |
+| 로이스치과 호치민 / `bad22e55-f097-4202-beb2-f2aa82893110` | 공식 도메인 접근 오류와 서로 다른 연락처 표기가 계속되어 현재 진료 예약 목적지를 확정하지 못함. | https://roycedental-vn.com/ · 2026-10-04 |
+| 닥터펫 동물병원 / `b25dd726-99e3-4b06-925d-a79c57c09ca8` | `23 Nguyễn Văn Linh` 지점의 최신 운영자 공식 예약 목적지를 확인하지 못함. Facebook 접근 제한을 우회하지 않음. | https://www.facebook.com/BenhvienDr.Pet/ · 2026-10-04 |
+
+### 검사 범위
+
+예약 직접 연결 8곳, 문의 34곳, 교통 예약 7곳. 신규·재확인 5곳의 ID·이름·분류·주소 일치, 공식 URL 제한, PC·모바일 문의 UI, 외부 링크 속성, 전화번호 복사, 뒤로가기·닫기·Escape를 관련 JSDOM 테스트로 검사한다. 실제 앱 실행·Facebook/Zalo 로그인·통화·메시지·예약·결제는 수행하지 않는다.
+
 ## 2026-09-26
 
 기준 main: `e83081c3e864081d5dcc2fb0e69db02b60cac1d3`. 공개 업체는 159곳이며 2026-09-25 기록 이후 신규 등록 2곳을 우선 조사했다. 직전 기록의 미조사 대기 9곳도 모두 이어서 확인했다. 회원·후기 정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다. 기존 미조사 대기는 0곳이며, 새 등록·변경 업체와 재확인일이 된 보류 업체를 다음 순환에서 다시 대조한다.

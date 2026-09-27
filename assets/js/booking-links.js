@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "91b696af-588e-4a13-af5a-d50fb363172f",
+    "name": "Vinpearl Landmark 81, Autograph Collection",
+    "category": "stay",
+    "address": "720A Điện Biên Phủ, Vinhomes Tân Cảng, Thạnh Mỹ Tây, Hồ Chí Minh 700000 베트남",
+    "url": "https://www.marriott.com/en-us/hotels/sgnak-vinpearl-landmark-81-autograph-collection/overview/",
+    "sourceUrl": "https://www.marriott.com/en-us/hotels/sgnak-vinpearl-landmark-81-autograph-collection/overview/",
+    "note": "720A Điện Biên Phủ의 Vinpearl Landmark 81 공식 Marriott 예약 화면입니다. 날짜·인원·객실과 취소 조건을 확인하세요.",
+    "verifiedOn": "2026-09-27"
+  },
+  {
     "id": "d2a04f77-2218-4101-b9be-3fdf172a8958",
     "name": "렉스 호텔",
     "category": "stay",
@@ -75,6 +85,85 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 ]);
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
+  {
+    "id": "0de5fe8b-8033-4b7c-a6c8-085d826f8e51",
+    "name": "Nha Khoa Blossom",
+    "category": "hospital",
+    "address": "119 Võ Văn Tần, Xuân Hòa, Hồ Chí Minh 72117 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/NhaKhoaBlossom/photos/1558879026251799/",
+    "note": "119 Võ Văn Tần의 Blossom Dental Clinic 공식 진료 예약 문의입니다. 희망 진료와 날짜·시간을 알리고 병원의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/NhaKhoaBlossom/"
+      }
+    ],
+    "verifiedOn": "2026-09-27"
+  },
+  {
+    "id": "16846a28-1150-4a14-9502-484af685e13f",
+    "name": "Steak Love The Villa",
+    "category": "restaurant",
+    "address": "290 Điện Biên Phủ, Xuân Hòa, Hồ Chí Minh 70000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://steaklove.vn/blogs/khuyen-mai/bo-viet-chuan-nhat",
+    "note": "290 Điện Biên Phủ의 Steak Love The Villa 공식 문의입니다. 방문 날짜·시간·인원을 알리고 The Villa 지점의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/SteakLove.vn/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84944565557",
+        "display": "+84 944 565 557"
+      }
+    ],
+    "verifiedOn": "2026-09-27"
+  },
+  {
+    "id": "5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc",
+    "name": "Shan Dimsum",
+    "category": "restaurant",
+    "address": "57 - 59 Đ. Phù Đổng Thiên Vương, Chợ Lớn, Hồ Chí Minh 70000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/p/SHAN-DIMSUM-61555667754674/",
+    "note": "57-59 Phù Đổng Thiên Vương의 Shan Dimsum 공식 문의 경로입니다. 방문 날짜·시간·인원이나 주문 내용을 알리고 매장의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/p/SHAN-DIMSUM-61555667754674/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84919021994",
+        "display": "+84 919 021 994"
+      }
+    ],
+    "verifiedOn": "2026-09-27"
+  },
+  {
+    "id": "0a6fd58f-dc5b-4fda-a975-45e5c98c0929",
+    "name": "Phở Việt Nam",
+    "category": "restaurant",
+    "address": "14 Phạm Hồng Thái, Bến Thành, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://phovietnam.vn/mach-ban-quan-pho-dem-giua-trung-tam-quan-1",
+    "note": "14 Phạm Hồng Thái의 Phở Việt Nam 1군 지점 문의입니다. 방문 날짜·시간·인원을 알리고 해당 지점의 예약 가능 여부와 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "zalo",
+        "url": "https://zalo.me/0943635050"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842838201237",
+        "display": "+84 28 3820 1237"
+      }
+    ],
+    "verifiedOn": "2026-09-27"
+  },
   {
     "id": "2508c6e3-494f-43b9-811f-fcd4096894c9",
     "name": "Another Bake Shop",
