@@ -32,6 +32,7 @@ async function check(mobile){
     assert.deepEqual(nj184.channels.map(c=>c.kind),['zalo','whatsapp','facebook','phone']);
     assert(nj184.channels.some(c=>c.url==='tel:+84708999184'));
     for(const expected of [
+      {id:'3d1f25fa-91cd-442e-80ac-7f14311d6e7b',kinds:['facebook','phone'],phone:'tel:+84389856780',date:'2026-09-28'},
       {id:'5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc',kinds:['facebook','phone'],phone:'tel:+84919021994',date:'2026-09-27'},
       {id:'0a6fd58f-dc5b-4fda-a975-45e5c98c0929',kinds:['zalo','phone'],phone:'tel:+842838201237',date:'2026-09-27'},
       {id:'16846a28-1150-4a14-9502-484af685e13f',kinds:['facebook','phone'],phone:'tel:+84944565557',date:'2026-09-27'},

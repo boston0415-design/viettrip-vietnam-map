@@ -86,6 +86,27 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "3d1f25fa-91cd-442e-80ac-7f14311d6e7b",
+    "name": "Tam Quan - Phu Quoc Noodle Soup - District 7",
+    "category": "restaurant",
+    "address": "355 Lê Văn Lương, Quận 7, Hồ Chí Minh 100000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.bunquayphuquoc.com.vn/",
+    "note": "공식 사이트에 안내된 355 Lê Văn Lương 지점의 문의 경로입니다. 방문·주문 내용과 예약 가능 여부를 묻고 매장의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/bunquaytphcm/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84389856780",
+        "display": "+84 38 985 6780"
+      }
+    ],
+    "verifiedOn": "2026-09-28"
+  },
+  {
     "id": "0de5fe8b-8033-4b7c-a6c8-085d826f8e51",
     "name": "Nha Khoa Blossom",
     "category": "hospital",
