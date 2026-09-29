@@ -30,7 +30,7 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "url": "https://www.tablecheck.com/en/the-deck-saigon/reserve/landing",
     "sourceUrl": "https://www.thedecksaigon.com/",
     "note": "The Deck Saigon · 38 Nguyễn Ư Dĩ",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-09-29"
   },
   {
     "id": "c6b8a22b-f577-42ca-8381-37218a4677c5",
@@ -40,17 +40,7 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "url": "https://quan-bui.com/",
     "sourceUrl": "https://quan-bui.com/original/",
     "note": "예약 양식에서 Original · 19 Ngô Văn Năm을 선택하세요.",
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "4eccf861-1154-461b-b257-20a48f8850c6",
-    "name": "콴 부이 가든",
-    "category": "restaurant",
-    "address": "55A Ngô Quang Huy, An Khánh, Hồ Chí Minh 70000 베트남",
-    "url": "https://quan-bui.com/",
-    "sourceUrl": "https://quan-bui.com/garden/",
-    "note": "예약 양식에서 Garden (1) · Ngô Quang Huy를 선택하세요.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-09-29"
   },
   {
     "id": "6eb2c0b0-8052-4d23-8753-ef143725ae6a",
@@ -60,7 +50,7 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "url": "https://www.tablecheck.com/vi/hum-signature/reserve/message?utm_source=website",
     "sourceUrl": "https://hum-dining.vn/en/homepage/",
     "note": "Hum Signature의 코스·연령 등 예약 조건을 확인하세요.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-09-29"
   },
   {
     "id": "590758f4-d650-4195-a583-15930d8b8632",
