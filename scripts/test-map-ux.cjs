@@ -99,6 +99,7 @@ const server=http.createServer((req,res)=>{
   assert(await page.locator('#roadReportDialog').isVisible());
   assert.equal(await page.locator('#roadReportName').inputValue(),'현장 제보 테스트 교차로','picker preserves unsent draft');
   await page.locator('#roadReportForm [type="submit"]').click();
+  await page.locator('#roadDraftResult').waitFor({state:'visible'});
   assert.match(await page.locator('#roadDraftStatus').innerText(),/아직 전송되지/);
   assert.match(await page.locator('#roadDraftText').inputValue(),/10.775000,106.705000/);
   await page.locator('#roadDraftResult .roadLink').scrollIntoViewIfNeeded();

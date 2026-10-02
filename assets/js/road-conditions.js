@@ -155,7 +155,7 @@
     const name=el('roadReportName').value.trim(),body=el('roadReportBody').value.trim();
     if(!name||body.length<10){fail('도로 이름과 10자 이상의 현장 상황을 입력해주세요.');return;}
     const text=`[베트남맵 ${LABEL[kind]} 제보]\n지역: ${CITY_DATA[el('roadReportCity').value]?.label||''}\n도로·교차로: ${name}\n확인 시각: ${date(observed)} (베트남 시간)\n위치: https://www.google.com/maps/search/?api=1&query=${reportPoint.lat.toFixed(6)},${reportPoint.lng.toFixed(6)}\n현장 상황: ${body}${source?'\n관련 출처: '+source:''}\n\n현장 사진이 있으면 첨부해주세요. 운영자 확인 전 제보입니다.`;
-    el('roadDraftText').value=text;el('roadDraftResult').hidden=false;
+    el('roadDraftText').value=text;el('roadDraftResult').hidden=false;status.textContent='제보 내용을 준비했습니다. 복사 후 카페에 게시해주세요. 아직 전송되지 않았습니다.';
     try{await navigator.clipboard.writeText(text);status.textContent='복사했습니다. 카페 글에 붙여넣어 게시해주세요. 아직 전송되지 않았습니다.';}
     catch{status.textContent='아래 내용을 길게 누르거나 선택해 복사한 뒤 카페에 게시해주세요. 아직 전송되지 않았습니다.';el('roadDraftText').focus();el('roadDraftText').select();}
   };
