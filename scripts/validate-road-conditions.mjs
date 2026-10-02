@@ -1,0 +1,11 @@
+import {readFileSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import vm from 'node:vm';
+const require=createRequire(import.meta.url);
+const D=require('../assets/js/road-condition-data.js');
+const feed=D.parse(JSON.parse(readFileSync(new URL('../assets/data/road-conditions.json',import.meta.url),'utf8')));
+const ctx=vm.createContext({});
+vm.runInContext(readFileSync(new URL('../assets/js/01-data-storage.js',import.meta.url),'utf8')+';globalThis.roadCities=Object.keys(CITY_DATA);',ctx);
+for(const row of feed.incidents)if(!ctx.roadCities.includes(row.city))throw Error('Unknown road-alert city: '+row.city);
+if(Date.parse(feed.updatedAt)>Date.now()+300000)throw Error('Road feed cannot be dated in the future');
+console.log(`Road feed validated: ${feed.incidents.length} reviewed records, ${D.active(feed).length} currently active`);

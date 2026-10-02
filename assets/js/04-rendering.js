@@ -543,7 +543,7 @@ function renderDetail(){
   if($('#adminDeleteBtn')) $('#adminDeleteBtn').onclick=()=>adminDeletePlace(p.id);
   if($('#clearDeleteRequestBtn')) $('#clearDeleteRequestBtn').onclick=()=>adminClearDeleteRequest(p.id);
 }
-function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync();window.MapUX?.syncNearby();window.BrowseExperience?.sync();window.MapWeather?.sync()}
+function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync();window.MapUX?.syncNearby();window.BrowseExperience?.sync();window.MapWeather?.sync();window.RoadConditions?.sync()}
 async function selectPlace(id,pan=true,showInfo=false){
   window.MapUX?.onSelection(id);
   window.PlaceSearch?.clearExternal();

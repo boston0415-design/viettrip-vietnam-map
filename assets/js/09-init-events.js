@@ -268,6 +268,7 @@ function initMap(){
   });
   initAddressAutocomplete();
   state.map.addListener('click',e=>{
+    if(window.RoadConditions?.handleMapClick(e))return;
     if(window.NearbyBusinesses?.handleMapClick(e))return;
     setMobileLegendExpanded(false);
     closeSystemInfo();
