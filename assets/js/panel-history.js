@@ -12,6 +12,7 @@
     const legend=byId('areaLegend'),list=byId('businessSide'),detail=byId('detail');
 
     add('nearby-pick',byId('nearbyPickControls'),()=>Boolean(window.NearbyBusinesses?.isPicking()),()=>window.NearbyBusinesses.cancelPick());
+    add('road-pick',byId('roadPickControls'),()=>Boolean(window.RoadConditions?.isPicking()),()=>window.RoadConditions.cancelPick());
     add('filters',legend,()=>byId('areaLegendTitle')?.getAttribute('aria-expanded')==='true',
       ()=>setMobileLegendExpanded(false,{restoreFocus:true}));
     add('areas',byId('areaPanel'),()=>byId('areaPanel').classList.contains('show'),()=>{
