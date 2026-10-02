@@ -32,6 +32,8 @@ async function check(mobile){
     assert.deepEqual(nj184.channels.map(c=>c.kind),['zalo','whatsapp','facebook','phone']);
     assert(nj184.channels.some(c=>c.url==='tel:+84708999184'));
     for(const expected of [
+      {id:'1a0a4dee-cb01-496e-8b88-cfb2d3589972',kinds:['facebook','phone'],phone:'tel:+84963013989',date:'2026-10-02'},
+      {id:'949be81f-6a88-4b1c-a187-426c4a1e2c95',kinds:['facebook','phone','phone'],phone:'tel:+84865488548',date:'2026-10-02'},
       {id:'3d1f25fa-91cd-442e-80ac-7f14311d6e7b',kinds:['facebook','phone'],phone:'tel:+84389856780',date:'2026-09-28'},
       {id:'5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc',kinds:['facebook','phone'],phone:'tel:+84919021994',date:'2026-09-27'},
       {id:'0a6fd58f-dc5b-4fda-a975-45e5c98c0929',kinds:['zalo','phone'],phone:'tel:+842838201237',date:'2026-09-27'},
@@ -52,6 +54,10 @@ async function check(mobile){
     assert(blossom,'Blossom Dental official appointment inquiry');
     assert.equal(blossom.verifiedOn,'2026-09-27');
     assert.deepEqual(blossom.channels.map(c=>c.kind),['facebook']);
+    const foremost=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='7576a9e9-d3c0-48c8-849b-9306dda2079c');
+    assert(foremost,'FOREMOST official cake order inquiry');
+    assert.equal(foremost.verifiedOn,'2026-10-02');
+    assert.deepEqual(foremost.channels.map(c=>c.kind),['facebook']);
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);

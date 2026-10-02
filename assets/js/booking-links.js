@@ -76,6 +76,69 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "1a0a4dee-cb01-496e-8b88-cfb2d3589972",
+    "name": "갈비로만 Galbi roman",
+    "category": "restaurant",
+    "address": "20 P. Trần Văn Lai, Từ Liêm, Hà Nội 10000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/galbiroman20tt4tvl/posts/251854524614046/",
+    "note": "Lô 20 TT4 Trần Văn Lai의 Galbi Roman Mỹ Đình 공식 예약 문의입니다. 공식 안내상 4인 이상 사전 예약을 받습니다. 날짜·시간·인원을 알리고 매장의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/galbiroman20tt4tvl/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84963013989",
+        "display": "+84 96 301 3989"
+      }
+    ],
+    "verifiedOn": "2026-10-02"
+  },
+  {
+    "id": "7576a9e9-d3c0-48c8-849b-9306dda2079c",
+    "name": "FOREMOST Bakery",
+    "category": "cafe",
+    "address": "베트남 12000 Hà Nội, Từ Liêm, Tổ 3 Sông Đà CT6 Khu Đô Thị Mỹ Đình - Sông Đà Trần Văn Lai",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/foremostbakery/posts/122167560878945250/",
+    "note": "CT6 Mỹ Đình Sông Đà의 FOREMOST Bakery 공식 케이크 주문 문의입니다. 공통 브랜드 Facebook에 CT6 지점 주문이라고 밝히고 케이크·수량·수령 날짜를 알린 뒤 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/foremostbakery/"
+      }
+    ],
+    "verifiedOn": "2026-10-02"
+  },
+  {
+    "id": "949be81f-6a88-4b1c-a187-426c4a1e2c95",
+    "name": "삼원정",
+    "category": "restaurant",
+    "address": "Lô 08-TT4-KĐT Mỹ Đình – Mễ Trì, Đường Trần Văn Lai, Phường Mỹ Đình 1, Quận Nam Từ Liêm, Hà Nội, Từ Liêm, Hà Nội 10000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://samwonjung.vn/contact",
+    "note": "Lô 08-TT4 Mỹ Đình 지점의 공식 예약 문의입니다. 한국어·베트남어/영어 전용 전화가 구분되어 있습니다. 날짜·시간·인원을 알리고 매장의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/Samwonjung.vn/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84865488548",
+        "display": "+84 86 548 8548 (한국어)"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84865466946",
+        "display": "+84 86 546 6946 (VN/EN)"
+      }
+    ],
+    "verifiedOn": "2026-10-02"
+  },
+  {
     "id": "3d1f25fa-91cd-442e-80ac-7f14311d6e7b",
     "name": "Tam Quan - Phu Quoc Noodle Soup - District 7",
     "category": "restaurant",
