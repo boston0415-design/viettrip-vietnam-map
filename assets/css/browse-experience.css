@@ -73,12 +73,15 @@
 .reviewRecovery button{min-height:38px;padding:5px 10px;border:1px solid #bbd3c4;border-radius:8px;color:#276647;background:#fff;margin-top:5px}
 .weatherLayer{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;contain:strict}
 .weatherLayer i{position:absolute;top:-24px;left:var(--x);animation:weather-fall var(--duration) linear infinite;animation-delay:var(--delay);opacity:.35;pointer-events:none;will-change:transform}
-.weatherLayer[data-kind="rain"] i{width:1px;height:18px;background:#547f94;border-radius:2px}
+.weatherLayer[data-kind="rain"] i{top:-44px;width:2px;height:32px;opacity:.76;background:linear-gradient(to bottom,#315e7a00,#315e7a 40%,#214e6b);border-radius:2px;box-shadow:1px 0 0 #ffffffa6;animation-name:weather-rain}
+.weatherLayer[data-kind="rain"] i:nth-child(3n){width:2.5px;height:40px;opacity:.88}
+.weatherLayer[data-kind="rain"] i:nth-child(3n + 1){height:24px;opacity:.6}
 .weatherLayer[data-kind="snow"] i{width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 2px #607780}
 .weatherLayer[data-kind="cloud"] i{top:var(--y);width:140px;height:40px;border-radius:50%;background:#cad5d7;opacity:.14;animation-name:weather-cloud}
 .weatherLayer[data-kind="cloud"] i::before,.weatherLayer[data-kind="cloud"] i::after{content:"";position:absolute;bottom:12px;left:24px;width:64px;height:52px;border-radius:50%;background:inherit}
 .weatherLayer[data-kind="cloud"] i::after{left:72px;width:42px;height:40px}
 @keyframes weather-fall{to{transform:translate3d(var(--drift),var(--fall),0)}}
+@keyframes weather-rain{from{transform:translate3d(0,0,0) rotate(5deg)}to{transform:translate3d(var(--drift),var(--fall),0) rotate(5deg)}}
 @keyframes weather-cloud{from{transform:translate3d(-60px,0,0)}to{transform:translate3d(150px,0,0)}}
 .mapWeather{flex:none;align-self:center;min-height:28px;min-width:36px;padding:3px 5px;border:0;border-radius:6px;background:#eef4f1;color:#385a4a;font:600 13px/1.4 system-ui,sans-serif;cursor:pointer}
 .brandLinks .mapWeather{min-height:24px;min-width:32px;padding:2px 4px;margin-left:6px;font-size:11px}
