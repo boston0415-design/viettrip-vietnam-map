@@ -76,6 +76,23 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "94f96d79-adf6-492f-9929-c41c6c67d9fb",
+    "name": "Doya Jjambbong 도야짬뽕",
+    "category": "restaurant",
+    "address": "14 Đ. Nội Khu Sky Garden, 3, Tân Hưng, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://doya.vn/lien-he/",
+    "note": "14 Nội Khu Sky Garden 3의 Doya Jjambbong 7군점 공식 문의 전화입니다. 방문 날짜·시간·인원을 알리고 예약 가능 여부와 매장의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+84797778877",
+        "display": "+84 79 777 8877"
+      }
+    ],
+    "verifiedOn": "2026-10-03"
+  },
+  {
     "id": "1a0a4dee-cb01-496e-8b88-cfb2d3589972",
     "name": "갈비로만 Galbi roman",
     "category": "restaurant",
