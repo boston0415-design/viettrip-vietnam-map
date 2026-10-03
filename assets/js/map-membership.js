@@ -20,9 +20,11 @@
     return `<span class="mapRank${b?' rank'+b.level:' rankPending'}" data-member-hash="${hash}" title="${b?`맵 기여 ${b.total}건 · 기여량 기준 등급`:'맵 등급 확인 중'}">${b?insignia(b.level)+grade(b.level)[0]:'등급 확인 중'}</span>`;
   }
   async function rpc(action,payload={}){
+    if(action!=='badges'&&window.MemberAccount)await window.MemberAccount.ready;
+    const headers=action==='badges'||!window.MemberAccount?SUPABASE_HEADERS:await window.MemberAccount.requestHeaders();
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
     try{
-      const response=await fetch(`${SUPABASE_URL}/rest/v1/rpc/map_membership`,{method:'POST',headers:SUPABASE_HEADERS,
+      const response=await fetch(`${SUPABASE_URL}/rest/v1/rpc/map_membership`,{method:'POST',headers,
         body:JSON.stringify({p_action:action,p_device_id:action==='badges'?null:getDeviceId(),p_payload:payload}),signal:controller.signal});
       const data=await response.json();
       if(!response.ok)throw new Error(data.message||'활동 정보를 불러오지 못했습니다.');
@@ -133,14 +135,17 @@
     }
     const linked=(profile?.devices||[]).length>1;
     if(el('memberDeviceStatus'))el('memberDeviceStatus').textContent=linked?'기기 연결됨 · 같은 회원 기록으로 등급을 확인합니다.':'PC·모바일 등급이 다르면 두 기기를 한 번 연결해 주세요.';
+    window.MemberAccount?.paint();
   }
-  async function open(){
+  async function open(options={}){
     if(state.isAdmin)return openOperator();
+    if(window.MemberAccount){await window.MemberAccount.ready;if(!window.MemberAccount.signedIn()&&options.guest!==true)return window.MemberAccount.open();}
     const dialog=el('memberDialog');if(!dialog.open)dialog.showModal();
     el('memberAdminTools').hidden=!state.isAdmin;
     message('활동 정보를 확인하고 있어요.');
     if(await refresh())message('지도 이용에는 등급 제한이 없습니다. 카페 등급과는 별도로 적용됩니다.');
     loadBadges(true);
+    window.MemberAccount?.loadReviews();
   }
   async function perform(button,task){
     if(busy)return;busy=true;if(button)button.disabled=true;
@@ -211,7 +216,7 @@
     window.addEventListener('focus',schedule);
     setInterval(()=>{if(!document.hidden&&el('memberDialog')?.open)schedule();},30000);
     el('memberClose').onclick=()=>el('memberDialog').close();
-    el('memberRefresh').onclick=()=>open();
+    el('memberRefresh').onclick=()=>open({guest:true});
     el('memberNicknameForm').onsubmit=event=>{
       event.preventDefault();perform(el('memberNicknameSave'),async()=>{adopt(await rpc('nickname',{nickname:el('memberNickname').value}));message('맵 활동 닉네임을 저장했습니다. 기존 후기의 작성자 이름은 유지됩니다.')});
     };
@@ -262,6 +267,8 @@
     refresh().then(()=>loadBadges());
   }
   window.MapMembership={GRADES,levelFor,badgeHtml,loadBadges,refresh,schedule,open,openOperator,syncRole:paint,
+    acceptAccountProfile:adopt,
+    resetIdentity:()=>{revision++;profile=null;credentials.clear();profileRequest=null;el('memberActivityList')?.replaceChildren();el('memberCorrectionList')?.replaceChildren();paintRole();},
     ownsHash:hash=>credentials.has(hash),credentialFor:hash=>credentials.get(hash)||null,
     memberFor:hash=>badges.get(hash)?.member||hash,
     correctionButton:id=>`<button type="button" class="mapCorrectionButton" data-map-correction="${esc(id)}">정보 수정 제안</button>`,

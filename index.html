@@ -33,6 +33,7 @@
 <link rel="stylesheet" href="./assets/css/nearby-businesses.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/place-search.css?v=20260920-search1">
 <link rel="stylesheet" href="./assets/css/map-membership.css?v=20260924-operator1">
+<link rel="stylesheet" href="./assets/css/member-account.css?v=20261003-account1">
 <link rel="stylesheet" href="./assets/css/map-ux.css?v=20260925-search-panels1">
 <link rel="stylesheet" href="./assets/css/panel-comfort.css?v=20260921-sticky-header1">
 <link rel="stylesheet" href="./assets/css/browse-experience.css?v=20261003-admin-entry1">
@@ -102,7 +103,7 @@
         <button type="button" data-benefit-filter="benefit" aria-pressed="false">혜택업소</button>
         <button type="button" data-benefit-filter="recommended" aria-pressed="false">강추업소</button>
       </nav>
-      <div class="operatorOptions" role="group" aria-label="관리자 메뉴"><button id="adminBtn" type="button">관리자 로그인</button><button id="openOperatorTools" type="button" aria-haspopup="dialog" aria-controls="operatorDialog" hidden>관리자 페이지</button></div>
+      <div class="operatorOptions" role="group" aria-label="회원·관리자 메뉴"><button id="memberLoginBtn" type="button" aria-haspopup="dialog">회원 로그인</button><button id="adminBtn" type="button">관리자 로그인</button><button id="openOperatorTools" type="button" aria-haspopup="dialog" aria-controls="operatorDialog" hidden>관리자 페이지</button></div>
       <div class="filters" id="listOptions">
         <div class="browseHeading">업체 둘러보기 <span>이름을 누르면 후기를 볼 수 있어요</span></div>
         <div class="listRegionFilter"><label for="listCity">지역</label><select id="listCity" aria-label="업체 목록 지역 선택"></select></div>
@@ -397,19 +398,22 @@
 
 <dialog id="memberDialog" class="travellerDialog memberDialog" data-no-sheet-resize aria-labelledby="memberTitle">
   <div class="travellerDialogHead"><div><h2 id="memberTitle">내 맵 등급 · 활동</h2><p>회원의 경험으로 함께 만드는 지도</p></div><button id="memberClose" type="button" aria-label="내 활동 닫기">×</button></div>
+  <div id="memberAccountInfo" class="memberAccountInfo" hidden><span id="memberAccountEmail"></span><button id="memberSignOut" type="button">로그아웃</button></div>
   <section class="memberHero" aria-label="나의 등급">
     <span id="memberHeroName">나의 맵 활동</span><strong id="memberHeroRank" class="memberHeroRank">등급 확인 중</strong>
-    <p>인정된 기여 <b id="memberTotal">—</b>건</p><progress id="memberProgress" max="1" value="0" aria-label="승급 진행률"></progress><p id="memberNext">활동 정보를 불러오고 있어요.</p>
+    <p>활동 점수 <b id="memberTotal">—</b>점</p><progress id="memberProgress" max="1" value="0" aria-label="승급 진행률"></progress><p id="memberNext">활동 정보를 불러오고 있어요.</p>
   </section>
   <div class="memberDeviceNotice"><p id="memberDeviceStatus">PC·모바일 등급을 동일하게 사용하려면 기기를 연결해 주세요.</p><button id="memberDeviceLinkButton" type="button">PC·모바일 연결하기 ›</button></div>
   <p id="memberStatus" class="memberStatus" role="status" aria-live="polite"></p>
   <button id="memberRefresh" class="memberRefresh" type="button">활동 새로고침</button>
   <dl class="memberCounts"><div><dt>업소 등록</dt><dd id="memberCount_place">—</dd></div><div><dt>방문 후기</dt><dd id="memberCount_review">—</dd></div><div><dt>정보 수정</dt><dd id="memberCount_correction">—</dd></div></dl>
-  <section id="memberGradeSection" class="memberSection"><h3>등급과 승급 기준</h3><ol id="memberGradeSteps" class="memberGradeSteps"></ol><p class="memberHelp">기여량 기준의 맵 등급이며, 카페 계급·혜택과는 별도입니다. 미접속 때문에 등급이 내려가지는 않습니다.</p></section>
+  <section id="memberReviewsSection" class="memberSection" hidden><h3>내 후기 <small id="memberReviewsCount"></small></h3><p class="memberHelp">별점만 남긴 기록도 포함합니다. 본인이 작성한 후기만 수정·삭제할 수 있어요.</p><p id="memberReviewsStatus" role="status" aria-live="polite"></p><div id="memberReviewUndo" hidden>후기를 삭제했습니다. <button id="memberRestoreReview" type="button">삭제 취소</button></div><ul id="memberOwnReviews" class="memberOwnReviews"></ul><button id="memberReviewsMore" type="button" hidden>후기 더 보기</button></section>
+  <section id="memberGradeSection" class="memberSection"><h3>등급과 승급 기준</h3><ol id="memberGradeSteps" class="memberGradeSteps"></ol><p class="memberHelp">인정된 기여 1건은 1점입니다. 점수는 활동에서 자동 계산되며, 삭제·인정 취소 시 다시 반영됩니다. 카페 계급·혜택과는 별도입니다.</p></section>
   <details class="memberSection"><summary>어떤 활동이 인정되나요?</summary><ul class="memberRules"><li>이름·주소·위치가 있는 새 업소 등록: 업소별 1건</li><li>10자 이상으로 경험을 남긴 방문 후기: 업소별 1건. 별점이 낮아도 동일하게 인정합니다.</li><li>관리자가 확인한 정보 수정 제안: 업소·항목별 1건</li><li>같은 내용의 반복 후기, 중복 업소, 단순 수정·사진 추가는 건수를 늘리지 않습니다.</li><li>별점만 남기기·강추·조회·출석·공유에는 기여가 적립되지 않습니다.</li><li>삭제되거나 허위·도배로 인정이 취소된 기록은 제외됩니다. 등급은 후기의 정확성을 보증하지 않습니다.</li></ul></details>
   <section class="memberSection"><h3>내 기여 내역 <small>최근 50건</small></h3><ul id="memberActivityList" class="memberActivityList"><li>불러오는 중…</li></ul></section>
   <details class="memberSection"><summary>내 정보 수정 제안</summary><ul id="memberCorrectionList" class="memberCorrectionList"></ul></details>
   <details class="memberSection"><summary>닉네임 설정</summary><form id="memberNicknameForm"><label for="memberNickname">맵 활동 닉네임</label><div class="memberInputRow"><input id="memberNickname" type="text" maxlength="30" required autocomplete="nickname"><button id="memberNicknameSave" type="submit">저장</button></div></form></details>
+  <details id="memberClaimSection" class="memberSection" hidden><summary>이 기기의 기존 활동 가져오기</summary><p class="memberHelp">로그인 전에 이 브라우저에서 작성한 업소·후기·활동을 현재 계정에 연결합니다. 다른 기기에서도 같은 이메일로 확인할 수 있어요.</p><form id="memberClaimForm"><label class="memberMerge"><input id="memberClaimConsent" type="checkbox" required>이 기기의 기존 활동이 제 것임을 확인하고 계정에 연결합니다.</label><button type="submit" id="memberClaimSubmit">기존 활동 연결</button></form></details>
   <details id="memberDeviceLink" class="memberSection"><summary>PC·모바일 연결 · 활동 복구</summary>
     <p class="memberHelp">별도 가입 없이 이 브라우저에서 시작합니다. PC·휴대폰의 활동을 합치려면 기존 기기에서 연결 코드를 만들고, 다른 기기에 입력하세요. 닉네임이 같아도 자동으로 합쳐지지 않습니다.</p>
     <div class="memberCodeActions"><button type="button" data-member-code="link">기기 연결 코드 만들기</button><button type="button" data-member-code="recovery">복구 코드 발급</button></div>
@@ -419,6 +423,20 @@
     <p class="memberHelp">코드는 본인만 보관해 주세요. 연결된 기기와 복구 코드가 모두 없으면 닉네임만으로 활동을 복구할 수 없습니다.</p>
   </details>
 </dialog>
+<dialog id="memberAuthDialog" class="travellerDialog memberAuthDialog" data-no-sheet-resize aria-labelledby="memberAuthTitle">
+  <div class="travellerDialogHead"><div><h2 id="memberAuthTitle">회원 로그인</h2><p id="memberAuthIntro">내 활동과 후기를 PC·휴대폰에서 함께 관리하세요.</p></div><button id="memberAuthClose" type="button" aria-label="회원 로그인 닫기">×</button></div>
+  <div class="memberAuthTabs" role="group" aria-label="회원 계정"><button type="button" data-member-auth-mode="login" aria-pressed="true">로그인</button><button type="button" data-member-auth-mode="signup" aria-pressed="false">회원가입</button></div>
+  <form id="memberAuthForm">
+    <label id="memberAuthNicknameField" hidden>닉네임<input id="memberAuthNickname" type="text" autocomplete="nickname" maxlength="30"></label>
+    <label id="memberAuthEmailField">이메일<input id="memberAuthEmailInput" type="email" autocomplete="username" required maxlength="254" inputmode="email"></label>
+    <label id="memberAuthPasswordField">비밀번호<input id="memberAuthPassword" type="password" autocomplete="current-password" required maxlength="128"></label>
+    <label id="memberAuthConfirmField" hidden>비밀번호 확인<input id="memberAuthConfirm" type="password" autocomplete="new-password" maxlength="128"></label>
+    <p id="memberAuthStatus" role="status" aria-live="polite"></p>
+    <button id="memberAuthSubmit" class="btn primary" type="submit">로그인</button>
+  </form>
+  <button id="memberAuthForgot" type="button">비밀번호를 잊으셨나요?</button>
+  <button id="memberAuthGuest" type="button">로그인 없이 이 기기의 활동 보기</button>
+</dialog>
 <dialog id="mapCorrectionDialog" class="travellerDialog memberDialog" aria-labelledby="mapCorrectionTitle">
   <div class="travellerDialogHead"><div><h2 id="mapCorrectionTitle">정보 수정 제안</h2><p id="correctionPlaceName"></p></div><button id="correctionClose" type="button" aria-label="정보 수정 제안 닫기">×</button></div>
   <form id="mapCorrectionForm"><input id="correctionPlaceId" type="hidden"><label for="correctionKind">어떤 정보가 달라졌나요?</label><select id="correctionKind"><option value="address">주소·위치</option><option value="hours">영업시간</option><option value="closed">폐업·휴업</option><option value="other">기타 정보</option></select><label for="correctionBody">확인한 내용</label><textarea id="correctionBody" minlength="10" maxlength="1000" required rows="4" placeholder="바뀐 정보와 확인한 날짜·근거를 적어주세요."></textarea><p class="memberHelp">관리자 확인 후 기여 1건으로 인정됩니다. 접수만으로 업소 정보가 변경되지는 않습니다.</p><button id="correctionSave" type="submit">제안 보내기</button><p id="correctionStatus" role="status" aria-live="polite"></p></form>
@@ -427,7 +445,7 @@
 <script src="./assets/js/01-data-storage.js?v=20260925-florist2"></script>
 <script src="./assets/js/hospital-directory.js?v=20260918-hospital-registration1"></script>
 <script src="./assets/js/pharmacy-directory.js?v=20260918-icons-pharmacy1"></script>
-<script src="./assets/js/02-services-media.js?v=20260923-ux1"></script>
+<script src="./assets/js/02-services-media.js?v=20261003-account1"></script>
 <script src="./assets/js/review-vault.js?v=20260923-ux1"></script>
 <script src="./assets/js/personal-places.js?v=20260920-compact1"></script>
 <script src="./assets/js/name-search.js?v=20260924-ai12"></script>
@@ -440,7 +458,7 @@
 <script src="./assets/js/detail-resize.js?v=20260926-detail-scroll1"></script>
 <script src="./assets/js/menu-resize.js?v=20260924-list-gesture1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
-<script src="./assets/js/06-save-motion.js?v=20260923-ux1"></script>
+<script src="./assets/js/06-save-motion.js?v=20261003-account1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260925-search-panels1"></script>
 <script src="./assets/js/place-search.js?v=20260926-detail-scroll1"></script>
@@ -451,7 +469,9 @@
 <script defer src="./assets/js/online-presence.js?v=20260923-ux1"></script>
 <script src="./assets/js/list-layout.js?v=20260925-search-panels1"></script>
 <script src="./assets/js/community-reviews.js?v=20260920-rank1"></script>
-<script src="./assets/js/map-membership.js?v=20260924-operator1"></script>
+<script src="./assets/vendor/member-auth-2.117.2.min.js"></script>
+<script src="./assets/js/member-account.js?v=20261003-account1"></script>
+<script src="./assets/js/map-membership.js?v=20261003-account1"></script>
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=polish1"></script>
