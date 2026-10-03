@@ -67,6 +67,7 @@ const server=http.createServer((req,res)=>{
   const adminEntry=page.locator('#adminBtn');
   assert.equal(await adminEntry.innerText(),'관리자 로그인');
   assert(await adminEntry.isVisible(),'admin login is available without opening list options');
+  await adminEntry.click({trial:true}); // Wait for the list opening transition before hit-testing.
   assert(await adminEntry.evaluate(n=>{const r=n.getBoundingClientRect();return n.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),'admin entry is inside the visible panel');
   await page.screenshot({path:path.join(out,`admin-entry-${width}.png`)});
   await adminEntry.click();
