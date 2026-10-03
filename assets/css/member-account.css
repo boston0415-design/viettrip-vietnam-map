@@ -1,0 +1,29 @@
+.memberAuthDialog{width:min(420px,calc(100vw - 24px));padding:20px;box-sizing:border-box;max-height:calc(100dvh - 24px);overflow:auto}
+.memberAuthDialog [hidden],#memberDialog [hidden]{display:none!important}
+.memberAuthDialog .travellerDialogHead{position:sticky;top:-20px;background:#fff;z-index:2;padding-top:10px}
+.memberAuthTabs{display:flex;gap:6px;margin:14px 0}
+.memberAuthTabs button{flex:1;min-height:42px;border:1px solid #d4e2dc;border-radius:9px;background:#f5f8f6;color:#476258;font:600 14px system-ui}
+.memberAuthTabs [aria-pressed=true]{background:#e5f2ee;border-color:#8cbfaf;color:#21685a}
+#memberAuthForm{display:grid;gap:14px}
+#memberAuthForm label{display:grid;gap:6px;font-size:13px;color:#3f5b50}
+#memberAuthForm input{width:100%;box-sizing:border-box;min-height:46px;padding:10px 12px;border:1px solid #cbdad2;border-radius:9px;font:16px system-ui;background:#fff;color:#20392d}
+#memberAuthSubmit{min-height:46px;width:100%;font-size:15px}
+#memberAuthStatus:empty,#memberReviewsStatus:empty{display:none}
+#memberAuthStatus,#memberReviewsStatus{font-size:13px;line-height:1.6;color:#356652;white-space:pre-line;margin:0}
+#memberAuthStatus.isError,#memberReviewsStatus.isError{color:#a33832}
+#memberAuthForgot,#memberAuthGuest{display:block;width:100%;min-height:42px;border:0;background:none;color:#536e62;font:13px system-ui;margin-top:5px}
+#memberLoginBtn{margin-right:auto}
+.memberAccountInfo{display:flex;align-items:center;gap:12px;font-size:12px;margin-bottom:12px}
+#memberAccountEmail{flex:1;min-width:0;overflow-wrap:anywhere;color:#587066}
+.memberAccountInfo button,.memberOwnReviews button,#memberReviewsMore,#memberReviewUndo button,#memberClaimSubmit{min-height:40px;padding:6px 12px;border:1px solid #cfddd6;border-radius:8px;background:#fff;color:#365b4a;font:600 12px system-ui;cursor:pointer}
+.memberOwnReviews{list-style:none;margin:12px 0 0;padding:0}
+.memberOwnReviews>li{padding:14px 0;border-bottom:1px solid #e2eae5}
+.memberOwnReviews h4{margin:0 0 5px;font-size:15px;overflow-wrap:anywhere}
+.memberOwnReviews p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;font-size:14px;margin:10px 0}
+.memberOwnReviews small{font-size:12px;color:#62796c}
+.memberReviewActions{display:flex;gap:8px;flex-wrap:wrap}
+.memberOwnReviews [data-account-delete]{color:#a1473f}
+#memberReviewUndo{padding:10px;background:#eef7f1;border-radius:9px;font-size:13px;margin:8px 0}
+#memberReviewsMore{width:100%;margin-top:12px}
+.memberAuthDialog :focus-visible,.memberOwnReviews button:focus-visible{outline:2px solid #378574;outline-offset:2px}
+@media(max-width:600px){.memberAuthDialog{padding:16px;max-height:calc(100dvh - 16px)}.memberAuthDialog .travellerDialogHead{top:-16px}.memberOwnReviews .memberReviewActions button{flex:1}}

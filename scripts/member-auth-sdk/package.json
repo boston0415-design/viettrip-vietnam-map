@@ -1,0 +1,12 @@
+{
+  "name": "viettrip-member-auth-sdk",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build.cjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2",
+    "esbuild": "0.25.12"
+  }
+}

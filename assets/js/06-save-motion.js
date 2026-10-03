@@ -289,10 +289,12 @@ ${err?.message||'사진을 처리하지 못했습니다.'}`);
   // 새 마커를 즉시 표시하고 설명창도 열기
   setTimeout(()=>selectPlace(newId,false,true),80);
 }
-function openReview(){
+function openReview(reviewId=null){
   if(state.reviewSaveInProgress)return;
   state.reviewEditPlaceId=state.selected;
-  const mine=db().reviews.find(r=>r.placeId===state.selected && isOwnReview(r));
+  const mine=db().reviews.find(r=>r.placeId===state.selected && isOwnReview(r) && (!reviewId||r.id===reviewId));
+  if(reviewId&&!mine)return;
+  state.reviewEditReviewId=mine?.id||null;
   const place=db().places.find(p=>p.id===state.selected);
   const owner=isOwnerPlace(place);
   const editing=!!mine||owner;
@@ -332,7 +334,7 @@ async function saveReview(){
   if(!placeId)return;
   const rating=state.rating;
   const recommended=$('#rRecommended').checked;
-  const oldReview=db().reviews.find(r=>r.placeId===placeId&&isOwnReview(r));
+  const oldReview=db().reviews.find(r=>r.placeId===placeId&&isOwnReview(r)&&(!state.reviewEditReviewId||r.id===state.reviewEditReviewId));
   if(oldReview?.text&&text&&text!==oldReview.text&&!confirm('기존 후기 내용을 새 내용으로 수정할까요? 빈칸으로 저장하면 기존 후기는 유지됩니다.'))return;
   window.ReviewVault?.capture();
   window.ReviewVault?.archive(oldReview?[oldReview]:[]);
@@ -345,7 +347,7 @@ async function saveReview(){
   const now=new Date().toISOString();
   const x=db();
 
-  let existing=x.reviews.find(r=>r.placeId===placeId && isOwnReview(r));
+  let existing=x.reviews.find(r=>r.placeId===placeId && isOwnReview(r)&&(!state.reviewEditReviewId||r.id===state.reviewEditReviewId));
   const registeredPlace=x.places.find(p=>p.id===placeId);
   const deviceId=window.MapMembership?.credentialFor(existing?.createdByHash)
     || (isOwnerPlace(registeredPlace)?window.MapMembership?.credentialFor(registeredPlace.ownerKeyHash):null)
@@ -404,6 +406,7 @@ async function saveReview(){
     $('#reviewModal').classList.remove('open');
     window.ReviewVault?.saved(placeId);
     state.reviewEditPlaceId=null;
+    state.reviewEditReviewId=null;
     revokeReviewPreviewUrls();
 
     try{

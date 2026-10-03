@@ -279,6 +279,9 @@ function isLocallyOwnedPlace(placeId){
 }
 
 function getDeviceId(){
+  return window.MemberAccount?.deviceId()||getGuestDeviceId();
+}
+function getGuestDeviceId(){
   const key='viettrip_device_id_v1';
   let id=safeStorageGet(key);
   if(!id){
@@ -338,9 +341,10 @@ async function supaGet(table,query=''){
 }
 
 async function supaInsert(table,row){
+  const headers=window.MemberAccount?await window.MemberAccount.requestHeaders():SUPABASE_HEADERS;
   const res=await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{
     method:'POST',
-    headers:{...SUPABASE_HEADERS,'Prefer':'return=minimal'},
+    headers:{...headers,'Prefer':'return=minimal'},
     body:JSON.stringify(row)
   });
   if(!res.ok){
@@ -352,9 +356,10 @@ async function supaInsert(table,row){
 }
 
 async function supaRpc(fn,args={}){
+  const headers=window.MemberAccount?await window.MemberAccount.requestHeaders():SUPABASE_HEADERS;
   const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`,{
     method:'POST',
-    headers:{...SUPABASE_HEADERS,'Accept':'application/json'},
+    headers:{...headers,'Accept':'application/json'},
     body:JSON.stringify(args)
   });
   if(!res.ok)throw new Error(await res.text());
