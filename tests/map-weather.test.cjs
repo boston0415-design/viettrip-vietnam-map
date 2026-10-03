@@ -13,7 +13,7 @@ const {JSDOM}=require('jsdom');
  const flush=()=>new Promise(resolve=>setImmediate(resolve));
  vm.runInContext(fs.readFileSync('assets/js/map-weather.js','utf8'),dom.getInternalVMContext());
  assert.equal(requests.length,1);assert.match(requests[0].url,/lat=10\.777&lon=106\.701/,'public city center, never precise user GPS');answer(requests[0],'lightrain');await flush();
- const layer=w.document.querySelector('.weatherLayer'),badge=w.document.querySelector('.mapWeather');assert(!layer.hidden);assert.equal(layer.dataset.kind,'rain');assert(layer.children.length<=22);assert.equal(badge.textContent,'27°','only temperature is visible');assert.match(badge.getAttribute('aria-label'),/비 예보/);
+ const layer=w.document.querySelector('.weatherLayer'),badge=w.document.querySelector('.mapWeather');assert(!layer.hidden);assert.equal(layer.dataset.kind,'rain');assert(layer.children.length<=120);assert.equal(badge.textContent,'27°','only temperature is visible');assert.match(badge.getAttribute('aria-label'),/비 예보/);
  assert(badge.closest('.brandLinks'));assert(!badge.closest('.mapwrap'),'weather cannot cover map content');
  badge.click();assert(w.document.getElementById('weatherDialog').open);assert.equal(w.document.querySelectorAll('#weatherDialog a').length,2,'forecast attribution remains available');w.document.getElementById('weatherClose').click();assert(!w.document.getElementById('weatherDialog').open);
  await w.MapWeather.sync();assert.equal(requests.length,1,'cached forecast coalesces map repaint requests');

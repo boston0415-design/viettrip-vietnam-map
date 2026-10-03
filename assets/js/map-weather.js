@@ -31,12 +31,30 @@
     const toggle=document.getElementById('weatherToggle');toggle.textContent=reduced.matches||saveData?'효과 제한됨':enabled?'효과 끄기':'효과 켜기';toggle.disabled=reduced.matches||!!saveData;toggle.setAttribute('aria-pressed',String(enabled&&!toggle.disabled));
     layer.hidden=!active;
     if(!active){layer.replaceChildren();paintKey='';return;}
-    const key=kind+':'+(innerWidth<901?'small':'large');if(paintKey===key)return;paintKey=key;layer.dataset.kind=kind;
-    layer.style.setProperty('--fall',Math.ceil(wrap.getBoundingClientRect().height+50)+'px');
-    const count=kind==='cloud'?3:kind==='rain'?(innerWidth<901?14:22):(innerWidth<901?8:14);
+    const compact=innerWidth<901,box=wrap.getBoundingClientRect(),height=Math.max(1,Math.round(box.height)),width=Math.max(1,Math.round(box.width||innerWidth));
+    const key=kind+':'+width+':'+height;if(paintKey===key)return;paintKey=key;layer.dataset.kind=kind;
+    const fall=height+(kind==='rain'?80:50);layer.style.setProperty('--fall',fall+'px');
+    const count=kind==='cloud'?3:kind==='rain'?Math.max(compact?40:64,Math.min(compact?64:120,Math.round(width/(compact?7:13)))):(compact?8:14);
     const frag=document.createDocumentFragment();
     for(let i=0;i<count;i++){
-      const drop=document.createElement('i');drop.style.setProperty('--x',((i*61.8)%100)+'%');drop.style.setProperty('--y',(8+i*17)+'%');drop.style.setProperty('--duration',(kind==='cloud'?32+i*9:kind==='rain'?1.1+(i%7)*.08:5+(i%7)*.5)+'s');drop.style.setProperty('--delay',(-i*(kind==='cloud'?11:.31))+'s');drop.style.setProperty('--drift',kind==='rain'?'-35px':(i%2?30:-30)+'px');frag.append(drop);
+      const drop=document.createElement('i');
+      if(kind==='rain'){
+        // Depth changes size and speed together; independent phases avoid marching rows.
+        const depth=i%3,jitter=((i*0.754877666)+0.31)%1,phase=((i*0.414213562)+0.17)%1;
+        const angle=5+jitter*3,speed=260+depth*125+jitter*65,duration=fall/speed,drift=-Math.tan(angle*Math.PI/180)*fall;
+        drop.style.setProperty('--x',(((i*0.618033989)%1)*100).toFixed(3)+'%');
+        drop.style.setProperty('--rain-offset',(-drift/2).toFixed(2)+'px');
+        drop.style.setProperty('--rain-length',(9+depth*6+jitter*5).toFixed(2)+'px');
+        drop.style.setProperty('--rain-width',(.6+depth*.15).toFixed(2)+'px');
+        drop.style.setProperty('--rain-opacity',(.25+depth*.13+jitter*.07).toFixed(3));
+        drop.style.setProperty('--rain-angle',angle.toFixed(2)+'deg');
+        drop.style.setProperty('--duration',duration.toFixed(3)+'s');
+        drop.style.setProperty('--delay',(-duration*phase).toFixed(3)+'s');
+        drop.style.setProperty('--drift',drift.toFixed(2)+'px');
+      }else{
+        drop.style.setProperty('--x',((i*61.8)%100)+'%');drop.style.setProperty('--y',(8+i*17)+'%');drop.style.setProperty('--duration',(kind==='cloud'?32+i*9:5+(i%7)*.5)+'s');drop.style.setProperty('--delay',(-i*(kind==='cloud'?11:.31))+'s');drop.style.setProperty('--drift',(i%2?30:-30)+'px');
+      }
+      frag.append(drop);
     }
     layer.replaceChildren(frag);
   }
