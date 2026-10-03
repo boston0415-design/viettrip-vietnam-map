@@ -15,8 +15,10 @@
 .browseQuickFilters label{min-height:43px;padding:3px 7px;border-radius:8px;box-shadow:none}
 .browseQuickFilters select{font-family:inherit;font-size:12px;cursor:pointer}
 .browseQuickFilters :focus-visible{outline:2px solid #458e7d;outline-offset:2px}
-.operatorOptions{display:flex;gap:12px;flex-wrap:wrap;padding-top:8px;margin-top:6px;border-top:1px solid #e3ebe7}
-.operatorOptions button{font:inherit;font-size:12px;color:#657c70;background:none;border:0;min-height:36px;cursor:pointer}
+.operatorOptions{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 12px;border-bottom:1px solid #e3ebe7;background:#fff}
+.operatorOptions button{font:inherit;font-size:12px;color:#365b4a;background:#f4f7f5;border:1px solid #d5e1dc;border-radius:8px;min-height:36px;padding:5px 10px;white-space:nowrap;cursor:pointer}
+.operatorOptions #adminBtn::after{content:none}
+.operatorOptions button:focus-visible{outline:2px solid #458e7d;outline-offset:2px}
 .detailReviewLink{border:0;background:none;padding:4px 0;color:#60788a;font-family:inherit;cursor:pointer;text-align:left;min-height:28px}
 .browseResultBar{display:flex;align-items:center;gap:7px;margin-top:0;font-size:12px}
 .browseResultBar button{border:1px solid #d5e1dc;border-radius:20px;background:#fff;color:#2e5145;min-height:36px;padding:6px 13px;font-weight:600}
