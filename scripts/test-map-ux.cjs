@@ -63,6 +63,18 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('.top #adminBtn').count(),0,'operator login does not clutter the header');
   assert.equal(await page.locator('.mapwrap [data-browse-filter]').count(),0,'no permanent filter boxes over the map');
   await page.locator('#browseShowList').click();
+  assert.equal(await page.locator('#mobileFilterToggle').getAttribute('aria-expanded'),'false');
+  const adminEntry=page.locator('#adminBtn');
+  assert.equal(await adminEntry.innerText(),'관리자 로그인');
+  assert(await adminEntry.isVisible(),'admin login is available without opening list options');
+  await adminEntry.click({trial:true}); // Wait for the list opening transition before hit-testing.
+  assert(await adminEntry.evaluate(n=>{const r=n.getBoundingClientRect();return n.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),'admin entry is inside the visible panel');
+  await page.screenshot({path:path.join(out,`admin-entry-${width}.png`)});
+  await adminEntry.click();
+  assert(await page.locator('#adminLoginModal').isVisible(),'admin login entry opens the password dialog');
+  assert(await page.locator('#adminPassword').isEnabled());
+  await page.locator('#adminLoginModal [data-close]').click();
+  assert(!(await page.locator('#adminLoginModal').isVisible()),'cancel closes login without changing the session');
   assert.equal(await page.locator('[data-browse-filter]').count(),3,'region, category and rating are directly selectable');
   await page.locator('[data-browse-filter="city"]').selectOption('hcmc');
   await page.locator('[data-browse-filter="category"]').selectOption('cafe');
@@ -171,6 +183,7 @@ const server=http.createServer((req,res)=>{
   await page.locator('#mobileListClose').click();await page.locator('#browseShowList').click();
   const reopened=await page.locator('#businessSide').boundingBox();assert(reopened.height>=sizing.list-2,'list entry restores a usable height after minimizing');
   assert.equal(await page.locator('#mobileFilterToggle').getAttribute('aria-expanded'),'false','list entry shows businesses before secondary options');
+  assert(await page.locator('#adminBtn').isVisible(),'admin entry remains available after reopening the list');
   const firstCard=await page.locator('#list article').first().boundingBox();assert(firstCard.y<reopened.y+reopened.height-60,'business content is visible without another drag');
   assert(await tabs.isVisible(),'tabs remain visible after reopening');assert(await page.locator('.mapWeather').isVisible(),'weather stays available with the list open');
   await page.screenshot({path:path.join(out,`compact-list-${width}.png`)});

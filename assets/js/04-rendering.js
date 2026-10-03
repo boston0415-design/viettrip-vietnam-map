@@ -42,7 +42,7 @@ let adminSessionRevision=0;
 function syncAdminButton(){
   const button=$('#adminBtn');
   if(!button)return;
-  button.textContent=state.isAdmin||adminKey()?'운영자 로그아웃':'운영자 로그인';
+  button.textContent=state.isAdmin||adminKey()?'관리자 로그아웃':'관리자 로그인';
   button.classList.toggle('adminOn',state.isAdmin);
   document.querySelectorAll('.communityStats>span').forEach(node=>{node.hidden=!state.isAdmin;});
   const tools=$('#openOperatorTools');if(tools)tools.hidden=!state.isAdmin;
