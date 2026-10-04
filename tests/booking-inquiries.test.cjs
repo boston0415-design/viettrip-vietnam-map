@@ -59,6 +59,12 @@ async function check(mobile){
     assert(foremost,'FOREMOST official cake order inquiry');
     assert.equal(foremost.verifiedOn,'2026-10-02');
     assert.deepEqual(foremost.channels.map(c=>c.kind),['facebook']);
+    const royce=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='bad22e55-f097-4202-beb2-f2aa82893110');
+    assert(royce,'Royce Dental official appointment inquiry');
+    assert.equal(royce.verifiedOn,'2026-10-04');
+    assert.equal(royce.sourceUrl,'https://roycedental-vn.com/Onlineconsultation');
+    assert.deepEqual(royce.channels.map(c=>c.kind),['phone']);
+    assert.equal(royce.channels[0].url,'tel:+84355112255');
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);

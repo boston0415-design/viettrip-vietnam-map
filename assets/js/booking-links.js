@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "b028e325-1bbf-41a7-967a-384cfe78b4d9",
+    "name": "XLIII Specialty Coffee",
+    "category": "cafe",
+    "address": "178a Pasteur, Sài Gòn, Hồ Chí Minh, 베트남",
+    "url": "https://xliiicoffee.com/en/location/xliii-coffee-hcmc/",
+    "sourceUrl": "https://xliiicoffee.com/en/location/xliii-coffee-hcmc/",
+    "note": "178A Pasteur의 XLIII Coffee 공식 예약 양식입니다. 날짜·시간·인원과 Location 항목을 확인한 뒤 신청하세요.",
+    "verifiedOn": "2026-10-04"
+  },
+  {
     "id": "91b696af-588e-4a13-af5a-d50fb363172f",
     "name": "Vinpearl Landmark 81, Autograph Collection",
     "category": "stay",
@@ -75,6 +85,23 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 ]);
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
+  {
+    "id": "bad22e55-f097-4202-beb2-f2aa82893110",
+    "name": "로이스치과 호치민 Royce nha khoa 罗伊斯奇瓜胡志明市 ロイス歯科 ホーチミン",
+    "category": "hospital",
+    "address": "155 Phạm Thái Bường, Khu đô thị Phú Mỹ Hưng, Tân Hưng, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://roycedental-vn.com/Onlineconsultation",
+    "note": "155 Phạm Thái Bường의 로이스치과 공식 진료 상담 전화입니다. 희망 진료와 날짜·시간을 알리고 병원의 예약 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+84355112255",
+        "display": "+84 35 511 2255"
+      }
+    ],
+    "verifiedOn": "2026-10-04"
+  },
   {
     "id": "94f96d79-adf6-492f-9929-c41c6c67d9fb",
     "name": "Doya Jjambbong 도야짬뽕",
