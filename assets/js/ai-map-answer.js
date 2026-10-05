@@ -23,7 +23,7 @@
         const preferences=[...new Set([...(info.preferenceHits||[]),...(row.preferenceHits||[])])].filter(x=>PREFS[x]);
         return {row,name,address:p?.address||row.address||'',source:google?'google':'member',rating:google?(info.googleRating||row.rating):row.rating,count:google?(info.googleCount||row.ratingCount||0):row.ratingCount||0,menuNamed:named,preferences,price:info.price?.known?info.price.label:'',member:!!p,recommended:!!row.recommended,benefit:!!p?.memberBenefit};
       }).sort((a,b)=>{
-        const menu=Number(!!a.row.menuUnconfirmed?.length)-Number(!!b.row.menuUnconfirmed?.length);if(menu)return menu;
+        const menu=Number(!!(a.row.menuUnconfirmed?.length||a.row.itemUnconfirmed?.length))-Number(!!(b.row.menuUnconfirmed?.length||b.row.itemUnconfirmed?.length));if(menu)return menu;
         const requested=window.AISearchInsights?.compare(a.row,b.row,entry.intent)||0;
         if(entry.intent.nearby||entry.intent.sortBy==='cheap'||['atmosphere','purpose'].includes(entry.intent.sortBy))return requested;
         // Rank the shortlist by evidence, not a one-vote perfect score. This
@@ -34,14 +34,14 @@
   }
   function reason(c,key,intent){
     switch(key){
-      case 'specialty':return c.menuNamed?(intent.service==='florist'?'업소명에서 꽃집 확인':'업소명에서 요청한 메뉴 확인'):'';
+      case 'specialty':return c.menuNamed?(intent.service==='florist'?'업소명에서 꽃집 확인':intent.category==='shopping'?'업소명에서 요청한 상품 관련 표기 확인':'업소명에서 요청한 메뉴 확인'):'';
       case 'rating':case 'reviews':return c.rating!=null?(c.source==='google'?'Google':'회원')+' 평점 '+Number(c.rating).toFixed(1)+' · 평가 '+c.count.toLocaleString('ko-KR')+'개':'';
       case 'preference':return c.preferences.length?c.preferences.map(p=>PREFS[p]).join('·')+' 관련 안내 확인':'';
       case 'price':return c.price?'Google 참고 가격대 · '+c.price:'';
       case 'recommended':return c.recommended?'회원 또는 등록자 강추 표시 있음':'';
       case 'benefit':return c.benefit?'등록된 회원 혜택 있음':'';
       case 'distance':return Number.isFinite(c.row.distance)?'기준 위치에서 '+(window.AINearbySearch?.distanceLabel(c.row.distance)||Math.round(c.row.distance)+'m')+' · 직선거리':'';
-      case 'match':return intent.service==='florist'?'요청한 지역의 꽃집 검색 결과':'요청한 지역·업종·메뉴 조건에 맞는 검색 결과';
+      case 'match':return intent.service==='florist'?'요청한 지역의 꽃집 검색 결과':intent.category==='shopping'?'요청한 지역·상품 관련 매장 검색 결과':'요청한 지역·업종·메뉴 조건에 맞는 검색 결과';
       default:return '';
     }
   }
@@ -53,16 +53,18 @@
     const picks=(result.picks||[]).map(p=>({p,c:entry.answerCandidates?.find(c=>c.id===p.id)})).filter(x=>x.c);
     if(!picks.length){box.append(node('strong','조건을 확인한 뒤 추천할게요.'));box.append(node('p',entry.intent.visitToday?'오늘 영업을 확인한 후보가 아직 없어요. 아래 영업시간 안내를 확인해 주세요.':entry.memberRows?.length||entry.google?.rows?.length?'요청한 룸·시설 등의 확인이 더 필요해요. 아래 문의 후보를 확인해 주세요.':'현재 검색 자료에서 모든 조건을 충족하는 업소를 확인하지 못했어요. 지역이나 메뉴를 바꾸어 물어보셔도 좋아요.'));return;}
     const menuPending=picks.some(({c})=>c.row.menuUnconfirmed?.length);
-    box.append(node('strong',menuPending?'주변에서 찾은 메뉴 후보':entry.intent.nearby?'가까운 곳 중 먼저 추천':result.basis==='search'?'검색 근거로 추린 후보':entry.intent.pickOne?'한 곳을 고르면':'질문에 맞춰 골랐어요','aiAnswerHeading'));
+    const itemPending=picks.some(({c})=>c.row.itemUnconfirmed?.length);
+    box.append(node('strong',itemPending?'상품 취급을 확인할 매장 후보':menuPending?'주변에서 찾은 메뉴 후보':entry.intent.nearby?'가까운 곳 중 먼저 추천':result.basis==='search'?'검색 근거로 추린 후보':entry.intent.pickOne?'한 곳을 고르면':'질문에 맞춰 골랐어요','aiAnswerHeading'));
     for(const [i,{p,c}] of picks.entries()){
       const button=node('button',(i===0?'먼저 추천 · ':'함께 비교 · ')+c.name,'aiAnswerPick');button.type='button';
       button.addEventListener('click',()=>{window.AIMapSearch?.close();document.getElementById('aiMapQuestion')?.blur();if(c.row.place)window.PlaceSearch?.openMember(c.row.place.id);else window.PlaceSearch?.openGoogle(c.row);});
       box.append(button);
       const reasons=[...new Set((p.reasons||[]).map(key=>reason(c,key,entry.intent)).filter(Boolean))];
       if(c.row.menuUnconfirmed?.length)reasons.push(c.row.menuUnconfirmed.join('·')+' 메뉴 확인 필요');
+      if(c.row.itemUnconfirmed?.length)reasons.push(c.row.itemUnconfirmed.join('·')+' 취급·재고 확인 필요');
       box.append(node('p',reasons.join(' / '),'aiAnswerReason'));
     }
-    box.append(node('small',menuPending?'메뉴 안내가 확인된 곳을 먼저 보여드려요. 확인이 필요한 후보는 방문 전에 메뉴를 확인해 주세요.':result.basis==='search'?'메뉴·평점·후기 등 확인된 검색 정보로 정리한 후보입니다. 인원·날짜별 예약 가능 여부는 업소에 확인해 주세요.':entry.intent.pickOne?'찾은 후보 중 메뉴·평점·후기 수를 비교한 AI 추천입니다. 누구에게나 절대적인 1위라는 뜻은 아니에요.':'현재 검색 자료를 바탕으로 한 AI 추천입니다. 가격·영업·예약 가능 여부는 업소에 확인해 주세요.','aiAnswerSource'));
+    box.append(node('small',entry.intent.category==='shopping'?'상품 관련 정보·평점·후기로 정리한 매장 후보입니다. 원하는 상품의 취급·재고·판매가는 매장에 확인해 주세요.':menuPending?'메뉴 안내가 확인된 곳을 먼저 보여드려요. 확인이 필요한 후보는 방문 전에 메뉴를 확인해 주세요.':result.basis==='search'?'메뉴·평점·후기 등 확인된 검색 정보로 정리한 후보입니다. 인원·날짜별 예약 가능 여부는 업소에 확인해 주세요.':entry.intent.pickOne?'찾은 후보 중 메뉴·평점·후기 수를 비교한 AI 추천입니다. 누구에게나 절대적인 1위라는 뜻은 아니에요.':'현재 검색 자료를 바탕으로 한 AI 추천입니다. 가격·영업·예약 가능 여부는 업소에 확인해 주세요.','aiAnswerSource'));
   }
   function render(list,entry,{pending=false}={}){
     if(!list||!entry||entry.intent.exploratory)return;
@@ -72,7 +74,7 @@
     if(active){paint(box,entry);return;}
     entry.answerCandidates=snapshot(entry);
     if(!entry.answerCandidates.length){entry.answer={picks:[],basis:'empty'};paint(box,entry);return;}
-    if(entry.intent.nearby){
+    if(entry.intent.nearby||entry.intent.category==='shopping'){
       entry.answer={basis:'search',picks:entry.answerCandidates.slice(0,entry.intent.pickOne?1:3).map(c=>({id:c.id,reasons:[...(c.preferences.length?['preference']:[]),...(c.rating!=null?['rating']:['match']),'distance']}))};
       paint(box,entry);return;
     }

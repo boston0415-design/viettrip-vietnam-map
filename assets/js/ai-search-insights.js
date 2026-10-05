@@ -52,7 +52,7 @@
   }
   function inspect(raw,intent,sources=[]){
     const preferences=preferenceEvidence(sources,intent);
-    if(intent.productSearch)return {price:{known:false,label:'제품별 판매가 미확인'},preferenceHits:[],proofs:[],hotelClass:null};
+    if(intent.productSearch||intent.category==='shopping')return {price:{known:false,label:'제품별 판매가 미확인'},preferenceHits:[],proofs:[],hotelClass:null};
     return {price:price(raw),preferenceHits:preferences.hits,proofs:preferences.proofs,hotelClass:hotelInfo(sources,intent.hotelStars),googleRating:Number(raw.rating)||null,googleCount:Number(raw.userRatingCount)||0};
   }
   function mergeMember(row,info,intent){
@@ -70,7 +70,7 @@
     return quality-distance*.18;
   }
   function compare(a,b,intent){
-    const menu=Number(!!a.menuUnconfirmed?.length)-Number(!!b.menuUnconfirmed?.length);if(menu)return menu;
+    const menu=Number(!!(a.menuUnconfirmed?.length||a.itemUnconfirmed?.length))-Number(!!(b.menuUnconfirmed?.length||b.itemUnconfirmed?.length));if(menu)return menu;
     const aa=a.insights||{},bb=b.insights||{};
     const hotel=Number(bb.hotelClass?.kind==='confirmed')-Number(aa.hotelClass?.kind==='confirmed');if(hotel)return hotel;
     if(intent.sortBy==='cheap'){
