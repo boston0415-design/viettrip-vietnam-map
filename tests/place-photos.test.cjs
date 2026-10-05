@@ -58,11 +58,7 @@ async function check(mobile){
   const close=()=>run('closeDetailPanel()');
   const clear=()=>{close();w.localStorage.clear();calls=[];urlCalls=0};
   run("state.selected='a';renderDetail()");
-  if(mobile){
-    assert.equal(calls.length,0,'compact mobile view makes no photo requests');
-    assert(w.document.getElementById('detailBody').hidden);
-    run('setDetailExpanded(true)');
-  }
+  assert(!w.document.getElementById('detailBody').hidden,'photos load in the initial expanded reading view');
   await tick();
   assert.equal(calls.length,2);assert.equal(calls[0].method,'find');assert.equal(calls[1].method,'details');
   assert.equal(urlCalls,3,'only three photo URLs requested');

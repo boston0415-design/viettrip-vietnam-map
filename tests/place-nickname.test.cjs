@@ -42,7 +42,7 @@ for(const name of fs.readdirSync(path.join(root,'assets/js')).filter(name=>/^0[1
 
   const place=fixture.places[0];state.selected=place.id;renderDetail();
   assert.equal($('#detail .placeRegistrant').textContent,'등록자 카페회원');
-  assert($('#detailBody').hidden,'registration attribution does not enlarge the compact mobile sheet');
+  assert(!$('#detailBody').hidden,'registration attribution is visible in the expanded sheet');
   assert($('#editPlaceBtn'),'owner retains edit access');
   place.ownerKeyHash='someone-else';renderDetail();
   assert(!$('#editPlaceBtn'),'same displayed nickname does not grant ownership');

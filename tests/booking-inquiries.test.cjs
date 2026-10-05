@@ -104,7 +104,7 @@ async function check(mobile){
     const triggers=[...w.document.querySelectorAll('#detail [data-booking-inquiry]')];
     assert.equal(triggers.length,1,'one booking action is shared by mobile and desktop');
     assert(w.document.querySelector('#detail .detailQuickActions').classList.contains('hasBooking'));
-    assert.equal(w.document.getElementById('detailBody').hidden,mobile,'mobile details stay compact; desktop details stay visible');
+    assert.equal(w.document.getElementById('detailBody').hidden,false,'booking details open ready to read on mobile and desktop');
     const depth=w.history.state.viettripPanelBack.depth,url=w.location.href;
     // Repeat opening is idempotent and never creates duplicate dialog history.
     triggers[0].click();await pause();assert(dialog.open);

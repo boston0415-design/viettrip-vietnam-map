@@ -4,6 +4,7 @@ for(const mobile of [true,false]){
  const dom=new JSDOM('<div class="mapwrap"><div id="detail" class="show"><div class="detailHeader"><button class="businessReviewName"><span>업소 이름</span></button><button class="detailClose">닫기</button></div><div id="detailBody"><p>업소 설명</p><button class="action">길찾기</button></div></div></div>',{runScripts:'outside-only'});
  const w=dom.window,p=w.document.getElementById('detail'),map=w.document.querySelector('.mapwrap'),context=dom.getInternalVMContext();
  const run=code=>vm.runInContext(code,context);let now=1000,mapHeight=700,reduced=false;
+ let viewportHeight=null;Object.defineProperty(w,'innerHeight',{get:()=>viewportHeight??mapHeight});
  w.matchMedia=query=>({matches:query.includes('reduced-motion')?reduced:mobile});
  w.performance.now=()=>now;w.Date.now=()=>now;
  let id=0;const frames=new Map();
@@ -71,6 +72,11 @@ for(const mobile of [true,false]){
  // A long heading scrolls with the content instead of forcing a tall minimum height.
  mapHeight=700;p.querySelector('.detailHeader').getBoundingClientRect=()=>({height:300});
  handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Home',cancelable:true}));assert.equal(height(),180);
+ if(mobile){
+  viewportHeight=900;p.getBoundingClientRect=()=>({height:height()||220,bottom:876});w.DetailSheetResize.reset();
+  handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'End',cancelable:true}));
+  assert.equal(height(),862,'phone maximum includes the space above the map');
+ }
  dom.window.close();
 }
 console.log('PASS real touch-event/mouse grip resizing and native title/body paths, frame batching, momentum snap, interruption, reduced motion, deferred refresh, scroll priority, taps, keyboard, bounds and cancellation (DOM simulation)');

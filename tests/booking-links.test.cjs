@@ -41,7 +41,7 @@ run(`
     const links=[...document.querySelectorAll('#detail .bookingButton')];
     assert.equal(links.length,1,'phone and desktop share one booking action');
     assert(document.querySelector('.detailQuickActions').classList.contains('hasBooking'));
-    assert(document.getElementById('detailBody').hidden,'booking does not force expanded mobile sheet');
+    assert(!document.getElementById('detailBody').hidden,'booking details open ready to read');
     for(const a of links){
       assert.equal(a.href,p.url);assert.equal(a.target,'_blank');
       assert(a.rel.includes('noopener'));assert(a.rel.includes('noreferrer'));

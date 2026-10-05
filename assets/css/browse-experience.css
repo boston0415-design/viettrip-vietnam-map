@@ -92,6 +92,8 @@
 .weatherDialog small{display:block;margin-top:16px;font-size:11px}.weatherDialog a{color:#617a6b;text-decoration:underline}
 .weatherLayer[hidden],.mapWeather[hidden]{display:none!important}
 @media(min-width:901px){
+ #detail.show{width:clamp(440px,42vw,580px)}
+ #detail.detailExpanded:not(.detailResized){height:calc(100% - 38px)!important}
  .content>#businessSide{z-index:16}
  body .modalback .modal.desktopWindowSized,body dialog.desktopWindowSized{height:var(--desktop-window-height)!important;min-height:0!important;max-height:calc(100dvh - 40px)!important;overflow-y:auto!important;box-sizing:border-box}
  [data-desktop-resize-hint]{user-select:none}
@@ -110,9 +112,12 @@
  .browseFilterDialog{margin:auto auto 0;width:100%;max-width:100vw;max-height:90dvh;border-radius:20px 20px 0 0}
  .browseDialogHead h2{font-size:18px;letter-spacing:-.3px}
  .browseFields{gap:15px 12px;padding:18px 16px}.browseDialogHead{padding:16px}.browseDialogFoot{padding-left:16px;padding-right:16px}
- #detail.show{max-width:100%}
+ /* Reading details uses the screen, including space normally occupied by
+    search. The close button and grip stay pinned in the same scroll container. */
+ #detail.show{position:fixed!important;z-index:41!important;left:6px!important;right:6px!important;top:auto!important;bottom:var(--detail-bottom-gap)!important;width:auto!important;max-width:100%;--detail-bottom-gap:max(24px,calc(env(safe-area-inset-bottom) + 12px))}
+ #detail.show:not(.detailResized){max-height:calc(100dvh - var(--detail-bottom-gap) - 14px)!important}
  #detail:not(.detailExpanded):not(.detailResized){height:min(260px,46%)!important}
- #detail.detailExpanded:not(.detailResized){height:82%!important}
+ #detail.detailExpanded:not(.detailResized){height:calc(94dvh - var(--detail-bottom-gap))!important}
  .mapUtilityBar .communityStats{display:flex!important;justify-content:center;gap:6px!important;min-height:26px}
  .mapUtilityBar .communityStats>span{min-height:26px}
 }
