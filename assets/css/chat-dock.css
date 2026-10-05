@@ -1,7 +1,7 @@
 /* One venue surface, plus a separate conversation sheet. */
 :root{--chat-peek:62px;--chat-height:62px}
 .top{grid-template-areas:"brand search actions"!important;grid-template-rows:auto!important}
-.content{padding-bottom:var(--chat-peek)}
+.content{padding-bottom:0}
 #businessSide{bottom:var(--chat-peek)!important;max-height:calc(100% - 76px)!important}
 #businessSide[data-detail="true"]{display:block!important;visibility:visible!important;transform:none!important;overflow:hidden!important}
 #businessSide[data-detail="true"]>:not(.menuResizeGrip):not(#detail){display:none!important}
@@ -51,3 +51,5 @@
 }
 .top .brand{grid-area:brand!important}.top .search{grid-area:search!important}.top .actions{grid-area:actions!important}
 #businessSide #detail .reviewNameHint{display:block}
+
+@media(min-width:901px){#businessSide{position:relative!important;align-self:end}#businessSide[data-detail="true"]:not(.menuSized){height:70%!important}.mapwrap.detailOpen #areaLegend{max-width:calc(100% - var(--desktop-list-offset) - 28px)}}

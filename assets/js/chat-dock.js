@@ -4,7 +4,7 @@
  const el=id=>document.getElementById(id),dock=el('chatDock');if(!dock)return;
  let height=62,mode='people',client=null,channel=null,generation=0,loading=false,sending=false,oldest=null,more=true,pendingId=null,pendingText='',retryTimer=null,retryDelay=2000;
  const messages=new Map(),week=7*24*60*60*1000;
- const bounds=()=>({min:62,max:Math.max(62,innerHeight-(document.querySelector('.top')?.getBoundingClientRect().bottom||100)-18)});
+ const bounds=()=>({min:62,max:Math.max(62,Math.min((window.visualViewport?.height||innerHeight)-(document.querySelector('.top')?.getBoundingClientRect().bottom||100)-18,parseFloat(getComputedStyle(dock).maxHeight)||Infinity))});
  function size(value){height=Math.max(62,Math.min(bounds().max,value));dock.style.setProperty('--chat-height',height+'px');const open=height>90;el('chatContent').hidden=!open;el('chatFold').hidden=!open;el('chatToggle').setAttribute('aria-expanded',String(open));document.body.classList.toggle('chatExpanded',open);el('chatGrip').setAttribute('aria-valuenow',Math.round(height));el('chatGrip').setAttribute('aria-valuemin',62);el('chatGrip').setAttribute('aria-valuemax',Math.round(bounds().max));if(open&&mode==='people')connect();else disconnect();}
  function open(){size(Math.min(520,bounds().max))}
  function setMode(next){mode=next;for(const [name,id] of [['people','peopleTab'],['ai','aiTab']]){el(id).setAttribute('aria-selected',String(name===next));el(id).tabIndex=name===next?0:-1;}el('peopleChat').hidden=next!=='people';el('aiChat').hidden=next!=='ai';if(next==='people')connect();else{disconnect();el('aiMapPanel').hidden=false;}}
@@ -26,6 +26,8 @@
  const detail=el('detail'),side=el('businessSide');let shown=false;
  function syncDetail(){const show=detail.classList.contains('show');side.dataset.detail=String(show);if(show&&!shown){window.ListLayout?.setCollapsed(false);side.classList.add('mobileOpen');side.scrollTop=0;size(62);}shown=show;if(show){const close=el('detailCloseBtn');if(close){close.textContent='← 목록';close.setAttribute('aria-label','업소 목록으로 돌아가기')}}}
  new MutationObserver(syncDetail).observe(detail,{attributes:true,attributeFilter:['class'],childList:true});syncDetail();
- window.addEventListener('resize',()=>size(height));window.addEventListener('offline',()=>{disconnect();status('오프라인 · 작성 중인 내용은 유지됩니다.')});window.addEventListener('online',connect);window.addEventListener('pagehide',disconnect);window.addEventListener('pageshow',connect);document.addEventListener('visibilitychange',()=>document.hidden?disconnect():connect());
+ function fitViewport(){const v=window.visualViewport;dock.style.bottom=Math.max(0,innerHeight-((v?.offsetTop||0)+(v?.height||innerHeight)))+'px';size(height)}
+ window.addEventListener('resize',fitViewport);window.visualViewport?.addEventListener('resize',fitViewport);window.addEventListener('offline',()=>{disconnect();status('오프라인 · 작성 중인 내용은 유지됩니다.')});window.addEventListener('online',connect);window.addEventListener('pagehide',disconnect);window.addEventListener('pageshow',connect);document.addEventListener('visibilitychange',()=>document.hidden?disconnect():connect());
+ window.ChatDock={open,close:()=>size(62)};
  setInterval(()=>{if(messages.size)render()},60000);size(62);
 })();

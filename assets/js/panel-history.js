@@ -26,11 +26,12 @@
       if(toggle)toggle.textContent='업종 필터';
     });
     add('detail',detail,()=>detail.classList.contains('show'),()=>window.MapUX?window.MapUX.closeDetail({restore:false}):closeDetailPanel());
-    add('detail-expanded',detail,()=>mobile() && detail.classList.contains('show') && detail.classList.contains('detailExpanded'),()=>setDetailExpanded(false));
+    add('detail-expanded',detail,()=>detail.parentElement?.id!=='businessSide' && mobile() && detail.classList.contains('show') && detail.classList.contains('detailExpanded'),()=>setDetailExpanded(false));
     add('map-info',byId('map'),()=>Boolean(state.clickInfo),()=>closeSystemInfo());
     add('registration',byId('regHint'),()=>state.registerMode,cancelRegisterMode);
     add('place-search',byId('placeSearchResults'),()=>!byId('placeSearchResults').hidden,()=>{window.PlaceSearch?.dismiss();byId('searchInput')?.blur();});
-    add('ai-search',byId('aiMapPanel'),()=>!byId('aiMapPanel').hidden,()=>{window.AIMapSearch?.close();byId('aiMapQuestion')?.blur();});
+    add('chat-dock',byId('chatContent'),()=>!byId('chatContent').hidden,()=>window.ChatDock?.close());
+    add('ai-search',byId('aiMapPanel'),()=>!byId('aiMapPanel').closest('#chatDock') && !byId('aiMapPanel').hidden,()=>{window.AIMapSearch?.close();byId('aiMapQuestion')?.blur();});
     document.querySelectorAll('.modalback').forEach(node=>{
       add(node.id,node,()=>node.classList.contains('open'),()=>closeModalById(node.id));
     });
