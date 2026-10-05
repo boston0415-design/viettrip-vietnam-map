@@ -24,7 +24,7 @@
         return {row,name,address:p?.address||row.address||'',source:google?'google':'member',rating:google?(info.googleRating||row.rating):row.rating,count:google?(info.googleCount||row.ratingCount||0):row.ratingCount||0,menuNamed:named,preferences,price:info.price?.known?info.price.label:'',member:!!p,recommended:!!row.recommended,benefit:!!p?.memberBenefit};
       }).sort((a,b)=>{
         const requested=window.AISearchInsights?.compare(a.row,b.row,entry.intent)||0;
-        if(entry.intent.sortBy==='cheap'||['atmosphere','purpose'].includes(entry.intent.sortBy))return requested;
+        if(entry.intent.nearby||entry.intent.sortBy==='cheap'||['atmosphere','purpose'].includes(entry.intent.sortBy))return requested;
         // Rank the shortlist by evidence, not a one-vote perfect score. This
         // score is internal only and is never shown as a user rating.
         const score=c=>((c.rating||0)*c.count+4*20)/(c.count+20)+(c.menuNamed ? 0.2 : 0);
@@ -39,6 +39,7 @@
       case 'price':return c.price?'Google 참고 가격대 · '+c.price:'';
       case 'recommended':return c.recommended?'회원 또는 등록자 강추 표시 있음':'';
       case 'benefit':return c.benefit?'등록된 회원 혜택 있음':'';
+      case 'distance':return Number.isFinite(c.row.distance)?'기준 위치에서 '+(window.AINearbySearch?.distanceLabel(c.row.distance)||Math.round(c.row.distance)+'m')+' · 직선거리':'';
       case 'match':return intent.service==='florist'?'요청한 지역의 꽃집 검색 결과':'요청한 지역·업종·메뉴 조건에 맞는 검색 결과';
       default:return '';
     }
@@ -50,7 +51,7 @@
     if(result.error){box.append(node('p',result.error));const retry=node('button','추천 설명 다시 보기','aiRetry');retry.type='button';retry.onclick=()=>{entry.answer=null;render(box.parentElement,entry);};box.append(retry);return;}
     const picks=(result.picks||[]).map(p=>({p,c:entry.answerCandidates?.find(c=>c.id===p.id)})).filter(x=>x.c);
     if(!picks.length){box.append(node('strong','조건을 확인한 뒤 추천할게요.'));box.append(node('p',entry.intent.visitToday?'오늘 영업을 확인한 후보가 아직 없어요. 아래 영업시간 안내를 확인해 주세요.':entry.memberRows?.length||entry.google?.rows?.length?'요청한 룸·시설 등의 확인이 더 필요해요. 아래 문의 후보를 확인해 주세요.':'현재 검색 자료에서 모든 조건을 충족하는 업소를 확인하지 못했어요. 지역이나 메뉴를 바꾸어 물어보셔도 좋아요.'));return;}
-    box.append(node('strong',result.basis==='search'?'검색 근거로 추린 후보':entry.intent.pickOne?'한 곳을 고르면':'질문에 맞춰 골랐어요','aiAnswerHeading'));
+    box.append(node('strong',entry.intent.nearby?'가까운 곳 중 먼저 추천':result.basis==='search'?'검색 근거로 추린 후보':entry.intent.pickOne?'한 곳을 고르면':'질문에 맞춰 골랐어요','aiAnswerHeading'));
     for(const [i,{p,c}] of picks.entries()){
       const button=node('button',(i===0?'먼저 추천 · ':'함께 비교 · ')+c.name,'aiAnswerPick');button.type='button';
       button.addEventListener('click',()=>{window.AIMapSearch?.close();document.getElementById('aiMapQuestion')?.blur();if(c.row.place)window.PlaceSearch?.openMember(c.row.place.id);else window.PlaceSearch?.openGoogle(c.row);});
@@ -67,6 +68,10 @@
     if(active){paint(box,entry);return;}
     entry.answerCandidates=snapshot(entry);
     if(!entry.answerCandidates.length){entry.answer={picks:[],basis:'empty'};paint(box,entry);return;}
+    if(entry.intent.nearby){
+      entry.answer={basis:'search',picks:entry.answerCandidates.slice(0,entry.intent.pickOne?1:3).map(c=>({id:c.id,reasons:[...(c.preferences.length?['preference']:[]),...(c.rating!=null?['rating']:['match']),'distance']}))};
+      paint(box,entry);return;
+    }
     paint(box,entry);const work=new AbortController();active=work;
     const timer=setTimeout(()=>work.abort(),26000);
     const candidates=entry.answerCandidates.map(({row,...publicFacts})=>publicFacts);

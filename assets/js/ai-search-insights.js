@@ -61,6 +61,14 @@
     if(local.hotelClass?.kind==='confirmed')hotelClass=info.hotelClass?.kind==='different'?{...local.hotelClass,kind:'unknown'}:local.hotelClass;
     return {...info,hotelClass,preferenceHits:[...new Set([...local.preferenceHits,...(info.preferenceHits||[])])],proofs:proofs.filter((p,i)=>proofs.findIndex(other=>other.evidence===p.evidence)===i)};
   }
+  function nearbyScore(row){
+    const info=row.insights||{},rating=info.googleRating||row.rating||0,count=info.googleCount||row.ratingCount||0;
+    if(!rating||!count)return 0;
+    // Shrink tiny samples towards 4.0; source labels remain separate in the UI.
+    const quality=(rating*count+4*20)/(count+20);
+    const distance=Number.isFinite(row.distance)?Math.min(1,row.distance/(row.searchRadius||2000)):1;
+    return quality-distance*.18;
+  }
   function compare(a,b,intent){
     const aa=a.insights||{},bb=b.insights||{};
     const hotel=Number(bb.hotelClass?.kind==='confirmed')-Number(aa.hotelClass?.kind==='confirmed');if(hotel)return hotel;
@@ -78,14 +86,17 @@
     if(['atmosphere','purpose'].includes(intent.sortBy)){
       const hit=(bb.preferenceHits?.length??b.preferenceHits?.length??0)-(aa.preferenceHits?.length??a.preferenceHits?.length??0);if(hit)return hit;
     }
+    if(intent.sortBy==='distance')return (a.distance??Infinity)-(b.distance??Infinity);
+    if(intent.nearby&&!['popular','top_rated'].includes(intent.sortBy))return nearbyScore(b)-nearbyScore(a)||(a.distance??Infinity)-(b.distance??Infinity);
     const ar=aa.googleRating||a.rating||0,br=bb.googleRating||b.rating||0,ac=aa.googleCount||a.ratingCount||0,bc=bb.googleCount||b.ratingCount||0;
     if(intent.sortBy==='popular'&&ac!==bc)return bc-ac;
     if(intent.sortBy&&ar!==br)return br-ar;
     if(intent.sortBy&&ac!==bc)return bc-ac;
     return 0;
   }
-  const sortLabel=intent=>({purpose:'단체 모임 관련 안내 우선 · 인원별 예약 가능 여부 문의',cheap:'확인된 금액 낮은 순 · 금액 없는 곳은 가격 수준순 · 미확인은 마지막',atmosphere:'요청한 분위기 관련 근거 우선',popular:'후기 수 많은 순 · 유명도 확정은 아님',top_rated:'이용자 평점 높은 순 · 같은 평점은 후기 수 순'}[intent.sortBy]||'');
+  const sortLabel=intent=>({nearby_best:'가까운 후보 중 평점·평가 수·거리를 함께 비교한 추천순',distance:'기준 위치에서 가까운 순 · 직선거리',purpose:'단체 모임 관련 안내 우선 · 인원별 예약 가능 여부 문의',cheap:'확인된 금액 낮은 순 · 금액 없는 곳은 가격 수준순 · 미확인은 마지막',atmosphere:'요청한 분위기 관련 근거 우선',popular:'후기 수 많은 순 · 유명도 확정은 아님',top_rated:'이용자 평점 높은 순 · 같은 평점은 후기 수 순'}[intent.sortBy]||'');
   function append(button,row,intent){
+    if(intent.nearby&&Number.isFinite(row.distance)){const line=document.createElement('span');line.className='aiNearbyDistance';line.textContent='기준 위치에서 '+(window.AINearbySearch?.distanceLabel(row.distance)||Math.round(row.distance)+'m')+' · 직선거리';button.append(line);}
     if(intent.productSearch)return;
     const info=row.insights||{},p=info.price;
     if(row.place&&intent.sortBy&&info.googleRating){const line=document.createElement('span');line.className='aiRating aiGoogleRank';line.textContent='Google ★ '+info.googleRating.toFixed(1)+' · 후기 '+info.googleCount.toLocaleString('ko-KR')+'개';button.append(line);}

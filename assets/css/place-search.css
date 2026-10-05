@@ -36,7 +36,7 @@
 #externalPhotos img{width:100%;height:180px;object-fit:cover;border-radius:12px}
 #externalPhotos figcaption{font-size:11px;line-height:1.5;color:#6b7d76;margin-top:5px}
 #externalPhotos figcaption a{color:inherit}
-@media(max-width:900px){#detail.externalDetail.detailExpanded{max-height:78%!important}.placeSearchResults{left:-1px;right:-1px}.top .search .placeSearchOption{padding:10px 8px}}
+@media(max-width:900px){#detail.externalDetail.detailExpanded:not(.detailResized){max-height:78%!important}.placeSearchResults{left:-1px;right:-1px}.top .search .placeSearchOption{padding:10px 8px}}
 @media(prefers-reduced-motion:reduce){#detail,.menuResizable{scroll-behavior:auto!important}}
 #detail.externalDetail:not(.detailExpanded) h2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 @media(min-width:901px){#detail.externalDetail{width:min(420px,calc(100% - 32px))}}

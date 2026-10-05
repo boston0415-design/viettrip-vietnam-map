@@ -370,8 +370,10 @@ const server=http.createServer((req,res)=>{
    await page.locator('#detail>.detailResizeHandle').press('End');
    await panel.evaluate(p=>p.scrollTop=80);
    const maximum=await panel.boundingBox();
+   const readingStart=await panel.evaluate(p=>{const r=p.getBoundingClientRect(),h=p.querySelector('.detailHeader').getBoundingClientRect(),x=r.left+Math.min(r.width/2,120),y=Math.max(h.bottom+24,r.top+r.height/2);return {scroll:p.scrollTop,maxScroll:p.scrollHeight-p.clientHeight,height:r.height,ariaMax:p.querySelector('.detailResizeHandle').getAttribute('aria-valuemax'),point:{x,y},target:document.elementFromPoint(x,y)?.outerHTML.slice(0,300)};});
    await swipe(-50);
-   assert(Math.abs((await panel.boundingBox()).height-maximum.height)<2,label+' reads back without folding before content reaches top');
+   const readingEnd=await panel.evaluate(p=>({height:p.getBoundingClientRect().height,scroll:p.scrollTop}));
+   assert(Math.abs(readingEnd.height-maximum.height)<2,label+' reads back without folding before content reaches top '+JSON.stringify({readingStart,readingEnd,maximum}));
    assert(Math.abs(await panel.evaluate(p=>p.scrollTop)-30)<3,label+' body content scrolls toward top');
    await swipe(-70);
    assert.equal(await panel.evaluate(p=>p.scrollTop),0,label+' reaches the content top');
@@ -598,7 +600,7 @@ const server=http.createServer((req,res)=>{
   const searchBox=await page.locator('.top .search').boundingBox(),aiBox=await page.locator('.aiComposer').boundingBox();
   assert(aiBox.y>=searchBox.y+searchBox.height,'AI composer sits below the existing search');
   assert(aiBox.x>=0&&aiBox.x+aiBox.width<=width+1,'composer fits the viewport');
-  assert.equal(aiBox.height,38,'search and question rows use the slimmer height');
+  assert.equal(aiBox.height,34,'search and question rows use the slimmer height');
   assert(Math.abs(searchBox.width-aiBox.width)<1&&Math.abs(searchBox.height-aiBox.height)<1,'both search boxes use identical dimensions');
   const geometry=await page.evaluate(()=>['.top .search','.aiComposer'].map(selector=>{const css=getComputedStyle(document.querySelector(selector));return [css.borderRadius,css.backgroundColor,css.borderColor].join('|')}));
   assert.equal(geometry[0],geometry[1],'both search boxes share shape and color');
@@ -904,6 +906,37 @@ const server=http.createServer((req,res)=>{
   await page.getByRole('button',{name:'카페 모임',exact:true}).click();await page.locator('[data-place-id="context-cafe"]').waitFor();
   assert.equal(await page.locator('[data-place-id="context-group"]').count(),0);
   assert.equal(await page.evaluate(()=>JSON.stringify(testData)),contextBefore,'context searches and switches preserve original data');
+  await page.locator('#aiMapClear').click();
+  // A named reference must work without first enabling the nearby map filter.
+  await page.evaluate(()=>{
+   state.nearby=null;state.city='hcmc';
+   testData.places.push(
+    {id:'near-anchor',name:'벤탄시장 테스트 지점',category:'market',address:'Ho Chi Minh',lat:10.73,lng:106.66},
+    {id:'near-tiny',name:'회원 한 표 식당',category:'restaurant',address:'Ho Chi Minh',lat:10.731,lng:106.66,initialRating:5,memberBenefit:true,tags:['강추업소']}
+   );
+   const originalFetch=window.fetch;window.fetch=(url,options)=>String(url)==='/api/ask-map'?Promise.resolve({ok:true,json:async()=>({intent:AIQueryIntent.recoveryIntent(JSON.parse(options.body).query,'hcmc')})}):originalFetch(url,options);
+   google.maps.places.Place.searchByText=async request=>{
+    window.nearbyRequest=request;
+    const place=(id,name,rating,count,lat)=>({id,displayName:name,rating,userRatingCount:count,location:{lat,lng:106.66},formattedAddress:'Ho Chi Minh',types:['restaurant'],addressComponents:[{types:['country'],shortText:'VN'}]});
+    return {places:[place('near-best','주변 후기 좋은 식당',4.8,700,10.735),place('near-close','바로 옆 식당',4.1,1000,10.7302),place('near-far','멀리 있는 유명 식당',5,8000,10.78)]};
+   };
+  });
+  const nearbyData=await page.evaluate(()=>JSON.stringify(testData));
+  await page.locator('#aiMapQuestion').fill('벤탄시장 테스트 지점 근처 맛집 추천해줘');await page.locator('#aiMapQuestion').press('Enter');
+  await page.locator('.aiAnswerPick').first().waitFor();
+  assert.match(await page.locator('.aiAnswerPick').first().innerText(),/주변 후기 좋은 식당/,'nearby best beats a one-vote member endorsement and nearer weak ratings');
+  assert.match(await page.locator('.aiNearbyContext').innerText(),/벤탄시장 테스트 지점 기준 · 반경 2km/);
+  assert.equal(await page.locator('.aiGoogleResults .aiResult').first().getAttribute('data-google-place-id'),'near-best','displayed results agree with the top recommendation');
+  assert.equal(await page.locator('[data-google-place-id="near-far"]').count(),0,'out-of-radius reputation cannot beat proximity');
+  assert(await page.evaluate(()=>!!nearbyRequest.locationRestriction),'Google discovery is restricted to the same nearby area');
+  await page.screenshot({path:path.join(out,`ai-nearby-best-${width}.png`)});
+  await page.getByRole('button',{name:'500m',exact:true}).click();
+  await page.waitForFunction(()=>document.querySelector('.aiAnswerPick')?.textContent.includes('바로 옆 식당'));
+  assert.equal(await page.locator('[data-google-place-id="near-best"]').count(),0,'changing radius rechecks Google and member results');
+  assert.equal(await page.evaluate(()=>JSON.stringify(testData)),nearbyData);assert.equal(await page.evaluate(()=>state.nearby),null,'AI search never saves an address or changes nearby map filters');
+  await page.locator('.aiAnswerPick').first().click();
+  assert.match(await page.locator('#detail h2').innerText(),/검색한 새 업소/,'nearby recommendation opens its actual detail');
+  await page.locator('#detailCloseBtn').click();
   await page.locator('#aiMapClear').click();
   if(width===390){
    await page.setViewportSize({width:844,height:390});

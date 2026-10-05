@@ -19,6 +19,35 @@ function cuisineLabel(value){
   return Object.keys(CUISINES).find(label=>cuisineAliases(label).some(alias=>alias.toLowerCase()===text))||Object.keys(CUISINES).find(label=>label===value)||'';
 }
 const strings=v=>Array.isArray(v)?v.filter(x=>typeof x==='string').map(x=>x.trim().slice(0,80)).filter(Boolean).slice(0,8):[];
+// Keep the reference place separate from what the user wants to find there.
+function nearbyRequest(query){
+  const ko=query.match(/^(.*?)\s*(근처|주변|인근)\s*(?:에서|에|의)?\s*(.*)$/i);
+  const en=!ko&&query.match(/^(.*?)\s+near\s+(.+?)(?:[?.!]|$)/i);
+  if(!ko&&!en)return null;
+  let anchor=(ko?ko[1]:en[2]).replace(/^(?:(?:오늘|내일|지금|혹시|나는|저는|난|저|나)\s+)+/,'').replace(/(?:에서|에|의)$/,'').trim();
+  let searchText=(ko?ko[3]:en[1]).trim();
+  const kind=/^(?:내|나|저|제|현재\s*위치|현위치|me|my location)$/i.test(anchor)?'current':/^(?:내\s*|우리\s*|지금\s*)?(?:숙소|호텔)$/i.test(anchor)?'stay':!anchor||/^(?:여기|이곳|이\s*곳|이|현재\s*지도|지도)$/i.test(anchor)?'context':'named';
+  if(kind!=='named')anchor='';
+  const radius=query.match(/(?:반경\s*)?(\d+(?:\.\d+)?)\s*(km|킬로(?:미터)?|m|미터)\s*(?:이내|안|내)?/i);
+  const meters=radius?Number(radius[1])*(/^(?:km|킬로)/i.test(radius[2])?1000:1):null;
+  const validRadius=meters&&meters>=100&&meters<=10000;
+  if(radius&&validRadius)searchText=searchText.replace(radius[0],' ').trim();
+  return {kind,anchor,searchText,radius:validRadius?meters:null,...(radius&&!validRadius?{invalidRadius:true}:{})};
+}
+function applyNearby(intent,query){
+  const ref=nearbyRequest(query);if(!ref||intent.transport||intent.guide||intent.guideTopic||intent.travelHelp||intent.mode==='advice')return intent;
+  const next={...intent,nearby:true,nearbyReference:ref,requestText:query,sortBy:intent.sortBy||'nearby_best'};
+  if(ref.invalidRadius)next.unsupported=[...(intent.unsupported||[]),'검색 반경은 100m~10km 범위에서 지정해 주세요'];
+  const clean=s=>s.toLowerCase().replace(/[\s.,?!]/g,'');
+  next.terms=(intent.terms||[]).filter(t=>!/^(?:근처|주변|인근|nearby|near)$/i.test(t)&&(!ref.anchor||!clean(ref.anchor).includes(clean(t))));
+  if(ref.anchor){
+    if(next.area&&clean(ref.anchor).includes(clean(next.area)))next.area='';
+    if(next.district&&new RegExp(next.district+'\\s*군').test(ref.anchor)&&!new RegExp(next.district+'\\s*군').test(ref.searchText))next.district='';
+    next.unsupported=(next.unsupported||[]).filter(t=>!clean(ref.anchor).includes(clean(t))&&!/^(?:근처|주변|인근)(?:\s*검색)?$/.test(t));
+  }
+  if(/가장\s*가까|제일\s*가까|가까운\s*순|거리순|nearest|closest/i.test(ref.searchText))next.sortBy='distance';
+  return next;
+}
 function validateIntent(value,city){
   if(value?.mode==='advice'){
     const answer=typeof value.answer==='string'?value.answer.trim():'';
@@ -47,6 +76,8 @@ function wantsFlorist(query){
   return /꽃다발|꽃바구니|(?:^|\s)꽃(?=을|를|\s|$)|\bflowers?\b|\bbouquet\b/i.test(query)&&/선물|사고|사려|사주|사줄|살\s*|구매|구입|배달|주문|보내|보낼|\b(?:buy|give|gift|send|order|deliver)\b/i.test(query);
 }
 function clarifyIntent(intent,query){
+  const originalQuery=query,proximity=nearbyRequest(query);
+  if(proximity?.anchor)query=proximity.searchText;
   const next={...intent,preferences:[...intent.preferences]};
   const cityNames={hcmc:/호치민|hochiminh|ho chi minh/i,hanoi:/하노이|hanoi|ha noi/i,danang:/다낭|da nang/i,nhatrang:/나트랑|nha trang/i,phuquoc:/푸꾸옥|푸꿕|phu quoc/i,dalat:/달랏|da lat/i,hoian:/호이안|hoi an/i,vungtau:/붕따우|호짬|vung tau/i,muine:/무이네|mui ne/i};
   const cities=Object.keys(cityNames).filter(key=>cityNames[key].test(query));
@@ -140,7 +171,7 @@ function clarifyIntent(intent,query){
     // A florist is not an electronics seller or a GrabFood merchant.
     delete next.action;delete next.productName;delete next.productSearch;delete next.guideTopic;
   }
-  return next;
+  return applyNearby(next,originalQuery);
 }
 // A route query is not a simultaneous two-city business filter. The renderer
 // uses reviewed gateways and official booking links, never model-made fares.
@@ -288,6 +319,14 @@ function contextualIntent(query,city){
   return extendIntent(clarifyIntent(parsed,query),query,city);
 }
 function recoveryIntent(query,city){
+  const ref=nearbyRequest(query);
+  if(ref&&ref.searchText){
+    const target=contextualIntent(ref.searchText,city)||literalIntent(ref.searchText,city);
+    if(target){
+      const explicit=Object.entries(ROUTE_CITIES).find(([,names])=>names.some(name=>query.toLowerCase().includes(name)));
+      return applyNearby(extendIntent({...target,city:explicit?.[0]||target.city},ref.searchText,city),query);
+    }
+  }
   return destinationIntent(query,city)||routeIntent(query,city)||guideIntent(query,city)||contextualIntent(query,city)||
     (()=>{const result=literalIntent(query,city);return result?extendIntent(result,query,city):null;})();
 }
@@ -323,11 +362,11 @@ function literalIntent(query,city){
     .replace(/오토바이|스쿠터|빌리(?:고|는|기)?|빌릴|빌려|대여|렌트/g,' ')
     .replace(/로컬|현지|룸|별실|개인실|개별실|독립실|프라이빗룸/g,' ')
     .replace(/여자\s*친구|남자\s*친구|연인|데이트|분위기|조용한?|야경|전망|가격대?|예산|비용|후기|평점|유명한?|인기|저렴한?|가성비|맛있는(?:\s*집)?|좋은|가장|최고|원탑|끝판왕|제일|베스트|혜택|제휴|강추|회원들이|회원/g,' ')
-    .replace(/오늘밤?|정도로?|놀만한|갈만한|추천해(?:주세요|줘)?|찾아(?:주세요|줘)?|알려(?:주세요|줘)?|어디(?:서|야|에)?|가야해|있는|싶어|싶은데|중에서|에서|으로|까지|중|곳|좀|많은|높은|낮은/g,' ');
+    .replace(/오늘밤?|정도로?|놀만한|갈만한|가까운|거리순|추천해(?:주세요|줘)?|찾아(?:주세요|줘)?|알려(?:주세요|줘)?|어디(?:서|야|에)?|가야해|있는|싶어|싶은데|중에서|에서|으로|까지|중|곳|좀|많은|높은|낮은/g,' ');
   if(intent.guide)remaining=remaining.replace(/배를|배편|페리|타고|표를|표|사야해|사는|사/g,' ');
   remaining=remaining.replace(/[?.!,~]/g,' ').replace(/(?:^|\s)(?:에|의|을|를|은|는|이|가|와|과|로|도|한|부터)(?=\s|$)/g,' ').replace(/[\s?.!,~]/g,'');
   return remaining?null:intent;
 }
 
-window.AIQueryIntent={contextualIntent,recoveryIntent,exploratoryIntent};
+window.AIQueryIntent={contextualIntent,recoveryIntent,exploratoryIntent,nearbyRequest,applyNearby};
 })();

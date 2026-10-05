@@ -65,6 +65,11 @@
       AREAS[intent.area]||intent.area,intent.district?'Quận '+intent.district:'',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
   }
   function boundsFor(intent,boundaries,nearby){
+    nearby=intent.nearbyOrigin||nearby;
+    if(intent.nearby&&nearby){
+      const dy=nearby.radius/111320,dx=dy/Math.cos(nearby.lat*Math.PI/180);
+      return {north:nearby.lat+dy,south:nearby.lat-dy,east:nearby.lng+dx,west:nearby.lng-dx};
+    }
     const feature=intent.city==='hcmc'&&boundaries.find(f=>f.properties?.era==='2020'&&f.properties.sourceName==='Quan '+intent.district);
     if(feature){
       const pairs=feature.geometry.coordinates.flat(feature.geometry.type==='MultiPolygon'?2:1);
@@ -108,6 +113,7 @@
       (typeof googlePhotoBranchMatches==='function'&&googlePhotoBranchMatches(p,raw))||exactBranch(p))||null;
   }
   function rowsFrom(raw,intent,{boundaries=[],nearby=null,places=[],memberUpdates=new Map()}={}){
+    nearby=intent.nearbyOrigin||nearby;
     // Google cannot establish community-only endorsements or partner benefits.
     if(intent.benefit||intent.recommended)return [];
     const seen=new Set(),rows=[];
@@ -128,6 +134,7 @@
       const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',...(intent.action==='grabfood'?{websiteURI:p.websiteURI||''}:{}),attributions:p.attributions||[],cuisineByMenu:!!cuisineProof,
         proofs:[...(cuisineProof?[cuisineProof]:[]),...proofs].slice(0,2).map(proof=>({...proof,evidence:proof.source.label==='Google 업소 설명'?'Google 업소 설명 · '+p.editorialSummary:proof.evidence}))};
       row.insights=window.AISearchInsights?.inspect(p,intent,sourcesFor(p));
+      if(intent.nearby&&nearby){row.distance=geoDistanceMeters(position,nearby);row.searchRadius=nearby.radius;}
       if(row.insights?.hotelClass?.kind==='different')continue;
       row.proofs=[...(row.insights?.proofs||[]),...row.proofs].slice(0,3).map(proof=>({...proof,evidence:proof.source.label==='Google 업소 설명'?'Google 업소 설명 · '+p.editorialSummary:proof.evidence}));
       if(window.AIMapSearch.wantsRoom(intent)){
