@@ -7,7 +7,7 @@
   const wrap=document.querySelector('.mapwrap');if(!wrap)return;
   const tools=document.createElement('nav');tools.className='browseTools';tools.setAttribute('aria-label','업소 찾기 조건');
   tools.innerHTML='<div class="browseFilterButtons">'+[['city','지역'],['category','업종'],['rating','평점']].map(([key,label])=>`<label><small>${label}</small><select data-browse-filter="${key}" aria-label="${label} 바로 선택"></select></label>`).join('')+'</div><div class="browseResultBar"><button id="browseShowList" type="button" aria-controls="businessSide">업소 목록</button><span id="browseConditions"></span><button id="browseClear" type="button" hidden>초기화</button></div>';
-  wrap.append(tools);
+  (document.querySelector('.mapUtilityBar')||wrap).prepend(tools);
   const quick=tools.querySelector('.browseFilterButtons');quick.classList.add('browseQuickFilters');
   el('businessSide').querySelector('.browseListTabs').after(quick);
   const dialog=document.createElement('dialog');dialog.id='browseFilterDialog';dialog.className='travellerDialog browseFilterDialog';dialog.setAttribute('data-no-sheet-resize','');dialog.setAttribute('aria-labelledby','browseFilterTitle');

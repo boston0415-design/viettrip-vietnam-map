@@ -59,7 +59,7 @@
 
   function reset(){
     pendingRefresh=false;
-    window.BodySheetDrag?.cancel(panel());stopAnimation();
+    window.BodySheetDrag?.cancel(panel()?.parentElement?.id==='businessSide'?panel().parentElement:panel());stopAnimation();
     if(frame!==null)cancelAnimationFrame(frame);frame=null;pending=null;
     height=null;bottom=null;dragging=false;tracking=false;dragBounds=null;
     const p=panel();if(!p)return;
@@ -67,7 +67,16 @@
     p.style.removeProperty('--sheet-height');p.style.removeProperty('--sheet-bottom');
   }
   function sync(){
-    if(panel()?.parentElement?.id==='businessSide')return;
+    if(panel()?.parentElement?.id==='businessSide'){
+      const p=panel();if(!p.classList.contains('show'))return;
+      if(!p.querySelector('.detailScroll')){
+        const content=document.createElement('div');content.className='detailScroll';
+        const header=p.querySelector('.detailHeader');
+        for(const child of [...p.children])if(child!==header&&!child.classList.contains('detailResizeHandle'))content.append(child);
+        p.append(content);p.scrollTop=0;
+      }
+      return;
+    }
     const p=panel();if(!p?.classList.contains('show'))return;
     syncTopGap();
     window.BodySheetDrag?.bind(p,{
@@ -99,7 +108,7 @@
     window.BodySheetDrag?.cancel(p);stopAnimation();flush();dragBounds=null;
     const b=bounds();apply(p.getBoundingClientRect().height>=b.max-3?b.min:b.max);p.scrollTop=0;positionSelectedPlaceInView();
   }
-  window.DetailSheetResize={sync,reset,toggle,isInteracting:()=>tracking||dragging||animation!==null,deferRefresh:()=>{pendingRefresh=true}};
+  window.DetailSheetResize={sync,reset,toggle,isInteracting:()=>tracking||dragging||animation!==null||Boolean(window.MenuSheetResize?.isInteracting(panel()?.parentElement)),deferRefresh:()=>{pendingRefresh=true},flushRefresh:refresh};
   window.addEventListener('resize',()=>{stopAnimation();dragBounds=null;syncTopGap();if(height!==null&&panel()?.classList.contains('show')){bottom=null;apply(height)}});
   window.addEventListener('blur',stopAnimation);
   window.addEventListener('pagehide',stopAnimation);

@@ -5,16 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <!-- build: modular-source-v4-20260917-range3 -->
 <title>일상탈출 베트남맵</title>
-<meta name="theme-color" content="#247f78">
+<meta name="theme-color" content="#6157d9">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="베트남맵">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" type="image/svg+xml" href="./assets/icons/vietmap.svg?v=20260918-vm1">
-<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/vietmap-192.png?v=20260918-vm1">
-<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/vietmap-180.png?v=20260918-vm1">
-<link rel="preload" href="./assets/fonts/vietmap-brand-extrabold.woff" as="font" type="font/woff" crossorigin>
+<link rel="icon" type="image/svg+xml" href="./assets/icons/vietmap.svg?v=20261006-brand2">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/vietmap-192.png?v=20261006-brand2">
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/vietmap-180.png?v=20261006-brand2">
 <link rel="stylesheet" href="./assets/css/base.css?v=20260919-recommend1">
 <link rel="stylesheet" href="./assets/css/responsive.css?v=20260917-range3">
 <link rel="stylesheet" href="./assets/css/community-stats.css?v=20260918-online1">
@@ -22,14 +21,14 @@
 <link rel="stylesheet" href="./assets/css/traveller-tools.css?v=20260918-all-cities1">
 <link rel="stylesheet" href="./assets/css/interface-polish.css?v=20260918-feedback-links2">
 <link rel="stylesheet" href="./assets/css/mobile-access.css?v=poi-directions1">
-<link rel="stylesheet" href="./assets/css/header-layout.css?v=20260918-vm1">
+<link rel="stylesheet" href="./assets/css/header-layout.css?v=20261006-brand2">
 <link rel="stylesheet" href="./assets/css/map-filters.css?v=mobile-filter-rails1">
 <link rel="stylesheet" href="./assets/css/detail-layout.css?v=20260920-search1">
 <link rel="stylesheet" href="./assets/css/menu-resize.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/place-photos.css?v=20260918-photos1">
 <link rel="stylesheet" href="./assets/css/booking-links.css?v=20260918-inquiries1">
-<link rel="stylesheet" href="./assets/css/home-screen.css?v=20260918-vm1">
-<link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20260918-vm1">
+<link rel="stylesheet" href="./assets/css/home-screen.css?v=20261006-brand2">
+<link rel="stylesheet" href="./assets/css/guide-map-link.css?v=20261006-brand2">
 <link rel="stylesheet" href="./assets/css/nearby-businesses.css?v=20260920-interaction3">
 <link rel="stylesheet" href="./assets/css/place-search.css?v=20261005-nearby-best1">
 <link rel="stylesheet" href="./assets/css/map-membership.css?v=20260924-operator1">
@@ -41,12 +40,13 @@
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
 <link rel="stylesheet" href="./assets/css/bright-interface.css?v=20261006-2">
 <link rel="stylesheet" href="./assets/css/chat-dock.css?v=20261006-admin-layout1">
+<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-drawer3">
 </head>
 <body>
 <div class="app">
   <header class="top">
     <div class="brand">
-      <div class="brandTitle"><span class="brandMark" aria-hidden="true"><img src="./assets/icons/vietmap.svg?v=20260918-vm1" width="44" height="44" alt=""></span><span>일상탈출 <em>베트남맵</em></span></div>
+      <div class="brandTitle"><span class="brandMark" aria-hidden="true"><img src="./assets/icons/vietmap.svg?v=20261006-brand2" width="44" height="44" alt=""></span><span>일상탈출 <em>베트남맵</em></span></div>
       <small>베트남 여행 정보와 현지 후기를 한눈에</small>
       <div class="brandLinks"><a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a><a id="mapGuideLink" class="mapGuideLink" href="./guide/">여행가이드 ↗</a></div>
     </div>
@@ -60,7 +60,7 @@
       <div class="operatorOptions" role="group" aria-label="관리자 메뉴"><strong id="adminSessionLabel" role="status" hidden>관리자 접속 중</strong><button id="adminBtn" type="button">관리자 로그인</button><button id="openOperatorTools" type="button" aria-haspopup="dialog" aria-controls="operatorDialog" hidden>관리자 페이지</button></div>
   <button id="openMapMembership" class="memberGradeBar" type="button" aria-haspopup="dialog" aria-controls="memberDialog"><span id="memberBarLabel">내 맵 등급</span><strong id="memberBarRank" class="mapRank rankPending">확인 중</strong><span id="memberBarProgress">내 활동 보기</span><span aria-hidden="true">›</span></button>
   <div class="appInstallBar" id="homeScreenBar">
-    <img src="./assets/icons/vietmap-192.png?v=20260918-vm1" alt="" width="28" height="28">
+    <img src="./assets/icons/vietmap-192.png?v=20261006-brand2" alt="" width="28" height="28">
     <div class="appInstallCopy"><strong>홈 화면에서 지도를 바로 열어요</strong><span>아이콘 하나로 지도·회원 후기까지</span></div>
     <button id="openHomeScreen" class="appInstallButton" type="button" aria-haspopup="dialog" aria-controls="homeScreenDialog">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m-4-4 4 4 4-4M5 15v5h14v-5"/></svg>홈 화면에 추가
@@ -326,7 +326,7 @@
 
 <dialog id="homeScreenDialog" class="travellerDialog homeScreenDialog" aria-labelledby="homeScreenTitle" aria-describedby="homeScreenIntro">
   <div class="travellerDialogHead">
-    <div class="homeScreenIdentity"><img src="./assets/icons/vietmap-192.png?v=20260918-vm1" alt="베트남맵 홈 화면 아이콘" width="62" height="62"><div><h2 id="homeScreenTitle">베트남맵을 홈 화면에</h2><p>일상탈출 · 언제든, 한 번에</p></div></div>
+    <div class="homeScreenIdentity"><img src="./assets/icons/vietmap-192.png?v=20261006-brand2" alt="베트남맵 홈 화면 아이콘" width="62" height="62"><div><h2 id="homeScreenTitle">베트남맵을 홈 화면에</h2><p>일상탈출 · 언제든, 한 번에</p></div></div>
     <button id="closeHomeScreen" type="button" aria-label="홈 화면 추가 안내 닫기">×</button>
   </div>
   <p id="homeScreenIntro" class="homeScreenIntro">홈 화면에 추가한 아이콘을 누르면 지도가 바로 열립니다. 인터넷에 연결하면 열 때와 화면으로 돌아올 때 업소·후기를 다시 불러옵니다.</p>
@@ -455,10 +455,10 @@
 <script src="./assets/js/booking-links.js?v=20261006-2"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260925-actions2"></script>
-<script src="./assets/js/04-rendering.js?v=20261006-admin-layout1"></script>
-<script src="./assets/js/body-sheet-drag.js?v=20261006-chat4"></script>
-<script src="./assets/js/detail-resize.js?v=20261006-chat1"></script>
-<script src="./assets/js/menu-resize.js?v=20261006-admin-layout1"></script>
+<script src="./assets/js/04-rendering.js?v=20261006-drawer3"></script>
+<script src="./assets/js/body-sheet-drag.js?v=20261006-drawer3"></script>
+<script src="./assets/js/detail-resize.js?v=20261006-drawer3"></script>
+<script src="./assets/js/menu-resize.js?v=20261006-drawer3"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260923-ux1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20261006-admin-layout1"></script>
@@ -478,8 +478,8 @@
 <script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260919-share1"></script>
 <script src="./assets/js/nearby-businesses.js?v=20260920-interaction3"></script>
-<script src="./assets/js/map-ux.js?v=20261006-admin-layout1"></script>
-<script src="./assets/js/browse-experience.js?v=20260925-search-panels1"></script>
+<script src="./assets/js/map-ux.js?v=20261006-drawer3"></script>
+<script src="./assets/js/browse-experience.js?v=20261006-drawer3"></script>
 <script src="./assets/js/map-weather.js?v=20261006-1"></script>
 <script src="./assets/js/road-condition-data.js?v=20261002-road1"></script>
 <script src="./assets/js/road-conditions.js?v=20261002-road1"></script>
@@ -496,6 +496,6 @@
 <script src="./assets/js/ai-nearby-search.js?v=20261005-nearby-best1"></script>
 <script src="./assets/js/ai-map-search.js?v=20261005-korean-vocabulary2"></script>
 
-<script src="./assets/js/chat-dock.js?v=20261006-3"></script>
+<script src="./assets/js/chat-dock.js?v=20261006-drawer3"></script>
 </body>
 </html>
