@@ -3,7 +3,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path'),
 const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results');fs.mkdirSync(out,{recursive:true});
 const fixture=String.raw`
-const testData={places:Array.from({length:24},(_,i)=>({id:'ux-'+i,name:i===0?'혜택 있는 카페':'주변 업소 '+i,category:'cafe',subcategory:'카페',address:'호치민 테스트 주소 '+i,area:'호치민',lat:10.77+i*.0001,lng:106.7,initialRating:null,memberBenefit:i===0,benefitText:i===0?'숙소 2박 이상 이용 회원 · 예약 시 혜택 확인':'',tags:[],photoUrls:i===0?['https://fixture.invalid/photo1.png','https://fixture.invalid/photo2.png']:[],createdAt:new Date(2026,8,20-i).toISOString()})),reviews:[{id:'review-1',placeId:'ux-0',nickname:'시험 회원',createdBy:'test-device-id',rating:4,recommended:true,text:'사진과 후기를 함께 확인하는 테스트입니다.',photoUrls:['https://fixture.invalid/photo3.png']}]};
+const testData={places:Array.from({length:24},(_,i)=>({id:'ux-'+i,name:i===0?'혜택 있는 카페':'주변 업소 '+i,category:'cafe',subcategory:'카페',address:'호치민 테스트 주소 '+i,description:i===0?'사진과 주소, 혜택을 살펴본 뒤 방문할 수 있습니다. '.repeat(18):'',area:'호치민',lat:10.77+i*.0001,lng:106.7,initialRating:null,memberBenefit:i===0,benefitText:i===0?'숙소 2박 이상 이용 회원 · 예약 시 혜택 확인':'',tags:[],photoUrls:i===0?['https://fixture.invalid/photo1.png','https://fixture.invalid/photo2.png']:[],createdAt:new Date(2026,8,20-i).toISOString()})),reviews:[{id:'review-1',placeId:'ux-0',nickname:'시험 회원',createdBy:'test-device-id',rating:4,recommended:true,text:'사진과 후기를 함께 확인하는 테스트입니다.',photoUrls:['https://fixture.invalid/photo3.png']}]};
 db=()=>testData;state.sharedDbLoading=false;state.city='all';state.cat='all';state.sub='all';state.sort='newest';state.query='';state.clickLatLng=null;
 const empty=()=>{};
 for(const name of ['renderMarkers','refreshRegisteredCoverage','renderPopularAreas','renderGolfCourses','renderPoiMarkers','clearSelectionRanges','clearAreaLabels','clearSelectedSystemIcons','closeSystemInfo','refreshMapAfterMobileLayout','positionSelectedPlaceInView','cancelPendingMapWork','fitCircleGeometry','fitSelectedCityView'])window[name]=empty;
@@ -384,7 +384,7 @@ const server=http.createServer((req,res)=>{
   if(width<901){
     const cdp=await context.newCDPSession(page),x=Math.round(titleRect.x+18),y=Math.round(titleRect.y+12);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
-    for(let i=1;i<=8;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y-i*12}]});await page.waitForTimeout(20);}
+    for(let i=1;i<=8;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y-i*6}]});await page.waitForTimeout(20);}
     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
   }else{
     await page.mouse.move(titleRect.x+18,titleRect.y+12);await page.mouse.wheel(0,100);
