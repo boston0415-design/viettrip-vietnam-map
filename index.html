@@ -40,7 +40,7 @@
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
 <link rel="stylesheet" href="./assets/css/bright-interface.css?v=20261006-2">
 <link rel="stylesheet" href="./assets/css/chat-dock.css?v=20261006-admin-layout1">
-<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-chat-rank8">
+<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-chat-name9">
 </head>
 <body>
 <div class="app">
@@ -416,7 +416,7 @@
       <div class="chatConnection"><span id="chatStatus" role="status">채팅을 열면 연결합니다.</span><button id="chatRetry" type="button">다시 연결</button></div>
       <button id="chatOlder" type="button" hidden>이전 대화 보기</button>
       <div id="chatMessages" role="log" aria-label="회원 채팅 메시지" aria-live="polite" aria-relevant="additions"></div>
-      <form id="chatForm" autocomplete="off"><label class="chatNickname">닉네임<input id="chatNickname" maxlength="30" required autocomplete="nickname" placeholder="공개 닉네임"></label><div class="chatCompose"><textarea id="chatMessage" maxlength="1000" rows="2" required aria-label="공개 채팅 메시지" placeholder="회원들과 이야기해 보세요 (최대 1,000자)"></textarea><button id="chatSend" type="submit">보내기</button></div><small>Enter 전송 · Shift+Enter 줄바꿈</small></form>
+      <form id="chatForm" autocomplete="off"><div class="chatCompose"><textarea id="chatMessage" maxlength="1000" rows="2" required aria-label="공개 채팅 메시지" placeholder="회원들과 이야기해 보세요 (최대 1,000자)"></textarea><button id="chatSend" type="submit">보내기</button></div><small>Enter 전송 · Shift+Enter 줄바꿈</small></form>
     </section>
     <section id="aiChat" role="tabpanel" aria-labelledby="aiTab" hidden><p class="chatNotice">AI 질문과 답변은 다른 회원에게 공개되지 않습니다.</p>
     <section class="aiMapSearch" aria-label="AI에게 업소 질문하기">
@@ -454,10 +454,10 @@
 <script src="./assets/js/booking-links.js?v=20261006-2"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260925-actions2"></script>
-<script src="./assets/js/04-rendering.js?v=20261006-chat-rank8"></script>
-<script src="./assets/js/body-sheet-drag.js?v=20261006-chat-rank8"></script>
-<script src="./assets/js/detail-resize.js?v=20261006-chat-rank8"></script>
-<script src="./assets/js/menu-resize.js?v=20261006-chat-rank8"></script>
+<script src="./assets/js/04-rendering.js?v=20261006-chat-name9"></script>
+<script src="./assets/js/body-sheet-drag.js?v=20261006-chat-name9"></script>
+<script src="./assets/js/detail-resize.js?v=20261006-chat-name9"></script>
+<script src="./assets/js/menu-resize.js?v=20261006-chat-name9"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260923-ux1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20261006-admin-layout1"></script>
@@ -477,8 +477,8 @@
 <script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260919-share1"></script>
 <script src="./assets/js/nearby-businesses.js?v=20260920-interaction3"></script>
-<script src="./assets/js/map-ux.js?v=20261006-chat-rank8"></script>
-<script src="./assets/js/browse-experience.js?v=20261006-chat-rank8"></script>
+<script src="./assets/js/map-ux.js?v=20261006-chat-name9"></script>
+<script src="./assets/js/browse-experience.js?v=20261006-chat-name9"></script>
 <script src="./assets/js/map-weather.js?v=20261006-1"></script>
 <script src="./assets/js/road-condition-data.js?v=20261002-road1"></script>
 <script src="./assets/js/road-conditions.js?v=20261002-road1"></script>
@@ -495,6 +495,6 @@
 <script src="./assets/js/ai-nearby-search.js?v=20261005-nearby-best1"></script>
 <script src="./assets/js/ai-map-search.js?v=20261005-korean-vocabulary2"></script>
 
-<script src="./assets/js/chat-dock.js?v=20261006-chat-rank8"></script>
+<script src="./assets/js/chat-dock.js?v=20261006-chat-name9"></script>
 </body>
 </html>
