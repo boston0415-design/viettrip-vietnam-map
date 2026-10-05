@@ -996,7 +996,6 @@ function openBookingInquiry(id){
   source.href=booking.sourceUrl;
   dialog.querySelector('#bookingInquiryChecked').textContent=`${booking.verifiedOn} 확인`;
   dialog.querySelector('#bookingInquiryStatus').textContent='';
-  window.TripCompanion?.prepareInquiry(place,dialog);
   if(!dialog.open)dialog.showModal();
   return true;
 }

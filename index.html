@@ -39,14 +39,14 @@
 <link rel="stylesheet" href="./assets/css/road-conditions.css?v=20261002-road1">
 <link rel="stylesheet" href="./assets/css/ai-map-search.css?v=20261005-nearby-best1">
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
-<link rel="stylesheet" href="./assets/css/trip-companion.css?v=20261006-1">
+<link rel="stylesheet" href="./assets/css/bright-interface.css?v=20261006-2">
 </head>
 <body>
 <div class="app">
   <header class="top">
     <div class="brand">
       <div class="brandTitle"><span class="brandMark" aria-hidden="true"><img src="./assets/icons/vietmap.svg?v=20260918-vm1" width="44" height="44" alt=""></span><span>일상탈출 <em>베트남맵</em></span></div>
-      <small>회원 혜택부터 예약 문의까지, 함께 만드는 여행지도</small>
+      <small>베트남 여행 정보와 현지 후기를 한눈에</small>
       <div class="brandLinks"><a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a><a id="mapGuideLink" class="mapGuideLink" href="./guide/">여행가이드 ↗</a></div>
     </div>
     <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" type="search" autocomplete="off" spellcheck="false" maxlength="200" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeSearchList" aria-label="업소명 또는 주소 검색" placeholder="업소명·주소·지역 검색"><button id="searchClear" class="searchClear" type="button" aria-label="검색어 지우기" hidden>×</button><button id="searchBtn" type="button">검색</button><div id="placeSearchResults" class="placeSearchResults" hidden><div id="placeSearchList" role="listbox" aria-label="추천 장소"></div><p id="placeSearchStatus" role="status" aria-live="polite"></p><div id="placeSearchCredit" translate="no" hidden>Google Maps</div></div></div>
@@ -76,7 +76,6 @@
     </div>
   </header>
   <div class="mapUtilityBar">
-  <button id="openTripCompanion" type="button" aria-haspopup="dialog" aria-controls="tripCompanion"><span aria-hidden="true">✦</span> 여행 도우미 <small>회원 혜택 · 후기 · 예약 문의</small></button>
   <button id="openMapMembership" class="memberGradeBar" type="button" aria-haspopup="dialog" aria-controls="memberDialog"><span id="memberBarLabel">내 맵 등급</span><strong id="memberBarRank" class="mapRank rankPending">확인 중</strong><span id="memberBarProgress">내 활동 보기</span><span aria-hidden="true">›</span></button>
   <div class="appInstallBar" id="homeScreenBar">
     <img src="./assets/icons/vietmap-192.png?v=20260918-vm1" alt="" width="28" height="28">
@@ -435,7 +434,7 @@
 <script src="./assets/js/search-vocabulary.js?v=20261005-korean-vocabulary2"></script>
 <script src="./assets/js/name-search.js?v=20261005-korean-vocabulary1"></script>
 <script src="./assets/js/03-business-ui.js?v=ai9-20260924-rating1"></script>
-<script src="./assets/js/booking-links.js?v=20261006-1"></script>
+<script src="./assets/js/booking-links.js?v=20261006-2"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260925-actions2"></script>
 <script src="./assets/js/04-rendering.js?v=20261004-detail-room1"></script>
@@ -478,6 +477,5 @@
 <script src="./assets/js/ai-query-intent.js?v=20261005-korean-vocabulary2"></script>
 <script src="./assets/js/ai-nearby-search.js?v=20261005-nearby-best1"></script>
 <script src="./assets/js/ai-map-search.js?v=20261005-korean-vocabulary2"></script>
-<script src="./assets/js/trip-companion.js?v=20261006-1"></script>
 </body>
 </html>
