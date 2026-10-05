@@ -28,7 +28,7 @@ async function login(a){a.node('#adminPassword').value=password;await a.run('sub
   const a=app();await login(a);
   assert.equal(a.local.get(KEY),password);assert(!a.session.has(KEY));assert.equal(a.run('state.isAdmin'),true);
   assert.equal(a.node('#adminSessionLabel').textContent,'관리자 접속 중');assert.equal(a.node('#openMapMembership').hidden,true);
-  assert.equal(a.node('#adminPassword').value,'');assert.equal(a.node('#adminBtn').textContent,'관리자 로그아웃');
+  assert.equal(a.node('#adminPassword').value,'');assert.equal(a.node('#adminBtn').textContent,'로그아웃');
 
   // A new page context and empty sessionStorage simulate closing/reopening the browser.
   const b=app(a.local);b.run('bindAdminSessionEvents()');await b.run('restoreAdminSession()');

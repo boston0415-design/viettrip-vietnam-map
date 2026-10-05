@@ -42,7 +42,7 @@ let adminSessionRevision=0;
 function syncAdminButton(){
   const button=$('#adminBtn');
   if(!button)return;
-  button.textContent=state.isAdmin||adminKey()?'관리자 로그아웃':'관리자 로그인';
+  button.textContent=state.isAdmin||adminKey()?'로그아웃':'관리자 로그인';
   button.classList.toggle('adminOn',state.isAdmin);
   const adminMenu=document.querySelector('.operatorOptions');if(adminMenu)adminMenu.hidden=!state.isAdmin;
   const adminStatus=$('#adminSessionLabel');

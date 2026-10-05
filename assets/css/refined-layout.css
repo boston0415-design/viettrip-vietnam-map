@@ -95,3 +95,9 @@
  .mapUtilityBar>.memberGradeBar{flex:1 1 auto;margin:0!important}
  .mapUtilityBar>.appInstallBar{margin:0!important}
 }
+
+@media(max-width:900px){
+ .mapUtilityBar #adminSessionLabel{display:none!important}
+ .mapUtilityBar>.operatorOptions{gap:4px!important}
+ .mapUtilityBar>.browseTools{flex:0 1 auto}
+}
