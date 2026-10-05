@@ -1,0 +1,24 @@
+/* A brighter shared palette, clear primary actions, and a compact utility row. */
+:root{--bg:#f6f9ff;--text:#192b43;--muted:#60718a;--line:#dce5f2;--blue:#2463eb}
+.top{--header-ink:#192b43;--header-accent:#2463eb;--header-line:#e0e8f5}
+.top .search,.top .aiComposer{background:#f6f9ff;border-color:#d5e2f5;box-shadow:none}
+.top .search>#searchBtn,.top .aiComposer>#aiMapSend:not(:disabled){background:#2463eb;color:#fff}
+.top .search>#searchBtn:hover,.top .aiComposer>#aiMapSend:not(:disabled):hover{background:#174ac5}
+.top .search:focus-within,.top .aiComposer:focus-within{border-color:#2463eb;box-shadow:0 0 0 3px #2463eb16}
+.top .actions .btn.primary{background:#edf4ff;color:#215ac7;border-color:#cddffb}
+.top .brand .cafeLink,.top .searchGlyph,.aiComposer label{color:#215ac7}
+.mapUtilityBar{background:#fff!important;border-bottom:1px solid #e0e8f5;gap:8px!important;padding:4px 14px!important;min-height:44px!important;align-items:center!important}
+.mapUtilityBar .memberGradeBar{margin-left:0;background:#fff;border:0;min-height:36px;padding:4px 8px}
+.mapUtilityBar .appInstallBar{background:none;border:0;min-height:36px;padding:0}
+.mapUtilityBar .appInstallBar>img,.mapUtilityBar .appInstallCopy{display:none}
+.mapUtilityBar .appInstallButton{min-height:36px;background:#fff;border-color:#dce5f2;color:#526681}
+#businessSide:not(.mobileFiltersOpen)>.operatorOptions{display:none}
+.browseListTabs button{background:#f3f6fc;color:#546784}
+.browseListTabs button.active{background:#eaf2ff;color:#174ea6;box-shadow:inset 0 0 0 1px #bfd5fa}
+.browseFilterButtons .isSet{background:#f6f9ff;border-color:#cbdcf7;color:#254971}
+#businessSide .card.active{background:#f1f6ff}
+#businessSide .rating{color:#234b88}#businessSide .businessRegion{color:#5e7391}
+#businessSide .cardBenefit{background:#fff5e9;color:#854600;border:1px solid #ffe0b8;border-radius:10px;padding:10px;line-height:1.6}
+.browseResultBar button{color:#254971;border-color:#d5e2f5;box-shadow:0 2px 8px #1e3e7210}
+#detail.show,#businessSide{border-color:#d5e2f5!important;box-shadow:0 8px 28px #193c6a1c!important}
+@media(max-width:900px){.mapUtilityBar{padding:3px 10px!important;gap:4px!important;flex-wrap:nowrap!important;min-height:42px!important}.mapUtilityBar .memberGradeBar{gap:4px;padding:3px}.mapUtilityBar .appInstallBar{margin-left:auto!important}.mapUtilityBar .appInstallButton{font-size:11px;padding:4px 7px}}
