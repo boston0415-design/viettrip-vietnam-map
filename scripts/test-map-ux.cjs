@@ -560,7 +560,6 @@ const server=http.createServer((req,res)=>{
   if(width<901)assert(googleReading.height>=page.viewportSize().height*.88&&googleReading.y<60,'long Google place opens at full reading height');
   else assert(googleReading.width>=440,'Google details share the wider desktop column');
   assert(address.y+address.height<=googleReading.y+googleReading.height,'address is visible below photos and the long title on opening');
-  await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
   await page.screenshot({path:path.join(out,`detail-large-google-${width}.png`)});
   await page.locator('#detail .externalInfo summary').click();
   await checkDetailReading('google');
@@ -888,6 +887,17 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('[data-place-id="context-group"]').count(),0);
   assert.equal(await page.evaluate(()=>JSON.stringify(testData)),contextBefore,'context searches and switches preserve original data');
   await page.locator('#aiMapClear').click();
+  if(width===390){
+   await page.setViewportSize({width:844,height:390});
+   await page.evaluate(()=>PlaceSearch.openGoogle({placeId:'reading-google',name:'UNAGI STATION'}));
+   const landscape=await page.locator('#detail').boundingBox();
+   assert(landscape.y>=0&&landscape.y<30&&landscape.y+landscape.height<=390,'landscape details remain within the screen');
+   assert(landscape.width>800,'landscape also uses the wider reading area');
+   await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
+   await page.screenshot({path:path.join(out,'detail-landscape.png')});
+   await page.locator('#detailCloseBtn').click();
+   assert(!await page.locator('#detail').isVisible(),'landscape close stays accessible');
+  }
   results.push({width,passed:true,checks:['transport choices, truthful rail connections and bilingual name selection','matching search design, date preferences, strict cuisine and benefit eligibility, verified-room and inquiry groups, raw fish and BBQ menu discovery independent of cuisine, price and atmosphere ranking across member/Google sources, truthful badges and stable detail','list-only quick filters','no public dashboard counts','operator controls in list options','desktop double-click max/min and mobile drag preservation','readable list under half height','expand-first title drag with anchored header and grip','nearby collapse/close/reopen','drag-to-collapse','title to detail','previous/next','photo drag versus tap','review close and frozen save target','photo modal','list/nearby restoration','benefit text','membership height','search registration','manual location validation']});
   await context.close();
  }

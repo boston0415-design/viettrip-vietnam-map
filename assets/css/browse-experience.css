@@ -114,7 +114,7 @@
  .browseFields{gap:15px 12px;padding:18px 16px}.browseDialogHead{padding:16px}.browseDialogFoot{padding-left:16px;padding-right:16px}
  /* Reading details uses the screen, including space normally occupied by
     search. The close button and grip stay pinned in the same scroll container. */
- #detail.show{position:fixed!important;z-index:41!important;left:6px!important;right:6px!important;top:auto!important;width:auto!important;max-width:100%;--detail-bottom-gap:max(24px,calc(env(safe-area-inset-bottom) + 12px))}
+ #detail.show{position:fixed!important;z-index:41!important;left:6px!important;right:6px!important;top:auto!important;bottom:var(--detail-bottom-gap)!important;width:auto!important;max-width:100%;--detail-bottom-gap:max(24px,calc(env(safe-area-inset-bottom) + 12px))}
  #detail.show:not(.detailResized){max-height:calc(100dvh - var(--detail-bottom-gap) - 14px)!important}
  #detail:not(.detailExpanded):not(.detailResized){height:min(260px,46%)!important}
  #detail.detailExpanded:not(.detailResized){height:calc(94dvh - var(--detail-bottom-gap))!important}
