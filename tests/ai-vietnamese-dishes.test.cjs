@@ -34,7 +34,7 @@ const {JSDOM}=require('jsdom'),read=p=>fs.readFileSync(p,'utf8');
   w.google={maps:{places:{Place:{searchByText:async request=>{requests.push(request);return {places:raw}}}}}};
   w.fetch=async()=>({ok:true,json:async()=>({intent:api.recoveryIntent(q,'hcmc')})});w.PlaceSearch={dismiss(){},openGoogle:row=>opened=row.placeId};
   const input=d.getElementById('aiMapQuestion');input.value=q;input.dispatchEvent(new w.Event('input'));d.getElementById('aiMapForm').dispatchEvent(new w.Event('submit',{cancelable:true}));await new Promise(r=>setTimeout(r,60));
-  assert.match(requests[0].textQuery,/cơm sườn/);assert(!requests[0].textQuery.includes('껌승집'));assert.match(requests[0].textQuery,/near sunrise/);assert(requests[0].locationRestriction);assert(requests.length<=2,'at most one supplemental dish query');
+  assert.match(requests[0].textQuery,/cơm sườn/);assert(!requests[0].textQuery.includes('껌승집'));assert(!requests[0].textQuery.includes('near sunrise'),'API uses coordinates, not an ambiguous location in the menu text');assert.match(w.AIGoogleSearch.queryFor(intent),/near sunrise/);assert(requests[0].locationRestriction);assert(requests.length<=2,'at most one supplemental dish query');
   assert.match(d.querySelector('.aiAnswerPick').textContent,/Cơm Sườn Nướng/);assert.match(d.querySelector('[data-google-place-id="related"]').textContent,/껌승 메뉴는 확인 필요/);assert.match(d.querySelector('.aiAnswer').textContent,/껌승 메뉴 확인 필요/);
   d.querySelector('[data-google-place-id="known"]').click();assert.equal(opened,'known');assert.equal(JSON.stringify(fixture),before);assert.equal(run('state.nearby'),null);
   dom.window.close();
