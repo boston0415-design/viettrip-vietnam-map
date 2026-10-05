@@ -41,3 +41,24 @@
 }
 @media(max-width:380px){.top .brandTitle{font-size:21px!important}.top .brandMark{width:27px;height:27px}}
 @media(prefers-reduced-motion:reduce){.chatDock{transition:none}}
+
+/* Explicit mobile rows: flex-basis:100% must never become a column height. */
+@media(max-width:900px){
+ :root{--chat-peek:70px}
+ .mapUtilityBar{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:none!important;grid-auto-rows:auto;flex-direction:row!important;justify-content:stretch!important;align-content:start!important;align-items:center!important;gap:6px 8px!important;padding:8px 10px!important;height:auto!important;min-height:0!important;box-sizing:border-box}
+ .mapUtilityBar>.browseTools{grid-column:1/-1;order:0;width:100%;min-width:0}
+ .mapUtilityBar .browseResultBar{justify-content:flex-start;align-items:center;gap:6px;flex-wrap:wrap}
+ .mapUtilityBar>.operatorOptions{grid-column:1/-1;order:1;justify-content:flex-start;align-items:center;gap:6px;margin:0!important;padding:0!important;width:100%;min-width:0;box-sizing:border-box}
+ .mapUtilityBar>.memberGradeBar{grid-column:1;order:1;margin:0!important;min-width:0;justify-content:flex-start}
+ .mapUtilityBar>.appInstallBar{grid-column:2;order:1;margin:0!important;min-width:0}
+ .mapUtilityBar>.communityStats{grid-column:1/-1;order:2;flex-basis:auto!important;align-self:auto;display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:4px 12px!important;width:auto!important;min-width:0;min-height:0!important;margin:0!important;padding:0!important;overflow:visible;box-sizing:border-box}
+ .mapUtilityBar>.communityStats>span{padding:0!important;min-height:22px!important}
+ .chatDock{left:8px;right:8px;bottom:8px;border-bottom:1px solid #d5e2f5;border-radius:18px;max-height:calc(100dvh - 16px)}
+ #chatForm{padding-bottom:max(16px,env(safe-area-inset-bottom))}
+}
+
+@media(max-width:900px){
+ .mapUtilityBar:has(#openOperatorTools[hidden])>.browseTools{grid-column:1;grid-row:1}
+ .mapUtilityBar:has(#openOperatorTools[hidden])>.operatorOptions{grid-column:2;grid-row:1;width:auto;justify-content:flex-end}
+}
+.mapUtilityBar #browseShowList,.mapUtilityBar #roadConditionsOpen{height:36px!important;min-height:36px!important;padding:6px 10px!important;box-sizing:border-box}
