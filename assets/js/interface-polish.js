@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(valid){params.set('dropOffLatitude',String(lat));params.set('dropOffLongitude',String(lng));}
     params.set('dropOffAddress',destination);params.set('dropOffKeywords',place.name||destination);
     const link=new URL('https://grab.onelink.me/2695613898');
-    link.search=new URLSearchParams({pid:'organic_web',af_force_deeplink:'true',af_dp:'grab://open?'+params.toString()}).toString();
+    link.search=new URLSearchParams({pid:'organic_web',af_force_deeplink:'true',af_dp:'grab://open?'+params.toString().replace(/\+/g,'%20')}).toString();
     document.getElementById('openGrabApp').href=link.href;
     document.getElementById('openGrabApp').textContent=valid?'목적지 넣고 그랩 열기':'그랩 예약 화면 열기';
     document.getElementById('grabPlaceName').textContent=place.name;
