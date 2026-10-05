@@ -280,6 +280,10 @@ const server=http.createServer((req,res)=>{
   assert(await page.locator('.browseNavigation').isVisible(),'list selection retains navigation');
   await page.locator('[data-browse-next]').click();assert.equal(await page.evaluate(()=>state.selected),'ux-1');
   await page.locator('[data-browse-prev]').click();assert.equal(await page.evaluate(()=>state.selected),'ux-0');
+  const openedDetail=await page.locator('#detail').boundingBox();
+  assert(await page.locator('#detailBody').isVisible(),'member details open expanded');
+  if(width<901)assert(openedDetail.height>=page.viewportSize().height*.88&&openedDetail.y<60,'phone details open above the search header');
+  else assert(openedDetail.width>=440,'desktop details have a wider reading column');
   // Photo tap opens a separate layer and never collapses the place panel.
   await page.evaluate(()=>setDetailExpanded(true));
   // One action row, with secondary choices in a modal instead of persistent rows.
@@ -392,7 +396,7 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:path.join(out,`pinned-detail-${width}.png`)});
   await page.locator('#detail>.detailResizeHandle').press('End');
   const tallestDetail=await page.locator('#detail').boundingBox();
-  assert(Math.abs(tallestDetail.y-readingMap.y-14)<=2,'maximized detail reaches just below the map top');
+  assert(Math.abs(tallestDetail.y-(width<901?14:readingMap.y+14))<=2,'maximized detail uses the full phone viewport or desktop map');
   await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
   assert(await page.locator('#detail .detailName').evaluate(n=>{const r=n.getBoundingClientRect();return n.contains(document.elementFromPoint(r.left+8,r.top+8))}),'map controls never cover the maximized business title');
   await page.screenshot({path:path.join(out,`detail-reading-space-${width}.png`)});
@@ -550,7 +554,13 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#pName').inputValue(),'직접 등록할 업소');
   assert.equal(await page.evaluate(()=>state.clickLatLng),null);
   await page.evaluate(()=>closeModalById('placeModal'));
-  await page.evaluate(()=>PlaceSearch.openGoogle({placeId:'reading-google',name:'한식당 호미도 1군 HOMIDO BBQ Quận 1'}));
+  await page.evaluate(()=>PlaceSearch.openGoogle({placeId:'reading-google',name:'UNAGI STATION - Japanese Fresh Grilled Eel - 新鮮焼日本鰻魚 - 신선한 장어구이 - Cơm lươn Nhật tươi nướng than.'}));
+  const googleReading=await page.locator('#detail').boundingBox(),address=await page.locator('#detail .externalInfo>div').first().boundingBox();
+  if(width<901)assert(googleReading.height>=page.viewportSize().height*.88&&googleReading.y<60,'long Google place opens at full reading height');
+  else assert(googleReading.width>=440,'Google details share the wider desktop column');
+  assert(address.y+address.height<=googleReading.y+googleReading.height,'address is visible below photos and the long title on opening');
+  await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
+  await page.screenshot({path:path.join(out,`detail-large-google-${width}.png`)});
   await page.locator('#detail .externalInfo summary').click();
   await checkDetailReading('google');
   await page.locator('#detail').evaluate(p=>p.scrollTop=140);

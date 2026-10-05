@@ -492,7 +492,7 @@ function renderDetail(){
     $('.mapwrap')?.classList.remove('detailOpen');
     return;
   }
-  if(detailPlaceId!==p.id){window.DetailSheetResize?.reset();detailExpanded=false;detailPlaceId=p.id;d.scrollTop=0;}
+  if(detailPlaceId!==p.id){window.DetailSheetResize?.reset();detailExpanded=true;detailPlaceId=p.id;d.scrollTop=0;}
   const st=stats(p.id);
   const ratingsOnly=db().reviews.filter(r=>r.placeId===p.id&&!String(r.text||'').trim());
   const ratingRecords=ratingsOnly.length?`<section class="ratingOnlyRecords"><h3>별점만 남긴 평가 ${ratingsOnly.length}개</h3>${ratingsOnly.map(r=>`<p><strong>${esc(r.nickname||'회원')}</strong> ${r.rating==null?'별점 없음':`★ ${esc(r.rating)}`} <small>글 후기 없이 별점만 등록</small></p>`).join('')}</section>`:'';

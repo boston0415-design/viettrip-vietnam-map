@@ -52,13 +52,13 @@ assert.equal(criteria(),originalCriteria);
  nodes.get('#businessSide').classList.add('mobileOpen');wrap.classList.add('listOpen');
  run('setMobileLegendExpanded(true)');
  await run("selectPlace('a')");flush();
- assert.equal(nodes.get('#detailBody').hidden,true,'selection starts compact');
+ assert.equal(nodes.get('#detailBody').hidden,false,'selection opens ready to read');
  assert(!nodes.get('#businessSide').classList.contains('mobileOpen'),'list closes on selection');
  assert(!wrap.classList.contains('listOpen'));assert(wrap.classList.contains('detailOpen'));
  assert(nodes.get('#areaLegendBody').hidden);assert(detail.innerHTML.includes('회원 후기 1개 보기'));
  assert(detail.innerHTML.includes('테스트 &lt;업체&gt;'));
  assert.equal((detail.innerHTML.match(/class="directionsButton/g)||[]).length,1,'one directions action shared by phone and desktop');assert(!detail.innerHTML.includes('id="adminDeleteBtn"'));
- run('assert.equal(lastPan.y,74);assert.equal(lastPan.x,0);assert.equal(criteria(),originalCriteria)');
+ run('assert.equal(lastPan.y,196);assert.equal(lastPan.x,0);assert.equal(criteria(),originalCriteria);setDetailExpanded(false)');flush();
  for(let i=0;i<3;i++){
   nodes.get('#detailExpandBtn').onclick();flush();assert.equal(nodes.get('#detailBody').hidden,false);
   run('assert.equal(lastPan.y,196)');
@@ -68,12 +68,12 @@ assert.equal(criteria(),originalCriteria);
  }
  run('setDetailExpanded(true);renderDetail()');assert.equal(nodes.get('#detailBody').hidden,false,'same place updates keep reading mode');
  nodes.get('#writeReview').onclick();run('assert.equal(writeReviewCalls,1)');
- await run("selectPlace('b')");flush();assert.equal(nodes.get('#detailBody').hidden,true,'new place resets summary');
+ await run("selectPlace('b')");flush();assert.equal(nodes.get('#detailBody').hidden,false,'new place opens ready to read');
  // Desktop/phone rotation keeps one panel and exposes details on desktop.
  mobile=false;run('syncDetailPanelLayout();positionSelectedPlaceInView()');flush();
  assert.equal(nodes.get('#detailBody').hidden,false);run('assert.equal(lastPan.x,188);assert.equal(lastPan.y,0)');
  mobile=true;landscape=true;run('syncDetailPanelLayout();positionSelectedPlaceInView()');flush();
- assert.equal(nodes.get('#detailBody').hidden,true);run('assert.equal(lastPan.x,160);assert.equal(lastPan.y,0)');landscape=false;
+ assert.equal(nodes.get('#detailBody').hidden,false);run('assert.equal(lastPan.x,160);assert.equal(lastPan.y,0)');landscape=false;
  // Filter and list opening dismiss detail; all map criteria remain intact.
  run('setMobileLegendExpanded(true)');assert(!detail.classList.contains('show'));assert(!nodes.get('#areaLegendBody').hidden);
  await run("selectPlace('a')");run('openMobileBusinessList()');flush();

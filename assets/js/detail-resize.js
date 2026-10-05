@@ -5,7 +5,10 @@
   function bounds(){
     if(dragBounds)return dragBounds;
     const map=document.querySelector('.mapwrap').getBoundingClientRect(),rect=panel().getBoundingClientRect();
-    const gap=bottom??Math.max(12,map.bottom-rect.bottom),max=Math.max(80,map.height-gap-14);
+    // Phone details float above the search header, so dragging uses the full
+    // viewport too. Desktop details remain beside the map.
+    const area=mobile()?{height:window.innerHeight,bottom:window.innerHeight}:map;
+    const gap=bottom??Math.max(12,area.bottom-rect.bottom),max=Math.max(80,area.height-gap-14);
     // Title and actions now share the panel's native scroll container.
     // Long names must not force the entire sheet to stay tall.
     return {min:Math.min(180,max),max,gap};
