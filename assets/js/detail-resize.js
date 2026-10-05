@@ -59,7 +59,7 @@
 
   function reset(){
     pendingRefresh=false;
-    window.BodySheetDrag?.cancel(panel());stopAnimation();
+    window.BodySheetDrag?.cancel(panel()?.parentElement?.id==='businessSide'?panel().parentElement:panel());stopAnimation();
     if(frame!==null)cancelAnimationFrame(frame);frame=null;pending=null;
     height=null;bottom=null;dragging=false;tracking=false;dragBounds=null;
     const p=panel();if(!p)return;

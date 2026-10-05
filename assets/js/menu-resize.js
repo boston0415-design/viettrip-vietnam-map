@@ -7,7 +7,8 @@
    const bottomGap=p.id==='businessSide'&&container?Math.max(0,container.getBoundingClientRect().bottom-p.getBoundingClientRect().bottom):0;
    let max=Math.max(80,available-(p.id==='businessSide'?14+bottomGap:32));
    if(container&&['areaLegend','areaPanel'].includes(p.id))max=Math.max(80,Math.min(max,p.getBoundingClientRect().bottom-container.getBoundingClientRect().top-12));
-   return {min:Math.min(p.id==='businessSide'?110:150,max),max};
+   const detailHeader=p.querySelector?.('#detail.show .detailHeader')?.getBoundingClientRect().height||0;
+   return {min:Math.min(p.id==='businessSide'?Math.max(110,detailHeader+76):150,max),max};
  }
  function size(p,value){
    const record=records.get(p),b=record.bounds||limits(p),h=Math.round(Math.max(b.min,Math.min(b.max,value)));
