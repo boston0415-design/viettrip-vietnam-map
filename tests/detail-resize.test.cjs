@@ -25,7 +25,7 @@ for(const mobile of [true,false]){
    else Object.assign(e,{pointerId:1,clientX:100,clientY:y,button:0,isPrimary:true,pointerType:'mouse'});
    target.dispatchEvent(e);return e;
  }
- // Genuine touch/mouse gestures use the explicit resize grip. Title links remain clickable.
+ // Genuine touch/mouse gestures move the sheet from titles as well as the grip.
  let clicks=0;p.querySelector('.businessReviewName').addEventListener('click',()=>clicks++);
  event(title,'down');event(title,'up');title.click();assert.equal(clicks,1);
  event(title,'down',500);assert.equal(event(title,'move',360).defaultPrevented,true);event(title,'cancel',360);assert.equal(height(),360,'title moves the sheet');w.DetailSheetResize.reset();
@@ -35,25 +35,35 @@ for(const mobile of [true,false]){
  const syncCount=run('syncs');advance(16);event(handle,'move',350);advance(16);assert.equal(run('syncs'),syncCount,'no full media/layout sync each frame');
  w.DetailSheetResize.deferRefresh();event(handle,'up',350);assert.equal(clicks,1,'drag does not generate a click');
  const before=height();assert(p.classList.contains('detailSettling'));advance(80);assert.notEqual(height(),before);assert(height()<=662);
- advance(200);assert.equal(Math.round(height()),410);assert(!p.classList.contains('detailSettling'));
+ advance(200);assert(height()>before&&height()<before+80,'modest momentum preserves the released position');assert(!p.classList.contains('detailSettling'));
  assert.equal(run('renders'),1,'deferred DB repaint resumes only after the gesture settles');
  // Grip drag can shrink even when the body has been scrolled.
  p.querySelector('#detailBody').scrollTop=200;
  event(handle,'down',300);event(handle,'move',450);advance(16);assert(p.classList.contains('detailDragging'));event(handle,'cancel',450);
  assert(!p.classList.contains('detailDragging'));assert(!p.classList.contains('detailSettling'));
- // Body scrolling stays native when content is not at the top.
+ // Body drags move an intermediate sheet even when content was scrolled.
  const previous=height();event(body,'down',300);assert.equal(event(body,'move',330).defaultPrevented,true);event(body,'cancel',330);assert(height()<previous,'compact body drag moves panel down');
- // An upward body swipe scrolls natively and never changes the sheet height.
+ // An upward body swipe expands before scrolling.
  const small=height();event(body,'down',500);assert.equal(event(body,'move',400).defaultPrevented,true);advance(16);assert(height()>small,'compact body drag expands before scrolling');event(body,'cancel',400);
  p.querySelector('#detailBody').scrollTop=0;
- // Reading an expanded panel must not resize it at an intermediate height.
+ // Expanded is not a drag lock: body drags resize at intermediate heights.
  Object.defineProperty(p,'scrollHeight',{get:()=>1600});
  Object.defineProperty(p,'clientHeight',{get:()=>p.getBoundingClientRect().height});
  p.classList.add('detailExpanded');p.scrollTop=100;
  const readingHeight=height();event(body,'down',300);event(body,'move',460);event(body,'cancel',460);
- assert.equal(height(),readingHeight);assert.equal(p.scrollTop,0,'read back to the top without folding');
+ assert(height()<readingHeight,'expanded body drag folds the sheet');
+ const foldedHeight=height();
  event(body,'down',500);event(body,'move',400);event(body,'cancel',400);
- assert.equal(height(),readingHeight);assert.equal(p.scrollTop,100,'read down without expanding again');
+ assert.equal(height(),foldedHeight+100,'expanded body drag raises the sheet first');
+ // At maximum, read long content, then continue folding after reaching its top.
+ handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'End',cancelable:true}));p.scrollTop=100;
+ event(body,'down',300);event(body,'move',350);event(body,'cancel',350);
+ assert.equal(height(),662);assert.equal(p.scrollTop,50);
+ event(body,'down',300);event(body,'move',410);event(body,'cancel',410);
+ assert.equal(p.scrollTop,0);assert.equal(height(),602,'one downward gesture scrolls to top then folds');
+ // A slow short drag rests where released, without snapping back.
+ event(body,'down',400);advance(80);event(body,'move',425);advance(160);event(body,'up',425);advance(300);
+ assert.equal(height(),577,'small held body drag stays at its released height');
  p.classList.remove('detailExpanded');p.scrollTop=0;
  // Reset/close cancels all frames, including in-flight inertia.
  event(handle,'down',500);event(handle,'move',250);event(handle,'up',250);w.DetailSheetResize.reset();advance(500);
@@ -64,7 +74,7 @@ for(const mobile of [true,false]){
  mapHeight=350;w.dispatchEvent(new w.Event('resize'));assert.equal(height(),312);
  if(mobile){
    mapHeight=700;w.DetailSheetResize.reset();reduced=true;event(handle,'down',500);advance(100);event(handle,'move',300);event(handle,'up',300);
-   assert.equal(height(),662);assert(!p.classList.contains('detailSettling'),'reduced-motion skips animation');
+   assert.equal(height(),600);assert(!p.classList.contains('detailSettling'),'reduced-motion skips animation');
    reduced=false;w.DetailSheetResize.reset();event(handle,'down',500);advance(100);event(handle,'move',350);event(handle,'up',350);advance(60);
    const interrupted=height();event(handle,'down',400);assert(!p.classList.contains('detailSettling'));advance(500);assert.equal(height(),interrupted,'new touch immediately stops settling');event(handle,'up',400);
  }
@@ -74,9 +84,13 @@ for(const mobile of [true,false]){
  handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Home',cancelable:true}));assert.equal(height(),180);
  if(mobile){
   viewportHeight=900;p.getBoundingClientRect=()=>({height:height()||220,bottom:876});w.DetailSheetResize.reset();
+  const header=w.document.createElement('header');header.className='top';header.getBoundingClientRect=()=>({bottom:100});w.document.body.prepend(header);w.DetailSheetResize.sync();
   handle.dispatchEvent(new w.KeyboardEvent('keydown',{key:'End',cancelable:true}));
-  assert.equal(height(),862,'phone maximum includes the space above the map');
+  assert.equal(height(),768,'phone maximum stays eight pixels below the search header');
+  assert.equal(p.style.getPropertyValue('--detail-top-gap'),'108px');
+  header.getBoundingClientRect=()=>({bottom:160});w.dispatchEvent(new w.Event('resize'));
+  assert.equal(height(),708,'viewport changes preserve the visible search header');
  }
  dom.window.close();
 }
-console.log('PASS real touch-event/mouse grip resizing and native title/body paths, frame batching, momentum snap, interruption, reduced motion, deferred refresh, scroll priority, taps, keyboard, bounds and cancellation (DOM simulation)');
+console.log('PASS touch/mouse title and body resizing, expand-first scrolling, free resting height, momentum, interruption, reduced motion, deferred refresh, taps, keyboard, header clearance and cancellation (DOM simulation)');

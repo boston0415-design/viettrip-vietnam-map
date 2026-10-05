@@ -282,7 +282,8 @@ const server=http.createServer((req,res)=>{
   await page.locator('[data-browse-prev]').click();assert.equal(await page.evaluate(()=>state.selected),'ux-0');
   const openedDetail=await page.locator('#detail').boundingBox();
   assert(await page.locator('#detailBody').isVisible(),'member details open expanded');
-  if(width<901)assert(openedDetail.height>=page.viewportSize().height*.88&&openedDetail.y<60,'phone details open above the search header');
+  const searchHeader=await page.locator('.top').boundingBox();
+  if(width<901)assert(openedDetail.height>=page.viewportSize().height*.65&&openedDetail.y>=searchHeader.y+searchHeader.height+24,'phone details leave breathing room below search');
   else assert(openedDetail.width>=440,'desktop details have a wider reading column');
   // Photo tap opens a separate layer and never collapses the place panel.
   await page.evaluate(()=>setDetailExpanded(true));
@@ -312,7 +313,9 @@ const server=http.createServer((req,res)=>{
     assert(!await page.locator('#businessShareDialog').evaluate(n=>n.open),'horizontal swipe never activates sharing');
   }
   await rail.evaluate(n=>n.scrollLeft=0);
-  await dragAt('#detail [data-business-share]',40);
+  const beforeActionDrag=await page.locator('#detail').boundingBox();
+  await dragAt('#detail [data-business-share]',-50,160);
+  assert((await page.locator('#detail').boundingBox()).height<beforeActionDrag.height-35,'vertical drag starting on a non-editing button folds the sheet');
   assert(!await page.locator('#businessShareDialog').evaluate(n=>n.open),'vertical drag on Share moves the sheet without opening it');
   await page.evaluate(()=>setDetailExpanded(true));
   await page.screenshot({path:path.join(out,`detail-actions-${width}.png`)});
@@ -341,7 +344,7 @@ const server=http.createServer((req,res)=>{
   assert(closeButton.width>=44&&closeButton.height>=44,'compact header retains a usable close target');
   async function checkDetailReading(label){
    const panel=page.locator('#detail');
-   // Read at a chosen, non-maximal height, matching a partially raised phone sheet.
+   // Every intermediate sheet moves first, even when marked expanded.
    await page.locator('#detail>.detailResizeHandle').press('End');
    await page.locator('#detail>.detailResizeHandle').press('ArrowDown');
    await page.locator('#detail>.detailResizeHandle').press('ArrowDown');
@@ -358,13 +361,25 @@ const server=http.createServer((req,res)=>{
     }else{await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x,y-delta,{steps:8});await page.waitForTimeout(160);await page.mouse.up();}
     await page.waitForTimeout(280);
    }
-   await swipe(-140);
-   assert.equal(await panel.evaluate(p=>p.scrollTop),0,label+' returns to its start');
-   await swipe(-40); // A fresh body pull at the top must also leave reading mode open.
+   await swipe(-50);
+   const folded=await panel.boundingBox();
+   assert(Math.abs(folded.height-(before.height-50))<3,label+' slow body pull stays where released');
+   await swipe(50);
+   assert(Math.abs((await panel.boundingBox()).height-before.height)<3,label+' body drag raises the intermediate sheet');
+   // At maximum, content scrolls until its top; further downward drag folds.
+   await page.locator('#detail>.detailResizeHandle').press('End');
+   await panel.evaluate(p=>p.scrollTop=80);
+   const maximum=await panel.boundingBox();
+   await swipe(-50);
+   assert(Math.abs((await panel.boundingBox()).height-maximum.height)<2,label+' reads back without folding before content reaches top');
+   assert(Math.abs(await panel.evaluate(p=>p.scrollTop)-30)<3,label+' body content scrolls toward top');
+   await swipe(-70);
+   assert.equal(await panel.evaluate(p=>p.scrollTop),0,label+' reaches the content top');
+   assert(Math.abs((await panel.boundingBox()).height-(maximum.height-40))<3,label+' same gesture continues folding after reaching the top');
+   await page.locator('#detail>.detailResizeHandle').press('End');
    await swipe(70);
-   assert(await panel.evaluate(p=>p.scrollTop)>40,label+' scrolls forward again');
-   const after=await panel.boundingBox();
-   assert(Math.abs(after.height-before.height)<2&&Math.abs(after.y-before.top)<2,label+' body swipes never move the panel');
+   assert(await panel.evaluate(p=>p.scrollTop)>50,label+' scrolls forward at full height');
+   assert(Math.abs((await panel.boundingBox()).height-maximum.height)<2,label+' reading at maximum preserves sheet height');
    await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
    await panel.evaluate(p=>p.scrollTop=0);
    await page.screenshot({path:path.join(out,`detail-scroll-${label}-${width}.png`)});
@@ -396,12 +411,13 @@ const server=http.createServer((req,res)=>{
   await page.screenshot({path:path.join(out,`pinned-detail-${width}.png`)});
   await page.locator('#detail>.detailResizeHandle').press('End');
   const tallestDetail=await page.locator('#detail').boundingBox();
-  assert(Math.abs(tallestDetail.y-(width<901?14:readingMap.y+14))<=2,'maximized detail uses the full phone viewport or desktop map');
+  assert(Math.abs(tallestDetail.y-(width<901?searchHeader.y+searchHeader.height+8:readingMap.y+14))<=2,'maximized detail stays below the search header');
   await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
   assert(await page.locator('#detail .detailName').evaluate(n=>{const r=n.getBoundingClientRect();return n.contains(document.elementFromPoint(r.left+8,r.top+8))}),'map controls never cover the maximized business title');
   await page.screenshot({path:path.join(out,`detail-reading-space-${width}.png`)});
   await page.locator('#detail').evaluate(n=>n.scrollTop=0);
-  await dragAt('.placePhotos img',-65);
+  await dragAt('.placePhotos img',-65,160);
+  assert((await page.locator('#detail').boundingBox()).height<tallestDetail.height-50,'photo drag folds the sheet');
   assert(!await page.locator('#memberPhotoViewer').evaluate(n=>n.open),'photo DRAG does not open the viewer');
   await checkDoubleClick('#detail','#detail .detailHeader h2');
   await page.locator('.placePhotos a').first().click();
@@ -556,11 +572,13 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>closeModalById('placeModal'));
   await page.evaluate(()=>PlaceSearch.openGoogle({placeId:'reading-google',name:'UNAGI STATION - Japanese Fresh Grilled Eel - 新鮮焼日本鰻魚 - 신선한 장어구이 - Cơm lươn Nhật tươi nướng than.'}));
   assert.match(await page.locator('#detail h2').innerText(),/UNAGI STATION.*신선한 장어구이/,'loaded details retain the long multilingual test name');
-  const googleReading=await page.locator('#detail').boundingBox(),address=await page.locator('#detail .externalInfo>div').first().boundingBox();
-  if(width<901)assert(googleReading.height>=page.viewportSize().height*.88&&googleReading.y<60,'long Google place opens at full reading height');
+  const googleReading=await page.locator('#detail').boundingBox();
+  if(width<901)assert(googleReading.height>=page.viewportSize().height*.65&&googleReading.y>=searchHeader.y+searchHeader.height+24,'Google details keep search visible with the same initial gap');
   else assert(googleReading.width>=440,'Google details share the wider desktop column');
-  assert(address.y+address.height<=googleReading.y+googleReading.height,'address is visible below photos and the long title on opening');
   await page.screenshot({path:path.join(out,`detail-large-google-${width}.png`)});
+  await page.locator('#detail .externalInfo>div').first().scrollIntoViewIfNeeded();
+  const address=await page.locator('#detail .externalInfo>div').first().boundingBox();
+  assert(address.y+address.height<=googleReading.y+googleReading.height,'address remains reachable below photos and the long title');
   await page.locator('#detail .externalInfo summary').click();
   await checkDetailReading('google');
   await page.locator('#detail').evaluate(p=>p.scrollTop=140);
@@ -891,7 +909,8 @@ const server=http.createServer((req,res)=>{
    await page.setViewportSize({width:844,height:390});
    await page.evaluate(()=>PlaceSearch.openGoogle({placeId:'reading-google',name:'UNAGI STATION'}));
    const landscape=await page.locator('#detail').boundingBox();
-   assert(landscape.y>=0&&landscape.y<30&&landscape.y+landscape.height<=390,'landscape details remain within the screen');
+   const landscapeHeader=await page.locator('.top').boundingBox();
+   assert(landscape.y>=landscapeHeader.y+landscapeHeader.height+8&&landscape.y+landscape.height<=390,'landscape details stay below search and within the screen');
    assert(landscape.width>800,'landscape also uses the wider reading area');
    await assertAnchored('#detail','.detailHeader','.detailResizeHandle');
    await page.screenshot({path:path.join(out,'detail-landscape.png')});

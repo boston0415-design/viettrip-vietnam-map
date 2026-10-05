@@ -2,13 +2,18 @@
   let height=null,bottom=null,frame=null,animation=null,pending=null,dragging=false,tracking=false,dragBounds=null,pendingRefresh=false;
   const panel=()=>document.getElementById('detail');
   const mobile=()=>typeof isMobileMapLayout==='function'?isMobileMapLayout():window.matchMedia('(max-width:900px)').matches;
+  function topGap(){
+    if(!mobile())return 14;
+    const header=document.querySelector('.top')?.getBoundingClientRect();
+    return Math.max(14,Math.min((header?.bottom??6)+8,window.innerHeight-220));
+  }
+  function syncTopGap(){panel()?.style.setProperty('--detail-top-gap',topGap()+'px')}
   function bounds(){
     if(dragBounds)return dragBounds;
     const map=document.querySelector('.mapwrap').getBoundingClientRect(),rect=panel().getBoundingClientRect();
-    // Phone details float above the search header, so dragging uses the full
-    // viewport too. Desktop details remain beside the map.
+    // Keep the phone search header visible at every sheet height.
     const area=mobile()?{height:window.innerHeight,bottom:window.innerHeight}:map;
-    const gap=bottom??Math.max(12,area.bottom-rect.bottom),max=Math.max(80,area.height-gap-14);
+    const gap=bottom??Math.max(12,area.bottom-rect.bottom),max=Math.max(80,area.height-gap-topGap());
     // Title and actions now share the panel's native scroll container.
     // Long names must not force the entire sheet to stay tall.
     return {min:Math.min(180,max),max,gap};
@@ -48,9 +53,9 @@
     flush();dragging=false;dragBounds=null;
     const p=panel();p?.classList.remove('detailDragging');
     if(canceled || !p?.classList.contains('show') || height===null)return;
-    const b=bounds(),stops=[clamp(220,b),clamp(b.max*.62,b),b.max];
-    const projected=clamp(height+velocity*150,b);
-    const target=stops.reduce((best,value)=>Math.abs(value-projected)<Math.abs(best-projected)?value:best,stops[0]);
+    // Keep the released height; a gentle flick adds momentum without snapping
+    // a short drag back to the same preset height.
+    const b=bounds(),target=clamp(height+velocity*90,b);
     const start=height,reduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
     if(reduced || Math.abs(start-target)<1){apply(target);positionSelectedPlaceInView();return}
     const started=performance.now();dragBounds=b;p.classList.add('detailSettling');
@@ -73,8 +78,9 @@
   }
   function sync(){
     const p=panel();if(!p?.classList.contains('show'))return;
+    syncTopGap();
     window.BodySheetDrag?.bind(p,{
-      anywhere:true,separateResizeAndScroll:true,preferContentScroll:()=>p.classList.contains('detailExpanded')&&(height===null||detailExpanded),
+      anywhere:true,
       includeHeaders:true,headerSelector:'.detailResizeHandle,.detailHeader',bounds,
       prepare(){stopAnimation();flush();tracking=true},
       start(){bottom=null;dragBounds=bounds();dragging=true;p.classList.add('detailDragging')},
@@ -86,7 +92,7 @@
       handle=document.createElement('div');handle.className='detailResizeHandle';handle.tabIndex=0;
       handle.setAttribute('role','separator');handle.setAttribute('aria-orientation','horizontal');
       handle.setAttribute('aria-label','상세창 높이 조절');handle.setAttribute('aria-controls','detailBody');
-      handle.title='제목·손잡이로 높이 조절 · 펼친 본문은 스크롤 · 방향키도 사용 가능';
+      handle.title='창 어디서나 위아래로 높이 조절 · 최대로 펼치면 내용 스크롤 · 방향키도 사용 가능';
       handle.innerHTML='<span aria-hidden="true"></span>';p.prepend(handle);
       handle.addEventListener('keydown',event=>{
         const b=bounds(),current=height??p.getBoundingClientRect().height;
@@ -102,7 +108,7 @@
     const b=bounds();apply(p.getBoundingClientRect().height>=b.max-3?b.min:b.max);p.scrollTop=0;positionSelectedPlaceInView();
   }
   window.DetailSheetResize={sync,reset,toggle,isInteracting:()=>tracking||dragging||animation!==null,deferRefresh:()=>{pendingRefresh=true}};
-  window.addEventListener('resize',()=>{stopAnimation();dragBounds=null;if(height!==null&&panel()?.classList.contains('show')){bottom=null;apply(height)}});
+  window.addEventListener('resize',()=>{stopAnimation();dragBounds=null;syncTopGap();if(height!==null&&panel()?.classList.contains('show')){bottom=null;apply(height)}});
   window.addEventListener('blur',stopAnimation);
   window.addEventListener('pagehide',stopAnimation);
 })();
