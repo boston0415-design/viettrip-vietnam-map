@@ -40,6 +40,7 @@
 <link rel="stylesheet" href="./assets/css/ai-map-search.css?v=20261005-nearby-best1">
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
 <link rel="stylesheet" href="./assets/css/bright-interface.css?v=20261006-2">
+<link rel="stylesheet" href="./assets/css/chat-dock.css?v=20261006-4">
 </head>
 <body>
 <div class="app">
@@ -50,26 +51,6 @@
       <div class="brandLinks"><a class="cafeLink" href="https://cafe.naver.com/talkvietnam" target="_blank" rel="noopener"><span>일상탈출 카페 <span aria-hidden="true">↗</span></span><span class="cafeAddress">cafe.naver.com/talkvietnam</span></a><a id="mapGuideLink" class="mapGuideLink" href="./guide/">여행가이드 ↗</a></div>
     </div>
     <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" type="search" autocomplete="off" spellcheck="false" maxlength="200" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeSearchList" aria-label="업소명 또는 주소 검색" placeholder="업소명·주소·지역 검색"><button id="searchClear" class="searchClear" type="button" aria-label="검색어 지우기" hidden>×</button><button id="searchBtn" type="button">검색</button><div id="placeSearchResults" class="placeSearchResults" hidden><div id="placeSearchList" role="listbox" aria-label="추천 장소"></div><p id="placeSearchStatus" role="status" aria-live="polite"></p><div id="placeSearchCredit" translate="no" hidden>Google Maps</div></div></div>
-    <section class="aiMapSearch" aria-label="AI에게 업소 질문하기">
-      <form id="aiMapForm" class="aiComposer" autocomplete="off">
-        <label for="aiMapQuestion">AI</label>
-        <input id="aiMapQuestion" type="text" maxlength="300" autocomplete="off" aria-label="AI에게 찾고 싶은 업소 질문하기" aria-controls="aiMapPanel" aria-expanded="false" placeholder="오늘 여자친구와 갈 만한 1군 분위기 좋은 바 찾아줘">
-        <button id="aiMapClear" class="searchClear" type="button" aria-label="AI 질문 지우기" hidden>×</button>
-        <button id="aiMapSend" type="submit" aria-label="AI에게 질문 보내기" disabled>질문</button>
-      </form>
-      <section id="aiMapPanel" class="aiPanel" aria-label="AI 업소 검색" hidden>
-        <div class="aiPanelHead"><strong id="aiMapTitle">이렇게 물어보세요</strong><button id="aiMapClose" type="button" aria-label="AI 검색 결과 닫기">×</button></div>
-        <div id="aiMapExamples" class="aiExamples">
-          <button type="button">오늘 여자친구와 갈 만한 1군에서 분위기 좋은 바를 찾아줘</button>
-          <button type="button">호치민에서 회원 혜택이 있는 마사지 찾아줘</button>
-          <button type="button">하노이에서 회원들이 강추한 식당 찾아줘</button>
-          <button type="button">호치민에서 달랏으로 가는 교통편 찾아줘</button>
-        </div>
-        <p id="aiMapStatus" role="status" aria-live="polite"></p>
-        <ul id="aiMapResults" class="aiResults" aria-label="회원 등록 업소와 Google 검색 결과"></ul>
-        <p id="aiMapNote" class="aiNote">회원 등록 업소를 먼저, Google 지도 업소를 함께 찾아요.</p>
-      </section>
-    </section>
     <div class="actions">
       <button id="locBtn" class="btn primary">현재 위치</button>
       <button id="addBtn" class="btn">업체 등록</button>
@@ -119,6 +100,7 @@
         <div class="sort"><span id="count">0개 업체</span><select id="sort" aria-label="업체 정렬"><option id="nearbyDistanceSort" value="distance" hidden disabled>가까운 순</option><option value="newest">최근 등록순</option><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
       </div>
       <div id="list" class="list"></div>
+      <section id="detail" class="detail"></section>
     </aside>
     <main class="mapwrap">
       <button id="desktopListToggle" type="button" aria-controls="businessSide" aria-expanded="true" aria-label="업체 목록 접기" title="업체 목록 접기">‹</button>
@@ -200,7 +182,6 @@
         </div>
         <div id="typeFilters" class="typeFilters"></div><div id="areaList" class="areaList"></div>
       </div>
-      <section id="detail" class="detail"></section>
     </main>
   </div>
 </div>
@@ -425,6 +406,42 @@
   <form id="mapCorrectionForm"><input id="correctionPlaceId" type="hidden"><label for="correctionKind">어떤 정보가 달라졌나요?</label><select id="correctionKind"><option value="address">주소·위치</option><option value="hours">영업시간</option><option value="closed">폐업·휴업</option><option value="other">기타 정보</option></select><label for="correctionBody">확인한 내용</label><textarea id="correctionBody" minlength="10" maxlength="1000" required rows="4" placeholder="바뀐 정보와 확인한 날짜·근거를 적어주세요."></textarea><p class="memberHelp">관리자 확인 후 기여 1건으로 인정됩니다. 접수만으로 업소 정보가 변경되지는 않습니다.</p><button id="correctionSave" type="submit">제안 보내기</button><p id="correctionStatus" role="status" aria-live="polite"></p></form>
 </dialog>
 
+<section id="chatDock" class="chatDock" aria-label="회원 채팅과 AI 질문">
+  <div id="chatGrip" class="chatGrip" role="separator" tabindex="0" aria-label="채팅창 높이 조절" aria-orientation="horizontal"><span></span></div>
+  <div class="chatHead"><button id="chatToggle" type="button" aria-expanded="false" aria-controls="chatContent">채팅 · AI 질문 <span id="chatUnread"></span></button><button id="chatFold" type="button" aria-label="채팅창 접기" hidden>⌄</button></div>
+  <div id="chatContent" hidden>
+    <div class="chatTabs" role="tablist" aria-label="대화 방식"><button id="peopleTab" role="tab" aria-selected="true" aria-controls="peopleChat">사람들과 채팅</button><button id="aiTab" role="tab" aria-selected="false" aria-controls="aiChat" tabindex="-1">AI에게 질문</button></div>
+    <section id="peopleChat" role="tabpanel" aria-labelledby="peopleTab">
+      <p class="chatNotice">전체 공개 채팅 · 최근 7일 보관 · 개인정보는 올리지 마세요.</p>
+      <div class="chatConnection"><span id="chatStatus" role="status">채팅을 열면 연결합니다.</span><button id="chatRetry" type="button">다시 연결</button></div>
+      <button id="chatOlder" type="button" hidden>이전 대화 보기</button>
+      <div id="chatMessages" role="log" aria-label="회원 채팅 메시지" aria-live="polite" aria-relevant="additions"></div>
+      <form id="chatForm" autocomplete="off"><label class="chatNickname">닉네임<input id="chatNickname" maxlength="30" required autocomplete="nickname" placeholder="공개 닉네임"></label><div class="chatCompose"><textarea id="chatMessage" maxlength="1000" rows="2" required aria-label="공개 채팅 메시지" placeholder="회원들과 이야기해 보세요 (최대 1,000자)"></textarea><button id="chatSend" type="submit">보내기</button></div><small>Enter 전송 · Shift+Enter 줄바꿈</small></form>
+    </section>
+    <section id="aiChat" role="tabpanel" aria-labelledby="aiTab" hidden><p class="chatNotice">AI 질문과 답변은 다른 회원에게 공개되지 않습니다.</p>
+    <section class="aiMapSearch" aria-label="AI에게 업소 질문하기">
+      <form id="aiMapForm" class="aiComposer" autocomplete="off">
+        <label for="aiMapQuestion">AI</label>
+        <input id="aiMapQuestion" type="text" maxlength="300" autocomplete="off" aria-label="AI에게 찾고 싶은 업소 질문하기" aria-controls="aiMapPanel" aria-expanded="false" placeholder="오늘 여자친구와 갈 만한 1군 분위기 좋은 바 찾아줘">
+        <button id="aiMapClear" class="searchClear" type="button" aria-label="AI 질문 지우기" hidden>×</button>
+        <button id="aiMapSend" type="submit" aria-label="AI에게 질문 보내기" disabled>질문</button>
+      </form>
+      <section id="aiMapPanel" class="aiPanel" aria-label="AI 업소 검색" hidden>
+        <div class="aiPanelHead"><strong id="aiMapTitle">이렇게 물어보세요</strong><button id="aiMapClose" type="button" aria-label="AI 검색 결과 닫기">×</button></div>
+        <div id="aiMapExamples" class="aiExamples">
+          <button type="button">오늘 여자친구와 갈 만한 1군에서 분위기 좋은 바를 찾아줘</button>
+          <button type="button">호치민에서 회원 혜택이 있는 마사지 찾아줘</button>
+          <button type="button">하노이에서 회원들이 강추한 식당 찾아줘</button>
+          <button type="button">호치민에서 달랏으로 가는 교통편 찾아줘</button>
+        </div>
+        <p id="aiMapStatus" role="status" aria-live="polite"></p>
+        <ul id="aiMapResults" class="aiResults" aria-label="회원 등록 업소와 Google 검색 결과"></ul>
+        <p id="aiMapNote" class="aiNote">회원 등록 업소를 먼저, Google 지도 업소를 함께 찾아요.</p>
+      </section>
+    </section>
+    </section>
+  </div>
+</section>
 <script src="./assets/js/01-data-storage.js?v=20260925-florist2"></script>
 <script src="./assets/js/hospital-directory.js?v=20260918-hospital-registration1"></script>
 <script src="./assets/js/pharmacy-directory.js?v=20260918-icons-pharmacy1"></script>
@@ -437,10 +454,10 @@
 <script src="./assets/js/booking-links.js?v=20261006-2"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260925-actions2"></script>
-<script src="./assets/js/04-rendering.js?v=20261004-detail-room1"></script>
-<script src="./assets/js/body-sheet-drag.js?v=20260926-detail-scroll1"></script>
-<script src="./assets/js/detail-resize.js?v=20261006-1"></script>
-<script src="./assets/js/menu-resize.js?v=20261006-1"></script>
+<script src="./assets/js/04-rendering.js?v=20261006-chat1"></script>
+<script src="./assets/js/body-sheet-drag.js?v=20261006-chat4"></script>
+<script src="./assets/js/detail-resize.js?v=20261006-chat1"></script>
+<script src="./assets/js/menu-resize.js?v=20261006-chat1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260923-ux1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
@@ -465,7 +482,7 @@
 <script src="./assets/js/map-weather.js?v=20261006-1"></script>
 <script src="./assets/js/road-condition-data.js?v=20261002-road1"></script>
 <script src="./assets/js/road-conditions.js?v=20261002-road1"></script>
-<script src="./assets/js/panel-history.js?v=20261002-road1"></script>
+<script src="./assets/js/panel-history.js?v=20261006-chat2"></script>
 <script src="./assets/js/desktop-window-size.js?v=20261006-1"></script>
 <script src="./assets/js/ai-place-hours.js?v=20260924-ai12"></script>
 <script src="./assets/js/ai-search-insights.js?v=20261005-korean-vocabulary2"></script>
@@ -477,5 +494,7 @@
 <script src="./assets/js/ai-query-intent.js?v=20261005-korean-vocabulary2"></script>
 <script src="./assets/js/ai-nearby-search.js?v=20261005-nearby-best1"></script>
 <script src="./assets/js/ai-map-search.js?v=20261005-korean-vocabulary2"></script>
+
+<script src="./assets/js/chat-dock.js?v=20261006-3"></script>
 </body>
 </html>

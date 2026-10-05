@@ -57,7 +57,7 @@
        grip.setAttribute('role','separator');grip.setAttribute('aria-orientation','horizontal');grip.setAttribute('aria-label','메뉴 높이 조절');
        grip.title=p.id==='businessSide'?'제목·업소명·본문을 위아래로 끌어 창 조절':'손잡이 또는 제목을 끌어 높이 조절 · 본문은 스크롤';grip.innerHTML='<span aria-hidden="true"></span>';p.prepend(grip);p.classList.add('menuResizable');records.set(p,{grip});
        window.BodySheetDrag?.bind(p,{
-         anywhere:['businessSide','areaLegend','areaPanel'].includes(p.id),separateResizeAndScroll:p.id==='businessSide',handlesOnly:true,includeHeaders:true,headerSelector:header+',.menuResizeGrip',bounds:()=>records.get(p).bounds||limits(p),
+         anywhere:['businessSide','areaLegend','areaPanel'].includes(p.id),separateResizeAndScroll:p.id==='businessSide',handlesOnly:true,includeHeaders:true,headerSelector:header+',.menuResizeGrip,.detailHeader',scrollElement:()=>p.id==='businessSide'&&p.querySelector('#detail.show')?p.querySelector('#detail'):p,bounds:()=>records.get(p).bounds||limits(p),
          prepare(){stop(p);records.get(p).bounds=limits(p)},
          start(){expand(p);p.classList.add('menuDragging')},size:value=>queue(p,value),flush:()=>stop(p),end:info=>end(p,info),afterEnd(){if(records.get(p).animation==null)records.get(p).bounds=null}
        });

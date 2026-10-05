@@ -67,6 +67,7 @@
     p.style.removeProperty('--sheet-height');p.style.removeProperty('--sheet-bottom');
   }
   function sync(){
+    if(panel()?.parentElement?.id==='businessSide')return;
     const p=panel();if(!p?.classList.contains('show'))return;
     syncTopGap();
     window.BodySheetDrag?.bind(p,{
@@ -93,6 +94,7 @@
     aria();
   }
   function toggle(){
+    if(panel()?.parentElement?.id==='businessSide'){window.MenuSheetResize?.toggle(panel().parentElement);return;}
     const p=panel();if(!p?.classList.contains('show'))return;
     window.BodySheetDrag?.cancel(p);stopAnimation();flush();dragBounds=null;
     const b=bounds();apply(p.getBoundingClientRect().height>=b.max-3?b.min:b.max);p.scrollTop=0;positionSelectedPlaceInView();

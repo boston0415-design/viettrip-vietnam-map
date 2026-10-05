@@ -96,7 +96,7 @@ async function fixture(mobile=true,{stale=false,denied=false}={}){
     await back();assert(!node('reviewModal').classList.contains('open'));
     assert.equal(run('reviewDraftResets'),1);assert(node('detail').classList.contains('show'));
     assert(node('detail').classList.contains('detailExpanded'));
-    if(mobile){await back();assert(node('detail').classList.contains('show'));assert(!node('detail').classList.contains('detailExpanded'))}
+    if(mobile&&node('detail').parentElement?.id!=='businessSide'){await back();assert(node('detail').classList.contains('show'));assert(!node('detail').classList.contains('detailExpanded'))}
     await back();assert(!node('detail').classList.contains('show'));assert(!guarded());
 
     if(mobile){

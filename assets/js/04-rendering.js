@@ -429,7 +429,8 @@ function positionSelectedPlaceInView(){
     if(!Number.isFinite(position.lat)||!Number.isFinite(position.lng))return;
     // Pan into the visible part of the map, including phone landscape and desktop.
     const sidePanel=panelRect.width<mapRect.width*.7;
-    const x=sidePanel?Math.max(0,(mapRect.right-panelRect.left)/2):0;
+    const overlap=Math.max(0,Math.min(mapRect.right,panelRect.right)-Math.max(mapRect.left,panelRect.left));
+    const x=sidePanel?(panel.parentElement?.id==='businessSide'?(panelRect.left<mapRect.left+mapRect.width/2?-overlap/2:overlap/2):Math.max(0,(mapRect.right-panelRect.left)/2)):0;
     const y=sidePanel?0:Math.max(0,(mapRect.bottom-panelRect.top-40)/2);
     state.map.setCenter(position);
     if(typeof state.map.panBy==='function')state.map.panBy(Math.round(x),Math.round(y));
@@ -439,7 +440,7 @@ function positionSelectedPlaceInView(){
 function syncDetailPanelLayout(){
   const panel=$('#detail');
   if(!panel?.classList.contains('show'))return;
-  const expanded=panel.classList.contains('externalDetail')?detailExpanded:(!isMobileMapLayout() || detailExpanded);
+  const expanded=panel.parentElement?.id==='businessSide'||(panel.classList.contains('externalDetail')?detailExpanded:(!isMobileMapLayout() || detailExpanded));
   panel.classList.toggle('detailExpanded',expanded);
   const body=$('#detailBody'),toggle=$('#detailExpandBtn');
   if(body)body.hidden=!expanded;
