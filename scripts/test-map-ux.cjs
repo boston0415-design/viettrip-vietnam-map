@@ -66,7 +66,9 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#mobileFilterToggle').getAttribute('aria-expanded'),'false');
   const adminEntry=page.locator('#adminBtn');
   assert.equal(await adminEntry.innerText(),'관리자 로그인');
-  assert(await adminEntry.isVisible(),'admin login is available without opening list options');
+  assert(!(await adminEntry.isVisible()),'admin login stays in secondary options');
+  await page.locator('#mobileFilterToggle').click();
+  assert(await adminEntry.isVisible(),'admin login is available in options');
   await adminEntry.click({trial:true}); // Wait for the list opening transition before hit-testing.
   assert(await adminEntry.evaluate(n=>{const r=n.getBoundingClientRect();return n.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),'admin entry is inside the visible panel');
   await page.screenshot({path:path.join(out,`admin-entry-${width}.png`)});
@@ -183,7 +185,7 @@ const server=http.createServer((req,res)=>{
   await page.locator('#mobileListClose').click();await page.locator('#browseShowList').click();
   const reopened=await page.locator('#businessSide').boundingBox();assert(reopened.height>=sizing.list-2,'list entry restores a usable height after minimizing');
   assert.equal(await page.locator('#mobileFilterToggle').getAttribute('aria-expanded'),'false','list entry shows businesses before secondary options');
-  assert(await page.locator('#adminBtn').isVisible(),'admin entry remains available after reopening the list');
+  assert(!(await page.locator('#adminBtn').isVisible()),'reopening keeps secondary admin options collapsed');
   const firstCard=await page.locator('#list article').first().boundingBox();assert(firstCard.y<reopened.y+reopened.height-60,'business content is visible without another drag');
   assert(await tabs.isVisible(),'tabs remain visible after reopening');assert(await page.locator('.mapWeather').isVisible(),'weather stays available with the list open');
   await page.screenshot({path:path.join(out,`compact-list-${width}.png`)});
@@ -377,7 +379,7 @@ const server=http.createServer((req,res)=>{
    assert(Math.abs(await panel.evaluate(p=>p.scrollTop)-30)<3,label+' body content scrolls toward top');
    await swipe(-70);
    assert.equal(await panel.evaluate(p=>p.scrollTop),0,label+' reaches the content top');
-   assert(Math.abs((await panel.boundingBox()).height-(maximum.height-40))<3,label+' same gesture continues folding after reaching the top');
+   assert(Math.abs((await panel.boundingBox()).height-maximum.height)<3,label+' reading gesture never unexpectedly folds at the top');
    await page.locator('#detail>.detailResizeHandle').press('End');
    await swipe(70);
    assert(await panel.evaluate(p=>p.scrollTop)>50,label+' scrolls forward at full height');

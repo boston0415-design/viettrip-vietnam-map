@@ -34,8 +34,7 @@ for(const mobile of [true,false]){
  assert(p.classList.contains('detailDragging'));assert.equal(run('detailExpanded'),true);
  const syncCount=run('syncs');advance(16);event(handle,'move',350);advance(16);assert.equal(run('syncs'),syncCount,'no full media/layout sync each frame');
  w.DetailSheetResize.deferRefresh();event(handle,'up',350);assert.equal(clicks,1,'drag does not generate a click');
- const before=height();assert(p.classList.contains('detailSettling'));advance(80);assert.notEqual(height(),before);assert(height()<=662);
- advance(200);assert(height()>before&&height()<before+80,'modest momentum preserves the released position');assert(!p.classList.contains('detailSettling'));
+ const before=height();assert(!p.classList.contains('detailSettling'));advance(280);assert.equal(height(),before,'sheet stops exactly where released');
  assert.equal(run('renders'),1,'deferred DB repaint resumes only after the gesture settles');
  // Grip drag can shrink even when the body has been scrolled.
  p.querySelector('#detailBody').scrollTop=200;
@@ -60,10 +59,10 @@ for(const mobile of [true,false]){
  event(body,'down',300);event(body,'move',350);event(body,'cancel',350);
  assert.equal(height(),662);assert.equal(p.scrollTop,50);
  event(body,'down',300);event(body,'move',410);event(body,'cancel',410);
- assert.equal(p.scrollTop,0);assert.equal(height(),602,'one downward gesture scrolls to top then folds');
+ assert.equal(p.scrollTop,0);assert.equal(height(),662,'reading gesture stays in scroll mode at the top');
  // A slow short drag rests where released, without snapping back.
  event(body,'down',400);advance(80);event(body,'move',425);advance(160);event(body,'up',425);advance(300);
- assert.equal(height(),577,'small held body drag stays at its released height');
+ assert.equal(height(),637,'small held body drag stays at its released height');
  p.classList.remove('detailExpanded');p.scrollTop=0;
  // Reset/close cancels all frames, including in-flight inertia.
  event(handle,'down',500);event(handle,'move',250);event(handle,'up',250);w.DetailSheetResize.reset();advance(500);
@@ -74,7 +73,7 @@ for(const mobile of [true,false]){
  mapHeight=350;w.dispatchEvent(new w.Event('resize'));assert.equal(height(),312);
  if(mobile){
    mapHeight=700;w.DetailSheetResize.reset();reduced=true;event(handle,'down',500);advance(100);event(handle,'move',300);event(handle,'up',300);
-   assert.equal(height(),600);assert(!p.classList.contains('detailSettling'),'reduced-motion skips animation');
+   assert.equal(height(),420);assert(!p.classList.contains('detailSettling'),'reduced-motion skips animation');
    reduced=false;w.DetailSheetResize.reset();event(handle,'down',500);advance(100);event(handle,'move',350);event(handle,'up',350);advance(60);
    const interrupted=height();event(handle,'down',400);assert(!p.classList.contains('detailSettling'));advance(500);assert.equal(height(),interrupted,'new touch immediately stops settling');event(handle,'up',400);
  }
@@ -93,4 +92,4 @@ for(const mobile of [true,false]){
  }
  dom.window.close();
 }
-console.log('PASS touch/mouse title and body resizing, expand-first scrolling, free resting height, momentum, interruption, reduced motion, deferred refresh, taps, keyboard, header clearance and cancellation (DOM simulation)');
+console.log('PASS touch/mouse title and body resizing, expand-first scrolling, free resting height, no post-release drift, interruption, reduced motion, deferred refresh, taps, keyboard, header clearance and cancellation (DOM simulation)');

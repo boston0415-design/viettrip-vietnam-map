@@ -36,6 +36,15 @@
   },true); // Handle overlay windows before the map consumes double-clicks.
   const titles='.mobileSideHead,.detailHeader,.menuResizeGrip,.detailResizeHandle,.areaPanelHead,.nearbyResultsHead,.nearbyResizeGrip,.travellerDialogHead,.reviewEditorHeader,.browseDialogHead,.weatherDialogHead,.photoViewerHead,.modal>h3';
   function hint(){document.querySelectorAll(titles).forEach(node=>{if(!node.hasAttribute('data-desktop-resize-hint')){node.setAttribute('data-desktop-resize-hint','');node.title='PC에서 두 번 클릭하면 창을 최대화·최소화합니다';}});}
-  hint();new MutationObserver(hint).observe(document.body,{childList:true,subtree:true});
+  hint();
+  new MutationObserver(changes=>{
+    for(const change of changes)for(const node of change.addedNodes){
+      if(node.nodeType!==1)continue;
+      const added=[...(node.matches(titles)?[node]:[]),...node.querySelectorAll(titles)];
+      for(const title of added)if(!title.hasAttribute('data-desktop-resize-hint')){
+        title.setAttribute('data-desktop-resize-hint','');title.title='PC에서 두 번 클릭하면 창을 최대화·최소화합니다';
+      }
+    }
+  }).observe(document.body,{childList:true,subtree:true});
   window.addEventListener('resize',()=>{for(const [panel,maximized] of windows){if(!panel.isConnected||!desktop()){panel.classList.remove('desktopWindowSized');panel.style.removeProperty('--desktop-window-height');windows.delete(panel);}else size(panel,maximized);}});
 })();

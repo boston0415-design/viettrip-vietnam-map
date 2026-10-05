@@ -69,7 +69,18 @@
      p.querySelectorAll(header).forEach(h=>h.classList.add('menuResizeHeader'));
    }
  }
- function start(){scan();new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});}
+ function start(){
+   scan();
+   const selector=configs.map(([selector])=>selector).join(',');
+   let scheduled=false;
+   new MutationObserver(changes=>{
+     // Ignore text updates, map tiles and business cards; only new panels need binding.
+     const relevant=changes.some(change=>[...change.addedNodes].some(node=>
+       node.nodeType===1&&(node.matches(selector)||node.querySelector(selector))));
+     if(!relevant||scheduled)return;
+     scheduled=true;queueMicrotask(()=>{scheduled=false;scan()});
+   }).observe(document.body,{childList:true,subtree:true});
+ }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
  window.MenuSheetResize={toggle};
  for(const event of ['blur','pagehide','resize'])window.addEventListener(event,()=>{for(const p of records.keys()){window.BodySheetDrag?.cancel(p);stop(p);records.get(p).bounds=null;if(event==='resize'&&p.classList.contains('menuSized'))size(p,parseFloat(p.style.getPropertyValue('--menu-height')))}});
