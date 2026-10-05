@@ -61,3 +61,4 @@
  .mapUtilityBar:has(#openOperatorTools[hidden])>.browseTools{grid-column:1;grid-row:1}
  .mapUtilityBar:has(#openOperatorTools[hidden])>.operatorOptions{grid-column:2;grid-row:1;width:auto;justify-content:flex-end}
 }
+.mapUtilityBar #browseShowList,.mapUtilityBar #roadConditionsOpen{height:36px!important;min-height:36px!important;padding:6px 10px!important;box-sizing:border-box}
