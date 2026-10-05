@@ -11,7 +11,7 @@
   // Match each original segment once. Replacement words must not be replaced
   // again (e.g. Saigon Square must stay one alias, and bar is not part of barber).
   const pattern=new RegExp(aliases.map(({alias})=>/[a-z]/.test(alias)?'(?<![a-z])'+escape(alias).replace(/ /g,'\\s*')+'(?![a-z])':escape(alias).replace(/ /g,'\\s*')).join('|'),'gi');
-  function canonical(s){return normalize(s).replace(pattern,m=>aliases.find(a=>a.alias.replace(/ /g,'')===m.replace(/ /g,''))?.word||m).replace(/\s+/g,' ').trim();}
+  function canonical(s){return normalize(window.SearchVocabulary?.googleQuery(s)||window.AIQueryIntent?.searchGoogleQuery(s)||s).replace(pattern,m=>aliases.find(a=>a.alias.replace(/ /g,'')===m.replace(/ /g,''))?.word||m).replace(/\s+/g,' ').trim();}
   const initials=['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h'];
   const vowels=['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i'];
   const endings=['','k','k','ks','n','nj','nh','t','l','lk','lm','lp','ls','lt','lp','lh','m','p','ps','t','t','ng','t','t','k','t','p','h'];
@@ -19,6 +19,8 @@
   function distance(a,b){let row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){const next=[i];for(let j=1;j<=b.length;j++)next[j]=Math.min(next[j-1]+1,row[j]+1,row[j-1]+Number(a[i-1]!==b[j-1]));row=next;}return row[b.length];}
   function score(name,query,details=''){
     const raw=normalize(query),n=normalize(name);if(!raw)return -1;
+    const vocabulary=window.SearchVocabulary;
+    if(vocabulary?.itemFor(query)&&vocabulary.mentions(name).length&&!vocabulary.match(name,query)&&!vocabulary.match(details,query))return -1;
     if(n===raw)return 0;if(n.startsWith(raw))return 1;if(n.includes(raw))return 2;
     const q=canonical(query),hay=canonical(name+' '+details),cn=canonical(name),compact=q.replace(/ /g,'');
     if(cn.replace(/ /g,'')===compact)return 3;

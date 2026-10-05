@@ -17,7 +17,7 @@
   const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').normalize('NFC').toLowerCase().replace(/\s+/g,' ').trim();
   const waxing=term=>/왁싱|wax(?:ing)?|wax long/i.test(normalize(term));
   const cuisineWords=cuisine=>CUISINES[cuisine]?[CUISINES[cuisine][0]]:[];
-  const sourcesFor=place=>[{label:'Google 업소명',text:place.displayName||''},{label:'Google 업소 설명',text:place.editorialSummary||''},...(place.reviews||[]).filter(r=>r.authorAttribution?.displayName).map(review=>({label:'Google 후기',text:review.text||review.originalText||'',review}))];
+  const sourcesFor=place=>[{label:'Google 업소명',text:place.displayName||''},{label:'Google 업소 설명',text:place.editorialSummary||''},...(place.reviews||[]).filter(r=>r.authorAttribution?.displayName).flatMap(review=>[...new Set([review.text,review.originalText].filter(Boolean))].map(text=>({label:'Google 후기',text,review})))];
   function includedType(intent){
     if(intent.terms?.includes('꽃집'))return 'florist';
     if(intent.productSearch)return intent.productKind==='computer'?'electronics_store':'cell_phone_store';
@@ -49,12 +49,17 @@
     if(intent.category==='bar'&&intent.subcategory==='바')return types.some(t=>t!=='night_club'&&CATEGORY_TYPES.bar.includes(t));
     return !intent.category||(CATEGORY_TYPES[intent.category]||[]).some(type=>types.includes(type));
   }
-  function termProof(place,term){
+  function termProof(place,term,intent={}){
     if(term==='꽃집'&&(place.types||[]).includes('florist'))return {evidence:'Google 업종 · 꽃집',source:{label:'Google 업종'}};
     if(term==='라멘'&&(place.types||[]).includes('ramen_restaurant'))return {evidence:'Google 업종 · 라멘',source:{label:'Google 업종'}};
     if(term==='햄버거'&&(place.types||[]).includes('hamburger_restaurant'))return {evidence:'Google 업종 · 햄버거',source:{label:'Google 업종'}};
     if(term==='고기·구이'&&(place.types||[]).some(type=>['barbecue_restaurant','korean_barbecue_restaurant'].includes(type)))return {evidence:'Google 업종 · 고기·구이',source:{label:'Google 업종'}};
     const proof=window.AIMapSearch.evidenceFor(sourcesFor(place),term);if(proof)return proof;
+    const translated=intent.termTranslations?.find(t=>t.term===term);
+    if(translated&&!window.AIQueryIntent?.searchItemFor(term)){
+      const aliases=[translated.vi,translated.en].filter(Boolean).map(s=>normalize(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s+'));
+      if(aliases.length){const proof=window.AIMapSearch.evidenceFor(sourcesFor(place),term,new RegExp('(?<![a-z])(?:'+aliases.join('|')+')(?![a-z])','i'));if(proof)return proof;}
+    }
     // A named cơm tấm shop supplies the rice context for a pork-chop menu
     // mentioned in a review; preserve the original quote and its attribution.
     if(term==='껌승'&&window.AIMapSearch.menuKeyword(place.displayName,'껌땀')&&!/\b(?:vegan|vegetarian|chay)\b|채식/i.test(normalize(place.displayName))){
@@ -71,7 +76,7 @@
   }
   function queryFor(intent,includeRoom=true,includeOrigin=true){
     if(intent.productSearch)return [window.NameSearch?.googleQuery(intent.requestText)||intent.requestText,intent.productKind==='computer'?'computer electronics store':'mobile phone store',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
-    const terms=(intent.terms||[]).map(term=>window.AIQueryIntent?.dishFor(term)?.query||(waxing(term)?'waxing':({'꽃집':'florist','라멘':'ramen','햄버거':'burger','쌀국수':'pho','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term)));
+    const terms=(intent.terms||[]).map(term=>window.AIQueryIntent?.searchItemFor(term)?.query||intent.termTranslations?.find(t=>t.term===term)?.vi||intent.termTranslations?.find(t=>t.term===term)?.en||(waxing(term)?'waxing':({'꽃집':'florist','라멘':'ramen','햄버거':'burger','쌀국수':'pho','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term)));
     const specialty=terms.some(waxing)||intent.terms?.includes('꽃집');
     return [intent.flowerGift?'flower bouquet':'',includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,intent.hotelStars?intent.hotelStars+' star':'',specialty?'':({'베이커리':'bakery','호텔':'hotel','로컬 KTV':'local Vietnamese karaoke'}[intent.subcategory]||SUBS[intent.subcategory]||CATEGORIES[intent.category]||''),
       ...(intent.preferences||[]).filter(p=>['quiet','rooftop','cheap','atmosphere','group'].includes(p)).map(p=>p==='group'?'group dining':p==='atmosphere'?'nice atmosphere':p==='cheap'?'affordable':p),
@@ -136,7 +141,7 @@
       if(['CLOSED_PERMANENTLY','CLOSED_TEMPORARILY','FUTURE_OPENING'].includes(p.businessStatus))continue;
       const country=p.addressComponents?.find(c=>c.types?.includes('country'));
       if(country&&country.shortText!=='VN')continue;
-      const proofs=intent.exploratory?[]:(intent.terms||[]).map(term=>termProof(p,term)||relatedDishProof(p,term));
+      const proofs=intent.exploratory?[]:(intent.terms||[]).map(term=>termProof(p,term,intent)||relatedDishProof(p,term));
       if(!typeMatches(p,intent)||proofs.some(proof=>!proof)||window.AIMapSearch.flowerPurposeMatches?.(p.displayName,intent)===false)continue;
       const place={name:String(p.displayName||'').trim(),address:p.formattedAddress||'',...position};
       if(!cityMatches(p,place,intent.city))continue;

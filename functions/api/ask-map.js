@@ -12,29 +12,115 @@ const CUISINES={
   '양식':['Western'],'퓨전':['Fusion'],'다국적':['International'],'기타':['Other']
 };
 const cuisineAliases=label=>[label,...CUISINES[label]];
-// One vocabulary feeds interpretation, Google queries and returned menu evidence.
-// Cơm tấm is a related shop type for cơm sườn, not proof of a pork dish.
-const VIETNAMESE_DISHES=[
-  {term:'껌승',query:'cơm sườn',aliases:['껌승','껌 승','껌수언','껌 수언','껌스언','껌쓰언','껌쑤언','껌슨','com suon','com tam suon','돼지갈비 덮밥','돼지갈비덮밥'],related:'껌땀'},
-  {term:'껌땀',query:'cơm tấm',aliases:['껌땀','껌 땀','껌땜','껌탐','com tam','broken rice']},
-  {term:'분짜',query:'bún chả',aliases:['분짜','분차','bun cha']},
-  {term:'반쎄오',query:'bánh xèo',aliases:['반쎄오','반세오','반쌔오','banh xeo']},
-  {term:'분팃느엉',query:'bún thịt nướng',aliases:['분팃느엉','분팃능','분팃느옹','bun thit nuong']},
-  {term:'껌가',query:'cơm gà',aliases:['껌가','껌 가','com ga','베트남 닭고기 덮밥']}
-];
+// SEARCH_VOCABULARY_START — shared by server, AI search and ordinary place search.
+// Search synonyms only. Never use this vocabulary to merge places or reviews.
+const SEARCH_VOCABULARY=[
+  ['껌승','cơm sườn','restaurant',['껌 승','껌수언','껌 수언','껌스언','껌쓰언','껌쑤언','껌슨','com tam suon','돼지갈비 덮밥','돼지갈비덮밥'],{related:'껌땀',parent:'껌땀'}],
+  ['껌땀','cơm tấm','restaurant',['껌 땀','껌땜','껌탐','broken rice']],
+  ['분짜','bún chả','restaurant',['분차']],
+  ['반쎄오','bánh xèo','restaurant',['반세오','반쌔오']],
+  ['분팃느엉','bún thịt nướng','restaurant',['분팃능','분팃느옹']],
+  ['껌가','cơm gà','restaurant',['껌 가','베트남 닭고기 덮밥']],
+  ['분보후에','bún bò Huế','restaurant',['분 보 후에','분보훼']],
+  ['분리우','bún riêu','restaurant',['분 리우']],
+  ['후띠우','hủ tiếu','restaurant',['후띠에우','후티우','후 티우']],
+  ['미꽝','mì Quảng','restaurant',['미 꽝','미광']],
+  ['까오러우','cao lầu','restaurant',['까오라우','카오라우','카오러우']],
+  ['반꾸온','bánh cuốn','restaurant',['반꾸언','반 꾸온','반꾸옹']],
+  ['반깐','bánh canh','restaurant',['반칸','반 깐']],
+  ['반꼿','bánh khọt','restaurant',['반콧','반 꼿']],
+  ['고이꾸온','gỏi cuốn','restaurant',['고이꾸언','고이 꾸온','월남쌈','fresh spring rolls','summer rolls']],
+  ['짜조','chả giò','restaurant',['차조','짜 조','nem rán','fried spring rolls']],
+  ['보네','bò né','restaurant',['보 네']],
+  ['보코','bò kho','restaurant',['보 kho','보 코']],
+  ['분더우맘똠','bún đậu mắm tôm','restaurant',['분더우 맘똠']],
+  ['볶음밥','cơm chiên','restaurant',['껌찌엔','껌 치엔','fried rice','cơm rang']],
+  ['쌀국수','phở','restaurant',[]],
+  ['소고기 쌀국수','phở bò','restaurant',['소고기쌀국수','퍼보','포보','beef pho'],{parent:'쌀국수'}],
+  ['닭고기 쌀국수','phở gà','restaurant',['닭고기쌀국수','퍼가','포가','chicken pho'],{parent:'쌀국수'}],
+  ['반미','bánh mì','restaurant',[]],
+  ['라멘','ramen','restaurant',['라아멘','ラーメン']],
+  ['햄버거','burger','restaurant',['버거','수제버거','hamburger','burgers','smashburger']],
+  ['피자','pizza','restaurant',[]],
+  ['파스타','pasta','restaurant',['스파게티','spaghetti','mì Ý']],
+  ['리조또','risotto','restaurant',[]],
+  ['스테이크','steak','restaurant',['비프스테이크','beefsteak','bít tết']],
+  ['초밥','sushi','restaurant',['스시']],
+  ['크루아상','croissant','cafe',['크로와상','크루와상','croissants']],
+  ['커피','coffee','cafe',['cà phê','카페 커피']],
+  ['에그커피','cà phê trứng','cafe',['에그 커피','계란커피','계란 커피','카페쯩','카페 쯩','egg coffee']],
+  ['연유커피','cà phê sữa','cafe',['연유 커피','카페쓰어','카페 쓰어','condensed milk coffee']],
+  ['코코넛커피','cà phê dừa','cafe',['코코넛 커피','카페즈어','카페 드어','coconut coffee']],
+  ['소금커피','cà phê muối','cafe',['소금 커피','카페무오이','salt coffee','salted coffee']],
+  ['망고스무디','sinh tố xoài','cafe',['망고 스무디','망고쉐이크','mango smoothie']],
+  ['아보카도스무디','sinh tố bơ','cafe',['아보카도 스무디','아보카도쉐이크','avocado smoothie']],
+  ['스무디','sinh tố','cafe',['씬또','신또','smoothie','smoothies']],
+  ['밀크티','trà sữa','cafe',['밀크 티','짜쓰어','짜 쓰어','milk tea','bubble tea','버블티']],
+  ['쩨','chè','cafe',[]],
+  ['아이스크림','ice cream','cafe',['아이스 크림','kem']],
+  ['빙수','bingsu','cafe',['팥빙수']],
+  ['망고','xoài','shopping',['mango','mangoes']],
+  ['두리안','sầu riêng','shopping',['durian']],
+  ['망고스틴','măng cụt','shopping',['mangosteen']],
+  ['용과','thanh long','shopping',['dragon fruit']],
+  ['코코넛','dừa','shopping',['coconut','coconuts']],
+  ['우산','umbrella','shopping',['umbrellas','dù che mưa','ô dù']],
+  ['우비','áo mưa','shopping',['raincoat','raincoats','rain poncho']],
+  ['헬멧','mũ bảo hiểm','shopping',['헬맷','helmet','helmets','nón bảo hiểm']],
+  ['충전기','charger','shopping',['chargers','bộ sạc','củ sạc']],
+  ['충전케이블','cáp sạc','shopping',['충전 케이블','charging cable','charge cable']],
+  ['보조배터리','sạc dự phòng','shopping',['보조 배터리','power bank','powerbank','pin dự phòng']],
+  ['여행용어댑터','travel adapter','shopping',['여행용 어댑터','여행용아답터','멀티어댑터','멀티 어댑터','ổ cắm du lịch']],
+  ['캐리어','vali','shopping',['케리어','여행가방','여행 가방','suitcase','suitcases','luggage','va li']],
+  ['배낭','ba lô','shopping',['백팩','backpack','backpacks','balo']],
+  ['샌들','sandal','shopping',['sandals','dép sandal']],
+  ['슬리퍼','dép lê','shopping',['slippers']],
+  ['운동화','giày thể thao','shopping',['sneakers','trainers']],
+  ['안경','kính mắt','shopping',['eyeglasses','spectacles','kính cận']],
+  ['선글라스','kính râm','shopping',['썬글라스','sunglasses','kính mát']],
+  ['콘택트렌즈','kính áp tròng','shopping',['콘택트 렌즈','컨택트렌즈','contact lenses']],
+  ['수영복','đồ bơi','shopping',['swimsuit','swimwear','áo tắm']],
+  ['낚시용품','đồ câu cá','shopping',['낚시 용품','fishing tackle','fishing equipment']],
+  ['기념품','đồ lưu niệm','shopping',['souvenir','souvenirs']],
+  ['향수','nước hoa','shopping',['perfume','perfumes']],
+  ['화장품','mỹ phẩm','shopping',['cosmetics']],
+  ['선크림','kem chống nắng','shopping',['썬크림','선 크림','sunscreen','sun cream','sunblock']],
+  ['목베개','gối cổ','shopping',['목 베개','neck pillow','travel pillow']],
+  ['수건','towel','shopping',['towels','khăn tắm']],
+  ['생수','nước đóng chai','shopping',['bottled water','nước suối']],
+  ['이어폰','tai nghe','shopping',['earphones','earbuds','헤드폰','headphones']],
+  ['카메라','máy ảnh','shopping',['camera','cameras']],
+  ['문구용품','văn phòng phẩm','shopping',['문구 용품','문구점','stationery']],
+  ['장난감','đồ chơi','shopping',['toy','toys']],
+  ['애견용품','đồ thú cưng','shopping',['애견 용품','반려동물용품','pet supplies']],
+  ['강아지사료','thức ăn cho chó','shopping',['강아지 사료','개사료','dog food']],
+  ['고양이사료','thức ăn cho mèo','shopping',['고양이 사료','cat food']]
+].map(([term,query,category,aliases,extra={}])=>({term,query,category,aliases,...extra}));
 const dishText=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').normalize('NFC').replace(/đ/gi,'d').toLowerCase();
-const dishAliases=VIETNAMESE_DISHES.flatMap(d=>[...new Set([d.term,...d.aliases])].map(alias=>({dish:d,alias:dishText(alias)}))).sort((a,b)=>b.alias.length-a.alias.length);
-const dishPattern=new RegExp(dishAliases.map(({alias})=>{const escaped=alias.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s*');return /[a-z]/.test(alias)?'(?<![a-z])'+escaped+'(?![a-z])':escaped;}).join('|'),'gi');
-export function dishMentions(text){
-  const found=[];dishText(text).replace(dishPattern,match=>{const item=dishAliases.find(a=>a.alias.replace(/\s/g,'')===match.replace(/\s/g,''));if(item&&!found.some(d=>d.term===item.dish.term))found.push(item.dish);return match;});return found;
+const searchEscape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const searchAliases=SEARCH_VOCABULARY.flatMap(item=>[...new Set([item.term,item.query,...item.aliases].map(dishText))].map(alias=>({item,alias}))).sort((a,b)=>b.alias.length-a.alias.length);
+const aliasPattern=alias=>/[a-z]/.test(alias)?'(?<![a-z])'+searchEscape(alias).replace(/\s+/g,'\\s*')+'(?![a-z])':'(?<![가-힣])'+searchEscape(alias).replace(/\s+/g,'\\s*')+'(?=$|[^가-힣]|전문점|맛집|식당|가게|매장|판매점|집|을|를|은|는|이|가|와|과|도|로|에서|먹|파는)';
+const searchPattern=new RegExp(searchAliases.map(({alias})=>aliasPattern(alias)).join('|'),'gi');
+const searchAlias=match=>searchAliases.find(a=>a.alias.replace(/\s/g,'')===match.replace(/\s/g,''));
+export function searchMentions(text){
+  const found=[];dishText(text).replace(searchPattern,match=>{const item=searchAlias(match)?.item;if(item&&!found.includes(item))found.push(item);return match;});return found;
 }
-export function dishFor(term){return VIETNAMESE_DISHES.find(d=>d.term===term)||(!stripDishes(term).trim()?dishMentions(term)[0]:null)||null;}
-export function dishMatch(text,term){
-  const dish=dishFor(term);if(!dish)return '';
-  const pattern=dishAliases.filter(a=>a.dish===dish).map(({alias})=>{const escaped=alias.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s*');return /[a-z]/.test(alias)?'(?<![a-z])'+escaped+'(?![a-z])':escaped;}).join('|');
-  return dishText(text).match(new RegExp(pattern,'i'))?.[0]||'';
+function stripSearchItems(text,items=SEARCH_VOCABULARY){
+  return dishText(text).replace(new RegExp('('+searchPattern.source+')(?:\\s*(?:전문점|맛집|식당|가게|매장|판매점|집))?','gi'),(whole,word)=>items.includes(searchAlias(word)?.item)?' ':whole);
 }
-function stripDishes(text){return dishText(text).replace(new RegExp('(?:'+dishPattern.source+')(?:\\s*(?:전문점|맛집|식당|집))?','gi'),' ');}
+export function searchItemFor(term){const items=searchMentions(term);return items.length===1&&!stripSearchItems(term,items).trim()?items[0]:null;}
+export function searchItemMatch(text,term){
+  const item=searchItemFor(term);if(!item)return '';
+  return [...dishText(text).matchAll(new RegExp(searchPattern.source,'gi'))].find(m=>{const found=searchAlias(m[0])?.item;return found===item||found?.parent===item.term;})?.[0]||'';
+}
+export function searchGoogleQuery(text){
+  return dishText(text).replace(new RegExp('('+searchPattern.source+')(?:\\s*(?:전문점|맛집|식당|가게|매장|판매점|집))?','gi'),(whole,word)=>searchAlias(word)?.item.query||whole).replace(/\s+/g,' ').trim();
+}
+export function dishMentions(text){return searchMentions(text).filter(d=>d.category==='restaurant');}
+export function dishFor(term){const item=searchItemFor(term);return item?.category==='restaurant'?item:null;}
+export function dishMatch(text,term){return dishFor(term)?searchItemMatch(text,term):'';}
+function stripDishes(text){return stripSearchItems(text,SEARCH_VOCABULARY.filter(d=>d.category==='restaurant'));}
+// SEARCH_VOCABULARY_END
 function cuisineLabel(value){
   const text=String(value||'').trim().replace(/\s*(?:식당|레스토랑|음식점|음식|요리|식|restaurants?|cuisine|food)$/i,'').trim().toLowerCase();
   return Object.keys(CUISINES).find(label=>cuisineAliases(label).some(alias=>alias.toLowerCase()===text))||Object.keys(CUISINES).find(label=>label===value)||'';
@@ -54,6 +140,7 @@ category: restaurant=식당/맛집, spa=마사지/스파/왁싱, barber=이발�
 반미/banh mi is restaurant with terms=["반미"], NEVER Chinese. 빵집/베이커리 is cafe with subcategory=베이커리, not shopping. 오토바이 대여/렌트/빌리기 is a supported business search: relevant=true category="" terms=["오토바이 대여"]. Hotel, ferry ticket and rental questions ARE relevant, including where/how to book. Hotel star classification is not the user review rating. Preserve hotel star constraints for the client to label verified and unverified candidates; do not reject them.
 subcategory: restaurant must preserve ONLY an explicitly requested cuisine from ${Object.keys(CUISINES).join('/')}; 프렌치/French=프랑스, 이탈리안/Italian=이탈리아. Otherwise "". NEVER infer a nationality from a dish: 횟집/회/sashimi is NOT necessarily Japanese, BBQ is NOT necessarily Korean. A requested cuisine can be supplied by a mixed-menu restaurant with evidence; it does not describe the owner's nationality. For bar: use 바 for a bar/pub/rooftop bar request, 클럽 for a nightclub request. For other categories leave empty and preserve narrower types as terms (except rooftop, which is a preference).
 terms: only specific dishes, business names or essential features explicitly asked for. ALL terms must match. Do not add city, district, area, category, subcategory, companion, date or subjective adjectives to terms. Do not invent synonyms or business names.
+Korean users may write English/Vietnamese foods or objects using either Korean phonetic spelling or their Korean meaning. Recognize both. Preserve the specific item, ingredients, brand, model, size, negation and named location. Never translate a proper business name into a different business. Optional termTranslations: [{"term":"an exact member of terms","en":"equivalent English item name","vi":"equivalent Vietnamese item name"}] supplies translations for retrieval, not claims about inventory. Use only direct equivalent item names you know; omit uncertain translations, broad substitute categories, URLs, place names, explanations and added attributes. Example: terms=["우비"], termTranslations=[{"term":"우비","en":"raincoat","vi":"áo mưa"}]. A sunscreen search is not an ice-cream search just because both Vietnamese names contain kem. A camera is not a camera repair service unless repair is requested. Ordinary object shopping uses category=shopping and preserves the object in terms; do not turn it into the phone/computer purchase action.
 Normalize broad 고기집/고깃집/고기구이/바베큐/BBQ requests to terms=["고기·구이"], 횟집/회집/회/사시미 to terms=["회"]. Keep a specifically named dish such as 삼겹살/광어회/동태탕 as that dish, not the broad group. 맛있는/맛집 is a ranking preference, never a literal term. Do not invent dishes the user did not specify.
 라멘/라멘집/ramen/ラーメン means terms=["라멘"], not generic noodles, 짬뽕, 라면 or the combined registration tag 국수·라멘. Preserve specifically requested ramen styles as additional terms; do not infer a cuisine unless explicitly requested.
 Common Vietnamese dishes: 껌승/껌수언/Cơm sườn use terms=["껌승"]; 껌땀/Cơm tấm=["껌땀"], 분짜/Bún chả=["분짜"], 반쎄오/Bánh xèo=["반쎄오"], 분팃느엉/Bún thịt nướng=["분팃느엉"], 껌가/Cơm gà=["껌가"]. A 집/맛집/전문점 suffix is not part of a dish name. Keep extra ingredients or exclusions as additional constraints. Cơm tấm alone does not establish that a particular meat is served.
@@ -87,7 +174,7 @@ const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control
 const strings=v=>Array.isArray(v)?v.filter(x=>typeof x==='string').map(x=>x.trim().slice(0,80)).filter(Boolean).slice(0,8):[];
 // Keep the reference place separate from what the user wants to find there.
 export function nearbyRequest(query){
-  const ko=query.match(/^(.*?)\s*(근처|주변|인근)\s*(?:에서|에|의)?\s*(.*)$/i);
+  const ko=query.match(/^(.*?)\s*(근처|주변|인근)(?:에서|에|의)?\s*(.*)$/i);
   const en=!ko&&query.match(/^(.*?)\s+near\s+(.+?)(?:[?.!]|$)/i);
   if(!ko&&!en)return null;
   let anchor=(ko?ko[1]:en[2]).replace(/^(?:(?:오늘|내일|지금|혹시|나는|저는|난|저|나)\s+)+/,'').replace(/(?:에서|에|의)$/,'').trim();
@@ -127,12 +214,14 @@ export function validateIntent(value,city){
   const rawSub=typeof value.subcategory==='string'?value.subcategory.trim().slice(0,80):'';
   const subcategory=value.category==='restaurant'?cuisineLabel(rawSub):({bar:['바','클럽'],cafe:['베이커리','디저트','카페'],stay:['호텔','아파트','레지던스'],karaoke:['한인 가라오케','일본 가라오케','중국 가라오케','로컬 KTV']}[value.category]||[]).includes(rawSub)?rawSub:'';
   const terms=strings(value.terms);
+  const translationText=s=>typeof s==='string'&&s.length>=2&&s.length<=100&&/\p{Script=Latin}/u.test(s)&&!/[가-힣<>\n\r]|https?:|www\.|[{}]/i.test(s)?s.trim():'';
+  const termTranslations=Array.isArray(value.termTranslations)?value.termTranslations.slice(0,6).filter(t=>t&&terms.includes(t.term)&&!searchItemFor(t.term)).map(t=>({term:t.term,en:translationText(t.en),vi:translationText(t.vi)})).filter(t=>t.en||t.vi):[];
   // Unknown narrower types remain hard terms instead of silently disappearing.
   if(rawSub&&!subcategory&&!terms.includes(rawSub))terms.push(rawSub);
   const guideTopics=['airport-arrival','airport-options','grab-green','exchange','stay-choice','member-benefits','before-flight','sim-data','river-trip','city-bus','food-reviews','useful-phrases','help'];
   const t=value.transport;
   const transport=t&&CITIES.includes(t.origin)&&t.origin!=='all'&&CITIES.includes(t.destination)&&t.destination!=='all'&&t.origin!==t.destination?{origin:t.origin,destination:t.destination,mode:['flight','bus','train','ferry'].includes(t.mode)?t.mode:'all',originExplicit:t.originExplicit===true}:null;
-  return {...(transport?{transport}:{}),...(['grabfood','purchase'].includes(value.action)?{action:value.action}:{}),...(typeof value.productName==='string'?{productName:value.productName.trim().slice(0,100)}:{}),...(guideTopics.includes(value.guideTopic)?{guideTopic:value.guideTopic}:{}),relevant:value.relevant,city:value.city||city,district,category:value.category||'',area:typeof value.area==='string'?value.area.trim().slice(0,80):'',subcategory,terms,...(strings(value.features).includes('private_room')?{features:['private_room']}:{}),preferences:strings(value.preferences).filter(x=>['date','atmosphere','quiet','view','rooftop','cheap','popular','top_rated','group'].includes(x)),visitToday:value.visitToday===true,benefit:value.benefit===true,recommended:value.recommended===true,nearby:value.nearby===true,unsupported:strings(value.unsupported)};
+  return {...(termTranslations.length?{termTranslations}:{}),...(transport?{transport}:{}),...(['grabfood','purchase'].includes(value.action)?{action:value.action}:{}),...(typeof value.productName==='string'?{productName:value.productName.trim().slice(0,100)}:{}),...(guideTopics.includes(value.guideTopic)?{guideTopic:value.guideTopic}:{}),relevant:value.relevant,city:value.city||city,district,category:value.category||'',area:typeof value.area==='string'?value.area.trim().slice(0,80):'',subcategory,terms,...(strings(value.features).includes('private_room')?{features:['private_room']}:{}),preferences:strings(value.preferences).filter(x=>['date','atmosphere','quiet','view','rooftop','cheap','popular','top_rated','group'].includes(x)),visitToday:value.visitToday===true,benefit:value.benefit===true,recommended:value.recommended===true,nearby:value.nearby===true,unsupported:strings(value.unsupported)};
 }
 // Literal, unambiguous place words protect routine Korean searches from a false
 // irrelevant classification. The model still interprets dishes and other context.
@@ -204,14 +293,16 @@ export function clarifyIntent(intent,query){
   }else delete next.features;
   // Common service/menu words are deterministic, not model guesses about cuisine.
   if(!/말고|제외|아닌/.test(query)){
-    const dishes=dishMentions(query);
-    if(dishes.length){
-      if(next.category!=='restaurant')next.subcategory='';
-      next.relevant=true;next.category='restaurant';
-      next.terms=[...next.terms.filter(t=>stripDishes(t).replace(/\s/g,'')!==''),...dishes.map(d=>d.term)];
+    const items=searchMentions(query).filter(item=>item.category!=='shopping'||!next.category||['shopping','market'].includes(next.category));
+    if(items.length){
+      const itemCategories=[...new Set(items.map(item=>item.category))];
+      const category=itemCategories.length===1?itemCategories[0]:next.category;
+      if(next.category!==category)next.subcategory='';
+      next.relevant=true;next.category=category;
+      next.terms=[...next.terms.filter(t=>stripSearchItems(t,items).replace(/\s/g,'')!==''),...items.map(item=>item.term)];
       next.terms=[...new Set(next.terms)];
     }
-    if(/쌀국수|\bph[oở]\b/i.test(query)){next.relevant=true;next.category='restaurant';next.terms=[...next.terms.filter(t=>!/^(?:쌀국수(?:집)?|ph[oở])$/i.test(t)),'쌀국수'];}
+    if(/쌀국수|\bph[oở]\b/i.test(query)&&!items.some(item=>item.parent==='쌀국수')){next.relevant=true;next.category='restaurant';next.terms=[...next.terms.filter(t=>!/^(?:쌀국수(?:집)?|ph[oở])$/i.test(t)),'쌀국수'];}
     const strip=pattern=>{next.terms=next.terms.filter(t=>!pattern.test(t));};
     if(/라멘|라아멘|\bramen\b|ラーメン/i.test(query)){next.relevant=true;next.category='restaurant';strip(/^(?:라멘(?:집)?|라아멘|ramen(?:\s+restaurants?)?|ラーメン|국수\s*[·/]\s*라멘)$/i);next.terms.push('라멘');}
     if(/햄버거|수제\s*버거|버거집|\bburgers?\b/i.test(query)){next.relevant=true;next.category='restaurant';strip(/햄버거|수제\s*버거|버거집|\bburgers?\b/i);next.terms.push('햄버거');}
@@ -421,7 +512,8 @@ export function literalIntent(query,city){
   if(/말고|제외|아닌|않|지금|현재|내일|주말|예약해/.test(query))return null;
   const cities=query.match(/호치민|하노이|다낭|나트랑|푸꾸옥|푸꿕|달랏|호이안|붕따우|무이네/g)||[];
   if(new Set(cities).size>1&&!intent.guide)return null;
-  let remaining=stripDishes(query);
+  let remaining=stripSearchItems(query,intent.terms.map(searchItemFor).filter(Boolean));
+  if(intent.terms.some(t=>searchItemFor(t)?.category==='shopping'))remaining=remaining.replace(/파는|판매하는|살\s*수\s*있는|살|사고|사려는|사려고|구매(?:하고)?|구입(?:하고)?|매장|판매점|가게|\b(?:buy|shop|store|selling)\b/gi,' ');
   if(intent.service==='florist')remaining=remaining
     .replace(/(?:여자\s*친구|남자\s*친구|여친|남친|아내|남편|엄마|어머니|부모님|친구)(?:에게|한테|께)?/g,' ')
     .replace(/꽃\s*(?:다발|바구니|집|가게)?(?:을|를)?|\bflorists?\b|\bflower\s*shops?\b/gi,' ')

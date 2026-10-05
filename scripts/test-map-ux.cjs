@@ -960,6 +960,31 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.evaluate(()=>JSON.stringify(testData)),dishData);
   assert.equal(await page.evaluate(()=>state.nearby),null);
   await page.locator('#aiMapClear').click();
+  // Shared vocabulary works in normal search and AI, in both layouts.
+  await page.evaluate(()=>{
+   testData.places.push({id:'vocab-member',name:'Vali Travel Test',category:'shopping',address:'Ho Chi Minh',lat:10.732,lng:106.66});
+   google.maps.places.Place.searchByText=async request=>{
+    window.vocabularyRequest=request;
+    const p=(id,displayName,types)=>({id,displayName,types,rating:4.8,userRatingCount:70,location:{lat:10.732,lng:106.66},formattedAddress:'Ho Chi Minh'});
+    return {places:[p('vocab-coffee','Cà Phê Trứng Test',['cafe']),p('vocab-item','Sạc Dự Phòng Test',['store','electronics_store']),p('vocab-wrong','Kem Chống Nắng Test',['store'])]};
+   };
+  });
+  const vocabularyData=await page.evaluate(()=>JSON.stringify(testData));
+  await page.locator('#searchInput').fill('캐리어');
+  await page.locator('#placeSearchList [data-search-index]').filter({hasText:'Vali Travel Test'}).waitFor();
+  assert.match(await page.evaluate(()=>NameSearch.googleQuery('보조배터리 20000mAh')),/sac du phong 20000mah/);
+  await page.locator('#searchClear').click();
+  for(const [question,id,translated] of [['선라이즈 근처 에그커피','vocab-coffee','cà phê trứng'],['선라이즈 근처 보조배터리 파는 가게','vocab-item','sạc dự phòng']]){
+   await page.locator('#aiMapQuestion').fill(question);await page.locator('#aiMapQuestion').press('Enter');
+   await page.locator('[data-google-place-id="'+id+'"]').waitFor();
+   assert((await page.evaluate(()=>vocabularyRequest.textQuery)).includes(translated));
+   assert.equal(await page.locator('[data-google-place-id="vocab-wrong"]').count(),0);
+   if(id==='vocab-item')assert.match(await page.locator('[data-google-place-id="'+id+'"]').innerText(),/재고·판매가/);
+   await page.screenshot({path:path.join(out,`korean-${id}-${width}.png`)});
+   await page.locator('.aiAnswerPick').first().click();assert(await page.locator('#detail').isVisible());await page.locator('#detailCloseBtn').click();
+   await page.locator('#aiMapClear').click();
+  }
+  assert.equal(await page.evaluate(()=>JSON.stringify(testData)),vocabularyData,'translation never rewrites place identities or reviews');
   if(width===390){
    await page.setViewportSize({width:844,height:390});
    await page.evaluate(()=>PlaceSearch.openGoogle({placeId:'reading-google',name:'UNAGI STATION'}));

@@ -34,14 +34,14 @@
   }
   function reason(c,key,intent){
     switch(key){
-      case 'specialty':return c.menuNamed?(intent.service==='florist'?'업소명에서 꽃집 확인':'업소명에서 요청한 메뉴 확인'):'';
+      case 'specialty':return c.menuNamed?(intent.service==='florist'?'업소명에서 꽃집 확인':intent.category==='shopping'?'업소명에서 요청한 상품 관련 표기 확인':'업소명에서 요청한 메뉴 확인'):'';
       case 'rating':case 'reviews':return c.rating!=null?(c.source==='google'?'Google':'회원')+' 평점 '+Number(c.rating).toFixed(1)+' · 평가 '+c.count.toLocaleString('ko-KR')+'개':'';
       case 'preference':return c.preferences.length?c.preferences.map(p=>PREFS[p]).join('·')+' 관련 안내 확인':'';
       case 'price':return c.price?'Google 참고 가격대 · '+c.price:'';
       case 'recommended':return c.recommended?'회원 또는 등록자 강추 표시 있음':'';
       case 'benefit':return c.benefit?'등록된 회원 혜택 있음':'';
       case 'distance':return Number.isFinite(c.row.distance)?'기준 위치에서 '+(window.AINearbySearch?.distanceLabel(c.row.distance)||Math.round(c.row.distance)+'m')+' · 직선거리':'';
-      case 'match':return intent.service==='florist'?'요청한 지역의 꽃집 검색 결과':'요청한 지역·업종·메뉴 조건에 맞는 검색 결과';
+      case 'match':return intent.service==='florist'?'요청한 지역의 꽃집 검색 결과':intent.category==='shopping'?'요청한 지역·상품 관련 매장 검색 결과':'요청한 지역·업종·메뉴 조건에 맞는 검색 결과';
       default:return '';
     }
   }
@@ -62,7 +62,7 @@
       if(c.row.menuUnconfirmed?.length)reasons.push(c.row.menuUnconfirmed.join('·')+' 메뉴 확인 필요');
       box.append(node('p',reasons.join(' / '),'aiAnswerReason'));
     }
-    box.append(node('small',menuPending?'메뉴 안내가 확인된 곳을 먼저 보여드려요. 확인이 필요한 후보는 방문 전에 메뉴를 확인해 주세요.':result.basis==='search'?'메뉴·평점·후기 등 확인된 검색 정보로 정리한 후보입니다. 인원·날짜별 예약 가능 여부는 업소에 확인해 주세요.':entry.intent.pickOne?'찾은 후보 중 메뉴·평점·후기 수를 비교한 AI 추천입니다. 누구에게나 절대적인 1위라는 뜻은 아니에요.':'현재 검색 자료를 바탕으로 한 AI 추천입니다. 가격·영업·예약 가능 여부는 업소에 확인해 주세요.','aiAnswerSource'));
+    box.append(node('small',entry.intent.category==='shopping'?'상품 관련 정보·평점·후기로 정리한 매장 후보입니다. 원하는 상품의 취급·재고·판매가는 매장에 확인해 주세요.':menuPending?'메뉴 안내가 확인된 곳을 먼저 보여드려요. 확인이 필요한 후보는 방문 전에 메뉴를 확인해 주세요.':result.basis==='search'?'메뉴·평점·후기 등 확인된 검색 정보로 정리한 후보입니다. 인원·날짜별 예약 가능 여부는 업소에 확인해 주세요.':entry.intent.pickOne?'찾은 후보 중 메뉴·평점·후기 수를 비교한 AI 추천입니다. 누구에게나 절대적인 1위라는 뜻은 아니에요.':'현재 검색 자료를 바탕으로 한 AI 추천입니다. 가격·영업·예약 가능 여부는 업소에 확인해 주세요.','aiAnswerSource'));
   }
   function render(list,entry,{pending=false}={}){
     if(!list||!entry||entry.intent.exploratory)return;

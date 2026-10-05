@@ -29,8 +29,8 @@
   const flowerPurposeMatches=(name,intent)=>!intent.flowerGift||!/장례|근조|추모|\b(?:funeral|sympathy|memorial)\b|hoa\s+(?:đám\s+tang|dam\s+tang|viếng|vieng|tang\b)/i.test(String(name||'').normalize('NFC'));
   function menuKeyword(text,term){
     let value=normalize(menuText(text,term));const pattern=MENU_PATTERNS[term];
-    const dish=window.AIQueryIntent?.dishFor(term);
-    if(dish)return window.AIQueryIntent.dishMatch(value,term);
+    const item=window.AIQueryIntent?.searchItemFor(term);
+    if(item)return window.AIQueryIntent.searchItemMatch(value,term);
     if(term==='고기·구이')value=value.replace(/\bbbq\s*chicken\b|비비큐\s*치킨|치킨\s*비비큐/gi,'');
     if(pattern)return value.match(pattern)?.[0]?.trim()||'';
     return (/왁싱|waxing/i.test(term)?['왁싱','waxing','wax long']:[term]).find(alias=>value.includes(normalize(alias))||window.NameSearch?.matches(text,alias))||'';
@@ -40,9 +40,9 @@
       const source={...original,text:menuText(original.text,term)};
       for(const clause of String(source.text||'').replace(/\(\s*[!?]+\s*\)/g,'').split(/[.!?。\n]/)){
         const keyword=pattern?normalize(clause).match(pattern)?.[0]:menuKeyword(clause,term);if(!keyword)continue;
-        if((pattern||MENU_PATTERNS[term]||window.AIQueryIntent?.dishFor(term))&&/없|안\s*팔|팔지\s*않|판매하지|제공하지|먹지\s*못|있는지|있나요|확인\s*필요|문의|예정|옆집|다른\s*식당|\b(?:no|not|without|whether|wish|maybe)\b|khong\s+(?:co|ban)/i.test(normalize(clause)))continue;
+        if((pattern||MENU_PATTERNS[term]||window.AIQueryIntent?.searchItemFor(term))&&/없|안\s*팔|팔지\s*않|판매하지|제공하지|먹지\s*못|있는지|있나요|확인\s*필요|문의|예정|옆집|다른\s*식당|품절|\b(?:no|not|without|whether|wish|maybe)\b|out\s+of\s+stock|khong\s+(?:co|ban)|het\s+hang/i.test(normalize(clause)))continue;
         const preceding=normalize(clause).slice(0,normalize(clause).indexOf(normalize(keyword)));
-        if(window.AIQueryIntent?.dishFor(term)&&/(?:다른|옆집|다른\s*가게|another|other).{0,20}$/i.test(preceding))continue;
+        if((pattern||window.AIQueryIntent?.searchItemFor(term))&&/(?:다른|옆집|다른\s*가게|another|other).{0,20}$/i.test(preceding))continue;
         return {evidence:quote(source,keyword),source};
       }
     }
@@ -303,7 +303,7 @@
       window.AISearchInsights?.append(button,row,entry.intent);
       for(const proof of row.proofs||[]){const label=document.createElement('span');label.className='aiEvidence';label.textContent=proof.evidence;button.append(label);}
       if(entry.intent.productSearch){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent='판매점 후보 · 요청 모델 취급·재고·판매가 미확인';button.append(info);}
-      if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.service==='florist'?'꽃 종류·가격·배달 가능 여부는 꽃집에 확인해 주세요.':entry.intent.terms.join('·')+' 검색 결과 · 메뉴·서비스 제공 여부는 업소에 확인해 주세요.';button.append(info);}
+      if(entry.intent.terms.length){const info=document.createElement('span');info.className='aiAlternativeNote';info.textContent=entry.intent.service==='florist'?'꽃 종류·가격·배달 가능 여부는 꽃집에 확인해 주세요.':entry.intent.terms.join('·')+' 검색 결과 · '+(entry.intent.category==='shopping'?'취급 상품·재고·판매가는 매장에 확인해 주세요.':'메뉴·서비스 제공 여부는 업소에 확인해 주세요.');button.append(info);}
       if(entry.intent.visitToday){const hours=document.createElement('span');hours.className='aiHours';hours.innerHTML='<b></b><span class="aiHoursTimes"></span><span class="aiHoursSource"></span>';button.append(hours);}
       button.addEventListener('click',()=>{close();input.blur();window.PlaceSearch?.openGoogle(row);});li.append(button);(row.room?.kind==='unknown'&&unknownResults?unknownResults:results).append(li);
       window.AIResultActions?.appendDelivery(li,row,entry.intent);
