@@ -123,3 +123,13 @@
  .chatQuick button+button{border-left:1px solid #e7e4f0}
  .chatQuick button span{color:#8a83a7;font-size:16px}
 }
+
+#chatNameDialog{width:min(340px,calc(100vw - 40px));box-sizing:border-box;border:1px solid #e3dff1;border-radius:16px;padding:20px;color:#292940}
+#chatNameDialog::backdrop{background:#20203966}
+#chatNameDialog h3{margin:0 0 8px;font-size:18px}
+#chatNameDialog p{font-size:13px;color:#716b86;margin:0 0 16px}
+#chatNameDialog label{display:block;font-size:13px;margin-bottom:6px}
+#chatNameDialog input{width:100%;box-sizing:border-box;font:16px system-ui;padding:10px;border:1px solid #d9d5e7;border-radius:8px}
+#chatNameDialog form>div{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+#chatNameDialog button{min-height:40px;border:0;border-radius:8px;padding:8px 12px;background:#f2f0f9;color:#514978}
+#chatNameDialog button[type=submit]{background:#6157d9;color:white}
