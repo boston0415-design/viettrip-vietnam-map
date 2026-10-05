@@ -370,8 +370,10 @@ const server=http.createServer((req,res)=>{
    await page.locator('#detail>.detailResizeHandle').press('End');
    await panel.evaluate(p=>p.scrollTop=80);
    const maximum=await panel.boundingBox();
+   const readingStart=await panel.evaluate(p=>{const r=p.getBoundingClientRect(),h=p.querySelector('.detailHeader').getBoundingClientRect(),x=r.left+Math.min(r.width/2,120),y=Math.max(h.bottom+24,r.top+r.height/2);return {scroll:p.scrollTop,maxScroll:p.scrollHeight-p.clientHeight,height:r.height,ariaMax:p.querySelector('.detailResizeHandle').getAttribute('aria-valuemax'),point:{x,y},target:document.elementFromPoint(x,y)?.outerHTML.slice(0,300)};});
    await swipe(-50);
-   assert(Math.abs((await panel.boundingBox()).height-maximum.height)<2,label+' reads back without folding before content reaches top');
+   const readingEnd=await panel.evaluate(p=>({height:p.getBoundingClientRect().height,scroll:p.scrollTop}));
+   assert(Math.abs(readingEnd.height-maximum.height)<2,label+' reads back without folding before content reaches top '+JSON.stringify({readingStart,readingEnd,maximum}));
    assert(Math.abs(await panel.evaluate(p=>p.scrollTop)-30)<3,label+' body content scrolls toward top');
    await swipe(-70);
    assert.equal(await panel.evaluate(p=>p.scrollTop),0,label+' reaches the content top');
