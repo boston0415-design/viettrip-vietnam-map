@@ -28,6 +28,7 @@ const {JSDOM}=require('jsdom'),read=p=>fs.readFileSync(p,'utf8');
   const google=[raw('가까운 검증 후기 식당',4.8,500,10.775),raw('바로 옆 낮은 평점',4.1,1000,10.7701),raw('먼 유명 식당',5,5000,10.82)];
   let requests=[];w.google={maps:{places:{Place:{searchByText:async request=>{requests.push(request);return {places:google}}}}}};
   const resolved=await w.AINearbySearch.resolve(intent,{places:fixture.places});assert.equal(resolved.nearbyOrigin.name,'벤탄시장');assert.equal(requests.length,0,'registered reference coordinates need no lookup');
+  const area=await w.AINearbySearch.resolve(api.recoveryIntent('푸미흥 근처 맛집','hcmc'),{places:[{id:'shop',name:'푸미흥 카페',category:'cafe',address:'Ho Chi Minh',lat:10.76,lng:106.71}]});assert.equal(area.nearbyOrigin.kind,'area');assert.equal(area.nearbyOrigin.lat,10.72975,'known neighbourhood takes precedence over a similarly named shop');
   assert.deepEqual(Array.from(w.AIMapSearch.findMatches(resolved,fixture,null),r=>r.place.id),['tiny']);
   const rows=w.AIGoogleSearch.rowsFrom(google,resolved);assert.deepEqual(Array.from(rows,r=>r.placeId),['가까운 검증 후기 식당','바로 옆 낮은 평점']);
   assert(rows[0].distance>500&&rows[0].distance<600);assert(w.AISearchInsights.compare(rows[0],w.AIMapSearch.findMatches(resolved,fixture,null)[0],resolved)<0,'one perfect community score does not beat substantial nearby evidence');

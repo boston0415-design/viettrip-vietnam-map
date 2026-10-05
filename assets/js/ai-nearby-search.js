@@ -1,7 +1,7 @@
 /* Query-local origins: never changes saved accommodation or community data. */
 (() => {
   'use strict';
-  const norm=s=>(window.NameSearch?.canonical(s)||String(s||'').toLowerCase()).replace(/\s+/g,' ').trim();
+  const norm=s=>(window.NameSearch?.canonical(s)||String(s||'').toLowerCase()).replace(/(\d+)\s*군/g,'quan $1').replace(/\s+/g,' ').trim();
   const point=value=>{
     if(!value)return null;
     const lat=Number(typeof value.lat==='function'?value.lat():value.lat),lng=Number(typeof value.lng==='function'?value.lng():value.lng);
@@ -17,7 +17,7 @@
     const q=norm(name),rows=[];
     for(const p of places){
       if(!point(p.position||p)||city!=='all'&&placeCityKey({...p,...point(p.position||p)})!==city)continue;
-      const n=norm(p.name),score=window.NameSearch?.score(p.name,name)??(n===q?0:n.includes(q)?2:-1);
+      const n=norm(p.name),score=n===q?0:(window.NameSearch?.score(p.name,name)??(n.includes(q)?2:-1));
       if(score<0||score>4)continue; // Phonetic suggestions are not verified origins.
       rows.push({p,score});
     }
@@ -39,14 +39,13 @@
     const ref=intent.nearbyReference||{kind:'context',anchor:'',radius:null};
     let found=null,options=[];
     if(ref.kind==='named'){
+      // A neighbourhood name refers to the area, not a shop whose name contains it.
+      const zones=typeof EXTRA_DATA!=='undefined'?Object.entries(EXTRA_DATA).filter(([city])=>intent.city==='all'||city===intent.city).flatMap(([,data])=>data.zones||[]):[];
+      const zone=zones.find(z=>z.center&&(norm(z.name)===norm(ref.anchor)||norm(z.name.split(/[·(]/)[0])===norm(ref.anchor)));
+      if(zone)found=origin({...zone.center,name:zone.name},ref,'area');
       const local=candidates(places,ref.anchor,intent.city);
-      if(local.length===1)found=origin(local[0],ref);
-      else if(local.length>1)options=local.slice(0,4).map(p=>origin(p,ref));
-      if(!found&&!options.length){
-        const zones=typeof EXTRA_DATA!=='undefined'?Object.entries(EXTRA_DATA).filter(([city])=>intent.city==='all'||city===intent.city).flatMap(([,data])=>data.zones||[]):[];
-        const zone=zones.find(z=>z.center&&norm(z.name)===norm(ref.anchor));
-        if(zone)found=origin({...zone.center,name:zone.name},ref,'area');
-      }
+      if(!found&&local.length===1)found=origin(local[0],ref);
+      else if(!found&&local.length>1)options=local.slice(0,4).map(p=>origin(p,ref));
       if(!found&&!options.length){
         const Place=window.google?.maps?.places?.Place;
         if(Place?.searchByText){
