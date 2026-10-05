@@ -70,6 +70,7 @@
     return quality-distance*.18;
   }
   function compare(a,b,intent){
+    const menu=Number(!!a.menuUnconfirmed?.length)-Number(!!b.menuUnconfirmed?.length);if(menu)return menu;
     const aa=a.insights||{},bb=b.insights||{};
     const hotel=Number(bb.hotelClass?.kind==='confirmed')-Number(aa.hotelClass?.kind==='confirmed');if(hotel)return hotel;
     if(intent.sortBy==='cheap'){

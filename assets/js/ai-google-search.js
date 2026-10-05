@@ -54,15 +54,28 @@
     if(term==='라멘'&&(place.types||[]).includes('ramen_restaurant'))return {evidence:'Google 업종 · 라멘',source:{label:'Google 업종'}};
     if(term==='햄버거'&&(place.types||[]).includes('hamburger_restaurant'))return {evidence:'Google 업종 · 햄버거',source:{label:'Google 업종'}};
     if(term==='고기·구이'&&(place.types||[]).some(type=>['barbecue_restaurant','korean_barbecue_restaurant'].includes(type)))return {evidence:'Google 업종 · 고기·구이',source:{label:'Google 업종'}};
-    return window.AIMapSearch.evidenceFor(sourcesFor(place),term);
+    const proof=window.AIMapSearch.evidenceFor(sourcesFor(place),term);if(proof)return proof;
+    // A named cơm tấm shop supplies the rice context for a pork-chop menu
+    // mentioned in a review; preserve the original quote and its attribution.
+    if(term==='껌승'&&window.AIMapSearch.menuKeyword(place.displayName,'껌땀')&&!/\b(?:vegan|vegetarian|chay)\b|채식/i.test(normalize(place.displayName))){
+      return window.AIMapSearch.evidenceFor(sourcesFor(place).filter(s=>s.label!=='Google 업소명'),term,/돼지\s*갈비|\bpork\s*chops?\b|\bsuon\b(?!\s+(?:bo|chay)\b)/i);
+    }
+    return null;
   }
-  function queryFor(intent,includeRoom=true){
+  function relatedDishProof(place,term){
+    const dish=window.AIQueryIntent?.dishFor(term);
+    if(!dish?.related||!window.AIMapSearch.menuKeyword(place.displayName,dish.related))return null;
+    const text=normalize(sourcesFor(place).map(s=>s.text).join(' '));
+    if((place.types||[]).some(t=>['vegan_restaurant','vegetarian_restaurant'].includes(t))||/\b(?:vegan|vegetarian|chay)\b|채식|\b(?:no|without)\s+(?:pork|ribs|com\s+(?:tam\s+)?suon)|khong\s+(?:co|ban|phuc vu).{0,20}suon|껌승.{0,12}(?:없|안\s*팔|판매하지)|돼지.{0,12}(?:없|안\s*팔|판매하지)/i.test(text))return null;
+    return {related:true,term:dish.term,evidence:'Google 업소명에서 '+dish.related+' 전문점 확인 · '+dish.term+' 메뉴는 확인 필요',source:{label:'Google 업소명'}};
+  }
+  function queryFor(intent,includeRoom=true,includeOrigin=true){
     if(intent.productSearch)return [window.NameSearch?.googleQuery(intent.requestText)||intent.requestText,intent.productKind==='computer'?'computer electronics store':'mobile phone store',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
-    const terms=(intent.terms||[]).map(term=>waxing(term)?'waxing':({'꽃집':'florist','라멘':'ramen','햄버거':'burger','쌀국수':'pho','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term));
+    const terms=(intent.terms||[]).map(term=>window.AIQueryIntent?.dishFor(term)?.query||(waxing(term)?'waxing':({'꽃집':'florist','라멘':'ramen','햄버거':'burger','쌀국수':'pho','고기·구이':'BBQ','회':'sashimi','반미':'banh mi','오토바이 대여':'motorbike rental'}[term]||window.NameSearch?.googleQuery(term)||term)));
     const specialty=terms.some(waxing)||intent.terms?.includes('꽃집');
     return [intent.flowerGift?'flower bouquet':'',includeRoom&&window.AIMapSearch?.wantsRoom(intent)?'private dining room':'',...terms,intent.hotelStars?intent.hotelStars+' star':'',specialty?'':({'베이커리':'bakery','호텔':'hotel','로컬 KTV':'local Vietnamese karaoke'}[intent.subcategory]||SUBS[intent.subcategory]||CATEGORIES[intent.category]||''),
       ...(intent.preferences||[]).filter(p=>['quiet','rooftop','cheap','atmosphere','group'].includes(p)).map(p=>p==='group'?'group dining':p==='atmosphere'?'nice atmosphere':p==='cheap'?'affordable':p),
-      AREAS[intent.area]||intent.area,intent.district?'Quận '+intent.district:'',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
+      AREAS[intent.area]||intent.area,intent.district?'Quận '+intent.district:'',includeOrigin&&intent.nearbyOrigin?.name?'near '+(window.NameSearch?.googleQuery(intent.nearbyOrigin.name)||intent.nearbyOrigin.name):'',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
   }
   function boundsFor(intent,boundaries,nearby){
     nearby=intent.nearbyOrigin||nearby;
@@ -123,7 +136,7 @@
       if(['CLOSED_PERMANENTLY','CLOSED_TEMPORARILY','FUTURE_OPENING'].includes(p.businessStatus))continue;
       const country=p.addressComponents?.find(c=>c.types?.includes('country'));
       if(country&&country.shortText!=='VN')continue;
-      const proofs=intent.exploratory?[]:(intent.terms||[]).map(term=>termProof(p,term));
+      const proofs=intent.exploratory?[]:(intent.terms||[]).map(term=>termProof(p,term)||relatedDishProof(p,term));
       if(!typeMatches(p,intent)||proofs.some(proof=>!proof)||window.AIMapSearch.flowerPurposeMatches?.(p.displayName,intent)===false)continue;
       const place={name:String(p.displayName||'').trim(),address:p.formattedAddress||'',...position};
       if(!cityMatches(p,place,intent.city))continue;
@@ -133,6 +146,7 @@
       const cuisineProof=intent.cuisineAsMenu&&!p.types?.includes(CUISINES[intent.subcategory]?.[1])?window.AIMapSearch.cuisineEvidence(sourcesFor(p),intent.subcategory):null;
       const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',...(intent.action==='grabfood'?{websiteURI:p.websiteURI||''}:{}),attributions:p.attributions||[],cuisineByMenu:!!cuisineProof,
         proofs:[...(cuisineProof?[cuisineProof]:[]),...proofs].slice(0,2).map(proof=>({...proof,evidence:proof.source.label==='Google 업소 설명'?'Google 업소 설명 · '+p.editorialSummary:proof.evidence}))};
+      row.menuUnconfirmed=proofs.filter(proof=>proof.related).map(proof=>proof.term);
       row.insights=window.AISearchInsights?.inspect(p,intent,sourcesFor(p));
       if(intent.nearby&&nearby){row.distance=geoDistanceMeters(position,nearby);row.searchRadius=nearby.radius;}
       if(row.insights?.hotelClass?.kind==='different')continue;
@@ -168,7 +182,9 @@
     if(intent.visitToday)fields.push('currentOpeningHours');
     const bounds=boundsFor(intent,boundaries,nearby);
     const type=includedType(intent);
-    const request={textQuery:queryFor(intent),fields,language:'ko',region:'vn',maxResultCount:20,minRating:4,...(type?{includedType:type,useStrictTypeFiltering:true}:{}),
+    // API discovery already has an exact geographic restriction. Keep the
+    // reference name in external Maps links, not in the food query itself.
+    const request={textQuery:queryFor(intent,true,false),fields,language:'ko',region:'vn',maxResultCount:20,minRating:4,...(type?{includedType:type,useStrictTypeFiltering:true}:{}),
       ...(bounds?{locationRestriction:bounds}:CITY_DATA[intent.city]?.center?{locationBias:{center:CITY_DATA[intent.city].center,radius:50000}}:{})};
     async function fetchPlaces(textQuery){
       if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
@@ -186,11 +202,14 @@
     const memberUpdates=new Map();let rows=rowsFrom(raw,intent,{boundaries,nearby,places,memberUpdates});
     // One bounded supplemental request prevents sparse amenity search text
     // hiding the same-area/cuisine inquiry leads. Never loosen type or geography.
-    const menuQuery=intent.terms?.includes('고기·구이')?request.textQuery.replace('BBQ','grilled meat'):intent.terms?.includes('회')?request.textQuery.replace('sashimi','횟집 sashimi'):null;
+    const menuQuery=intent.terms?.includes('고기·구이')?request.textQuery.replace('BBQ','grilled meat'):intent.terms?.includes('회')?request.textQuery.replace('sashimi','횟집 sashimi'):intent.terms?.includes('껌승')?request.textQuery.replace('cơm sườn','cơm tấm sườn'):null;
     const productQuery=intent.productSearch?[/아이폰|iphone|애플|apple/i.test(intent.requestText)?'Apple iPhone':/갤럭시|samsung|삼성/i.test(intent.requestText)?'Samsung':'',intent.productKind==='computer'?'computer electronics store':'mobile phone store',AREAS[intent.area]||intent.area,intent.district?'Quận '+intent.district:'',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' '):null;
     if((roomSearch||menuQuery||productQuery)&&rows.length<5){
-      try{rows=rowsFrom([...raw,...await fetchPlaces(roomSearch?queryFor(intent,false):productQuery||menuQuery)],intent,{boundaries,nearby,places,memberUpdates});}
+      try{rows=rowsFrom([...raw,...await fetchPlaces(roomSearch?queryFor(intent,false,false):productQuery||menuQuery)],intent,{boundaries,nearby,places,memberUpdates});}
       catch(error){if(error.name==='AbortError'||!rows.length)throw error;}
+    }
+    if(location.hostname.endsWith('.netlify.app')&&intent.terms?.some(t=>window.AIQueryIntent?.dishFor(t))){
+      console.debug('Map menu search counts',JSON.stringify({received:raw.length,qualified:rows.length,type:raw.filter(p=>typeMatches(p,intent)).length,rated:raw.filter(p=>Number(p.rating)>=4&&Number(p.userRatingCount)>0).length,menu:raw.filter(p=>(intent.terms||[]).every(t=>termProof(p,t)||relatedDishProof(p,t))).length,withinRadius:raw.filter(p=>{const pos=googlePhotoPosition(p.location),o=intent.nearbyOrigin;return pos&&(!o||geoDistanceMeters(pos,o)<=o.radius);}).length}));
     }
     const result=rows.slice(0,20);result.memberUpdates=memberUpdates;return result;
   }
