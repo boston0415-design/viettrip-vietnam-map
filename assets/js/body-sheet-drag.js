@@ -37,6 +37,7 @@
     function begin(event,point,kind){
       // A fresh deliberate contact must never be blocked by the preceding drag.
       suppressUntil=0;stopMomentum();
+      if(options.enabled?.()===false)return;
       const target=event.target.closest?.('*');
       if(gesture||!point||event.defaultPrevented||!target||target.closest(editor))return;
       const rect=panel.getBoundingClientRect();
@@ -136,6 +137,7 @@
     }
     function begin(event,point,kind){
       if(gesture || !point || event.defaultPrevented)return;
+      if(options.enabled?.()===false)return;
       const target=event.target.closest?.('*');
       if(!target || (options.handlesOnly && !target.closest(options.headerSelector||headers)) || (!options.includeHeaders && target.closest(headers)) || target.closest(controls))return;
       // Do not intercept the native desktop scrollbar thumb.

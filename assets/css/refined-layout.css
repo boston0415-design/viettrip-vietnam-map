@@ -1,0 +1,43 @@
+/* Quiet typography, an unmistakable map mark, and controls outside the map sheets. */
+:root{--blue:#6157d9;--text:#292940;--bg:#f8f9fd}
+.top{--header-accent:#6157d9;--header-ink:#303046}
+.top .brandTitle{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans KR","Malgun Gothic",sans-serif!important;font-size:30px!important;font-weight:500!important;letter-spacing:-.035em!important;gap:11px!important}
+.top .brandTitle em{font-weight:650!important;color:#6157d9}
+.top .brandMark{background:transparent!important;width:42px;height:42px;border-radius:13px;box-shadow:0 4px 12px #6157d91a}
+.top .brand small{font-size:11px;color:#8a899b;letter-spacing:.015em}
+.top .brandLinks{margin-top:5px}.top .brand .cafeLink,.top .brand .mapGuideLink{color:#716b96;font-weight:500}
+.top .search>#searchBtn,.chatTabs [aria-selected="true"],.chatCompose button,#aiChat #aiMapSend{background:#6157d9!important}
+.top .search{background:#f8f8fc;border-color:#e4e1f0}.top .search:focus-within{border-color:#9a91e8;box-shadow:0 0 0 3px #6157d910}
+.top .actions .btn.primary{background:#f1effc;border-color:#e3def8;color:#5b51bd}
+.mapUtilityBar{position:relative;z-index:25;display:flex!important;flex-wrap:wrap!important;min-width:0}
+.mapUtilityBar .browseTools{position:static!important;inset:auto!important;transform:none!important;max-width:none;margin:0;flex:none;pointer-events:auto}
+.mapUtilityBar .browseResultBar{margin:0;gap:6px;flex-wrap:wrap}
+.mapUtilityBar .browseResultBar button{min-height:36px;background:#f5f4fb;border:1px solid #e5e1f4;border-radius:10px;color:#504775;box-shadow:none;white-space:nowrap}
+.mapUtilityBar .browseResultBar #browseConditions{display:none}
+.mapUtilityBar>.operatorOptions{margin-left:auto}
+#businessSide>#detail.show{display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:0 14px!important}
+#businessSide #detail>.detailHeader{position:relative!important;top:auto!important;flex:none;z-index:2;min-height:0;padding:12px 0!important}
+#businessSide #detail>.detailScroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding-bottom:18px;scroll-padding-top:12px;overflow-anchor:none}
+#businessSide #detail>.browseNavigation{flex:none}
+#chatLauncher{display:none}
+@media(min-width:901px){
+ .chatDock{top:var(--chat-top,164px);right:12px;left:auto;bottom:12px!important;width:min(420px,calc(100vw - 390px));max-width:none;margin:0;height:auto!important;max-height:none!important;border:1px solid #e3dff1;border-radius:20px;box-shadow:-8px 10px 34px #3329571a;transform:translateX(calc(100% + 24px));visibility:hidden;transition:transform .24s ease,visibility .24s}
+ body.chatExpanded .chatDock{transform:translateX(0);visibility:visible}
+ .chatDock .chatGrip{display:none}.chatDock .chatHead{min-height:62px;flex-basis:62px;padding:0 16px;border-bottom:1px solid #efedf6}
+ .chatDock .chatHead button{color:#51468d}.chatDock .chatTabs{padding-top:12px}
+ #chatLauncher{position:fixed;z-index:99;display:block;right:0;top:42%;padding:17px 12px;writing-mode:vertical-rl;letter-spacing:.08em;min-width:46px;border:1px solid #ded8f3;border-right:0;border-radius:14px 0 0 14px;background:#6157d9;color:#fff;font:600 14px/1.5 system-ui;box-shadow:-3px 4px 16px #6157d927;cursor:pointer}
+ #chatLauncher:hover{background:#5046c6}#chatLauncher:focus-visible{outline:3px solid #b8b0f4;outline-offset:2px}
+ body.chatExpanded #chatLauncher{display:none}
+ .chatDock,.chatDock *{touch-action:auto!important;-webkit-user-select:auto!important;user-select:auto!important}
+}
+@media(max-width:900px){
+ .top .brandTitle{font-size:23px!important;font-weight:500!important;gap:7px!important}.top .brandMark{display:inline-flex!important;width:30px;height:30px;border-radius:10px}
+ .mapUtilityBar{flex-wrap:wrap!important;gap:4px 6px!important;padding:5px 8px!important}
+ .mapUtilityBar .browseResultBar button{min-height:32px;font-size:11px;padding:5px 9px}
+ .mapUtilityBar .communityStats{flex-basis:100%;margin:0!important}
+ .mapUtilityBar>.operatorOptions{padding:0;gap:4px;flex-wrap:wrap}
+ .mapUtilityBar .memberGradeBar{margin-left:auto}.mapUtilityBar .appInstallBar{margin-left:0!important}
+ #adminSessionLabel{font-size:10px}
+}
+@media(max-width:380px){.top .brandTitle{font-size:21px!important}.top .brandMark{width:27px;height:27px}}
+@media(prefers-reduced-motion:reduce){.chatDock{transition:none}}
