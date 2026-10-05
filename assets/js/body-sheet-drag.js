@@ -99,7 +99,8 @@
     panel.addEventListener('dragstart',event=>{if(gesture)event.preventDefault();});
     panel.addEventListener('wheel',stopMomentum,{passive:true});
     panel.addEventListener('pointerdown',event=>{if(event.pointerType!=='touch'&&event.isPrimary&&event.button===0)begin(event,event,'pointer');});
-    panel.addEventListener('pointermove',event=>{if(gesture?.kind==='pointer'&&event.pointerId===gesture.id)move(event,event);});
+    // Keep tracking when a fast first movement leaves a compact sheet before capture.
+    window.addEventListener('pointermove',event=>{if(gesture?.kind==='pointer'&&event.pointerId===gesture.id)move(event,event);});
     for(const type of ['pointerup','pointercancel','lostpointercapture'])window.addEventListener(type,event=>{if(gesture?.kind==='pointer'&&event.pointerId===gesture.id)finish(type!=='pointerup');});
     panel.addEventListener('touchstart',event=>{if(event.touches.length!==1){finish(true);return;}begin(event,event.touches[0],'touch');},{passive:true});
     panel.addEventListener('touchmove',event=>{if(gesture?.kind!=='touch')return;if(event.touches.length!==1){finish(true);return;}move(event,[...event.touches].find(t=>t.identifier===gesture.id));},{passive:false});

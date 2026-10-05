@@ -57,3 +57,5 @@
 @media(max-height:500px){.chatDock{max-height:calc(100dvh - 12px)}.chatDock:has(textarea:focus) .chatNotice,.chatDock:has(textarea:focus) .chatNickname,.chatDock:has(textarea:focus) #chatForm small{display:none}}
 
 #businessSide #detail [data-browse-back]{display:none}
+
+#aiChat .aiMapSearch{max-width:none!important}
