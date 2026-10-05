@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "bedc2ca1-07b3-4c7f-b49a-8d5f5cc4d1cd",
+    "name": "Kim spa",
+    "category": "spa",
+    "address": "F11 Đ. 3A, Tân Hưng, Hồ Chí Minh 700000 베트남",
+    "url": "https://kimmassagequan7.com/",
+    "sourceUrl": "https://kimmassagequan7.com/",
+    "note": "F11 Đường 3A의 Kim Spa Massage 공식 사이트입니다. Book us 양식에 날짜·시간·요청사항을 입력하고 업소의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-05"
+  },
+  {
     "id": "b028e325-1bbf-41a7-967a-384cfe78b4d9",
     "name": "XLIII Specialty Coffee",
     "category": "cafe",
