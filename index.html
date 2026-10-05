@@ -40,7 +40,7 @@
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
 <link rel="stylesheet" href="./assets/css/bright-interface.css?v=20261006-2">
 <link rel="stylesheet" href="./assets/css/chat-dock.css?v=20261006-admin-layout1">
-<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-mobile5">
+<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-header6">
 </head>
 <body>
 <div class="app">
@@ -52,12 +52,16 @@
     </div>
     <div class="search" role="search"><svg class="searchGlyph" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchInput" type="search" autocomplete="off" spellcheck="false" maxlength="200" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeSearchList" aria-label="업소명 또는 주소 검색" placeholder="업소명·주소·지역 검색"><button id="searchClear" class="searchClear" type="button" aria-label="검색어 지우기" hidden>×</button><button id="searchBtn" type="button">검색</button><div id="placeSearchResults" class="placeSearchResults" hidden><div id="placeSearchList" role="listbox" aria-label="추천 장소"></div><p id="placeSearchStatus" role="status" aria-live="polite"></p><div id="placeSearchCredit" translate="no" hidden>Google Maps</div></div></div>
     <div class="actions">
+  <div class="communityStats" aria-label="전체 지도 이용 통계">
+    <span class="onlineStat" hidden data-status="connecting" title="현재 연결된 브라우저 수입니다. 같은 브라우저의 여러 탭은 1명으로 집계합니다. 연결 종료 반영에는 잠시 지연이 있을 수 있으며, 브라우저 저장을 차단하면 중복 집계될 수 있습니다."><i class="onlineDot" aria-hidden="true"></i><span class="statLabelFull">실시간 접속</span><span class="statLabelShort" aria-hidden="true">접속</span> <b id="onlineUsers">—</b><small>명</small></span>
+    <span hidden title="같은 브라우저에서는 최초 접속 후 30분 동안 1회 집계하며, 이후 재접속하면 다시 집계합니다. 과거 누적 수치는 유지됩니다. 브라우저 저장을 차단하면 중복 집계될 수 있으며 실제 사람 수와는 다릅니다."><span class="statLabelFull">누적 방문</span><span class="statLabelShort" aria-hidden="true">방문</span> <b id="totalVisits">—</b><small>회</small></span>
+  </div>
       <button id="locBtn" class="btn primary">현재 위치</button>
       <button id="addBtn" class="btn">업체 등록</button>
     </div>
   </header>
   <div class="mapUtilityBar">
-      <div class="operatorOptions" role="group" aria-label="관리자 메뉴"><strong id="adminSessionLabel" role="status" hidden>관리자 접속 중</strong><button id="adminBtn" type="button">관리자 로그인</button><button id="openOperatorTools" type="button" aria-haspopup="dialog" aria-controls="operatorDialog" hidden>관리자 페이지</button></div>
+      <div class="operatorOptions" hidden role="group" aria-label="관리자 메뉴"><strong id="adminSessionLabel" role="status" hidden>관리자 접속 중</strong><button id="adminBtn" type="button">관리자 로그인</button><button id="openOperatorTools" type="button" aria-haspopup="dialog" aria-controls="operatorDialog" hidden>관리자 페이지</button></div>
   <button id="openMapMembership" class="memberGradeBar" type="button" aria-haspopup="dialog" aria-controls="memberDialog"><span id="memberBarLabel">내 맵 등급</span><strong id="memberBarRank" class="mapRank rankPending">확인 중</strong><span id="memberBarProgress">내 활동 보기</span><span aria-hidden="true">›</span></button>
   <div class="appInstallBar" id="homeScreenBar">
     <img src="./assets/icons/vietmap-192.png?v=20261006-brand2" alt="" width="28" height="28">
@@ -66,12 +70,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m-4-4 4 4 4-4M5 15v5h14v-5"/></svg>홈 화면에 추가
     </button>
   </div>
-  <div class="communityStats" aria-label="전체 지도 이용 통계">
-    <span class="onlineStat" hidden data-status="connecting" title="현재 연결된 브라우저 수입니다. 같은 브라우저의 여러 탭은 1명으로 집계합니다. 연결 종료 반영에는 잠시 지연이 있을 수 있으며, 브라우저 저장을 차단하면 중복 집계될 수 있습니다."><i class="onlineDot" aria-hidden="true"></i><span class="statLabelFull">실시간 접속</span><span class="statLabelShort" aria-hidden="true">접속</span> <b id="onlineUsers">—</b><small>명</small></span>
-    <span hidden title="같은 브라우저에서는 최초 접속 후 30분 동안 1회 집계하며, 이후 재접속하면 다시 집계합니다. 과거 누적 수치는 유지됩니다. 브라우저 저장을 차단하면 중복 집계될 수 있으며 실제 사람 수와는 다릅니다."><span class="statLabelFull">누적 방문</span><span class="statLabelShort" aria-hidden="true">방문</span> <b id="totalVisits">—</b><small>회</small></span>
-    <span hidden><span class="statLabelFull">등록 업체</span><span class="statLabelShort" aria-hidden="true">업체</span> <b id="totalPlaces">—</b><small>곳</small></span>
-    <span hidden><button id="openCommunityReviews" class="statsReviewButton" type="button" aria-haspopup="dialog"><span class="statLabelFull">회원 후기</span><span class="statLabelShort" aria-hidden="true">후기</span> <b id="totalReviews">—</b><small>개</small><span aria-hidden="true"> ›</span></button></span>
-  </div>
+
   </div>
   <div class="content">
     <aside class="side" id="businessSide">
@@ -455,10 +454,10 @@
 <script src="./assets/js/booking-links.js?v=20261006-2"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260925-actions2"></script>
-<script src="./assets/js/04-rendering.js?v=20261006-mobile5"></script>
-<script src="./assets/js/body-sheet-drag.js?v=20261006-mobile5"></script>
-<script src="./assets/js/detail-resize.js?v=20261006-mobile5"></script>
-<script src="./assets/js/menu-resize.js?v=20261006-mobile5"></script>
+<script src="./assets/js/04-rendering.js?v=20261006-header6"></script>
+<script src="./assets/js/body-sheet-drag.js?v=20261006-header6"></script>
+<script src="./assets/js/detail-resize.js?v=20261006-header6"></script>
+<script src="./assets/js/menu-resize.js?v=20261006-header6"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260923-ux1"></script>
 <script src="./assets/js/07-ranges-categories.js?v=20261006-admin-layout1"></script>
@@ -478,8 +477,8 @@
 <script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260919-share1"></script>
 <script src="./assets/js/nearby-businesses.js?v=20260920-interaction3"></script>
-<script src="./assets/js/map-ux.js?v=20261006-mobile5"></script>
-<script src="./assets/js/browse-experience.js?v=20261006-mobile5"></script>
+<script src="./assets/js/map-ux.js?v=20261006-header6"></script>
+<script src="./assets/js/browse-experience.js?v=20261006-header6"></script>
 <script src="./assets/js/map-weather.js?v=20261006-1"></script>
 <script src="./assets/js/road-condition-data.js?v=20261002-road1"></script>
 <script src="./assets/js/road-conditions.js?v=20261002-road1"></script>
@@ -496,6 +495,6 @@
 <script src="./assets/js/ai-nearby-search.js?v=20261005-nearby-best1"></script>
 <script src="./assets/js/ai-map-search.js?v=20261005-korean-vocabulary2"></script>
 
-<script src="./assets/js/chat-dock.js?v=20261006-mobile5"></script>
+<script src="./assets/js/chat-dock.js?v=20261006-header6"></script>
 </body>
 </html>

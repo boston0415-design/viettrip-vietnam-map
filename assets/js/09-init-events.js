@@ -411,6 +411,8 @@ $('#reviewModal').addEventListener('keydown',e=>{
 
 $('#pBenefitEnabled').addEventListener('change',toggleBenefitField);
 $('#adminBtn').onclick=toggleAdminMode;
+// Private entry URL opens the existing password dialog; it never grants access.
+if(new URLSearchParams(location.search).get('admin')==='login'&&!adminKey())toggleAdminMode();
 $('#adminCredentialsForm').addEventListener('submit',e=>{
   e.preventDefault();
   if(!$('#adminLoginSubmit').disabled)submitAdminPassword();

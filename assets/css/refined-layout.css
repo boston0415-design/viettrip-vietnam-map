@@ -62,3 +62,42 @@
  .mapUtilityBar:has(#openOperatorTools[hidden])>.operatorOptions{grid-column:2;grid-row:1;width:auto;justify-content:flex-end}
 }
 .mapUtilityBar #browseShowList,.mapUtilityBar #roadConditionsOpen{height:36px!important;min-height:36px!important;padding:6px 10px!important;box-sizing:border-box}
+
+/* Only authenticated administrators see their controls; removed rows give space to the map. */
+.operatorOptions[hidden]{display:none!important}
+.top .actions .communityStats{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;flex-wrap:nowrap;gap:3px!important;padding:0 8px 0 0;border:0;background:transparent;min-height:0;margin:0;font-size:10px}
+.top .actions .communityStats>span{margin:0!important;padding:0!important;gap:3px;min-height:0}
+.top .actions .communityStats>span[hidden]{display:none!important}
+.top .actions .communityStats:not(:has(>span:not([hidden]))){display:none!important}
+.top .actions .communityStats .statLabelFull{display:none}
+.top .actions .communityStats .statLabelShort{display:inline!important}
+.top .actions .communityStats b{font-size:11px}
+.top .actions .communityStats small{font-size:9px}
+.app{grid-template-rows:auto auto minmax(0,1fr)!important}
+@media(max-width:900px){
+ .top{height:auto!important;grid-template-rows:auto 38px!important;grid-template-columns:minmax(0,1fr)!important;gap:5px!important;padding:8px 10px!important}
+ .top .brand{grid-column:1!important;grid-row:1!important}
+ .top .brandLinks{margin-top:2px}
+ .top .actions{grid-column:1!important;grid-row:2!important;justify-self:end;align-self:center}
+ .top:has(.communityStats>span:not([hidden])) .brandLinks{position:absolute;left:10px;top:47px;margin:0!important}
+ .top:has(.communityStats>span:not([hidden])) .brand{padding-bottom:0}
+ .top:has(.communityStats>span:not([hidden])){position:relative}
+ .top:has(.communityStats>span:not([hidden])) .brandLinks .cafeLink{margin-left:0!important}
+ .top:has(.communityStats>span:not([hidden])) .mapWeather{display:none!important}
+ .top .search{grid-column:1!important;grid-row:3!important;height:38px!important}
+ .top .actions .btn{height:34px!important;min-height:34px!important}
+ .top:not(:has(.communityStats>span:not([hidden]))){grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:54px 38px!important}
+ .top:not(:has(.communityStats>span:not([hidden]))) .actions{grid-column:2!important;grid-row:1!important}
+ .top:not(:has(.communityStats>span:not([hidden]))) .search{grid-column:1/-1!important;grid-row:2!important}
+ .mapUtilityBar{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:6px!important;padding:6px 10px!important}
+ .mapUtilityBar>.browseTools{width:auto!important;flex:1 1 auto}
+ .mapUtilityBar>.operatorOptions{width:auto!important;margin-left:auto!important}
+ .mapUtilityBar>.memberGradeBar{flex:1 1 auto;margin:0!important}
+ .mapUtilityBar>.appInstallBar{margin:0!important}
+}
+
+@media(max-width:900px){
+ .mapUtilityBar #adminSessionLabel{display:none!important}
+ .mapUtilityBar>.operatorOptions{gap:4px!important}
+ .mapUtilityBar>.browseTools{flex:0 1 auto}
+}

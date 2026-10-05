@@ -42,8 +42,9 @@ let adminSessionRevision=0;
 function syncAdminButton(){
   const button=$('#adminBtn');
   if(!button)return;
-  button.textContent=state.isAdmin||adminKey()?'관리자 로그아웃':'관리자 로그인';
+  button.textContent=state.isAdmin||adminKey()?'로그아웃':'관리자 로그인';
   button.classList.toggle('adminOn',state.isAdmin);
+  const adminMenu=document.querySelector('.operatorOptions');if(adminMenu)adminMenu.hidden=!state.isAdmin;
   const adminStatus=$('#adminSessionLabel');
   if(adminStatus){adminStatus.hidden=!state.isAdmin&&!adminKey();adminStatus.textContent=state.isAdmin?'관리자 접속 중':'관리자 인증 재확인 중';}
   const memberEntry=$('#openMapMembership');if(memberEntry)memberEntry.hidden=Boolean(state.isAdmin||adminKey());
