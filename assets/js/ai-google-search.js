@@ -29,6 +29,7 @@
   }
   function typeMatches(place,intent){
     const types=place.types||[];
+    if(intent.category==='shopping'&&intent.terms?.some(term=>window.AIQueryIntent?.searchItemFor(term)?.shopTypes?.some(type=>types.includes(type))))return true;
     if(intent.terms?.includes('꽃집'))return types.includes('florist');
     if(intent.productSearch)return types.includes(intent.productKind==='computer'?'electronics_store':'cell_phone_store');
     if(intent.subcategory==='베이커리')return types.includes('bakery');
@@ -73,6 +74,13 @@
     const text=normalize(sourcesFor(place).map(s=>s.text).join(' '));
     if((place.types||[]).some(t=>['vegan_restaurant','vegetarian_restaurant'].includes(t))||/\b(?:vegan|vegetarian|chay)\b|채식|\b(?:no|without)\s+(?:pork|ribs|com\s+(?:tam\s+)?suon)|khong\s+(?:co|ban|phuc vu).{0,20}suon|껌승.{0,12}(?:없|안\s*팔|판매하지)|돼지.{0,12}(?:없|안\s*팔|판매하지)/i.test(text))return null;
     return {related:true,term:dish.term,evidence:'Google 업소명에서 '+dish.related+' 전문점 확인 · '+dish.term+' 메뉴는 확인 필요',source:{label:'Google 업소명'}};
+  }
+  function retailProof(place,term,intent){
+    const item=window.AIQueryIntent?.searchItemFor(term);
+    if(intent.category!=='shopping'||!item?.shopTypes?.some(type=>place.types?.includes(type)))return null;
+    // Explicit negative stock/menu evidence is not turned into a positive lead.
+    if(sourcesFor(place).some(s=>window.AIQueryIntent.searchItemMatch(s.text,term)&&/없|안\s*팔|품절|판매하지|\b(?:no|not|without)\b|out\s+of\s+stock|khong\s+(?:co|ban)|het\s+hang/i.test(normalize(s.text))))return null;
+    return {retail:true,term:item.term,evidence:'Google 관련 판매 업종 확인 · '+item.term+' 취급·재고 확인 필요',source:{label:'Google 업종'}};
   }
   function queryFor(intent,includeRoom=true,includeOrigin=true){
     if(intent.productSearch)return [window.NameSearch?.googleQuery(intent.requestText)||intent.requestText,intent.productKind==='computer'?'computer electronics store':'mobile phone store',CITIES[intent.city]||'','Vietnam'].filter(Boolean).join(' ');
@@ -141,7 +149,7 @@
       if(['CLOSED_PERMANENTLY','CLOSED_TEMPORARILY','FUTURE_OPENING'].includes(p.businessStatus))continue;
       const country=p.addressComponents?.find(c=>c.types?.includes('country'));
       if(country&&country.shortText!=='VN')continue;
-      const proofs=intent.exploratory?[]:(intent.terms||[]).map(term=>termProof(p,term,intent)||relatedDishProof(p,term));
+      const proofs=intent.exploratory?[]:(intent.terms||[]).map(term=>termProof(p,term,intent)||relatedDishProof(p,term)||retailProof(p,term,intent));
       if(!typeMatches(p,intent)||proofs.some(proof=>!proof)||window.AIMapSearch.flowerPurposeMatches?.(p.displayName,intent)===false)continue;
       const place={name:String(p.displayName||'').trim(),address:p.formattedAddress||'',...position};
       if(!cityMatches(p,place,intent.city))continue;
@@ -152,6 +160,7 @@
       const row={placeId:p.id,name:place.name,address:place.address,position,rating,ratingCount:count,termMatch,source:'google',...(intent.action==='grabfood'?{websiteURI:p.websiteURI||''}:{}),attributions:p.attributions||[],cuisineByMenu:!!cuisineProof,
         proofs:[...(cuisineProof?[cuisineProof]:[]),...proofs].slice(0,2).map(proof=>({...proof,evidence:proof.source.label==='Google 업소 설명'?'Google 업소 설명 · '+p.editorialSummary:proof.evidence}))};
       row.menuUnconfirmed=proofs.filter(proof=>proof.related).map(proof=>proof.term);
+      row.itemUnconfirmed=proofs.filter(proof=>proof.retail).map(proof=>proof.term);
       row.insights=window.AISearchInsights?.inspect(p,intent,sourcesFor(p));
       if(intent.nearby&&nearby){row.distance=geoDistanceMeters(position,nearby);row.searchRadius=nearby.radius;}
       if(row.insights?.hotelClass?.kind==='different')continue;
@@ -180,7 +189,7 @@
     const Place=window.google?.maps?.places?.Place;
     if(typeof Place?.searchByText!=='function')throw Error('GOOGLE_UNAVAILABLE');
     const fields=['id','displayName','formattedAddress','location','rating','userRatingCount','businessStatus','addressComponents','types','attributions'];
-    if(!intent.productSearch)fields.push('priceLevel','priceRange');
+    if(!intent.productSearch&&intent.category!=='shopping')fields.push('priceLevel','priceRange');
     if(intent.action==='grabfood')fields.push('websiteURI');
     const roomSearch=window.AIMapSearch.wantsRoom(intent);
     if(intent.preferences?.includes('group')||intent.terms?.length||roomSearch||intent.cuisineAsMenu||['atmosphere','purpose'].includes(intent.sortBy)||intent.hotelStars)fields.push('editorialSummary','reviews');

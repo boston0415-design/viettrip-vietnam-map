@@ -71,7 +71,7 @@ const SEARCH_VOCABULARY=[
   ['헬멧','mũ bảo hiểm','shopping',['헬맷','helmet','helmets','nón bảo hiểm']],
   ['충전기','charger','shopping',['chargers','bộ sạc','củ sạc']],
   ['충전케이블','cáp sạc','shopping',['충전 케이블','charging cable','charge cable']],
-  ['보조배터리','sạc dự phòng','shopping',['보조 배터리','power bank','powerbank','pin dự phòng']],
+  ['보조배터리','sạc dự phòng','shopping',['보조 배터리','power bank','power banks','powerbank','powerbanks','pin dự phòng']],
   ['여행용어댑터','travel adapter','shopping',['여행용 어댑터','여행용아답터','멀티어댑터','멀티 어댑터','ổ cắm du lịch']],
   ['캐리어','vali','shopping',['케리어','여행가방','여행 가방','suitcase','suitcases','luggage','va li']],
   ['배낭','ba lô','shopping',['백팩','backpack','backpacks','balo']],
@@ -86,7 +86,7 @@ const SEARCH_VOCABULARY=[
   ['기념품','đồ lưu niệm','shopping',['souvenir','souvenirs']],
   ['향수','nước hoa','shopping',['perfume','perfumes']],
   ['화장품','mỹ phẩm','shopping',['cosmetics']],
-  ['선크림','kem chống nắng','shopping',['썬크림','선 크림','sunscreen','sun cream','sunblock']],
+  ['선크림','kem chống nắng','shopping',['썬크림','선 크림','sunscreen','sunscreens','sun cream','sunblock']],
   ['목베개','gối cổ','shopping',['목 베개','neck pillow','travel pillow']],
   ['수건','towel','shopping',['towels','khăn tắm']],
   ['생수','nước đóng chai','shopping',['bottled water','nước suối']],
@@ -98,6 +98,23 @@ const SEARCH_VOCABULARY=[
   ['강아지사료','thức ăn cho chó','shopping',['강아지 사료','개사료','dog food']],
   ['고양이사료','thức ăn cho mèo','shopping',['고양이 사료','cat food']]
 ].map(([term,query,category,aliases,extra={}])=>({term,query,category,aliases,...extra}));
+// A matching retail type establishes an inquiry candidate, never item stock.
+const RETAIL_GROUPS=[
+  [['충전기','충전케이블','보조배터리','여행용어댑터','이어폰'],['electronics_store','cell_phone_store']],
+  [['카메라'],['electronics_store']],
+  [['우산','우비','목베개','수건'],['department_store','home_goods_store','general_store','supermarket']],
+  [['캐리어','배낭','수영복'],['department_store','clothing_store','sporting_goods_store']],
+  [['헬멧'],['sporting_goods_store','auto_parts_store','bicycle_store']],
+  [['샌들','슬리퍼','운동화'],['shoe_store','sporting_goods_store']],
+  [['낚시용품'],['sporting_goods_store']],
+  [['기념품'],['gift_shop']],
+  [['향수','화장품','선크림'],['cosmetics_store','department_store']],
+  [['망고','두리안','망고스틴','용과','코코넛','생수'],['grocery_store','supermarket','food_store']],
+  [['문구용품'],['book_store']],
+  [['장난감'],['toy_store']],
+  [['애견용품','강아지사료','고양이사료'],['pet_store']]
+];
+for(const [terms,types] of RETAIL_GROUPS)for(const term of terms)SEARCH_VOCABULARY.find(item=>item.term===term).shopTypes=types;
 const dishText=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').normalize('NFC').replace(/đ/gi,'d').toLowerCase();
 const searchEscape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const searchAliases=SEARCH_VOCABULARY.flatMap(item=>[...new Set([item.term,item.query,...item.aliases].map(dishText))].map(alias=>({item,alias}))).sort((a,b)=>b.alias.length-a.alias.length);

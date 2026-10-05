@@ -202,6 +202,7 @@
   function resultTitle(entry){
     const rows=[...(entry.memberRows||[]),...(entry.google?.rows||[])];
     if(entry.intent.productSearch){title.textContent='판매점 문의 후보 · '+rows.length+'곳';return;}
+    if(entry.intent.category==='shopping'&&entry.intent.terms?.some(t=>window.AIQueryIntent?.searchItemFor(t)?.category==='shopping')){title.textContent='상품 관련 매장 · '+rows.length+'곳';return;}
     if(entry.intent.hotelStars){const count=rows.filter(r=>r.insights?.hotelClass?.kind==='confirmed').length;title.textContent=entry.intent.hotelStars+'성급 안내 '+count+'곳 · 성급 문의 '+(rows.length-count)+'곳';return;}
     if(entry.intent.subcategory==='로컬 KTV'){title.textContent='로컬 등록 '+rows.filter(r=>r.place).length+'곳 · 운영 문의 '+rows.filter(r=>!r.place).length+'곳';return;}
     title.textContent=entry.intent.exploratory?'질문 관련 장소 후보 · '+rows.length+'곳':wantsRoom(entry.intent)?'룸 안내 '+rows.filter(r=>r.room?.kind==='confirmed').length+'곳 · 문의 필요 '+rows.filter(r=>r.room?.kind==='unknown').length+'곳':(entry.intent.purpose==='group'?'모임 장소 후보 · ':'추천 업소 · ')+rows.length+'곳';
@@ -336,7 +337,7 @@
     if(!entry.intent.sortBy||wantsRoom(entry.intent))return;
     const section=byId('aiGoogleSection');if(!section)return;
     list.querySelectorAll(':scope > .aiSourceHeading').forEach(n=>n.remove());
-    const h=section.querySelector('h3');if(h)h.textContent=entry.google?.rows?.some(row=>row.menuUnconfirmed?.length)?'주변 메뉴 검색 후보':'조건에 맞는 업소';
+    const h=section.querySelector('h3');if(h)h.textContent=entry.google?.rows?.some(row=>row.itemUnconfirmed?.length)?'상품 취급 확인이 필요한 매장 포함':entry.google?.rows?.some(row=>row.menuUnconfirmed?.length)?'주변 메뉴 검색 후보':'조건에 맞는 업소';
     const status=section.querySelector('.aiGoogleStatus');if(status&&!entry.google.error)status.textContent=window.AISearchInsights?.sortLabel(entry.intent)||'';
     let ul=section.querySelector('ul');if(!ul){ul=document.createElement('ul');ul.className='aiGoogleResults';section.append(ul);}
     const rows=[...(entry.memberRows||[]),...(entry.google?.rows||[])].sort((a,b)=>(window.AISearchInsights?.compare(a,b,entry.intent)||0)||Number(!!b.place)-Number(!!a.place));

@@ -966,7 +966,7 @@ const server=http.createServer((req,res)=>{
    google.maps.places.Place.searchByText=async request=>{
     window.vocabularyRequest=request;
     const p=(id,displayName,types)=>({id,displayName,types,rating:4.8,userRatingCount:70,location:{lat:10.732,lng:106.66},formattedAddress:'Ho Chi Minh'});
-    return {places:[p('vocab-coffee','Cà Phê Trứng Test',['cafe']),p('vocab-item','Sạc Dự Phòng Test',['store','electronics_store']),p('vocab-wrong','Kem Chống Nắng Test',['store'])]};
+    return {places:[p('vocab-coffee','Cà Phê Trứng Test',['cafe']),p('vocab-item','Sạc Dự Phòng Test',['store','electronics_store']),p('vocab-lead','Electronics Store Test',['store','electronics_store']),p('vocab-wrong','Kem Chống Nắng Test',['store'])]};
    };
   });
   const vocabularyData=await page.evaluate(()=>JSON.stringify(testData));
@@ -979,7 +979,7 @@ const server=http.createServer((req,res)=>{
    await page.locator('[data-google-place-id="'+id+'"]').waitFor();
    assert((await page.evaluate(()=>vocabularyRequest.textQuery)).includes(translated));
    assert.equal(await page.locator('[data-google-place-id="vocab-wrong"]').count(),0);
-   if(id==='vocab-item')assert.match(await page.locator('[data-google-place-id="'+id+'"]').innerText(),/재고·판매가/);
+   if(id==='vocab-item'){assert.match(await page.locator('[data-google-place-id="'+id+'"]').innerText(),/재고·판매가/);assert.match(await page.locator('[data-google-place-id="vocab-lead"]').innerText(),/취급·재고 확인 필요/);}
    await page.screenshot({path:path.join(out,`korean-${id}-${width}.png`)});
    await page.locator('.aiAnswerPick').first().click();assert(await page.locator('#detail').isVisible());await page.locator('#detailCloseBtn').click();
    await page.locator('#aiMapClear').click();
