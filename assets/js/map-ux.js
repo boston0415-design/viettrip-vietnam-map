@@ -75,7 +75,7 @@
     if(index<0)return;
     const nav=document.createElement('nav');nav.className='browseNavigation';nav.setAttribute('aria-label','업소 이어보기');
     nav.innerHTML=`<button type="button" data-browse-back>← ${browse.source==='nearby'?'주변목록':'업체목록'}</button><span>${index+1} / ${ids.length}</span><button type="button" data-browse-prev ${index===0?'disabled':''} aria-label="이전 업소">이전</button><button type="button" data-browse-next ${index===ids.length-1?'disabled':''} aria-label="다음 업소">다음</button>`;
-    header.after(nav);
+    const content=panel.querySelector('.detailScroll');if(content)content.prepend(nav);else header.after(nav);
     nav.querySelector('[data-browse-back]').onclick=()=>closeDetail();
     nav.querySelector('[data-browse-prev]').onclick=()=>{if(index>0)choose(ids[index-1]);};
     nav.querySelector('[data-browse-next]').onclick=()=>{if(index+1<ids.length)choose(ids[index+1]);};
