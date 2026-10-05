@@ -29,6 +29,8 @@
   const flowerPurposeMatches=(name,intent)=>!intent.flowerGift||!/장례|근조|추모|\b(?:funeral|sympathy|memorial)\b|hoa\s+(?:đám\s+tang|dam\s+tang|viếng|vieng|tang\b)/i.test(String(name||'').normalize('NFC'));
   function menuKeyword(text,term){
     let value=normalize(menuText(text,term));const pattern=MENU_PATTERNS[term];
+    const dish=window.AIQueryIntent?.dishFor(term);
+    if(dish)return window.AIQueryIntent.dishMatch(value,term);
     if(term==='고기·구이')value=value.replace(/\bbbq\s*chicken\b|비비큐\s*치킨|치킨\s*비비큐/gi,'');
     if(pattern)return value.match(pattern)?.[0]?.trim()||'';
     return (/왁싱|waxing/i.test(term)?['왁싱','waxing','wax long']:[term]).find(alias=>value.includes(normalize(alias))||window.NameSearch?.matches(text,alias))||'';
@@ -38,7 +40,7 @@
       const source={...original,text:menuText(original.text,term)};
       for(const clause of String(source.text||'').split(/[.!?。\n]/)){
         const keyword=menuKeyword(clause,term);if(!keyword)continue;
-        if(MENU_PATTERNS[term]&&/없|안\s*팔|팔지\s*않|판매하지|제공하지|먹지\s*못|있는지|있나요|확인\s*필요|문의|예정|옆집|다른\s*식당|\b(?:no|not|without|whether|wish|maybe)\b|khong\s+(?:co|ban)/i.test(normalize(clause)))continue;
+        if((MENU_PATTERNS[term]||window.AIQueryIntent?.dishFor(term))&&/없|안\s*팔|팔지\s*않|판매하지|제공하지|먹지\s*못|있는지|있나요|확인\s*필요|문의|예정|옆집|다른\s*식당|\b(?:no|not|without|whether|wish|maybe)\b|khong\s+(?:co|ban)/i.test(normalize(clause)))continue;
         return {evidence:quote(source,keyword),source};
       }
     }
@@ -332,7 +334,7 @@
     if(!entry.intent.sortBy||wantsRoom(entry.intent))return;
     const section=byId('aiGoogleSection');if(!section)return;
     list.querySelectorAll(':scope > .aiSourceHeading').forEach(n=>n.remove());
-    const h=section.querySelector('h3');if(h)h.textContent='조건에 맞는 업소';
+    const h=section.querySelector('h3');if(h)h.textContent=entry.google?.rows?.some(row=>row.menuUnconfirmed?.length)?'주변 메뉴 검색 후보':'조건에 맞는 업소';
     const status=section.querySelector('.aiGoogleStatus');if(status&&!entry.google.error)status.textContent=window.AISearchInsights?.sortLabel(entry.intent)||'';
     let ul=section.querySelector('ul');if(!ul){ul=document.createElement('ul');ul.className='aiGoogleResults';section.append(ul);}
     const rows=[...(entry.memberRows||[]),...(entry.google?.rows||[])].sort((a,b)=>(window.AISearchInsights?.compare(a,b,entry.intent)||0)||Number(!!b.place)-Number(!!a.place));

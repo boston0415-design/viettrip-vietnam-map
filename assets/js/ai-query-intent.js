@@ -14,6 +14,29 @@ const CUISINES={
   '양식':['Western'],'퓨전':['Fusion'],'다국적':['International'],'기타':['Other']
 };
 const cuisineAliases=label=>[label,...CUISINES[label]];
+// One vocabulary feeds interpretation, Google queries and returned menu evidence.
+// Cơm tấm is a related shop type for cơm sườn, not proof of a pork dish.
+const VIETNAMESE_DISHES=[
+  {term:'껌승',query:'cơm sườn',aliases:['껌승','껌 승','껌수언','껌 수언','껌스언','껌쓰언','껌쑤언','껌슨','com suon','com tam suon','돼지갈비 덮밥','돼지갈비덮밥'],related:'껌땀'},
+  {term:'껌땀',query:'cơm tấm',aliases:['껌땀','껌 땀','껌땜','껌탐','com tam','broken rice']},
+  {term:'분짜',query:'bún chả',aliases:['분짜','분차','bun cha']},
+  {term:'반쎄오',query:'bánh xèo',aliases:['반쎄오','반세오','반쌔오','banh xeo']},
+  {term:'분팃느엉',query:'bún thịt nướng',aliases:['분팃느엉','분팃능','분팃느옹','bun thit nuong']},
+  {term:'껌가',query:'cơm gà',aliases:['껌가','껌 가','com ga','베트남 닭고기 덮밥']}
+];
+const dishText=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').normalize('NFC').replace(/đ/gi,'d').toLowerCase();
+const dishAliases=VIETNAMESE_DISHES.flatMap(d=>[...new Set([d.term,...d.aliases])].map(alias=>({dish:d,alias:dishText(alias)}))).sort((a,b)=>b.alias.length-a.alias.length);
+const dishPattern=new RegExp(dishAliases.map(({alias})=>{const escaped=alias.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s*');return /[a-z]/.test(alias)?'(?<![a-z])'+escaped+'(?![a-z])':escaped;}).join('|'),'gi');
+function dishMentions(text){
+  const found=[];dishText(text).replace(dishPattern,match=>{const item=dishAliases.find(a=>a.alias.replace(/\s/g,'')===match.replace(/\s/g,''));if(item&&!found.some(d=>d.term===item.dish.term))found.push(item.dish);return match;});return found;
+}
+function dishFor(term){return VIETNAMESE_DISHES.find(d=>d.term===term)||(!stripDishes(term).trim()?dishMentions(term)[0]:null)||null;}
+function dishMatch(text,term){
+  const dish=dishFor(term);if(!dish)return '';
+  const pattern=dishAliases.filter(a=>a.dish===dish).map(({alias})=>{const escaped=alias.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s*');return /[a-z]/.test(alias)?'(?<![a-z])'+escaped+'(?![a-z])':escaped;}).join('|');
+  return dishText(text).match(new RegExp(pattern,'i'))?.[0]||'';
+}
+function stripDishes(text){return dishText(text).replace(new RegExp('(?:'+dishPattern.source+')(?:\\s*(?:전문점|맛집|식당|집))?','gi'),' ');}
 function cuisineLabel(value){
   const text=String(value||'').trim().replace(/\s*(?:식당|레스토랑|음식점|음식|요리|식|restaurants?|cuisine|food)$/i,'').trim().toLowerCase();
   return Object.keys(CUISINES).find(label=>cuisineAliases(label).some(alias=>alias.toLowerCase()===text))||Object.keys(CUISINES).find(label=>label===value)||'';
@@ -138,6 +161,13 @@ function clarifyIntent(intent,query){
   }else delete next.features;
   // Common service/menu words are deterministic, not model guesses about cuisine.
   if(!/말고|제외|아닌/.test(query)){
+    const dishes=dishMentions(query);
+    if(dishes.length){
+      if(next.category!=='restaurant')next.subcategory='';
+      next.relevant=true;next.category='restaurant';
+      next.terms=[...next.terms.filter(t=>stripDishes(t).replace(/\s/g,'')!==''),...dishes.map(d=>d.term)];
+      next.terms=[...new Set(next.terms)];
+    }
     if(/쌀국수|\bph[oở]\b/i.test(query)){next.relevant=true;next.category='restaurant';next.terms=[...next.terms.filter(t=>!/^(?:쌀국수(?:집)?|ph[oở])$/i.test(t)),'쌀국수'];}
     const strip=pattern=>{next.terms=next.terms.filter(t=>!pattern.test(t));};
     if(/라멘|라아멘|\bramen\b|ラーメン/i.test(query)){next.relevant=true;next.category='restaurant';strip(/^(?:라멘(?:집)?|라아멘|ramen(?:\s+restaurants?)?|ラーメン|국수\s*[·/]\s*라멘)$/i);next.terms.push('라멘');}
@@ -348,7 +378,7 @@ function literalIntent(query,city){
   if(/말고|제외|아닌|않|지금|현재|내일|주말|예약해/.test(query))return null;
   const cities=query.match(/호치민|하노이|다낭|나트랑|푸꾸옥|푸꿕|달랏|호이안|붕따우|무이네/g)||[];
   if(new Set(cities).size>1&&!intent.guide)return null;
-  let remaining=query;
+  let remaining=stripDishes(query);
   if(intent.service==='florist')remaining=remaining
     .replace(/(?:여자\s*친구|남자\s*친구|여친|남친|아내|남편|엄마|어머니|부모님|친구)(?:에게|한테|께)?/g,' ')
     .replace(/꽃\s*(?:다발|바구니|집|가게)?(?:을|를)?|\bflorists?\b|\bflower\s*shops?\b/gi,' ')
@@ -368,5 +398,5 @@ function literalIntent(query,city){
   return remaining?null:intent;
 }
 
-window.AIQueryIntent={contextualIntent,recoveryIntent,exploratoryIntent,nearbyRequest,applyNearby};
+window.AIQueryIntent={contextualIntent,recoveryIntent,exploratoryIntent,nearbyRequest,applyNearby,dishFor,dishMentions,dishMatch};
 })();

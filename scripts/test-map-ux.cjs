@@ -938,6 +938,28 @@ const server=http.createServer((req,res)=>{
   assert.match(await page.locator('#detail h2').innerText(),/검색한 새 업소/,'nearby recommendation opens its actual detail');
   await page.locator('#detailCloseBtn').click();
   await page.locator('#aiMapClear').click();
+  // Reproduce the reported Korean dish question without changing its wording.
+  await page.evaluate(()=>{
+   testData.places.push({id:'dish-anchor',name:'선라이즈 아파트',category:'stay',address:'Ho Chi Minh',lat:10.73,lng:106.66});
+   google.maps.places.Place.searchByText=async request=>{
+    window.dishRequest=request;
+    const p=(id,name,rating,lat)=>({id,displayName:name,rating,userRatingCount:300,location:{lat,lng:106.66},formattedAddress:'Ho Chi Minh',types:['restaurant'],addressComponents:[{types:['country'],shortText:'VN'}]});
+    return {places:[p('dish-known','Cơm Sườn Nướng Test',4.8,10.734),p('dish-related','Cơm Tấm Test',5,10.731),p('dish-wrong','Phở Test',5,10.731),p('dish-far','Cơm Sườn Far',5,10.8)]};
+   };
+  });
+  const dishData=await page.evaluate(()=>JSON.stringify(testData));
+  await page.locator('#aiMapQuestion').fill('선라이즈 근처 껌승집');await page.locator('#aiMapQuestion').press('Enter');
+  await page.locator('[data-google-place-id="dish-known"]').waitFor();
+  assert.match(await page.locator('.aiAnswerPick').first().innerText(),/Cơm Sườn Nướng Test/);
+  assert.match(await page.locator('.aiNearbyContext').innerText(),/선라이즈 아파트 기준 · 반경 2km/);
+  assert.match(await page.evaluate(()=>dishRequest.textQuery),/cơm (?:tấm )?sườn/);
+  assert(await page.evaluate(()=>!!dishRequest.locationRestriction));
+  assert.match(await page.locator('[data-google-place-id="dish-related"]').innerText(),/껌승 메뉴는 확인 필요/);
+  assert.equal(await page.locator('[data-google-place-id="dish-wrong"],[data-google-place-id="dish-far"]').count(),0);
+  await page.screenshot({path:path.join(out,`ai-vietnamese-dish-${width}.png`)});
+  assert.equal(await page.evaluate(()=>JSON.stringify(testData)),dishData);
+  assert.equal(await page.evaluate(()=>state.nearby),null);
+  await page.locator('#aiMapClear').click();
   if(width===390){
    await page.setViewportSize({width:844,height:390});
    await page.evaluate(()=>PlaceSearch.openGoogle({placeId:'reading-google',name:'UNAGI STATION'}));
