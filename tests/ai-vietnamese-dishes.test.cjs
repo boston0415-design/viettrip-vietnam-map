@@ -28,6 +28,7 @@ const {JSDOM}=require('jsdom'),read=p=>fs.readFileSync(p,'utf8');
   assert.equal(w.AIMapSearch.findMatches(intent,fixture,null)[0].place.id,'member');
   assert(!w.AIMapSearch.evidenceFor([{label:'메뉴',text:'Không bán cơm sườn'}],'껌승'));
   assert(!w.AIMapSearch.evidenceFor([{label:'후기',text:'다른 유명한 껌승집은 달아서 싫었다.'}],'껌승'),'another venue is not this venue menu evidence');
+  assert(!w.AIMapSearch.evidenceFor([{label:'후기',text:'배달도 시켜먹음 다른 유명한(?) 껌승집은 음식도 소스도 다 달아서 슬펐는데 여긴 베트남 현지인 추천으로 옴'}],'껌승'),'parenthetical punctuation must not discard the other-venue context');
   const place=(id,name,lat=10.734,extra={})=>({id,displayName:name,formattedAddress:'Ho Chi Minh',location:{lat,lng:106.66},types:['restaurant'],rating:4.8,userRatingCount:300,addressComponents:[{types:['country'],shortText:'VN'}],...extra});
   const raw=[place('known','Cơm Sườn Nướng'),place('related','Cơm Tấm Test',10.7301,{rating:5,userRatingCount:9999}),place('wrong','Phở Test'),place('chicken','Cơm Gà Test'),place('vegan','Cơm Tấm Chay'),place('denied','Cơm Tấm No Pork',10.732,{editorialSummary:'No pork served here.'}),place('far','Cơm Sườn Far',10.8)];
   const rows=w.AIGoogleSearch.rowsFrom(raw,intent);assert.deepEqual(Array.from(rows,r=>r.placeId),['known','related']);assert.equal(rows[1].menuUnconfirmed[0],'껌승');

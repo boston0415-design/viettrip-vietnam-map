@@ -38,7 +38,7 @@
   function evidenceFor(sources,term,pattern=null){
     for(const original of sources){
       const source={...original,text:menuText(original.text,term)};
-      for(const clause of String(source.text||'').split(/[.!?。\n]/)){
+      for(const clause of String(source.text||'').replace(/\(\s*[!?]+\s*\)/g,'').split(/[.!?。\n]/)){
         const keyword=pattern?normalize(clause).match(pattern)?.[0]:menuKeyword(clause,term);if(!keyword)continue;
         if((pattern||MENU_PATTERNS[term]||window.AIQueryIntent?.dishFor(term))&&/없|안\s*팔|팔지\s*않|판매하지|제공하지|먹지\s*못|있는지|있나요|확인\s*필요|문의|예정|옆집|다른\s*식당|\b(?:no|not|without|whether|wish|maybe)\b|khong\s+(?:co|ban)/i.test(normalize(clause)))continue;
         const preceding=normalize(clause).slice(0,normalize(clause).indexOf(normalize(keyword)));
