@@ -53,20 +53,10 @@
     flush();dragging=false;dragBounds=null;
     const p=panel();p?.classList.remove('detailDragging');
     if(canceled || !p?.classList.contains('show') || height===null)return;
-    // Keep the released height; a gentle flick adds momentum without snapping
-    // a short drag back to the same preset height.
-    const b=bounds(),target=clamp(height+velocity*90,b);
-    const start=height,reduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-    if(reduced || Math.abs(start-target)<1){apply(target);positionSelectedPlaceInView();return}
-    const started=performance.now();dragBounds=b;p.classList.add('detailSettling');
-    function tick(now){
-      const t=Math.min(1,(now-started)/240),ease=1-Math.pow(1-t,3);
-      apply(start+(target-start)*ease);
-      if(t<1)animation=requestAnimationFrame(tick);
-      else{animation=null;dragBounds=null;p.classList.remove('detailSettling');refresh();positionSelectedPlaceInView()}
-    }
-    animation=requestAnimationFrame(tick);
+    // A sheet stops under the finger. Only reading scroll has momentum.
+    apply(height);refresh();positionSelectedPlaceInView();
   }
+
   function reset(){
     pendingRefresh=false;
     window.BodySheetDrag?.cancel(panel());stopAnimation();
@@ -80,7 +70,7 @@
     const p=panel();if(!p?.classList.contains('show'))return;
     syncTopGap();
     window.BodySheetDrag?.bind(p,{
-      anywhere:true,
+      anywhere:true,separateResizeAndScroll:true,
       includeHeaders:true,headerSelector:'.detailResizeHandle,.detailHeader',bounds,
       prepare(){stopAnimation();flush();tracking=true},
       start(){bottom=null;dragBounds=bounds();dragging=true;p.classList.add('detailDragging')},

@@ -11,7 +11,7 @@
   details.innerHTML='<div class="weatherDialogHead"><strong id="weatherTitle">날씨</strong><button id="weatherClose" type="button" aria-label="날씨 닫기">×</button></div><p id="weatherSummary"></p><p id="weatherTime"></p><button id="weatherToggle" type="button" aria-pressed="true">효과 끄기</button><small>시간대 예보 · <a href="https://api.met.no/weatherapi/locationforecast/2.0/documentation" target="_blank" rel="noopener">MET Norway</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></small>';
   document.body.append(details);
   const reduced=window.matchMedia('(prefers-reduced-motion:reduce)'),saveData=navigator.connection?.saveData;
-  let enabled=safeStorageGet('viettrip_weather_effect')!=='off',city=null,data=null,controller=null,revision=0,nextFetch=0,timer=null,paintKey='';
+  let enabled=safeStorageGet('viettrip_weather_effect')==='on',city=null,data=null,controller=null,revision=0,nextFetch=0,timer=null,paintKey='';
   const now=()=>Date.now();
   const storageKey=k=>'viettrip_weather_v1_'+k;
   function condition(entry){
