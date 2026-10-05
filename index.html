@@ -40,7 +40,7 @@
 <link rel="stylesheet" href="./assets/css/ai-map-search.css?v=20261005-nearby-best1">
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
 <link rel="stylesheet" href="./assets/css/bright-interface.css?v=20261006-2">
-<link rel="stylesheet" href="./assets/css/chat-dock.css?v=20261006-4">
+<link rel="stylesheet" href="./assets/css/chat-dock.css?v=20261006-admin-layout1">
 </head>
 <body>
 <div class="app">
@@ -57,6 +57,7 @@
     </div>
   </header>
   <div class="mapUtilityBar">
+      <div class="operatorOptions" role="group" aria-label="관리자 메뉴"><strong id="adminSessionLabel" role="status" hidden>관리자 접속 중</strong><button id="adminBtn" type="button">관리자 로그인</button><button id="openOperatorTools" type="button" aria-haspopup="dialog" aria-controls="operatorDialog" hidden>관리자 페이지</button></div>
   <button id="openMapMembership" class="memberGradeBar" type="button" aria-haspopup="dialog" aria-controls="memberDialog"><span id="memberBarLabel">내 맵 등급</span><strong id="memberBarRank" class="mapRank rankPending">확인 중</strong><span id="memberBarProgress">내 활동 보기</span><span aria-hidden="true">›</span></button>
   <div class="appInstallBar" id="homeScreenBar">
     <img src="./assets/icons/vietmap-192.png?v=20260918-vm1" alt="" width="28" height="28">
@@ -84,7 +85,7 @@
         <button type="button" data-benefit-filter="benefit" aria-pressed="false">혜택업소</button>
         <button type="button" data-benefit-filter="recommended" aria-pressed="false">강추업소</button>
       </nav>
-      <div class="operatorOptions" role="group" aria-label="관리자 메뉴"><button id="adminBtn" type="button">관리자 로그인</button><button id="openOperatorTools" type="button" aria-haspopup="dialog" aria-controls="operatorDialog" hidden>관리자 페이지</button></div>
+
       <div class="filters" id="listOptions">
         <div class="browseHeading">업체 둘러보기 <span>이름을 누르면 후기를 볼 수 있어요</span></div>
         <div class="listRegionFilter"><label for="listCity">지역</label><select id="listCity" aria-label="업체 목록 지역 선택"></select></div>
@@ -99,22 +100,6 @@
         <div id="subs" class="row subs"></div>
         <div class="sort"><span id="count">0개 업체</span><select id="sort" aria-label="업체 정렬"><option id="nearbyDistanceSort" value="distance" hidden disabled>가까운 순</option><option value="newest">최근 등록순</option><option value="rating">평점 높은순</option><option value="reviews">후기 많은순</option><option value="name">이름순</option></select></div>
       </div>
-      <div id="list" class="list"></div>
-      <section id="detail" class="detail"></section>
-    </aside>
-    <main class="mapwrap">
-      <button id="desktopListToggle" type="button" aria-controls="businessSide" aria-expanded="true" aria-label="업체 목록 접기" title="업체 목록 접기">‹</button>
-      <div id="map" class="map"></div>
-      <div id="personalPlaceStatus" class="personalPlaceStatus" role="status" hidden></div>
-      <div id="mapLoadState" class="mapLoadState">
-        <div class="mapLoadCard">
-          <b id="mapLoadTitle">지도 불러오는 중…</b>
-          <span id="mapLoadText">잠시만 기다려주세요.</span>
-          <button id="mapRetryBtn" class="btn primary" type="button" style="display:none">지도 다시 불러오기</button>
-        </div>
-      </div>
-      <button id="mobileListBtn" class="mobileListBtn" type="button">업체 목록 <span id="mobileListCount">0</span></button>
-      <div id="regHint" class="regHint">등록할 업체 아이콘을 지도에서 클릭하세요</div>
       <div class="areaLegend mobileCollapsed" id="areaLegend">
         <section class="nearbyTools" aria-label="주변 업소 찾기">
           <div class="nearbyActions"><strong class="nearbyLabel">주변 찾기</strong>
@@ -175,6 +160,22 @@
         <div class="mapFilterFooter"><span>선택한 조건으로 지도를 표시합니다</span><button id="closeMapFilters" type="button">지도 보기</button></div>
         </div>
       </div>
+      <div id="list" class="list"></div>
+      <section id="detail" class="detail"></section>
+    </aside>
+    <main class="mapwrap">
+      <button id="desktopListToggle" type="button" aria-controls="businessSide" aria-expanded="true" aria-label="업체 목록 접기" title="업체 목록 접기">‹</button>
+      <div id="map" class="map"></div>
+      <div id="personalPlaceStatus" class="personalPlaceStatus" role="status" hidden></div>
+      <div id="mapLoadState" class="mapLoadState">
+        <div class="mapLoadCard">
+          <b id="mapLoadTitle">지도 불러오는 중…</b>
+          <span id="mapLoadText">잠시만 기다려주세요.</span>
+          <button id="mapRetryBtn" class="btn primary" type="button" style="display:none">지도 다시 불러오기</button>
+        </div>
+      </div>
+      <button id="mobileListBtn" class="mobileListBtn" type="button">업체 목록 <span id="mobileListCount">0</span></button>
+      <div id="regHint" class="regHint">등록할 업체 아이콘을 지도에서 클릭하세요</div>
       <div id="areaPanel" class="areaPanel">
         <div class="areaPanelHead">
           <strong id="areaPanelTitle">호치민 주요지역</strong>
@@ -454,13 +455,13 @@
 <script src="./assets/js/booking-links.js?v=20261006-2"></script>
 <script src="./assets/js/place-photos.js?v=20260918-photos1"></script>
 <script src="./assets/js/business-share.js?v=20260925-actions2"></script>
-<script src="./assets/js/04-rendering.js?v=20261006-chat1"></script>
+<script src="./assets/js/04-rendering.js?v=20261006-admin-layout1"></script>
 <script src="./assets/js/body-sheet-drag.js?v=20261006-chat4"></script>
 <script src="./assets/js/detail-resize.js?v=20261006-chat1"></script>
-<script src="./assets/js/menu-resize.js?v=20261006-chat1"></script>
+<script src="./assets/js/menu-resize.js?v=20261006-admin-layout1"></script>
 <script src="./assets/js/05-places-registration.js?v=20260918-public-office1"></script>
 <script src="./assets/js/06-save-motion.js?v=20260923-ux1"></script>
-<script src="./assets/js/07-ranges-categories.js?v=20260918-nearby1"></script>
+<script src="./assets/js/07-ranges-categories.js?v=20261006-admin-layout1"></script>
 <script src="./assets/js/08-search-audit.js?v=20260925-search-panels1"></script>
 <script src="./assets/js/place-search.js?v=20260926-detail-scroll1"></script>
 <script src="./assets/js/09-init-events.js?v=20261002-road1"></script>
@@ -470,20 +471,20 @@
 <script defer src="./assets/js/online-presence.js?v=20260923-ux1"></script>
 <script src="./assets/js/list-layout.js?v=20260925-search-panels1"></script>
 <script src="./assets/js/community-reviews.js?v=20260920-rank1"></script>
-<script src="./assets/js/map-membership.js?v=20260924-operator1"></script>
+<script src="./assets/js/map-membership.js?v=20261006-admin-layout1"></script>
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=polish1"></script>
 <script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260919-share1"></script>
 <script src="./assets/js/nearby-businesses.js?v=20260920-interaction3"></script>
-<script src="./assets/js/map-ux.js?v=20260925-search-panels1"></script>
+<script src="./assets/js/map-ux.js?v=20261006-admin-layout1"></script>
 <script src="./assets/js/browse-experience.js?v=20260925-search-panels1"></script>
 <script src="./assets/js/map-weather.js?v=20261006-1"></script>
 <script src="./assets/js/road-condition-data.js?v=20261002-road1"></script>
 <script src="./assets/js/road-conditions.js?v=20261002-road1"></script>
 <script src="./assets/js/panel-history.js?v=20261006-chat2"></script>
-<script src="./assets/js/desktop-window-size.js?v=20261006-1"></script>
+<script src="./assets/js/desktop-window-size.js?v=20261006-admin-layout1"></script>
 <script src="./assets/js/ai-place-hours.js?v=20260924-ai12"></script>
 <script src="./assets/js/ai-search-insights.js?v=20261005-korean-vocabulary2"></script>
 <script src="./assets/js/ai-google-search.js?v=20261005-korean-vocabulary2"></script>

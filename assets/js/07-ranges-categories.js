@@ -6,7 +6,7 @@ function rangeViewportPadding(padding=78){
     result.top=Math.min(padding,mapRect.height<320?24:64);
   }
   const legendRect=$('#areaLegend')?.getBoundingClientRect?.();
-  if(mapRect && legendRect && legendRect.width>0 && legendRect.height>0 && legendRect.top<mapRect.bottom && legendRect.bottom>mapRect.top){
+  if(!$('#areaLegend')?.closest?.('#businessSide') && mapRect && legendRect && legendRect.width>0 && legendRect.height>0 && legendRect.top<mapRect.bottom && legendRect.bottom>mapRect.top){
     result.bottom=Math.max(result.bottom,Math.min(Math.max(0,mapRect.height-80),mapRect.bottom-legendRect.top+16));
     if(state.nearby){
       // The origin/radius rows are taller than the old disclosure, particularly

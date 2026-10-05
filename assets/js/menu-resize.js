@@ -52,6 +52,7 @@
  function scan(){
    if(typeof document==='undefined')return;
    for(const [selector,header] of configs)for(const p of document.querySelectorAll(selector)){
+     if(p.id==='areaLegend'&&p.closest('#businessSide'))continue;
      if(!records.has(p)){
        const grip=document.createElement('div');grip.className='menuResizeGrip';grip.tabIndex=0;
        grip.setAttribute('role','separator');grip.setAttribute('aria-orientation','horizontal');grip.setAttribute('aria-label','메뉴 높이 조절');
