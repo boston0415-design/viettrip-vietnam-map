@@ -112,3 +112,14 @@
  body:not(.chatExpanded) #chatToggle::after{content:'⌃';position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:500;color:#716b96}
  .chatTabs{gap:8px;padding:8px 12px 12px}
 }
+
+.chatQuick{display:none}
+.chatMessage header{flex-wrap:wrap;gap:5px 7px}.chatMessage header strong{overflow-wrap:anywhere}.chatMessage header time{white-space:nowrap}.chatRank{flex:none;font-size:10px}
+@media(max-width:900px){
+ body:not(.chatExpanded) .chatDock{border-radius:14px}
+ body:not(.chatExpanded) .chatGrip,body:not(.chatExpanded) .chatHead{display:none}
+ body:not(.chatExpanded) .chatQuick{display:grid;grid-template-columns:1fr 1fr;align-items:stretch;flex:1;padding:8px}
+ .chatQuick button{display:flex;align-items:center;justify-content:space-between;gap:8px;border:0;background:transparent;color:#504775;font:600 14px/1.4 system-ui;padding:0 12px;min-height:44px;cursor:pointer}
+ .chatQuick button+button{border-left:1px solid #e7e4f0}
+ .chatQuick button span{color:#8a83a7;font-size:16px}
+}
