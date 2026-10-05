@@ -54,7 +54,13 @@
     if(term==='라멘'&&(place.types||[]).includes('ramen_restaurant'))return {evidence:'Google 업종 · 라멘',source:{label:'Google 업종'}};
     if(term==='햄버거'&&(place.types||[]).includes('hamburger_restaurant'))return {evidence:'Google 업종 · 햄버거',source:{label:'Google 업종'}};
     if(term==='고기·구이'&&(place.types||[]).some(type=>['barbecue_restaurant','korean_barbecue_restaurant'].includes(type)))return {evidence:'Google 업종 · 고기·구이',source:{label:'Google 업종'}};
-    return window.AIMapSearch.evidenceFor(sourcesFor(place),term);
+    const proof=window.AIMapSearch.evidenceFor(sourcesFor(place),term);if(proof)return proof;
+    // A named cơm tấm shop supplies the rice context for a pork-chop menu
+    // mentioned in a review; preserve the original quote and its attribution.
+    if(term==='껌승'&&window.AIMapSearch.menuKeyword(place.displayName,'껌땀')&&!/\b(?:vegan|vegetarian|chay)\b|채식/i.test(normalize(place.displayName))){
+      return window.AIMapSearch.evidenceFor(sourcesFor(place).filter(s=>s.label!=='Google 업소명'),term,/돼지\s*갈비|\bpork\s*chops?\b|\bsuon\b(?!\s+(?:bo|chay)\b)/i);
+    }
+    return null;
   }
   function relatedDishProof(place,term){
     const dish=window.AIQueryIntent?.dishFor(term);
