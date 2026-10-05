@@ -580,7 +580,7 @@ const server=http.createServer((req,res)=>{
   const searchBox=await page.locator('.top .search').boundingBox(),aiBox=await page.locator('.aiComposer').boundingBox();
   assert(aiBox.y>=searchBox.y+searchBox.height,'AI composer sits below the existing search');
   assert(aiBox.x>=0&&aiBox.x+aiBox.width<=width+1,'composer fits the viewport');
-  assert.equal(aiBox.height,44,'slim composer retains usable height');
+  assert.equal(aiBox.height,38,'search and question rows use the slimmer height');
   assert(Math.abs(searchBox.width-aiBox.width)<1&&Math.abs(searchBox.height-aiBox.height)<1,'both search boxes use identical dimensions');
   const geometry=await page.evaluate(()=>['.top .search','.aiComposer'].map(selector=>{const css=getComputedStyle(document.querySelector(selector));return [css.borderRadius,css.backgroundColor,css.borderColor].join('|')}));
   assert.equal(geometry[0],geometry[1],'both search boxes share shape and color');
