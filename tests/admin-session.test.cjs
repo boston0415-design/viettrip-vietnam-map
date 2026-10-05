@@ -27,6 +27,7 @@ async function login(a){a.node('#adminPassword').value=password;await a.run('sub
 (async()=>{
   const a=app();await login(a);
   assert.equal(a.local.get(KEY),password);assert(!a.session.has(KEY));assert.equal(a.run('state.isAdmin'),true);
+  assert.equal(a.node('#adminSessionLabel').textContent,'관리자 접속 중');assert.equal(a.node('#openMapMembership').hidden,true);
   assert.equal(a.node('#adminPassword').value,'');assert.equal(a.node('#adminBtn').textContent,'관리자 로그아웃');
 
   // A new page context and empty sessionStorage simulate closing/reopening the browser.
@@ -47,6 +48,7 @@ async function login(a){a.node('#adminPassword').value=password;await a.run('sub
 
   const offline=app(new Map([[KEY,password]]));offline.run('bindAdminSessionEvents()');
   offline.c.supaRpc=async()=>{throw Error('network unavailable')};await offline.run('restoreAdminSession()');
+  assert.equal(offline.node('#adminSessionLabel').textContent,'관리자 인증 재확인 중');
   assert.equal(offline.local.get(KEY),password);assert.equal(offline.run('state.isAdmin'),false,'offline startup does not grant unverified permissions');
   offline.c.supaRpc=async()=>true;await offline.emit('online');assert.equal(offline.run('state.isAdmin'),true);
 

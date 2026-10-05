@@ -111,7 +111,7 @@
   }
   function paintRole(){
     const admin=Boolean(state.isAdmin);
-    if(el('openMapMembership'))el('openMapMembership').hidden=admin;
+    if(el('openMapMembership'))el('openMapMembership').hidden=admin||Boolean(typeof adminKey==='function'&&adminKey());
     el('memberDialog')?.classList.toggle('isAdministrator',admin);
     if(el('memberAdminTools'))el('memberAdminTools').hidden=!admin;
     if(!admin){

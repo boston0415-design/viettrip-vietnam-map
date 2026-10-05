@@ -12,6 +12,7 @@
     panel.scrollTop=0;windows.set(panel,maximized);
   }
   function toggle(panel){
+    if(panel.id==='areaLegend'&&panel.closest('#businessSide'))panel=panel.closest('#businessSide');
     window.BodySheetDrag?.cancel(panel);
     if(panel.id==='detail'){window.DetailSheetResize?.toggle();return;}
     if(panel.id==='nearbyResults'){window.MapUX?.toggleNearbySize();return;}

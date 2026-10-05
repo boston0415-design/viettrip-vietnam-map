@@ -59,3 +59,22 @@
 #businessSide #detail [data-browse-back]{display:none}
 
 #aiChat .aiMapSearch{max-width:none!important}
+
+/* The list opens from the top; resizing remains available on the same surface. */
+#businessSide:not(.menuSized){height:calc(100% - 76px)!important}
+#businessSide>#areaLegend{position:relative!important;inset:auto!important;transform:none!important;width:auto!important;max-width:none!important;height:auto!important;max-height:none!important;margin:0 12px 10px!important;padding:0!important;border:1px solid #dce6f5;border-radius:12px;box-shadow:none!important;overflow:visible!important;flex:none;display:block!important}
+#businessSide[data-detail="true"]>#areaLegend{display:none!important}
+#businessSide #areaLegend>.menuResizeGrip{display:none!important}
+#businessSide #areaLegendTitle{position:static!important;border-radius:0 0 12px 12px}
+#businessSide #areaLegendBody{max-height:none!important;overflow:visible!important}
+#businessSide #areaLegendBody[hidden]{display:none!important}
+#businessSide .nearbyActions{flex-wrap:wrap;padding:8px;gap:4px}
+#businessSide .nearbyLabel{width:100%;font-size:12px}
+#businessSide .nearbyActions button{flex:1;padding:6px 5px;min-height:36px;font-size:12px}
+#businessSide .areaLegendRow,#businessSide .cityRow,#businessSide .travellerToolbar{flex-wrap:wrap}
+.mapUtilityBar>.operatorOptions{margin-left:auto;flex:none;padding:3px 8px;border:0;gap:6px}
+#adminSessionLabel{font-size:12px;color:#245cd0;white-space:nowrap}
+#adminSessionLabel[hidden]{display:none!important}
+.adminRestoreNotice{padding:10px;background:#eef4ff;color:#315b9d;border-radius:8px;font-size:12px}
+@media(min-width:901px){#businessSide{bottom:0!important;max-height:calc(100% - 14px)!important}#businessSide:not(.menuSized),#businessSide[data-detail="true"]:not(.menuSized){height:calc(100% - 14px)!important}}
+@media(max-width:900px){#businessSide.mobileOpen:not(.menuSized),#businessSide[data-detail="true"]:not(.menuSized){height:calc(100% - 76px)!important}.mapUtilityBar>.operatorOptions button{font-size:11px;min-height:32px;padding:4px 6px}.mapUtilityBar>.operatorOptions{padding:2px 6px}#adminSessionLabel{font-size:11px}}

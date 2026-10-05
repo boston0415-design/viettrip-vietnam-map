@@ -128,7 +128,8 @@
   function positionNearby(){
     const tray=el('nearbyResults'),legend=el('areaLegend'),wrap=document.querySelector('.mapwrap');if(!tray||!legend||!wrap)return;
     const mapRect=wrap.getBoundingClientRect(),menuRect=legend.getBoundingClientRect();
-    const bottom=Math.max(8,mapRect.bottom-menuRect.top+8);
+    const nested=Boolean(legend.closest('#businessSide'));
+    const bottom=nested?74:Math.max(8,mapRect.bottom-menuRect.top+8);
     const max=Math.max(52,mapRect.height-bottom-8);
     const filtersOpen=el('areaLegendTitle')?.getAttribute('aria-expanded')==='true';
     for(const node of [tray,el('nearbyReopen')])if(node){

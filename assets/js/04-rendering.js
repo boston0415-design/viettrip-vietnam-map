@@ -44,6 +44,9 @@ function syncAdminButton(){
   if(!button)return;
   button.textContent=state.isAdmin||adminKey()?'관리자 로그아웃':'관리자 로그인';
   button.classList.toggle('adminOn',state.isAdmin);
+  const adminStatus=$('#adminSessionLabel');
+  if(adminStatus){adminStatus.hidden=!state.isAdmin&&!adminKey();adminStatus.textContent=state.isAdmin?'관리자 접속 중':'관리자 인증 재확인 중';}
+  const memberEntry=$('#openMapMembership');if(memberEntry)memberEntry.hidden=Boolean(state.isAdmin||adminKey());
   document.querySelectorAll('.communityStats>span').forEach(node=>{node.hidden=!state.isAdmin;});
   const tools=$('#openOperatorTools');if(tools)tools.hidden=!state.isAdmin;
   window.CommunityStats?.syncRole();
@@ -499,11 +502,12 @@ function renderDetail(){
   const ratingRecords=ratingsOnly.length?`<section class="ratingOnlyRecords"><h3>별점만 남긴 평가 ${ratingsOnly.length}개</h3>${ratingsOnly.map(r=>`<p><strong>${esc(r.nickname||'회원')}</strong> ${r.rating==null?'별점 없음':`★ ${esc(r.rating)}`} <small>글 후기 없이 별점만 등록</small></p>`).join('')}</section>`:'';
   const reviewConnectionNote=state.reviewsLoadFailed?'<p class="reviewConnectionNote" role="status">후기 연결 지연 · 마지막으로 읽은 내용을 표시합니다.</p>':'';
   const owner=isOwnerPlace(p);
+  const adminPending=!state.isAdmin&&Boolean(adminKey());
   const canEdit=owner||state.isAdmin;
-  const management=canEdit
+  const management=adminPending?'<p class="adminRestoreNotice" role="status">관리자 인증을 재확인하고 있습니다. 연결되면 관리자 수정·삭제 버튼이 표시됩니다.</p>':canEdit
     ? `<div class="manageRow">
         <button id="editPlaceBtn" class="btn">${state.isAdmin?'관리자 수정':'내 업체 수정 · 사진추가'}</button>
-        ${owner&&!state.isAdmin?'<button id="requestDeleteBtn" class="btn danger">삭제 요청</button>':''}
+        ${owner&&!state.isAdmin&&!adminKey()?'<button id="requestDeleteBtn" class="btn danger">삭제 요청</button>':''}
         ${state.isAdmin?'<button id="adminDeleteBtn" class="btn danger">관리자 삭제</button>':''}
         ${state.isAdmin&&p.deleteRequested?'<button id="clearDeleteRequestBtn" class="btn">삭제요청 해제</button>':''}
       </div>
