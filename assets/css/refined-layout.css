@@ -133,3 +133,5 @@
 #chatNameDialog form>div{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 #chatNameDialog button{min-height:40px;border:0;border-radius:8px;padding:8px 12px;background:#f2f0f9;color:#514978}
 #chatNameDialog button[type=submit]{background:#6157d9;color:white}
+
+.grabDestination label{font-size:12px;color:#61716d;margin-top:10px}.grabDestination input{width:100%;box-sizing:border-box;min-height:44px;padding:10px;border:1px solid #d5e2dd;border-radius:8px;background:#fff;font:16px/1.4 system-ui;color:#263d36}.grabActions a:not([href]){opacity:.45;pointer-events:none}
