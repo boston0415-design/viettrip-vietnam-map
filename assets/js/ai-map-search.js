@@ -123,6 +123,7 @@
     return {kind:negative&&!positive?'unavailable':'unknown',evidence:''};
   }
   function collectCandidates(intent,data,nearby){
+    nearby=intent.nearbyOrigin||nearby;
     const reviewMap=new Map();
     for(const r of data.reviews||[]){if(!reviewMap.has(r.placeId))reviewMap.set(r.placeId,[]);reviewMap.get(r.placeId).push(r);}
     const found=[];
@@ -167,7 +168,7 @@
         const source=sources.find(s=>pref.pattern.test(s.text)&&!/(분위기|데이트|조용|단체|모임|회식).{0,12}(별로|않|없|최악|안 좋|불가)/.test(s.text));
         if(source){preferenceHits.push(key);const word=source.text.match(pref.pattern)?.[0]||pref.label;evidence.push(quote(source,word));}
       }
-      found.push({place:p,room,insights,sources,evidence:[...new Set(evidence)],missingTerms,preferenceHits,memberRecommendations,registrantRecommended,recommended:memberRecommendations>0||registrantRecommended,rating,ratingCount:ratingValues.length,reviewCount:reviews.filter(r=>r.text?.trim()).length});
+      found.push({place:p,room,insights,sources,evidence:[...new Set(evidence)],missingTerms,preferenceHits,memberRecommendations,registrantRecommended,recommended:memberRecommendations>0||registrantRecommended,rating,ratingCount:ratingValues.length,reviewCount:reviews.filter(r=>r.text?.trim()).length,...(intent.nearby&&nearby?{distance:geoDistanceMeters(nearby,p),searchRadius:nearby.radius}:{})});
     }
     return found.sort((a,b)=>Number(b.room?.kind==='confirmed')-Number(a.room?.kind==='confirmed')||(window.AISearchInsights?.compare(a,b,intent)||0)||b.preferenceHits.length-a.preferenceHits.length||Number(b.recommended)-Number(a.recommended)||b.memberRecommendations-a.memberRecommendations||(b.rating??-1)-(a.rating??-1)||b.ratingCount-a.ratingCount||b.reviewCount-a.reviewCount||String(a.place.name).localeCompare(String(b.place.name),'ko'));
   }
@@ -321,7 +322,7 @@
     resultTitle(entry);
     for(const row of entry.memberRows||[]){
       const button=[...list.querySelectorAll('.aiMemberResult')].find(b=>b.dataset.placeId===row.place.id);if(!button)continue;
-      button.querySelectorAll('.aiPrice,.aiHotelClass,.aiAudienceInfo,.aiBudgetInfo,.aiEnrichedProof,.aiGoogleRank').forEach(n=>n.remove());
+      button.querySelectorAll('.aiPrice,.aiHotelClass,.aiAudienceInfo,.aiBudgetInfo,.aiEnrichedProof,.aiGoogleRank,.aiNearbyDistance').forEach(n=>n.remove());
       if(row.insights?.preferenceHits?.length)button.querySelectorAll('.aiAlternativeNote').forEach(n=>{if(n.textContent==='분위기·방문 목적은 직접 확인해 주세요')n.remove();});
       if(entry.intent.hotelStars&&row.insights?.hotelClass?.kind!=='confirmed')button.querySelectorAll('.aiBenefit,.aiRecommended,.aiBenefitCopy').forEach(n=>n.remove());
       window.AISearchInsights?.append(button,row,entry.intent);
@@ -341,7 +342,7 @@
   function searchGoogle(entry){
     if(!window.AIGoogleSearch||entry.google||googleController)return;
     const token=revision,work=new AbortController();googleController=work;
-    Promise.allSettled([window.AIGoogleSearch.search(entry.intent,{signal:work.signal,boundaries:districtData,nearby:state.nearby,places:(entry.memberRows||[]).map(row=>row.place)}),window.AISearchInsights?.enrich(entry.memberRows||[],entry.intent,{signal:work.signal})]).then(([result])=>{
+    Promise.allSettled([window.AIGoogleSearch.search(entry.intent,{signal:work.signal,boundaries:districtData,nearby:entry.intent.nearbyOrigin||state.nearby,places:(entry.memberRows||[]).map(row=>row.place)}),window.AISearchInsights?.enrich(entry.memberRows||[],entry.intent,{signal:work.signal})]).then(([result])=>{
       if(token!==revision||last!==entry||work.signal.aborted)return;
       entry.google=result.status==='fulfilled'?{rows:result.value}:{error:true};
       if(result.status==='fulfilled')for(const row of entry.memberRows||[]){const info=result.value.memberUpdates?.get(row.place.id);if(info)row.insights=window.AISearchInsights?.mergeMember(row,info,entry.intent)||info;}
@@ -380,14 +381,18 @@
     }
     if(!intent?.relevant){note.textContent='확인되지 않은 내용을 답으로 만들지 않고, 원래 질문과 관련된 정보를 더 찾을 수 있게 연결합니다.';status.textContent='질문에 답할 장소·여행 정보를 아직 확인하지 못했어요.';window.AITravelSearch?.fallback(list,intent?.requestText||input.value);return;}
     if(window.AISearchInsights?.renderGuide(list,intent)){title.textContent='이동·예약 안내';status.textContent='출발 항구와 공식 예매처';note.textContent='공식 선사 안내를 바탕으로 작성했습니다. 아래 링크에서 실제 출발일 정보를 확인하세요.';return;}
-    const scope=[CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,({'florist':'꽃집','motorbike_rental':'오토바이 대여'}[intent.service])||intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
-    if(intent.nearby&&!state.nearby){status.textContent='먼저 지도 아래 ‘주변 찾기’에서 현재 위치나 숙소를 지정한 뒤 다시 질문해 주세요.';return;}
+    const scope=[intent.nearbyOrigin?.name||CITY_DATA[intent.city]?.label||'전체 지역',intent.district?intent.district+'군':'',intent.area,({'florist':'꽃집','motorbike_rental':'오토바이 대여'}[intent.service])||intent.subcategory||CONFIG.categories[intent.category]?.label].filter(Boolean).join(' · ');
+    window.AINearbySearch?.appendContext(list,intent,origin=>{
+      cancel();const next={...intent,nearbyOrigin:origin,nearbyOptions:[]};
+      last={query:input.value.trim(),intent:next,hours:new Map(),checkedAt:Date.now()};render(next);fitPanel();
+    });
+    if(intent.nearby&&!(intent.nearbyOrigin||(!intent.nearbyReference&&state.nearby))){status.textContent='주변 검색 기준 위치 확인';return;}
     if(intent.unsupported?.length){status.textContent='확인이 필요한 조건: '+intent.unsupported.join(', ');window.AITravelSearch?.fallback(list,intent.requestText||input.value);return;}
     if(state.sharedDbLoading)note.textContent+=' 회원 업소는 아직 불러오는 중이며, 준비된 자료와 Google 검색을 먼저 표시합니다.';
     appendSearchContext(intent);
     window.AIResultActions?.deliveryIntro(list,intent);
     if(intent.action==='grabfood')note.textContent='음식 조건에 맞는 업소를 찾습니다. GrabFood 등록·배달 가능 여부는 별도이며, 확인된 주문 링크가 없으면 업소명을 복사해 찾을 수 있습니다.';
-    const results=buildResults(intent,db(),state.nearby);
+    const results=buildResults(intent,db(),intent.nearbyOrigin||state.nearby);
     const {rows}=results;
     if(last?.insights)for(const row of rows)if(last.insights.has(row.place.id))row.insights=last.insights.get(row.place.id);
     const memberOnly=intent.benefit||intent.recommended,roomSearch=wantsRoom(intent);
@@ -460,6 +465,18 @@
   document.addEventListener('pointerdown',event=>{if(!event.target.closest('.aiMapSearch'))close();});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){input.focus();close();}});
   window.addEventListener('resize',fitPanel);window.visualViewport?.addEventListener('resize',fitPanel);
+  async function prepareIntent(intent,query,signal){
+    const recovered=window.AIQueryIntent?.recoveryIntent(query,state.city);
+    if(recovered?.nearby)intent=recovered;
+    else intent=window.AIQueryIntent?.applyNearby(intent,query)||intent;
+    await prepareDistricts(intent,signal);
+    if(intent.mode!=='advice'&&!intent.transport&&!intent.guideTopic&&!intent.productSearch&&!intent.travelDestination&&!intent.travelHelp)await waitForPlaces(signal);
+    if(intent.nearby&&window.AINearbySearch){
+      try{return await window.AINearbySearch.resolve(intent,{signal,places:db().places||[]});}
+      catch(error){if(error.name==='AbortError')throw error;return {...intent,nearbyOrigin:null,nearbyOptions:[]};}
+    }
+    return intent;
+  }
   form.addEventListener('submit',async event=>{
     event.preventDefault();const query=input.value.trim();if(query.length<2||query.length>300||controller)return;
     cancel();const token=revision;controller=new AbortController();const signal=controller.signal;
@@ -473,17 +490,17 @@
       if(!payload.intent||!Array.isArray(payload.intent.terms)||!Array.isArray(payload.intent.unsupported))throw Error('AI 응답을 확인하지 못했어요. 다시 질문해 주세요.');
       const context=window.AIQueryIntent?.contextualIntent(query,state.city);
       if(context&&(payload.intent.mode==='advice'||!payload.intent.relevant))payload.intent=context;
-      await prepareDistricts(payload.intent,signal);
-      if(payload.intent.mode!=='advice'&&!payload.intent.transport&&!payload.intent.guideTopic&&!payload.intent.productSearch&&!payload.intent.travelDestination&&!payload.intent.travelHelp)await waitForPlaces(signal);
+      clearTimeout(timeout);
+      payload.intent=await prepareIntent(payload.intent,query,signal);
       if(token!==revision)return;
       if(payload.model&&payload.intent.mode==='advice')payload.intent.answerModel=payload.model;
       last={query,intent:payload.intent,hours:new Map(),checkedAt:Date.now()};render(payload.intent);panel.scrollTop=0;fitPanel();
     }catch(error){
       if(token!==revision)return;
-      const recovered=window.AIQueryIntent?.recoveryIntent(query,state.city)||window.AIQueryIntent?.exploratoryIntent(query,state.city);
+      let recovered=window.AIQueryIntent?.recoveryIntent(query,state.city)||window.AIQueryIntent?.exploratoryIntent(query,state.city);
       if(recovered){
         clearTimeout(timeout);controller=new AbortController();
-        try{await prepareDistricts(recovered,controller.signal);}catch{}
+        try{recovered=await prepareIntent(recovered,query,controller.signal);}catch{}
         if(token!==revision)return;
         last={query,intent:recovered,hours:new Map(),checkedAt:Date.now()};render(recovered);fitPanel();
       }else{window.AITravelSearch?.fallback(list,query);title.textContent='장소 검색 연결';status.textContent=error.message;}
