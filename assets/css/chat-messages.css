@@ -35,3 +35,9 @@
 #chatReplyAlert{position:fixed;z-index:10020;top:12px;left:50%;transform:translateX(-50%);max-width:calc(100vw - 24px);padding:12px 18px;border:1px solid #d9d3ef;border-radius:12px;background:#fff;color:#514397;box-shadow:0 4px 20px #25204022;font-size:14px;cursor:pointer}#chatReplyAlert[hidden]{display:none}#chatMessages .chatReplyFocused{outline:2px solid #b6abd9;outline-offset:6px}
 
 #chatBadgePermission{border:0;background:transparent;color:#6555a4;font-size:12px;padding:4px 0;cursor:pointer}#chatBadgePermission[hidden]{display:none}
+
+/* Explicit row alignment applies equally to narrow/mobile and desktop layouts. */
+#chatMessages .chatMessage[data-sender="self"]{display:table;width:fit-content;max-width:88%;margin:0 0 22px auto;text-align:right;float:none;clear:both}
+#chatMessages .chatMessage[data-sender="other"]{display:table;width:fit-content;max-width:88%;margin:0 auto 22px 0;text-align:left;float:none;clear:both}
+#chatMessages .chatMessage[data-sender="self"]>p,#chatMessages .chatMessage[data-sender="self"]>.chatTime{text-align:right}
+#chatMessages .chatMessage[data-sender="self"]>header{justify-content:flex-end;text-align:right}
