@@ -141,3 +141,12 @@
 #shareMapApp{flex-shrink:0;min-height:36px;white-space:nowrap;margin-left:auto}.aiExamples details{width:100%;border-bottom:1px solid #eceaf3;padding:8px 0}.aiExamples summary{cursor:pointer;font-weight:600;min-height:36px;line-height:36px}.aiExamples details button{display:block;width:100%;text-align:left;margin:6px 0;min-height:44px;white-space:normal}.appShareDialog{border:1px solid #e5e1ef;border-radius:18px;padding:20px;width:min(400px,calc(100vw - 40px));box-sizing:border-box}.appShareDialog::backdrop{background:#20203566}.appShareDialog input{width:100%;box-sizing:border-box;padding:12px;font-size:16px;margin:12px 0}.appShareDialog button{min-height:44px;padding:8px 16px;margin-right:8px;border:1px solid #dedbea;border-radius:10px;background:#f6f4ff;color:#44378a}.appShareDialog p{line-height:1.5}
 
 .kakaoShareButton:not([hidden]){background:#fee500!important;color:#191919!important;border-color:#fee500!important}.kakaoShareButton[hidden]{display:none!important}
+
+/* Conversation alignment and in-page unread indicators, shared across layouts. */
+#chatMessages .chatMessage{width:fit-content;max-width:86%;box-sizing:border-box;margin:0 auto 12px 0;border-radius:4px 16px 16px 16px;background:#f0f2f7;padding:10px 12px}
+#chatMessages .chatMessageMine{margin-left:auto;margin-right:0;background:#eee9ff;border-radius:16px 4px 16px 16px}
+#chatMessages .chatMessage header{gap:5px 8px}#chatMessages .chatMessage time{font-size:10px;color:#707785}
+.chatUnreadBadge{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;margin-left:6px;padding:0 5px;box-sizing:border-box;border-radius:20px;background:#de395b;color:#fff;font:700 11px/1 system-ui;vertical-align:middle;writing-mode:horizontal-tb}
+.chatUnreadBadge[hidden],#chatRetry[hidden],#chatNewMessages[hidden]{display:none!important}
+#chatLauncher.hasUnread{box-shadow:0 0 0 3px #f5b4c2,0 4px 18px #32265a33}
+#chatNewMessages{flex:none;align-self:center;margin:4px 8px 8px;padding:8px 14px;border:1px solid #d9d1f4;border-radius:20px;background:#f4f0ff;color:#5545a6;font:600 13px system-ui;min-height:36px}

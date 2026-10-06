@@ -41,7 +41,7 @@
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
 <link rel="stylesheet" href="./assets/css/bright-interface.css?v=20261006-2">
 <link rel="stylesheet" href="./assets/css/chat-dock.css?v=20261006-admin-layout1">
-<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-kakao2">
+<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-notify">
 </head>
 <body>
 <div class="app">
@@ -415,7 +415,7 @@
     <div class="chatTabs" role="tablist" aria-label="대화 방식"><button id="peopleTab" role="tab" aria-selected="true" aria-controls="peopleChat">사람들과 채팅</button><button id="aiTab" role="tab" aria-selected="false" aria-controls="aiChat" tabindex="-1">AI에게 질문</button></div>
     <section id="peopleChat" role="tabpanel" aria-labelledby="peopleTab">
       <p class="chatNotice">전체 공개 채팅 · 최근 7일 보관 · 개인정보는 올리지 마세요.</p>
-      <div class="chatConnection"><span id="chatStatus" role="status">채팅을 열면 연결합니다.</span><button id="chatRetry" type="button">다시 연결</button></div>
+      <div class="chatConnection"><span id="chatStatus" role="status">채팅을 열면 연결합니다.</span><button id="chatRetry" type="button" hidden>다시 연결</button></div>
       <button id="chatOlder" type="button" hidden>이전 대화 보기</button>
       <div id="chatMessages" role="log" aria-label="회원 채팅 메시지" aria-live="polite" aria-relevant="additions"></div>
       <form id="chatForm" autocomplete="off"><div class="chatCompose"><textarea id="chatMessage" maxlength="1000" rows="2" required aria-label="공개 채팅 메시지" placeholder="회원들과 이야기해 보세요 (최대 1,000자)"></textarea><button id="chatSend" type="submit">보내기</button></div><small>Enter 전송 · Shift+Enter 줄바꿈</small></form>
@@ -473,7 +473,7 @@
 <script defer src="./assets/js/online-presence.js?v=20260923-ux1"></script>
 <script src="./assets/js/list-layout.js?v=20260925-search-panels1"></script>
 <script src="./assets/js/community-reviews.js?v=20260920-rank1"></script>
-<script src="./assets/js/map-membership.js?v=20261006-admin-layout1"></script>
+<script src="./assets/js/map-membership.js?v=20261006-notify"></script>
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=20261006-short"></script>
@@ -500,6 +500,6 @@
 <script src="./assets/js/ai-airport-pickup.js?v=20261006-2"></script>
 <script src="./assets/js/ai-map-search.js?v=20261006-validation3"></script>
 
-<script src="./assets/js/chat-dock.js?v=20261006-interactions"></script>
+<script src="./assets/js/chat-dock.js?v=20261006-notify"></script>
 </body>
 </html>
