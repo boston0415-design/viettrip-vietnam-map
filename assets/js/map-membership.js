@@ -40,6 +40,8 @@
     }
     if(data.nickname)rememberMemberNickname(data.nickname);
     revision++;paint();
+    try{localStorage.setItem('viettrip_verified_member_v1',JSON.stringify({device:getDeviceId(),member:profile.id}));}catch{}
+    window.dispatchEvent(new CustomEvent('map-membership-ready',{detail:{memberId:profile.id}}));
   }
   async function refresh(){
     if(profileRequest)return profileRequest;
