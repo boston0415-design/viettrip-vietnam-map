@@ -473,6 +473,7 @@ function setDetailExpanded(expanded){
 }
 
 function closeDetailPanel(){
+  window.DestinationLine?.clear();
   window.MapUX?.onDetailClosed();
   window.PlaceSearch?.clearExternal();
   const sharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
@@ -492,6 +493,7 @@ function closeDetailPanel(){
 }
 
 function renderDetail(){
+  window.DestinationLine?.sync();
   if(!state.selected && window.PlaceSearch?.renderDetail())return;
   const p=db().places.find(x=>x.id===state.selected);const d=$('#detail');
   if(p && detailPlaceId===p.id && window.DetailSheetResize?.isInteracting()){
