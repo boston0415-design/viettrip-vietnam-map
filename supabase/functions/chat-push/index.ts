@@ -14,7 +14,7 @@ async function dispatch(c:any){const jobs=await db('rpc/claim_chat_push','POST',
 Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response(null,{headers:cors});try{
  const action=new URL(req.url).pathname.split('/').pop();
  if(action==='config'&&req.method==='GET'){const c=await config();return json({publicKey:c.vapid.publicKey});}
- if(action==='dispatch'){const [c]=await db('chat_push_config?id=eq.true');if(req.method!=='POST'||req.headers.get('x-push-secret')!==c.dispatch_secret)return json({error:'Unauthorized'},401);return json(await dispatch(await config()));}
+ if(action==='dispatch'){const token=req.headers.get('x-push-token')||'';if(req.method!=='POST'||! /^[a-f0-9]{64}$/.test(token))return json({error:'Unauthorized'},401);const used=await db('chat_push_tokens?token_hash=eq.'+await hash(token)+'&created_at=gt.'+encodeURIComponent(new Date(Date.now()-60000).toISOString()),'DELETE');if(!used?.length)return json({error:'Unauthorized'},401);return json(await dispatch(await config()));}
  if(req.method!=='POST')return json({error:'Not found'},404);
  if(req.headers.get('origin')!==origin)return json({error:'Origin not allowed'},403);
  const raw=await req.text();if(raw.length>6000)return json({error:'Request too large'},413);const data=JSON.parse(raw);if(!validId(data.deviceId))return json({error:'회원 연결을 확인해 주세요.'},401);
