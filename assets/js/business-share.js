@@ -7,8 +7,7 @@
 
   function url(place){
     if(!validId(place?.id))return '';
-    const link=new URL('/',publicOrigin);
-    link.searchParams.set('place',place.id);
+    const link=new URL('/share/place/'+encodeURIComponent(place.id),publicOrigin);
     return link.href;
   }
   function text(place){

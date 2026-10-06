@@ -1,1 +1,10 @@
-{"version":1,"include":["/api/ask-map","/api/answer-map","/api/product-info"],"exclude":[]}
+{
+  "version": 1,
+  "include": [
+    "/api/ask-map",
+    "/api/answer-map",
+    "/api/product-info",
+    "/share/place/*"
+  ],
+  "exclude": []
+}
