@@ -41,7 +41,7 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     trigger.click();
     const dialog=f.w.document.getElementById('businessShareDialog');assert(dialog.open);
     assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'테스트 <업소>');
-    const buttons=dialog.querySelectorAll('.copyBtn');assert.equal(buttons.length,5);
+    const buttons=dialog.querySelectorAll('[data-copy-value]');assert.equal(buttons.length,5);
     const copied=decodeURIComponent(buttons[0].dataset.copyValue);
     assert.equal(copied,'테스트 <업소>\n나트랑 테스트 주소\n베트남맵에서 위치·후기 보기\nhttps://viettrip-vietnam-map.pages.dev/?place=shared-1');
     assert.equal(decodeURIComponent(buttons[1].dataset.copyValue),'https://viettrip-vietnam-map.pages.dev/?place=shared-1');
@@ -62,8 +62,8 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     // Reopening always reads the selected business, never the previous dialog contents.
     f.run(`fixtures.push({...target,id:'shared-2',name:'다른 업체',address:''});state.selected='shared-2';renderDetail()`);
     f.w.document.querySelector('#detail [data-business-share]').click();assert(dialog.open);
-    assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'다른 업체');assert.equal(dialog.querySelectorAll('.copyBtn').length,3);
-    assert.equal(decodeURIComponent(dialog.querySelectorAll('.copyBtn')[1].dataset.copyValue),'https://viettrip-vietnam-map.pages.dev/?place=shared-2');
+    assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'다른 업체');assert.equal(dialog.querySelectorAll('[data-copy-value]').length,3);
+    assert.equal(decodeURIComponent(dialog.querySelectorAll('[data-copy-value]')[1].dataset.copyValue),'https://viettrip-vietnam-map.pages.dev/?place=shared-2');
     dialog.close();f.run(`fixtures=[target];state.selected='shared-1';renderDetail()`);
     f.run(`closeDetailPanel();assert.equal(state.markers.length,0);assert.equal(PersonalPlaces.isHidden('shared-1'),true);assert.equal(BusinessShare.url({id:'bad?id'}),'')`);
     f.close();
