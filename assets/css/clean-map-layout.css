@@ -1,0 +1,55 @@
+/* Final layout contract: map fills the screen, navigation floats above it, panels share one slot. */
+body.cleanMap{--blue:#1a73e8;--shadow:0 2px 10px #20212424;background:#fff;color:#202124;font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif}
+body.cleanMap .app{display:block!important;position:relative;height:100dvh!important;overflow:hidden}
+body.cleanMap .content{position:absolute!important;inset:0;display:block!important;padding:0!important;min-height:0!important}
+body.cleanMap .mapwrap{position:absolute!important;inset:0!important;height:auto!important;width:auto!important;min-height:0!important}
+body.cleanMap .top{position:absolute!important;z-index:110;top:12px;left:12px;right:auto;width:360px;height:52px!important;min-height:0!important;display:flex!important;grid-template:none!important;gap:0!important;padding:0!important;border:0!important;border-radius:28px!important;background:#fff!important;box-shadow:0 2px 8px #20212435!important}
+body.cleanMap .top .actions:empty,body.cleanMap .top .actions{display:none!important}
+body.cleanMap #mapMenuButton{flex:none;width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:#5f6368;padding:14px}
+#mapMenuButton svg{width:20px;height:20px}
+body.cleanMap .top .search{flex:1;width:0;max-width:none!important;min-height:52px!important;height:52px!important;border:0!important;border-radius:0 28px 28px 0!important;box-shadow:none!important;background:transparent!important;overflow:visible!important}
+body.cleanMap .searchGlyph{display:none!important}
+body.cleanMap .top .search input{font-size:16px!important;padding:10px 0!important;height:48px!important;min-width:0!important;letter-spacing:0!important}
+body.cleanMap .top #searchBtn{padding:0 14px!important;border:0!important;background:transparent!important;color:#1a73e8!important;border-radius:0 28px 28px 0!important;min-width:48px!important;font-size:14px!important}
+body.cleanMap .placeSearchResults{top:58px!important;left:-48px!important;right:0!important;border-radius:16px!important;box-shadow:var(--shadow)!important;max-height:60dvh!important}
+body.cleanMap .mapUtilityBar{position:absolute!important;z-index:100;left:12px;top:74px;right:12px;display:flex!important;gap:8px!important;padding:0!important;min-height:0!important;height:36px!important;background:transparent!important;border:0!important;pointer-events:none}
+body.cleanMap .mapUtilityBar>*{pointer-events:auto}
+body.cleanMap .browseTools{width:auto!important;margin:0!important}.cleanMap .browseResultBar{gap:8px!important;flex-wrap:nowrap!important}
+body.cleanMap .browseResultBar button{min-height:34px!important;height:34px!important;border:1px solid #dadce0!important;border-radius:18px!important;background:#fff!important;box-shadow:0 1px 5px #20212418!important;color:#3c4043!important;font-size:13px!important;padding:6px 13px!important;font-weight:500!important}
+body.cleanMap #browseConditions{display:none!important}
+body.cleanMap #businessSide{position:absolute!important;z-index:50!important;top:120px!important;left:12px!important;bottom:12px!important;width:360px!important;max-width:calc(100% - 24px)!important;height:auto!important;max-height:calc(100% - 132px)!important;border:0!important;border-radius:16px!important;box-shadow:var(--shadow)!important;background:#fff!important}
+body.cleanMap .content.desktopListCollapsed>#businessSide{display:none!important}
+body.cleanMap #businessSide .detailHeader{padding:14px 0!important}.cleanMap #detail h2{font-size:21px!important;font-weight:600!important;letter-spacing:-.4px!important}
+body.cleanMap #detail{border-radius:0!important;box-shadow:none!important}.cleanMap .detailQuickActions{gap:8px!important;padding:8px 0!important;border:0!important}
+body.cleanMap .detailQuickActions button,body.cleanMap .detailQuickActions a{border:1px solid #dadce0!important;background:#fff!important;color:#1a73e8!important;border-radius:22px!important;box-shadow:none!important;font-weight:500!important}
+body.cleanMap .detailQuickActions .directionsButton{background:#1a73e8!important;border-color:#1a73e8!important;color:#fff!important}
+body.cleanMap #desktopListToggle{display:none!important}
+body.cleanMap .cleanLocation{position:absolute!important;z-index:45;right:14px;bottom:38px;width:46px!important;height:46px!important;min-height:46px!important;padding:0!important;border:1px solid #dadce0!important;border-radius:50%!important;box-shadow:var(--shadow);background:#fff!important;color:transparent!important;font-size:0!important}
+body.cleanMap .cleanLocation::after{content:'◎';font-size:29px;color:#1a73e8;line-height:1}
+body.cleanMap .cleanLocation:disabled{opacity:.5}
+body.cleanMap #areaLegend{border-radius:12px!important;box-shadow:none!important}
+body.cleanMap .destinationRoute{top:120px;left:12px;max-height:calc(100% - 140px);border-radius:14px;box-shadow:var(--shadow)}
+body.cleanMap .chatDock{border-radius:16px!important;box-shadow:var(--shadow)!important}
+body.cleanMap #chatLauncher{font-size:12px!important;background:#fff!important;color:#1a73e8!important;box-shadow:var(--shadow)!important;border-color:#dadce0!important;letter-spacing:0!important}
+#mapMainMenu{width:min(350px,calc(100vw - 32px));max-height:calc(100dvh - 40px);border:0;border-radius:20px;padding:18px;color:#202124;box-shadow:0 12px 40px #20212433}
+#mapMainMenu::backdrop{background:#20212450}.cleanMenuHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.cleanMenuHead button{border:0;background:#f1f3f4;border-radius:50%;width:36px;height:36px;font-size:24px}
+.cleanMenuContent{display:flex;flex-direction:column;gap:12px}.cleanMenuContent .brandTitle,.cleanMenuContent .brand>small{display:none!important}.cleanMenuContent .brandLinks{display:flex!important;flex-wrap:wrap!important;gap:12px!important;position:static!important;font-size:13px!important}.cleanMenuContent .cafeAddress{display:none}.cleanMenuContent button{min-height:44px;border:1px solid #dadce0;border-radius:12px;padding:10px;background:#fff;color:#3c4043;text-align:left;white-space:normal}.cleanMenuContent .appInstallBar{margin:0!important}.cleanMenuContent .appInstallCopy,.cleanMenuContent .appInstallBar>img{display:none!important}.cleanMenuContent .operatorOptions[hidden]{display:none!important}.cleanMenuContent #shareMapApp{margin:0!important}.cleanMenuContent .communityStats{position:static!important;display:flex!important;flex-wrap:wrap;gap:12px!important}.cleanMenuContent .operatorOptions{flex-wrap:wrap}
+#mapBottomNav{display:none}
+@media(min-width:901px){body.cleanMap .chatDock{top:120px!important;bottom:12px!important}body.cleanMap #mapBottomNav{display:flex;position:fixed;right:12px;top:12px;z-index:105;background:#fff;padding:4px;border-radius:26px;box-shadow:var(--shadow)}body.cleanMap #mapBottomNav button{border:0;border-radius:22px;padding:10px 16px;background:#fff;color:#3c4043;font:500 13px/1.4 Arial,sans-serif}body.cleanMap #cleanExplore{display:none}}
+@media(max-width:900px){
+ body.cleanMap .content{bottom:calc(60px + env(safe-area-inset-bottom))!important}
+ body.cleanMap .top{width:auto;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));height:52px!important}
+ body.cleanMap .mapUtilityBar{top:calc(72px + env(safe-area-inset-top));overflow-x:auto;scrollbar-width:none;right:0;padding-right:12px!important}
+ body.cleanMap #businessSide{top:auto!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;max-width:none!important;max-height:calc(100% - 118px - env(safe-area-inset-top))!important;height:var(--menu-height,58%)!important;border-radius:22px 22px 0 0!important;box-shadow:0 -2px 12px #20212424!important}
+ body.cleanMap #businessSide:not(.mobileOpen){display:none!important}body.cleanMap #businessSide.mobileOpen,body.cleanMap .content.desktopListCollapsed>#businessSide.mobileOpen{display:flex!important}
+ body.cleanMap #chatDock{display:none!important;left:0!important;right:0!important;bottom:calc(60px + env(safe-area-inset-bottom))!important;border-radius:22px 22px 0 0!important;max-height:calc(100dvh - 184px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important}
+ body.cleanMap.chatExpanded #chatDock{display:flex!important}body.cleanMap.chatExpanded #businessSide{display:none!important}
+ body.cleanMap #chatLauncher{display:none!important}
+ body.cleanMap #mapBottomNav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:110;height:calc(60px + env(safe-area-inset-bottom));padding:4px 12px calc(4px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e8eaed;gap:8px}
+ body.cleanMap #mapBottomNav button{flex:1;min-width:0;min-height:48px;border:0;border-radius:24px;background:#fff;color:#5f6368;font:500 14px/1.4 Arial,sans-serif}
+ body.cleanMap:not(.chatExpanded) #cleanExplore{background:#e8f0fe;color:#1967d2}
+ body.cleanMap .destinationRoute{top:calc(118px + env(safe-area-inset-top));left:8px;max-width:calc(100% - 16px);max-height:calc(100% - 134px - env(safe-area-inset-top))}
+ body.cleanMap .nearbyResults{bottom:12px!important}.cleanMap .nearbyReopen{bottom:12px!important}
+ body.cleanMap.routeNavigating #mapBottomNav{display:none}body.cleanMap.routeNavigating .content{bottom:0!important}
+ body.cleanMap.routeNavigating #chatLauncher{display:block!important}
+}
