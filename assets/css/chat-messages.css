@@ -1,0 +1,15 @@
+/* Plain conversation rows; position distinguishes the sender on every screen. */
+#chatMessages .chatMessage{width:fit-content;max-width:88%;box-sizing:border-box;margin:0 auto 22px 0;border:0;border-radius:0;background:transparent;padding:0;text-align:left;box-shadow:none}
+#chatMessages .chatMessageMine{margin-left:auto;margin-right:0;background:transparent;text-align:right}
+#chatMessages .chatMessageMine header{justify-content:flex-end}
+#chatMessages .chatMessage p{margin:5px 0 3px;font-size:16px;line-height:1.55;color:#263142}
+#chatMessages .chatMessage>.chatTime{display:block;margin:0;font-size:10px;line-height:1.4;color:#89909b}
+#chatMessages .chatRank{background:transparent;border:0;border-radius:0;padding:0;box-shadow:none}
+#chatMessages{padding:14px 16px}
+#chatMessages .chatMessage header{gap:5px 8px}#chatMessages .chatMessage time{font-size:10px;color:#707785}
+
+#chatMessages .chatRank{display:inline-flex;align-items:center;justify-content:center;min-width:16px;min-height:16px;color:#596273;vertical-align:middle}
+#chatMessages .rankBars{display:inline-flex;flex-direction:column;gap:2px;min-width:12px}
+#chatMessages .rankBars i{display:block;width:12px;height:2px;background:currentColor}
+#chatMessages .rankBars:empty{min-width:7px;width:7px;height:7px;border:1px solid currentColor;border-radius:50%}
+#chatMessages .rankStars{font-size:9px;letter-spacing:0;white-space:nowrap}

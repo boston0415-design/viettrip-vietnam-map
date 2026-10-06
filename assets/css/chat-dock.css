@@ -28,7 +28,7 @@
 .chatConnection{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 14px 6px;font-size:12px;color:#617592}
 .chatConnection button,#chatOlder{border:0;background:#f1f6ff;color:#2358b8;padding:6px 10px;border-radius:8px}
 #chatMessages{overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:40px;padding:8px 14px;overflow-wrap:anywhere}
-.chatMessage{padding:10px 12px;margin:0 0 9px;background:#f1f5fb;border-radius:12px;white-space:pre-wrap;font-size:14px;line-height:1.55}
+.chatMessage{padding:0;margin:0 0 22px;background:transparent;border-radius:0;white-space:pre-wrap;font-size:14px;line-height:1.55}
 .chatMessage header{display:flex;gap:8px;font-size:11px;color:#617592;align-items:center}.chatMessage header strong{color:#24456e}.chatMessage p{margin:5px 0 0}.chatMessage time{margin-left:auto}.chatEmpty{color:#617592;text-align:center;padding:24px 8px;font-size:13px}
 #chatForm{flex:none;padding:10px 12px max(12px,env(safe-area-inset-bottom));border-top:1px solid #e0e8f5;background:#fff}
 .chatNickname{display:flex;align-items:center;gap:8px;font-size:12px;color:#617592;margin-bottom:7px}.chatNickname input{max-width:160px;min-height:30px;border:1px solid #d5e2f5;border-radius:7px;padding:5px 8px}
