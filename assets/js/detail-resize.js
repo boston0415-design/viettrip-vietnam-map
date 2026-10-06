@@ -80,7 +80,7 @@
     const p=panel();if(!p?.classList.contains('show'))return;
     syncTopGap();
     window.BodySheetDrag?.bind(p,{
-      anywhere:true,separateResizeAndScroll:true,
+      anywhere:true,separateResizeAndScroll:false,
       includeHeaders:true,headerSelector:'.detailResizeHandle,.detailHeader',bounds,
       prepare(){stopAnimation();flush();tracking=true},
       start(){bottom=null;dragBounds=bounds();dragging=true;p.classList.add('detailDragging')},
