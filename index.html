@@ -40,7 +40,7 @@
 <link rel="stylesheet" href="./assets/css/business-share.css?v=20260925-actions2">
 <link rel="stylesheet" href="./assets/css/bright-interface.css?v=20261006-2">
 <link rel="stylesheet" href="./assets/css/chat-dock.css?v=20261006-admin-layout1">
-<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-airport1">
+<link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261006-share1">
 </head>
 <body>
 <div class="app">
@@ -63,6 +63,7 @@
   <div class="mapUtilityBar">
       <div class="operatorOptions" hidden role="group" aria-label="관리자 메뉴"><strong id="adminSessionLabel" role="status" hidden>관리자 접속 중</strong><button id="adminBtn" type="button">관리자 로그인</button><button id="openOperatorTools" type="button" aria-haspopup="dialog" aria-controls="operatorDialog" hidden>관리자 페이지</button></div>
   <button id="openMapMembership" class="memberGradeBar" type="button" aria-haspopup="dialog" aria-controls="memberDialog"><span id="memberBarLabel">내 맵 등급</span><strong id="memberBarRank" class="mapRank rankPending">확인 중</strong><span id="memberBarProgress">내 활동 보기</span><span aria-hidden="true">›</span></button>
+  <button id="shareMapApp" class="appInstallButton" type="button" aria-label="베트남맵 앱 공유">앱 공유</button>
   <div class="appInstallBar" id="homeScreenBar">
     <img src="./assets/icons/vietmap-192.png?v=20261006-brand2" alt="" width="28" height="28">
     <div class="appInstallCopy"><strong>홈 화면에서 지도를 바로 열어요</strong><span>아이콘 하나로 지도·회원 후기까지</span></div>
@@ -429,10 +430,10 @@
       <section id="aiMapPanel" class="aiPanel" aria-label="AI 업소 검색" hidden>
         <div class="aiPanelHead"><strong id="aiMapTitle">이렇게 물어보세요</strong><button id="aiMapClose" type="button" aria-label="AI 검색 결과 닫기">×</button></div>
         <div id="aiMapExamples" class="aiExamples">
-          <button type="button">오늘 여자친구와 갈 만한 1군에서 분위기 좋은 바를 찾아줘</button>
-          <button type="button">호치민에서 회원 혜택이 있는 마사지 찾아줘</button>
-          <button type="button">하노이에서 회원들이 강추한 식당 찾아줘</button>
-          <button type="button">호치민에서 달랏으로 가는 교통편 찾아줘</button>
+          <details open><summary>공항·이동</summary><button type="button">공항에서 그랩 타고 싶어</button><button type="button">떤선녓 국제선에서 그랩 타는 곳 보여줘</button><button type="button">호치민에서 달랏으로 가는 교통편 찾아줘</button></details>
+          <details><summary>숙소 주변·맛집</summary><button type="button">선라이즈 근처 껌승집 추천해줘</button><button type="button">푸미흥에서 맛있는 고기집 찾아줘</button><button type="button">호치민에서 맛있는 라멘집 추천해줘</button></details>
+          <details><summary>데이트·모임</summary><button type="button">오늘 여자친구와 갈 만한 1군 분위기 좋은 바 찾아줘</button><button type="button">2군에서 룸 있는 한식당 찾아줘</button><button type="button">호치민 프랑스 음식점 추천해줘</button></details>
+          <details><summary>배달·혜택·생활</summary><button type="button">맛있는 햄버거집 찾아서 그랩푸드로 연결해줘</button><button type="button">호치민에서 회원 혜택이 있는 마사지 찾아줘</button><button type="button">푸미흥에서 동물병원 찾아줘</button></details>
         </div>
         <p id="aiMapStatus" role="status" aria-live="polite"></p>
         <ul id="aiMapResults" class="aiResults" aria-label="회원 등록 업소와 Google 검색 결과"></ul>
@@ -474,6 +475,7 @@
 <script src="./assets/js/transport-guide.js?v=20260917-tools1"></script>
 <script src="./assets/js/admin-regions.js?v=20260917-tools1"></script>
 <script src="./assets/js/interface-polish.js?v=20261006-grab-address2"></script>
+<script src="./assets/js/app-share.js?v=20261006-1"></script>
 <script src="./assets/js/home-screen.js?v=20260918-booking-back1"></script>
 <script src="./assets/js/guide-map-link.js?v=20260919-share1"></script>
 <script src="./assets/js/nearby-businesses.js?v=20260920-interaction3"></script>
