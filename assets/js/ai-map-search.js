@@ -461,7 +461,7 @@
     if(window.AIGoogleSearch&&last&&!memberOnly){list.classList.toggle('aiRankingPending',!!intent.sortBy&&!last.google);renderGoogle(last);searchGoogle(last);}
     window.AIMapAnswer?.render(list,last,{pending:!!window.AIGoogleSearch&&!memberOnly&&!last?.google});
   }
-  input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.google=null;last.answer=null;window.AIMapAnswer?.cancel();last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
+  input.addEventListener('focus',()=>{window.PlaceSearch?.dismiss();if(window.AIAirportPickup?.active){window.AIAirportPickup.render(list);show();return;}if(last?.query===input.value.trim()){if(last.intent.visitToday&&Date.now()-last.checkedAt>60000){last.hours.clear();last.google=null;last.answer=null;window.AIMapAnswer?.cancel();last.checkedAt=Date.now();}render(last.intent);}else reset();show();});
   input.addEventListener('input',()=>{cancel();last=null;reset();show();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();form.requestSubmit();}if(event.key==='Escape'){event.preventDefault();close();input.blur();}});
   examples.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;cancel();last=null;input.value=button.textContent;syncInput();form.requestSubmit();});
@@ -484,7 +484,7 @@
   }
   form.addEventListener('submit',async event=>{
     event.preventDefault();const query=input.value.trim();if(query.length<2||query.length>300||controller)return;
-    cancel();const token=revision;controller=new AbortController();const signal=controller.signal;
+    cancel();if(window.AIAirportPickup?.matches(query)){last=null;show();window.AIAirportPickup.render(list);input.blur();fitPanel();window.AIAirportPickup.showMap(true);return;}const token=revision;controller=new AbortController();const signal=controller.signal;
     send.disabled=true;form.setAttribute('aria-busy','true');examples.hidden=true;list.replaceChildren();title.textContent='질문을 이해하고 있어요';status.textContent='필요한 정보와 추천 근거를 확인할게요…';show();input.blur();
     const pending=controller;const timeout=setTimeout(()=>pending.abort(),30000);
     try{
