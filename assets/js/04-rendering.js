@@ -561,6 +561,7 @@ function renderDetail(){
 }
 function renderAll(){renderCats();renderList();renderMarkers();refreshRegisteredCoverage();renderDetail();if(typeof syncMapFilterSummary==='function')syncMapFilterSummary();window.NearbyBusinesses?.sync();window.MapUX?.syncNearby();window.BrowseExperience?.sync();window.MapWeather?.sync();window.RoadConditions?.sync()}
 async function selectPlace(id,pan=true,showInfo=false){
+  window.DestinationLine?.clear();
   window.MapUX?.onSelection(id);
   window.PlaceSearch?.clearExternal();
   const previousSharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
