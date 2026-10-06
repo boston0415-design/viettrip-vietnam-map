@@ -780,6 +780,7 @@ function renderPopularAreas(){
 }
 
 function clearUserLocation(){
+  window.DestinationLine?.clear();
   if(state.userMarker){state.userMarker.setMap(null);state.userMarker=null}
   if(state.userAccuracyCircle){state.userAccuracyCircle.setMap(null);state.userAccuracyCircle=null}
   if(state.userInfo){state.userInfo.close();state.userInfo=null}
@@ -829,6 +830,7 @@ function showUserLocation(pos, autoZoom=true){
     state.userAccuracyCircle.setRadius(accuracy);
   }
 
+  window.DestinationLine?.sync();
   state.userLocationInfo={name:'내 현재 위치',type:'브라우저 위치',description:`정확도 약 ±${accuracy}m. 파란 원은 위치 오차 범위입니다.`,...point};
   if(!state.userInfo){
     state.userInfo=new google.maps.InfoWindow();
