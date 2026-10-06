@@ -31,3 +31,5 @@
 #chatMessageMenu::backdrop{background:#20203055}.chatMenuExcerpt{max-height:110px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.6;color:#81818d;margin:0 0 10px}
 #chatMessageMenu button{display:block;width:100%;border:0;background:transparent;text-align:left;min-height:44px;padding:8px;font-size:15px;color:#403957;cursor:pointer}
 #chatMessageMenu button:hover{background:#f5f3f8}#chatMessageMenu button:focus-visible,.chatMessageActions:focus-visible{outline:2px solid #8173c6}
+
+#chatReplyAlert{position:fixed;z-index:10020;top:12px;left:50%;transform:translateX(-50%);max-width:calc(100vw - 24px);padding:12px 18px;border:1px solid #d9d3ef;border-radius:12px;background:#fff;color:#514397;box-shadow:0 4px 20px #25204022;font-size:14px;cursor:pointer}#chatReplyAlert[hidden]{display:none}#chatMessages .chatReplyFocused{outline:2px solid #b6abd9;outline-offset:6px}
