@@ -4,3 +4,11 @@
 .destinationRoute p{margin:8px 0}.routeActions{display:flex;flex-wrap:wrap;gap:6px}.destinationRoute ol{padding-left:22px;max-height:110px;overflow:auto;margin:8px 0}.destinationRoute :focus-visible{outline:2px solid #2878e8;outline-offset:2px}
 
 .destinationRoute summary{cursor:pointer;margin-top:6px}.destinationRoute details[open] ol{max-height:110px;overflow:auto}
+
+/* Routing owns the map surface; collapsed chat and nearby trays must not stack at the bottom. */
+body.routeNavigating #chatDock,body.routeNavigating #nearbyResults,body.routeNavigating #nearbyReopen,body.routeNavigating #areaLegend,body.routeNavigating #mobileListBtn,body.routeNavigating #areaPanel{display:none!important}
+body.routeNavigating .destinationRoute{max-height:calc(100% - 24px);overflow-y:auto;overscroll-behavior:contain}
+@media(max-width:900px){
+ body.routeNavigating #chatLauncher{display:block;position:fixed;z-index:99;right:8px;top:45%;bottom:auto;min-width:40px;min-height:44px;padding:10px 8px;border:1px solid #ded8f3;border-radius:12px;background:#6157d9;color:#fff;font:600 12px/1.5 system-ui;writing-mode:vertical-rl}
+ body.routeNavigating .destinationRoute{left:8px;top:8px;max-width:calc(100% - 64px);max-height:calc(100% - 16px);padding:8px 10px}
+}

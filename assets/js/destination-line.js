@@ -18,7 +18,7 @@
   return {path:(step.path||[]).map(point).filter(Boolean),alley:explicit,instruction};
  }
  function erase(){lines.forEach(l=>l.setMap(null));lines=[];fullPath=[];alleyPath=[];if(endMarker)endMarker.setMap(null);endMarker=null;}
- function clear(){serial++;active=null;erase();document.getElementById('destinationLineHint')?.remove();}
+ function clear(){document.body.classList.remove('routeNavigating');serial++;active=null;erase();document.getElementById('destinationLineHint')?.remove();}
  function sync(){if(active&&destination()&&key(destination())!==active.key)clear();if(active)queueMicrotask(render);}
  function fit(path=fullPath){
   if(!path.length||!state.map)return;
@@ -29,14 +29,14 @@
  function draw(path,segments=[]){
   erase();fullPath=path;
   // Solid base preserves every returned path vertex; dotted overlays erase only explicitly named alley steps.
-  lines.push(new google.maps.Polyline({map:state.map,path,strokeColor:'#2878e8',strokeWeight:7,strokeOpacity:1,clickable:false,zIndex:85}));
+  lines.push(new google.maps.Polyline({map:state.map,path,strokeColor:'#2878e8',strokeWeight:3,strokeOpacity:1,clickable:false,zIndex:85}));
   // Render individual steps instead when all geometry is available, so no solid line remains under dots.
   if(segments.length&&segments.every(s=>s.path.length>1)){
    lines[0].setMap(null);lines=[];
    for(const segment of segments){
     const options={map:state.map,path:segment.path,clickable:false,zIndex:85};
-    if(segment.alley){alleyPath.push(...segment.path);Object.assign(options,{strokeOpacity:0,icons:[{icon:{path:google.maps.SymbolPath.CIRCLE,scale:3.5,fillColor:'#2878e8',fillOpacity:1,strokeColor:'#fff',strokeWeight:1},offset:'0',repeat:'12px'}]});}
-    else Object.assign(options,{strokeColor:'#2878e8',strokeWeight:7,strokeOpacity:1});
+    if(segment.alley){alleyPath.push(...segment.path);Object.assign(options,{strokeOpacity:0,icons:[{icon:{path:google.maps.SymbolPath.CIRCLE,scale:2,fillColor:'#2878e8',fillOpacity:1,strokeColor:'#fff',strokeWeight:1},offset:'0',repeat:'9px'}]});}
+    else Object.assign(options,{strokeColor:'#2878e8',strokeWeight:3,strokeOpacity:1});
     lines.push(new google.maps.Polyline(options));
    }
   }
@@ -79,7 +79,7 @@
    status(`${mode==='WALKING'?'도보':'자동차'} ${km}km · 약 ${minutes}분`);fit();
   }catch(error){if(request!==serial)return;erase();current.steps=[];status(error.message==='LOCATION'?'현재 위치를 확인할 수 없습니다. 위치 권한과 휴대폰 위치 설정을 켠 뒤 다시 시도해 주세요.':'도로 경로를 불러오지 못했습니다. 다시 시도하거나 Google 지도에서 열어 주세요.');console.warn('Route unavailable',error?.code||error?.message);}
  }
- function open(){const p=destination();if(!p)return;if(active?.key===key(p)&&active.loading)return;clear();if(typeof closeDetailPanel==='function')closeDetailPanel();if(typeof closeMobileBusinessList==='function')closeMobileBusinessList();window.ListLayout?.setCollapsed(true);active={place:p,key:key(p),mode:'DRIVING',message:'',loading:false,revision:0,steps:[]};calculate();}
- document.addEventListener('click',e=>{const link=e.target.closest?.('#detail [data-map-route]');if(!link||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open();});
+ function open(){const p=destination();if(!p)return;if(active?.key===key(p)&&active.loading)return;clear();if(typeof closeDetailPanel==='function')closeDetailPanel();if(typeof closeMobileBusinessList==='function')closeMobileBusinessList();window.ListLayout?.setCollapsed(true);window.ChatDock?.close();document.body.classList.add('routeNavigating');active={place:p,key:key(p),mode:'DRIVING',message:'',loading:false,revision:0,steps:[]};calculate();}
+ document.addEventListener('click',e=>{if(active&&e.target.closest?.('#chatLauncher'))clear();const link=e.target.closest?.('#detail [data-map-route]');if(!link||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open();});
  window.DestinationLine={sync,clear,fit,open,stepInfo};
 })();
