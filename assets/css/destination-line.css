@@ -1,7 +1,4 @@
 .destinationRoute{margin:8px 12px;color:#536276;font-size:12px;line-height:1.5;text-align:left}
-.destinationRoute form{display:flex;flex-wrap:wrap;gap:6px}
-.destinationRoute input{flex:1 1 100%;min-width:0;padding:10px;border:1px solid #dbe1e8;border-radius:10px;background:#fff;color:#202b3c;font:inherit;font-size:14px}
-.destinationRoute button,.destinationRoute select,.destinationRoute a{border:1px solid #dbe1e8;border-radius:9px;background:white;color:#2865b9;padding:8px;font:inherit;min-height:40px;cursor:pointer;text-decoration:none}
-.destinationRoute form button{flex:1;background:#2878e8;color:white;border:0;font-weight:650}
+.destinationRoute button,.destinationRoute a{border:1px solid #dbe1e8;border-radius:9px;background:white;color:#2865b9;padding:8px;font:inherit;min-height:40px;cursor:pointer;text-decoration:none}
 .destinationRoute button:disabled{opacity:.6;cursor:wait}
 .destinationRoute p{margin:8px 0}.routeActions{display:flex;flex-wrap:wrap;gap:6px}.destinationRoute ol{padding-left:22px;max-height:110px;overflow:auto;margin:8px 0}.destinationRoute :focus-visible{outline:2px solid #2878e8;outline-offset:2px}

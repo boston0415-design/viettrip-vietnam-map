@@ -31,15 +31,12 @@
  function render(){
   if(!active)return;const panel=document.getElementById('detail');if(!panel?.classList.contains('show'))return;
   let box=document.getElementById('destinationLineHint');if(!box){box=element('section');box.id='destinationLineHint';box.className='destinationRoute';box.setAttribute('aria-label','길찾기');panel.querySelector('.detailQuickActions')?.after(box);}
-  // Keep focus and typing stable when unrelated place data rerenders.
   if(box.dataset.revision===String(active.revision))return;box.dataset.revision=String(active.revision);box.replaceChildren();
-  const form=element('form'),input=element('input');input.placeholder='출발지 주소 · 비우면 내 위치';input.setAttribute('aria-label','출발지 주소');input.value=active.address;input.maxLength=250;input.disabled=active.loading;input.addEventListener('input',()=>{if(active)active.address=input.value;});
-  const mode=element('select');mode.setAttribute('aria-label','이동 수단');for(const [v,t] of [['DRIVING','자동차'],['WALKING','도보']]){const o=element('option',t);o.value=v;mode.append(o);}mode.value=active.mode;mode.disabled=active.loading;mode.onchange=()=>{if(active)active.mode=mode.value;};
-  const submit=element('button',active.loading?'찾는 중…':'경로 찾기');submit.type='submit';submit.disabled=active.loading;form.append(input,mode,submit);form.onsubmit=e=>{e.preventDefault();calculate();};box.append(form);
   const status=element('p',active.message);status.setAttribute('role','status');box.append(status);
   const actions=element('div');actions.className='routeActions';
   if(fullPath.length){const all=element('button','전체 경로'),near=element('button','목적지 근처');all.type=near.type='button';all.onclick=()=>fit();near.onclick=()=>fit(splitPath(fullPath).near);actions.append(all,near);}
-  const fallback=element('a','Google 지도에서 열기');fallback.href=businessDirectionsUrl(active.place,{travelmode:active.mode.toLowerCase()});if(active.address){const u=new URL(fallback.href);u.searchParams.set('origin',active.address);fallback.href=u.href;}fallback.target='_blank';fallback.rel='noopener noreferrer';actions.append(fallback);
+  if(!active.loading){const retry=element('button',fullPath.length?(active.mode==='DRIVING'?'도보로 보기':'자동차로 보기'):'다시 시도');retry.type='button';retry.onclick=()=>{if(fullPath.length)active.mode=active.mode==='DRIVING'?'WALKING':'DRIVING';calculate();};actions.append(retry);}
+  const fallback=element('a','Google 지도에서 열기');fallback.href=businessDirectionsUrl(active.place,{travelmode:active.mode.toLowerCase()});fallback.target='_blank';fallback.rel='noopener noreferrer';actions.append(fallback);
   const close=element('button','안내 닫기');close.type='button';close.onclick=clear;actions.append(close);box.append(actions);
   if(active.steps?.length){const list=element('ol');for(const step of active.steps.slice(-4))list.append(element('li',step));box.append(list);}
   if(active.mode==='WALKING'&&fullPath.length)box.append(element('small','보행로 정보가 누락될 수 있습니다. 현장 표지와 통행 가능 여부를 확인하세요.'));
@@ -57,17 +54,17 @@
   const legs=r.legs||[],steps=legs.flatMap(l=>l.steps||[]);return {path:steps.flatMap(s=>s.path||[]),meters:legs.reduce((n,l)=>n+(l.distance?.value||0),0),millis:legs.reduce((n,l)=>n+(l.duration?.value||0)*1000,0),steps:steps.map(s=>{const d=document.createElement('div');d.innerHTML=s.instructions||'';return d.textContent||'';})};
  }
  async function calculate(){
-  if(!active||active.loading)return;const request=++serial,current=active,address=current.address.trim(),mode=current.mode;erase();status('실제 도로 경로를 찾고 있습니다…',true);
+  if(!active||active.loading)return;const request=++serial,current=active,mode=current.mode;erase();status('현재 위치 확인 중…',true);
   try{
-   const origin=address||point(state.userMarker?.getPosition())||await locate();if(request!==serial)return;
+   const origin=await locate();if(request!==serial)return;status('경로를 찾고 있습니다…',true);
    let timer;const result=await Promise.race([route(origin,point(current.place)||current.place.address,mode),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('TIMEOUT')),18000);})]).finally(()=>clearTimeout(timer));if(request!==serial||active!==current)return;
    const path=(result.path||[]).map(point).filter(Boolean);if(path.length<2)throw Error('ZERO_RESULTS');
    draw(path);current.steps=result.steps;
    const km=(result.meters/1000).toFixed(1),minutes=Math.max(1,Math.round(result.millis/60000));
    status(`${mode==='WALKING'?'도보':'자동차'} ${km}km · 약 ${minutes}분 · 목적지 인근 300m 상세 안내`);
-  }catch(error){if(request!==serial)return;erase();current.steps=[];status(error.message==='LOCATION'?'위치를 확인할 수 없습니다. 출발지 주소를 입력해 주세요.':'도로 경로를 불러오지 못했습니다. 다시 시도하거나 Google 지도에서 열어 주세요.');console.warn('Route unavailable',error?.code||error?.message);}
+  }catch(error){if(request!==serial)return;erase();current.steps=[];status(error.message==='LOCATION'?'현재 위치를 확인할 수 없습니다. 위치 권한과 휴대폰 위치 설정을 켠 뒤 다시 시도해 주세요.':'도로 경로를 불러오지 못했습니다. 다시 시도하거나 Google 지도에서 열어 주세요.');console.warn('Route unavailable',error?.code||error?.message);}
  }
- function open(){const p=destination();if(!p)return;clear();active={place:p,key:key(p),address:'',mode:'DRIVING',message:'출발지를 입력하거나 내 위치로 경로를 찾으세요.',loading:false,revision:0,steps:[]};render();if(point(state.userMarker?.getPosition()))calculate();else document.getElementById('destinationLineHint')?.querySelector('input')?.focus();}
+ function open(){const p=destination();if(!p)return;if(active?.key===key(p)&&active.loading)return;clear();active={place:p,key:key(p),mode:'DRIVING',message:'',loading:false,revision:0,steps:[]};calculate();}
  document.addEventListener('click',e=>{const link=e.target.closest?.('#detail [data-map-route]');if(!link||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open();});
  window.DestinationLine={sync,clear,fit,open,splitPath};
 })();
