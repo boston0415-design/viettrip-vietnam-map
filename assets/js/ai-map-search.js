@@ -465,7 +465,7 @@
   input.addEventListener('input',()=>{cancel();last=null;reset();show();});
   input.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();form.requestSubmit();}if(event.key==='Escape'){event.preventDefault();close();input.blur();}});
   examples.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;cancel();last=null;input.value=button.textContent;syncInput();form.requestSubmit();});
-  clear?.addEventListener('click',()=>{input.value='';cancel();last=null;reset();input.focus();show();});
+  clear?.addEventListener('click',()=>{window.AIAirportPickup?.reset();input.value='';cancel();last=null;reset();input.focus();show();});
   byId('aiMapClose').addEventListener('click',()=>{input.focus();close();});
   document.addEventListener('pointerdown',event=>{if(!event.target.closest('.aiMapSearch'))close();});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){input.focus();close();}});

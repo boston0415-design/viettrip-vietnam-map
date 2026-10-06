@@ -8,14 +8,18 @@
  const el=id=>document.getElementById(id);
  function matches(query){
   const a=airports.find(x=>x[2].test(query));
-  const t=query.match(/\bT\s*([123])\b|([123])\s*터미널/i);
-  const ride=/그랩|grab/i.test(query),airport=/공항|airport/i.test(query)||!!a;
+  const t=query.match(/(?:^|\s)T\s*([123])(?=$|[^0-9a-z])|([123])\s*터미널/i);
+  const delivery=/그랩\s*푸드|grab\s*food|배달|배송/i.test(query);
+  const airport=/공항|airport|떤[선션]?녓|탄손누트|탄손낫|tan\s*son\s*nhat|\bsgn\b|노이바이|noi\s*bai/i.test(query);
+  const ride=/그랩|grab/i.test(query)&&!delivery;
+  const shortReply=/^(?:저는?\s*)?(?:떤[선션]?녓(?:\s*공항)?|호치민(?:\s*공항)?|노이바이(?:\s*공항)?|하노이(?:\s*공항)?|다낭(?:\s*공항)?|국제선|국내선|T\s*[123]|[123]\s*터미널)(?:이에요|예요|이야|입니다|이요|요)?[.!?\s]*$/i.test(query);
+  if(delivery){active=false;return false;}
   if(ride&&airport){active=true;city=a?.[0]||'';terminal='';}
-  else if(!active)return false;
-  else if(!a&&!t&&!/^(국제선|국내선)(이에요|이야|입니다)?[.!?\s]*$/.test(query)){active=false;return false;}
+  else if(!active||!shortReply){active=false;return false;}
   if(a&&city!==a[0]){city=a[0];terminal='';}
   if(t)terminal='T'+(t[1]||t[2]);
   else if(/국제선/.test(query)&&city)terminal='T2';
+  else if(/국내선/.test(query))terminal='';
   return true;
  }
  function render(list){
@@ -43,5 +47,5 @@
   jumpToPoi(point.name);
   if(collapse)window.ChatDock?.close();
  }
- window.AIAirportPickup={matches,render,showMap,get active(){return active}};
+ window.AIAirportPickup={matches,render,showMap,reset(){active=false;city='';terminal='';},get active(){return active}};
 })();
