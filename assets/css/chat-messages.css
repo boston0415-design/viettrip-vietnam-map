@@ -13,3 +13,21 @@
 #chatMessages .rankBars i{display:block;width:12px;height:2px;background:currentColor}
 #chatMessages .rankBars:empty{min-width:7px;width:7px;height:7px;border:1px solid currentColor;border-radius:50%}
 #chatMessages .rankStars{font-size:9px;letter-spacing:0;white-space:nowrap}
+
+.chatDateDivider{text-align:center;font-size:11px;color:#9096a0;margin:8px 0 22px;line-height:1.5}
+#chatMessages .chatMessage header{position:relative;padding-right:28px;min-height:24px}
+#chatMessages .chatMessageMine header{padding-right:0;padding-left:28px}
+.chatMessageActions{position:absolute;right:-6px;top:-8px;width:36px;height:36px;min-height:36px;border:0;background:transparent;color:#9297a0;font:22px system-ui;cursor:pointer}
+.chatMessageMine .chatMessageActions{left:-6px;right:auto}
+#chatMessages .chatMessage a{color:#6157bb;text-decoration:underline;word-break:break-word}
+#chatMessages .chatQuote{margin:0 0 7px;padding:2px 8px;border-left:2px solid #c6bfdc;font-size:12px;color:#83818b;text-align:left;white-space:pre-wrap}
+#chatReplyPreview{display:flex;align-items:center;gap:8px;border-left:2px solid #7665bb;padding:5px 8px;margin:0 0 8px;font-size:12px;color:#756987}
+#chatReplyPreview span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}#chatReplyPreview button{border:0;background:transparent;min-width:36px;min-height:36px;font-size:20px;color:#777}
+#chatReplyPreview[hidden]{display:none}
+#chatComposeStatus{font-size:12px;color:#796395;margin:4px 0 0}#chatComposeStatus:empty{display:none}
+#chatForm .chatCompose{align-items:flex-end}#chatForm #chatMessage{min-height:42px!important;max-height:120px;padding:10px 12px;font-size:16px;line-height:22px;resize:none;box-sizing:border-box;overflow-y:auto}
+#chatForm #chatSend{min-height:42px;height:42px;padding:8px 14px;font-size:14px}#chatForm small:empty{display:none}
+#chatMessageMenu{width:min(340px,calc(100vw - 32px));box-sizing:border-box;border:1px solid #e4e0eb;border-radius:16px;padding:16px;color:#303244;background:#fff}
+#chatMessageMenu::backdrop{background:#20203055}.chatMenuExcerpt{max-height:110px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.6;color:#81818d;margin:0 0 10px}
+#chatMessageMenu button{display:block;width:100%;border:0;background:transparent;text-align:left;min-height:44px;padding:8px;font-size:15px;color:#403957;cursor:pointer}
+#chatMessageMenu button:hover{background:#f5f3f8}#chatMessageMenu button:focus-visible,.chatMessageActions:focus-visible{outline:2px solid #8173c6}
