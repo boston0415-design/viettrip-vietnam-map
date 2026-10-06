@@ -500,6 +500,10 @@ export function contextualIntent(query,city){
   return extendIntent(clarifyIntent(parsed,query),query,city);
 }
 export function recoveryIntent(query,city){
+  // Vietnam Tourism: must-try-noodles-vietnam and node/1305, checked 2026-10-06.
+  // Only the basic comparison; do not override allergy, nutrition or shop questions.
+  const comparison=query.trim().replace(/[?？!.]/g,'');
+  if(/^(?:퍼|포|쌀국수|ph[oở])\s*(?:와|과|랑|하고|and|vs\.?)\s*(?:분짜|분차|b[uú]n\s*ch[aả])(?:가|는|의)?\s*(?:뭐가\s*달라|어떻게\s*달라|차이(?:점)?(?:가\s*뭐야)?|비교)\s*(?:요|나요|해줘|알려줘)?$/i.test(comparison))return {mode:'advice',relevant:true,city,terms:[],unsupported:[],preferences:[],answer:'퍼(Phở)는 납작한 쌀국수 면을 소고기나 닭고기 육수에 넣어 먹는 국물 요리입니다. 분짜(Bún chả)는 구운 돼지고기와 돼지고기 완자에 가는 쌀국수 면·허브를 곁들여, 느억맘으로 만든 새콤달콤한 소스에 찍어 먹는 음식입니다. 핵심 차이는 국물 쌀국수인지, 구운 고기와 면을 소스에 곁들여 먹는지입니다.',relatedSearches:['쌀국수 맛집 찾아줘','분짜 맛집 찾아줘'],verifiedDishComparison:true};
   const ref=nearbyRequest(query);
   if(ref&&ref.searchText){
     const target=contextualIntent(ref.searchText,city)||literalIntent(ref.searchText,city);
