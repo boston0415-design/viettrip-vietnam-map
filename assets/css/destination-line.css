@@ -1,4 +1,6 @@
-.destinationRoute{margin:8px 12px;color:#536276;font-size:12px;line-height:1.5;text-align:left}
+.destinationRoute{position:absolute;top:12px;left:12px;z-index:100;box-sizing:border-box;width:max-content;max-width:min(360px,calc(100% - 24px));padding:10px 12px;border:1px solid #dbe1e8;border-radius:14px;background:#fff;box-shadow:0 3px 12px #26365020;color:#536276;font-size:12px;line-height:1.5;text-align:left}
 .destinationRoute button,.destinationRoute a{border:1px solid #dbe1e8;border-radius:9px;background:white;color:#2865b9;padding:8px;font:inherit;min-height:40px;cursor:pointer;text-decoration:none}
 .destinationRoute button:disabled{opacity:.6;cursor:wait}
 .destinationRoute p{margin:8px 0}.routeActions{display:flex;flex-wrap:wrap;gap:6px}.destinationRoute ol{padding-left:22px;max-height:110px;overflow:auto;margin:8px 0}.destinationRoute :focus-visible{outline:2px solid #2878e8;outline-offset:2px}
+
+.destinationRoute summary{cursor:pointer;margin-top:6px}.destinationRoute details[open] ol{max-height:110px;overflow:auto}
