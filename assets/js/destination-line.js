@@ -33,8 +33,8 @@
   let box=document.getElementById('destinationLineHint');if(!box){box=element('section');box.id='destinationLineHint';box.className='destinationRoute';box.setAttribute('aria-label','길찾기');panel.querySelector('.detailQuickActions')?.after(box);}
   // Keep focus and typing stable when unrelated place data rerenders.
   if(box.dataset.revision===String(active.revision))return;box.dataset.revision=String(active.revision);box.replaceChildren();
-  const form=element('form'),input=element('input');input.placeholder='출발지 주소 · 비우면 내 위치';input.setAttribute('aria-label','출발지 주소');input.value=active.address;input.maxLength=250;input.addEventListener('input',()=>{if(active)active.address=input.value;});
-  const mode=element('select');mode.setAttribute('aria-label','이동 수단');for(const [v,t] of [['DRIVING','자동차'],['WALKING','도보']]){const o=element('option',t);o.value=v;mode.append(o);}mode.value=active.mode;mode.onchange=()=>{if(active)active.mode=mode.value;};
+  const form=element('form'),input=element('input');input.placeholder='출발지 주소 · 비우면 내 위치';input.setAttribute('aria-label','출발지 주소');input.value=active.address;input.maxLength=250;input.disabled=active.loading;input.addEventListener('input',()=>{if(active)active.address=input.value;});
+  const mode=element('select');mode.setAttribute('aria-label','이동 수단');for(const [v,t] of [['DRIVING','자동차'],['WALKING','도보']]){const o=element('option',t);o.value=v;mode.append(o);}mode.value=active.mode;mode.disabled=active.loading;mode.onchange=()=>{if(active)active.mode=mode.value;};
   const submit=element('button',active.loading?'찾는 중…':'경로 찾기');submit.type='submit';submit.disabled=active.loading;form.append(input,mode,submit);form.onsubmit=e=>{e.preventDefault();calculate();};box.append(form);
   const status=element('p',active.message);status.setAttribute('role','status');box.append(status);
   const actions=element('div');actions.className='routeActions';
@@ -60,7 +60,7 @@
   if(!active||active.loading)return;const request=++serial,current=active,address=current.address.trim(),mode=current.mode;erase();status('실제 도로 경로를 찾고 있습니다…',true);
   try{
    const origin=address||point(state.userMarker?.getPosition())||await locate();if(request!==serial)return;
-   const result=await route(origin,point(current.place)||current.place.address,mode);if(request!==serial||active!==current)return;
+   let timer;const result=await Promise.race([route(origin,point(current.place)||current.place.address,mode),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('TIMEOUT')),18000);})]).finally(()=>clearTimeout(timer));if(request!==serial||active!==current)return;
    const path=(result.path||[]).map(point).filter(Boolean);if(path.length<2)throw Error('ZERO_RESULTS');
    draw(path);current.steps=result.steps;
    const km=(result.meters/1000).toFixed(1),minutes=Math.max(1,Math.round(result.millis/60000));
