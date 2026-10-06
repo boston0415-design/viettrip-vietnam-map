@@ -272,7 +272,7 @@ function encodeCopyValue(text){
 }
 
 // Maps URLs use the device location in Google Maps when origin is omitted.
-// No Directions/Routes API call, stored origin, or background location tracking.
+// External navigation fallback; the in-map route control uses the same destination.
 function businessDirectionsUrl(place,{travelmode}={}){
   if(!place)return '';
   const present=value=>value!==null && value!==undefined && String(value).trim()!=='';
@@ -287,7 +287,7 @@ function businessDirectionsUrl(place,{travelmode}={}){
 function businessDirectionsLinkHtml(place,compact=false){
   const url=businessDirectionsUrl(place);
   if(!url)return '';
-  return `<a class="directionsButton${compact?'':' copyBtn'}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(place.name||'선택한 업체')} 현재 위치에서 길찾기 · 구글 지도 새 창" title="구글 지도에서 현재 위치를 허용하고 이동 수단을 선택하세요"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-8a4 4 0 0 1 4-4h10M14 3l5 5-5 5"/></svg><span>길찾기</span></a>`;
+  return `<a data-map-route class="directionsButton${compact?'':' copyBtn'}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(place.name||'선택한 업체')} 길찾기" title="지도에서 도로 경로 보기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-8a4 4 0 0 1 4-4h10M14 3l5 5-5 5"/></svg><span>길찾기</span></a>`;
 }
 
 function copyButtonHtml(label,text){
