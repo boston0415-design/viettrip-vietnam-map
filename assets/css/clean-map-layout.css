@@ -53,3 +53,14 @@ body.cleanMap #chatLauncher{font-size:12px!important;background:#fff!important;c
  body.cleanMap.routeNavigating #mapBottomNav{display:none}body.cleanMap.routeNavigating .content{bottom:0!important}
  body.cleanMap.routeNavigating #chatLauncher{display:block!important}
 }
+/* Keep small controls readable at every width and avoid duplicate chat navigation. */
+body.cleanMap .top #searchBtn{flex:0 0 56px!important;width:56px!important;white-space:nowrap!important;writing-mode:horizontal-tb!important}
+body.cleanMap #detailCloseBtn{flex:none!important;min-width:64px!important;white-space:nowrap!important}
+body.cleanMap .cleanLocation::after{content:'◎'!important;font-size:29px!important;color:#1a73e8!important}
+body.cleanMap #chatLauncher{display:none!important}
+body.cleanMap .chatTabs{display:none!important}
+body.cleanMap .chatHead{min-height:44px!important;flex-basis:44px!important;padding:0 14px!important}
+body.cleanMap #chatToggle{font-size:14px!important;text-align:left!important;font-weight:600!important}
+body.cleanMap #chatSend,body.cleanMap #aiMapAsk{background:#1a73e8!important;color:white!important}
+body.cleanMap.chatExpanded:has(#peopleTab[aria-selected="true"]) #chatQuickPeople,body.cleanMap.chatExpanded:has(#aiTab[aria-selected="true"]) #chatQuickAi{background:#e8f0fe!important;color:#1967d2!important}
+@media(max-width:900px){body.cleanMap.routeNavigating #chatLauncher{display:block!important}}
