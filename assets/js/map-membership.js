@@ -261,7 +261,7 @@
     for(const id of ['detail','communityReviewFeed'])if(el(id))observer.observe(el(id),{childList:true,subtree:true});
     refresh().then(()=>loadBadges());
   }
-  window.MapMembership={GRADES,levelFor,badgeHtml,loadBadges,refresh,schedule,open,openOperator,syncRole:paint,
+  window.MapMembership={get memberId(){return profile?.id||null},GRADES,levelFor,badgeHtml,loadBadges,refresh,schedule,open,openOperator,syncRole:paint,
     ownsHash:hash=>credentials.has(hash),credentialFor:hash=>credentials.get(hash)||null,
     memberFor:hash=>badges.get(hash)?.member||hash,
     correctionButton:id=>`<button type="button" class="mapCorrectionButton" data-map-correction="${esc(id)}">정보 수정 제안</button>`,
