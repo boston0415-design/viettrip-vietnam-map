@@ -22,7 +22,7 @@
  function richText(node,text){const pattern=/https?:\/\/[^\s<>]+/g;let from=0;for(const match of text.matchAll(pattern)){node.append(document.createTextNode(text.slice(from,match.index)));const a=document.createElement('a');a.href=match[0];a.textContent=match[0];a.target='_blank';a.rel='noopener noreferrer';node.append(a);from=match.index+match[0].length;}node.append(document.createTextNode(text.slice(from)));}
  function decorate(node,row){
   const body=node.querySelector('p');body.replaceChildren();const split=row.body.startsWith('↪ ')?row.body.indexOf('\n\n'):-1;
-  if(split>0){const block=document.createElement('blockquote');block.className='chatQuote';block.textContent=row.body.slice(2,split);body.append(block);richText(body,row.body.slice(split+2));}else richText(body,row.body);
+  if(split>0){const block=document.createElement('blockquote');block.className='chatQuote';block.textContent=row.body.slice(2,split);body.before(block);richText(body,row.body.slice(split+2));}else richText(body,row.body);
   const action=document.createElement('button');action.type='button';action.className='chatMessageActions';action.textContent='⋯';action.setAttribute('aria-label',row.nickname+' 메시지 메뉴');action.onclick=()=>{selected={row,trigger:action};menu.querySelector('.chatMenuExcerpt').textContent=row.body.slice(0,160);if(!menu.open)menu.showModal()};node.querySelector('header').append(action);
  }
  window.ChatComfort={decorate,compose:text=>prefix()+text,sent(text,sentBody){if(input.value.trim()===text&&prefix()+text===sentBody){input.value='';reply=null;paint();save();}},feedback:text=>{feedback.textContent=text},changed:resize};
