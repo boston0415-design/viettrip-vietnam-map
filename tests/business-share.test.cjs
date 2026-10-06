@@ -41,28 +41,24 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     trigger.click();
     const dialog=f.w.document.getElementById('businessShareDialog');assert(dialog.open);
     assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'테스트 <업소>');
-    const buttons=dialog.querySelectorAll('[data-copy-value]');assert.equal(buttons.length,5);
+    const buttons=dialog.querySelectorAll('[data-copy-value]');assert.equal(buttons.length,2);
     const copied=decodeURIComponent(buttons[0].dataset.copyValue);
     assert.equal(copied,'테스트 <업소>\n나트랑 테스트 주소\n베트남맵에서 위치·후기 보기\nhttps://viettrip-vietnam-map.pages.dev/?place=shared-1');
     assert.equal(decodeURIComponent(buttons[1].dataset.copyValue),'https://viettrip-vietnam-map.pages.dev/?place=shared-1');
     assert(!dialog.querySelector('script'));
     let clipboard;Object.defineProperty(f.w,'isSecureContext',{value:true});Object.defineProperty(f.w.navigator,'clipboard',{value:{writeText:async value=>clipboard=value}});
     f.w.handleCopyButton({preventDefault(){},stopPropagation(){},stopImmediatePropagation(){}},buttons[0]);await tick();assert.equal(clipboard,copied);assert.equal(buttons[0].textContent,'복사됨 ✓');
-    const details=[...buttons].slice(2);
-    for(const [index,value] of ['테스트 <업소>','나트랑 테스트 주소','테스트 <업소>\n나트랑 테스트 주소'].entries()){
-      f.w.handleCopyButton({preventDefault(){},stopPropagation(){},stopImmediatePropagation(){}},details[index]);await tick();assert.equal(clipboard,value);
-    }
     f.w.navigator.clipboard.writeText=async()=>{throw Error('clipboard denied')};
     f.w.console.warn=()=>{};
     f.w.document.execCommand=()=>{const input=dialog.querySelector('textarea');assert(input,'fallback stays inside the active modal');clipboard=input.value;return true};
-    details[1].focus();f.w.handleCopyButton(null,details[1]);await tick();assert.equal(clipboard,'나트랑 테스트 주소');assert(!dialog.querySelector('textarea'));
+    buttons[1].focus();f.w.handleCopyButton(null,buttons[1]);await tick();assert.equal(clipboard,'https://viettrip-vietnam-map.pages.dev/?place=shared-1');assert(!dialog.querySelector('textarea'));
     let manual;f.w.document.execCommand=()=>false;f.w.prompt=(_,value)=>{manual=value;return null};
-    f.w.handleCopyButton(null,details[0]);await tick();assert.equal(manual,'테스트 <업소>');assert(dialog.open,'failed copy never closes the selected place');
+    f.w.handleCopyButton(null,buttons[0]);await tick();assert.equal(manual,copied);assert(dialog.open,'failed copy never closes the selected place');
     f.w.document.getElementById('businessShareClose').click();assert(!dialog.open);assert.equal(f.w.document.activeElement,trigger);
     // Reopening always reads the selected business, never the previous dialog contents.
     f.run(`fixtures.push({...target,id:'shared-2',name:'다른 업체',address:''});state.selected='shared-2';renderDetail()`);
     f.w.document.querySelector('#detail [data-business-share]').click();assert(dialog.open);
-    assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'다른 업체');assert.equal(dialog.querySelectorAll('[data-copy-value]').length,3);
+    assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'다른 업체');assert.equal(dialog.querySelectorAll('[data-copy-value]').length,2);
     assert.equal(decodeURIComponent(dialog.querySelectorAll('[data-copy-value]')[1].dataset.copyValue),'https://viettrip-vietnam-map.pages.dev/?place=shared-2');
     dialog.close();f.run(`fixtures=[target];state.selected='shared-1';renderDetail()`);
     f.run(`closeDetailPanel();assert.equal(state.markers.length,0);assert.equal(PersonalPlaces.isHidden('shared-1'),true);assert.equal(BusinessShare.url({id:'bad?id'}),'')`);

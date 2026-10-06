@@ -11,6 +11,7 @@ function renderMarkers(){
       position:{lat:Number(p.lat),lng:Number(p.lng)},
       title:`${p.name}${st.rating==null?'':` · ${st.rating.toFixed(1)}점`}`,
       zIndex:150,
+      optimized:false,
       icon:businessMarkerIcon(p.category,p.subcategory)
     });
     bindMapFeatureInfo(m,{...p,type:`${catLabel(p.category)} · ${p.subcategory||''}${st.rating==null?'':` · ${st.rating.toFixed(1)}점`}`},{lat:Number(p.lat),lng:Number(p.lng)},null,{click:false});
@@ -444,6 +445,11 @@ function positionSelectedPlaceInView(){
 function syncDetailPanelLayout(){
   const panel=$('#detail');
   if(!panel?.classList.contains('show'))return;
+  if(panel.parentElement?.id==='businessSide'){
+    const content=document.querySelector('.content');
+    if(content?.classList.contains('desktopListCollapsed'))window.ListLayout?.setCollapsed(false);
+    panel.parentElement.classList.add('mobileOpen');
+  }
   const expanded=panel.parentElement?.id==='businessSide'||(panel.classList.contains('externalDetail')?detailExpanded:(!isMobileMapLayout() || detailExpanded));
   panel.classList.toggle('detailExpanded',expanded);
   const body=$('#detailBody'),toggle=$('#detailExpandBtn');

@@ -28,11 +28,8 @@
     dialog.querySelector('#businessShareOptions').innerHTML=[
       '<button type="button" class="copyBtn" data-native-share>다른 앱으로 공유</button>',
       window.MapSharing?.kakaoReady?'<button type="button" class="copyBtn kakaoShareButton" data-kakao-share>카카오톡으로 공유</button>':'',
-      copyButtonHtml('카페에 공유',text(place)),
-      copyButtonHtml('위치 링크 복사',url(place)),
-      copyButtonHtml('업체명 복사',place.name),
-      place.address?copyButtonHtml('주소 복사',place.address):'',
-      place.address?copyButtonHtml('이름+주소 복사',[place.name,place.address].join('\n')):''
+      copyButtonHtml('업소 정보 복사',text(place)),
+      copyButtonHtml('위치 링크 복사',url(place))
     ].join('');
     const share=async kakao=>{const ok=await window.MapSharing?.share(place,{kakao});if(!ok){dialog.querySelector('#businessShareHint').textContent='공유창을 열지 못했어요. 위치 링크 복사를 눌러 원하는 대화방에 붙여넣어 주세요.';}};
     dialog.querySelector('[data-native-share]').onclick=()=>share(false);
