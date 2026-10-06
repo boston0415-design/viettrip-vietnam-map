@@ -10,5 +10,11 @@ for(const width of [390,1280]){
  assert.equal(a.matches('맛있는 라멘집 알려줘'),false);assert.equal(a.active,false);
  assert(a.matches('떤선녓 국제선에서 그랩 타고 싶어'));a.render(list);assert(list.textContent.includes('Grab T2'));
  assert(a.matches('공항에서 그랩 타고 싶어'));a.render(list);assert(!list.textContent.includes('Grab T2'));
+ assert.equal(a.matches('호치민에서 맛있는 햄버거집 찾아서 그랩푸드로 연결해줘'),false);
+ assert.equal(a.matches('호치민에서 그랩 타고 벤탄시장 가고 싶어'),false);
+ assert(a.matches('공항에서 그랩 타고 싶어'));assert(a.matches('떤션녓이요'));assert(a.matches('T2요'));assert(a.matches('국내선'));a.render(list);assert(list.textContent.includes('T1 · 국내선'));
+ assert.equal(a.matches('호치민 프랑스 음식점 추천해줘'),false);
+ assert(a.matches('떤선녓 공항 그랩'));a.reset();assert.equal(a.active,false);
+
 }
 console.log('Airport selection, terminal context, correct pickup POI, city switch and drawer close pass at mobile/desktop widths');
