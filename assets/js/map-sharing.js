@@ -5,10 +5,10 @@
  const key=document.querySelector('meta[name="kakao-javascript-key"]')?.content.trim();
  let ready=false;
  if(key){const sdk=document.createElement('script');sdk.src='https://t1.kakaocdn.net/kakao_js_sdk/2.8.3/kakao.min.js';sdk.onload=()=>{try{if(!window.Kakao.isInitialized())window.Kakao.init(key);ready=true;document.dispatchEvent(new Event('map-sharing-ready'));}catch{}};document.head.append(sdk);}
- function payload(place){const url=new URL('/',origin);if(place?.id&&/^[a-zA-Z0-9_-]{1,160}$/.test(place.id))url.pathname='/share/place/'+encodeURIComponent(place.id);return {title:place?.name||'일상탈출 베트남맵',text:place?[place.name,place.address,'베트남맵에서 위치·후기 보기'].filter(Boolean).join('\n'):'베트남 맛집·숙소·회원 후기와 공항 승차장까지',url:url.href};}
+ function payload(place){const url=new URL('/',origin);if(place?.id&&/^[a-zA-Z0-9_-]{1,160}$/.test(place.id))url.pathname='/share/place/'+encodeURIComponent(place.id);return {title:place?.name||'일상탈출 베트남맵',text:place?[place.name,place.address].filter(Boolean).join('\n'):'베트남 맛집·숙소·회원 후기와 공항 승차장까지',url:url.href};}
  async function share(place,{kakao=false}={}){const data=payload(place);
-  if(kakao){if(!ready)return false;try{window.Kakao.Share.sendDefault({objectType:'feed',content:{title:data.title,description:data.text,imageUrl:place?.photoUrls?.find(value=>{try{return new URL(value).protocol==='https:'}catch{return false}})||origin+'/assets/icons/vietmap-192.png',link:{mobileWebUrl:data.url,webUrl:data.url}},buttons:[{title:place?'업소 위치 보기':'베트남맵 열기',link:{mobileWebUrl:data.url,webUrl:data.url}}]});return true;}catch{return false;}}
-  if(!navigator.share)return false;try{await navigator.share({title:data.title,url:data.url});return true;}catch(error){return error.name==='AbortError';}
+  if(kakao){if(!ready)return false;try{if(place&&!place.photoUrls?.some(value=>{try{return new URL(value).protocol==='https:'}catch{return false}})){window.Kakao.Share.sendDefault({objectType:'text',text:data.text,link:{mobileWebUrl:data.url,webUrl:data.url},buttonTitle:'길찾기'});return true;}window.Kakao.Share.sendDefault({objectType:'feed',content:{title:data.title,description:data.text,imageUrl:place?.photoUrls?.find(value=>{try{return new URL(value).protocol==='https:'}catch{return false}})||origin+'/assets/icons/vietmap-192.png',link:{mobileWebUrl:data.url,webUrl:data.url}},buttons:[{title:place?'업소 위치 보기':'베트남맵 열기',link:{mobileWebUrl:data.url,webUrl:data.url}}]});return true;}catch{return false;}}
+  if(!navigator.share)return false;try{await navigator.share({title:data.title,text:data.text,url:data.url});return true;}catch(error){return error.name==='AbortError';}
  }
  window.MapSharing={payload,share,get kakaoReady(){return ready}};
 })();

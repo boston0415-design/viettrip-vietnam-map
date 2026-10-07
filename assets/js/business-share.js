@@ -12,7 +12,7 @@
   }
   function text(place){
     const link=url(place);
-    return link?[place.name,place.address,'베트남맵에서 위치·후기 보기',link].filter(Boolean).join('\n'):'';
+    return link?[place.name,place.address,link].filter(Boolean).join('\n'):'';
   }
   function html(place){
     if(!url(place))return '';
@@ -27,7 +27,7 @@
     const nativeAvailable=Boolean(navigator.share&&/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
     dialog.querySelector('#businessShareOptions').innerHTML=[
       '<button type="button" class="copyBtn kakaoShareButton" data-kakao-share>카카오톡 공유</button>',
-      copyButtonHtml('공유 링크 복사',url(place)),
+      copyButtonHtml('공유 내용 복사',text(place)),
       nativeAvailable?'<button type="button" class="copyBtn" data-native-share>휴대폰 공유 메뉴</button>':''
     ].join('');
     const hint=dialog.querySelector('#businessShareHint');
