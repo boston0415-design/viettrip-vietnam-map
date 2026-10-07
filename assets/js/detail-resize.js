@@ -72,7 +72,7 @@
       if(!p.querySelector('.detailScroll')){
         const content=document.createElement('div');content.className='detailScroll';
         const header=p.querySelector('.detailHeader');
-        for(const child of [...p.children])if(child!==header&&!child.classList.contains('detailResizeHandle'))content.append(child);
+        for(const child of [...p.children])if(child!==header&&!child.classList.contains('detailResizeHandle')&&!child.classList.contains('detailQuickActions'))content.append(child);
         p.append(content);p.scrollTop=0;
       }
       return;

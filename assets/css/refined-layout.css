@@ -146,3 +146,6 @@
 .chatUnreadBadge[hidden],#chatRetry[hidden],#chatNewMessages[hidden]{display:none!important}
 #chatLauncher.hasUnread{box-shadow:0 0 0 3px #f5b4c2,0 4px 18px #32265a33}
 #chatNewMessages{flex:none;align-self:center;margin:4px 8px 8px;padding:8px 14px;border:1px solid #d9d1f4;border-radius:20px;background:#f4f0ff;color:#5545a6;font:600 13px system-ui;min-height:36px}
+
+/* Primary place actions stay above the independently scrolling photos and reviews. */
+#businessSide #detail>.detailQuickActions{flex:0 0 auto;position:relative;z-index:2;background:#fff;margin:0!important;padding:8px 0!important;border-bottom:1px solid #e8eaed}
