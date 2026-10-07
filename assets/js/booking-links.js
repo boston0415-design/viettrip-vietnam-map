@@ -80,7 +80,7 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "url": "https://www.tablecheck.com/en/park-hyatt-saigon-opera/reserve/landing",
     "sourceUrl": "https://www.parkhyattsaigonrestaurants.com/opera",
     "note": "Park Hyatt Saigon의 Opera 레스토랑입니다.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-07"
   },
   {
     "id": "4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd",
@@ -90,7 +90,7 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "url": "https://www.tablecheck.com/en/park-hyatt-saigon-square-one/reserve/landing",
     "sourceUrl": "https://www.parkhyattsaigonrestaurants.com/square-one",
     "note": "Park Hyatt Saigon의 Square One 레스토랑입니다.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-07"
   }
 ]);
 // Contact channels are copied from the operator site, never inferred from a phone/name.

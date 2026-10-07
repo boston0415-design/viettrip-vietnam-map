@@ -1,5 +1,20 @@
 # 예약 경로 점검 기록
 
+## 2026-10-07
+
+기준 main: `0f7dbe58dc3b62f8d223723f0aecedd87cfbf468`. 공개 업체는 165곳이며 2026-10-06 기록 이후 신규 등록·이름 변경·주소 변경은 없다. 재확인 예정일이 된 보류 업체가 없어 마지막 확인일이 가장 오래된 직접 예약 2곳을 순차 점검했다. 회원·후기 정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.
+
+### 기존 직접 예약 재확인
+
+아래 2곳은 2026-10-07 운영자 공식 지점 페이지와 해당 페이지가 직접 연결하는 예약 화면을 다시 대조했다. 주소·예약 URL 변경이나 끊어진 링크는 발견되지 않아 기존 연결을 유지하고 확인일만 갱신했다.
+
+| 업체 / ID | 재확인 결과 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| Opera / `590758f4-d650-4195-a583-15930d8b8632` | Park Hyatt Saigon 공식 Opera 페이지의 `Reserve Now`가 기존 TableCheck 예약 화면으로 연결된다. 공식 페이지의 Park Hyatt Saigon 지점, 예약·문의 전화와 예약 화면이 모두 유지됨. | https://www.parkhyattsaigonrestaurants.com/opera · https://www.tablecheck.com/en/park-hyatt-saigon-opera/reserve/landing · 2026-11-07 또는 업체명·주소 변경 시 |
+| Square One / `4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd` | Park Hyatt Saigon 공식 Square One 페이지의 `Reserve Now`가 기존 TableCheck 예약 화면으로 연결된다. 공식 페이지의 Park Hyatt Saigon 지점, 예약·문의 전화와 예약 화면이 모두 유지됨. | https://www.parkhyattsaigonrestaurants.com/square-one · https://www.tablecheck.com/en/park-hyatt-saigon-square-one/reserve/landing · 2026-11-07 또는 업체명·주소 변경 시 |
+
+직접 예약 9곳, 문의 40곳, 교통 예약 7곳을 유지하고 두 업체의 ID·이름·분류·주소 일치, 공식 예약 URL 제한, PC·모바일 예약 UI, 외부 링크 속성, 뒤로가기·닫기를 관련 테스트와 빌드로 검사한다. 실제 통화·메시지·예약·결제는 수행하지 않는다.
+
 ## 2026-10-06
 
 기준 main: `c2b2318d15a88bd5fd09336763354e2bceb3f52b`. 공개 업체는 165곳이며 2026-10-05 기록 이후 신규 등록 1곳을 우선 조사했다. 재확인 예정일이 된 기존 주소 불일치 업체 1곳도 현재 공개 업체 정보와 운영자 공식 출처를 다시 대조했다. 회원·후기 정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.
