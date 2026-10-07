@@ -45,15 +45,15 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'테스트 <업소>');
     const buttons=dialog.querySelectorAll('[data-copy-value]');assert.equal(buttons.length,1);
     const copied=decodeURIComponent(buttons[0].dataset.copyValue);
-    assert.equal(copied,'https://viettrip-vietnam-map.pages.dev/share/place/shared-1');
-    assert.equal(decodeURIComponent(buttons[0].dataset.copyValue),'https://viettrip-vietnam-map.pages.dev/share/place/shared-1');
+    assert.equal(copied,'테스트 <업소>\n나트랑 테스트 주소\nhttps://viettrip-vietnam-map.pages.dev/share/place/shared-1');
+    assert.equal(decodeURIComponent(buttons[0].dataset.copyValue),copied);
     assert(!dialog.querySelector('script'));
     let clipboard;Object.defineProperty(f.w,'isSecureContext',{value:true});Object.defineProperty(f.w.navigator,'clipboard',{value:{writeText:async value=>clipboard=value}});
     f.w.handleCopyButton({preventDefault(){},stopPropagation(){},stopImmediatePropagation(){}},buttons[0]);await tick();assert.equal(clipboard,copied);assert.equal(buttons[0].textContent,'복사됨 ✓');
     f.w.navigator.clipboard.writeText=async()=>{throw Error('clipboard denied')};
     f.w.console.warn=()=>{};
     f.w.document.execCommand=()=>{const input=dialog.querySelector('textarea');assert(input,'fallback stays inside the active modal');clipboard=input.value;return true};
-    buttons[0].focus();f.w.handleCopyButton(null,buttons[0]);await tick();assert.equal(clipboard,'https://viettrip-vietnam-map.pages.dev/share/place/shared-1');assert(!dialog.querySelector('textarea'));
+    buttons[0].focus();f.w.handleCopyButton(null,buttons[0]);await tick();assert.equal(clipboard,copied);assert(!dialog.querySelector('textarea'));
     let manual;f.w.document.execCommand=()=>false;f.w.prompt=(_,value)=>{manual=value;return null};
     f.w.handleCopyButton(null,buttons[0]);await tick();assert.equal(manual,copied);assert(dialog.open,'failed copy never closes the selected place');
     f.w.document.getElementById('businessShareClose').click();assert(!dialog.open);assert.equal(f.w.document.activeElement,trigger);
@@ -61,7 +61,7 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     f.run(`fixtures.push({...target,id:'shared-2',name:'다른 업체',address:''});state.selected='shared-2';renderDetail()`);
     f.w.document.querySelector('#detail [data-business-share]').click();assert(dialog.open);
     assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'다른 업체');assert.equal(dialog.querySelectorAll('[data-copy-value]').length,1);
-    assert.equal(decodeURIComponent(dialog.querySelectorAll('[data-copy-value]')[0].dataset.copyValue),'https://viettrip-vietnam-map.pages.dev/share/place/shared-2');
+    assert.equal(decodeURIComponent(dialog.querySelectorAll('[data-copy-value]')[0].dataset.copyValue),'다른 업체\nhttps://viettrip-vietnam-map.pages.dev/share/place/shared-2');
     dialog.close();f.run(`fixtures=[target];state.selected='shared-1';renderDetail()`);
     f.run(`closeDetailPanel();assert.equal(state.markers.length,0);assert.equal(PersonalPlaces.isHidden('shared-1'),true);assert.equal(BusinessShare.url({id:'bad?id'}),'')`);
     f.close();
