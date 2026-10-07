@@ -25,11 +25,13 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     renderAll=()=>{renderList();renderMarkers();renderDetail()};
     window.PersonalPlaces={getView:()=>window.personalView||'favorites',setView:v=>window.personalView=v,filter:places=>places.filter(p=>!${hidden}||p.id!=='shared-1'),isHidden:id=>${hidden}&&id==='shared-1',isFavorite:()=>false};
   `);
+  w.DestinationLine={open:()=>w.routeOpened=true,sync(){},clear(){}};
   run(read('assets/js/business-share.js'));await tick();
   return {w,run,close:()=>w.close()};
 }
 (async()=>{
   for(const mobile of [false,true]){
+    const route=await fixture('?place=shared-1&navigate=1',{mobile});assert.equal(route.w.routeOpened,true);assert.equal(route.w.document.getElementById('businessShareNotice').hidden,true);route.close();
     const f=await fixture('?place=shared-1&from=guide&city=hanoi',{mobile,hidden:true});
     f.run(`assert.equal(state.selected,'shared-1');assert.equal(state.city,'nhatrang');assert.equal(state.cat,'all');assert.equal(state.ratingFilter,'all');assert.equal(state.query,'');assert.equal(window.personalView,'all');assert.equal(window.zoom,17);assert.equal(window.positioned,true);assert.equal(state.markers.length,1);assert.equal(state.markers[0]._placeId,'shared-1');assert.equal(PersonalPlaces.isHidden('shared-1'),true)`);
     // Existing guide auto-navigation must not override the explicit business.
