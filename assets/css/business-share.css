@@ -31,3 +31,7 @@
 .businessShareNotice[hidden],.businessShareNotice button[hidden]{display:none}
 .businessShareNotice button{flex-shrink:0;min-height:44px;padding:5px 8px;border:1px solid #d4e1d7;background:#f1f7f0;border-radius:7px;color:#2d7464;font:inherit;cursor:pointer}
 .businessShareNotice button:last-child{border:0;background:transparent;font-size:22px;min-width:36px;padding:0}
+
+#businessShareOptions .kakaoShareButton,.appShareDialog .kakaoShareButton{background:#fee500;color:#191919}
+#businessShareOptions button:disabled,.appShareDialog button:disabled{opacity:.5;cursor:not-allowed}
+.appShareDialog button[hidden]{display:none!important}

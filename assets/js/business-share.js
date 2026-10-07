@@ -24,16 +24,20 @@
     if(!place || !url(place) || !dialog)return false;
     shareTrigger=trigger;
     dialog.querySelector('#businessSharePlace').textContent=place.name;
+    const nativeAvailable=Boolean(navigator.share&&/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
     dialog.querySelector('#businessShareOptions').innerHTML=[
-      '<button type="button" class="copyBtn" data-native-share>다른 앱으로 공유</button>',
-      window.MapSharing?.kakaoReady?'<button type="button" class="copyBtn kakaoShareButton" data-kakao-share>카카오톡으로 공유</button>':'',
-      copyButtonHtml('업소 정보 복사',text(place)),
-      copyButtonHtml('위치 링크 복사',url(place))
+      '<button type="button" class="copyBtn kakaoShareButton" data-kakao-share>카카오톡 공유</button>',
+      copyButtonHtml('공유 링크 복사',url(place)),
+      nativeAvailable?'<button type="button" class="copyBtn" data-native-share>휴대폰 공유 메뉴</button>':''
     ].join('');
-    const share=async kakao=>{const ok=await window.MapSharing?.share(place,{kakao});if(!ok){dialog.querySelector('#businessShareHint').textContent='공유가 안 되면 링크를 복사해 보내세요.';}};
-    dialog.querySelector('[data-native-share]').onclick=()=>share(false);
-    const kakaoButton=dialog.querySelector('[data-kakao-share]');if(kakaoButton)kakaoButton.onclick=()=>share(true);
-    dialog.querySelector('#businessShareHint').textContent='카카오톡·잘로로 위치와 후기를 공유하세요.';
+    const hint=dialog.querySelector('#businessShareHint');
+    const kakaoButton=dialog.querySelector('[data-kakao-share]');
+    const ready=()=>{kakaoButton.disabled=!window.MapSharing?.kakaoReady;hint.textContent=kakaoButton.disabled?'카카오톡 직접 공유 연결이 준비되지 않았습니다. 링크를 복사해 대화방에 붙여넣어 주세요.':'사진·업소명·주소를 카카오톡으로 보내세요.';};
+    ready();
+    document.addEventListener('map-sharing-ready',ready,{once:true});
+    const share=async kakao=>{const ok=await window.MapSharing?.share(place,{kakao});if(!ok)hint.textContent='공유창을 열지 못했습니다. 공유 링크 복사를 이용해 주세요.';};
+    dialog.querySelector('[data-native-share]')?.addEventListener('click',()=>share(false));
+    kakaoButton.onclick=()=>share(true);
     if(!dialog.open)dialog.showModal();
     return true;
   }
