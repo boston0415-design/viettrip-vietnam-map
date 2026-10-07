@@ -124,6 +124,7 @@
           positionSelectedPlaceInView();
         }
         done=true;
+        if(params.get('navigate')==='1' && hasMap && hasPosition && window.DestinationLine?.open){box.hidden=true;window.DestinationLine.open();return;}
         if(!hasMap){message.textContent='업소 정보는 열었습니다. 지도를 연결하지 못해 위치는 다시 열기를 눌러 확인해 주세요.';retry.hidden=false}
         else if(!hasPosition){message.textContent='업소 정보는 열었지만 등록된 위치 좌표가 없습니다.'}
         else{

@@ -4,7 +4,7 @@ const {onRequest,photo}=await import('data:text/javascript;base64,'+fs.readFileS
 const request=new Request('https://example.test/share/place/test');
 let calls=0;
 globalThis.fetch=async url=>{calls++;assert(url.includes('select=id,name,address,photo_urls'));return Response.json([{name:'<script>bad</script>',address:'A "quoted" address',photo_urls:['javascript:bad','https://example.test/photo.jpg']}])};
-let r=await onRequest({request,params:{id:'test'}}),html=await r.text();assert.equal(r.status,200);assert(html.includes('og:image" content="https://example.test/photo.jpg'));assert(html.includes('A &quot;quoted&quot; address'));assert(!html.includes('<script>bad'));assert(html.includes('/?place=test'));
+let r=await onRequest({request,params:{id:'test'}}),html=await r.text();assert.equal(r.status,200);assert(html.includes('og:image" content="https://example.test/photo.jpg'));assert(html.includes('A &quot;quoted&quot; address'));assert(!html.includes('<script>bad'));assert(html.includes('/?place=test&amp;navigate=1'));assert(html.includes('http-equiv="refresh"'));assert(!html.includes('베트남맵에서 위치 보기'));assert(!html.includes('<img src='));
 r=await onRequest({request,params:{id:'bad&or=1'}});assert.equal(r.status,400);assert.equal(calls,1);
 assert(photo({photo_urls:[]}).endsWith('/vietmap-192.png'));
 globalThis.fetch=async()=>Response.json([]);assert.equal((await onRequest({request,params:{id:'missing'}})).status,404);
