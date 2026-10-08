@@ -3,6 +3,26 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "264290b4-1b37-4f6d-bde8-79b54ec467a1",
+    "name": "골든로터스 스파 & 마사지 클럽",
+    "category": "spa",
+    "address": "15 Thái Văn Lung, Sài Gòn, Hồ Chí Minh, 베트남",
+    "url": "https://saigonwellness.vn/",
+    "sourceUrl": "https://saigonwellness.vn/",
+    "note": "15 Thái Văn Lung 지점의 공식 예약 신청 화면입니다. 서비스·날짜·시간을 선택해 신청하고 업소의 예약 확정 답변을 확인하세요. 당일 예약은 공식 안내에 따라 전화 문의를 권장합니다.",
+    "verifiedOn": "2026-10-08"
+  },
+  {
+    "id": "ab1794e5-1897-4a13-920d-688b6cdffaa7",
+    "name": "템플리프 사우나 & 스파",
+    "category": "spa",
+    "address": "32 Thái Văn Lung, Sài Gòn, Hồ Chí Minh, 베트남",
+    "url": "https://templeleafsauna.com/bookingonline",
+    "sourceUrl": "https://templeleafsauna.com/",
+    "note": "32 Thái Văn Lung 지점의 공식 예약 신청 양식입니다. 인원·희망 시간·서비스와 연락 수단을 입력하고 업소의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-08"
+  },
+  {
     "id": "bedc2ca1-07b3-4c7f-b49a-8d5f5cc4d1cd",
     "name": "Kim spa",
     "category": "spa",
@@ -540,31 +560,6 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "verifiedOn": "2026-09-18"
   },
   {
-    "id": "264290b4-1b37-4f6d-bde8-79b54ec467a1",
-    "name": "골든로터스 스파 & 마사지 클럽",
-    "category": "spa",
-    "address": "15 Thái Văn Lung, Sài Gòn, Hồ Chí Minh, 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://saigonwellness.vn/",
-    "note": "15 Thái Văn Lung 지점입니다. 당일 예약은 전화 문의를 권장합니다.",
-    "channels": [
-      {
-        "kind": "kakao",
-        "url": "https://pf.kakao.com/_xeMGXT/chat"
-      },
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/GoldenLotusSpaSaiGon"
-      },
-      {
-        "kind": "phone",
-        "url": "tel:+842838221515",
-        "display": "+84 28 3822 1515"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
     "id": "29a25657-68f0-437a-adcf-ffaff2d56f1a",
     "name": "아일라스파 사이공",
     "category": "spa",
@@ -581,23 +576,6 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "kind": "phone",
         "url": "tel:+84888545767",
         "display": "+84 888 545 767"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "ab1794e5-1897-4a13-920d-688b6cdffaa7",
-    "name": "템플리프 사우나 & 스파",
-    "category": "spa",
-    "address": "32 Thái Văn Lung, Sài Gòn, Hồ Chí Minh, 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://templeleafsauna.com/bookingonline.html",
-    "note": "32 Thái Văn Lung 지점입니다. 원하는 서비스와 예약 가능 시간을 전화로 확인하세요.",
-    "channels": [
-      {
-        "kind": "phone",
-        "url": "tel:+842862913656",
-        "display": "+84 28 6291 3656"
       }
     ],
     "verifiedOn": "2026-09-18"
