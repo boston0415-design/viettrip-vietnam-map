@@ -3,6 +3,36 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "d1d8099f-8864-43ef-8025-7f77771b92d1",
+    "name": "Lousiane Brewhouse Nha Trang Restaurant & Craft Beer",
+    "category": "bar",
+    "address": "Lô 29 Trần Phú, Nha Trang, Khánh Hòa 650000 베트남",
+    "url": "https://louisianebrewhouse.com.vn/contact-us-reservations/",
+    "sourceUrl": "https://louisianebrewhouse.com.vn/contact-us-reservations/",
+    "note": "Lot 29 Trần Phú의 Lousiane Brewhouse 공식 예약 신청 양식입니다. 날짜·시간·인원을 입력하고 업소의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-09"
+  },
+  {
+    "id": "a3c685fa-2d7d-459c-a0bc-f5d6d3cac080",
+    "name": "MZ Club - Live Music",
+    "category": "bar",
+    "address": "56 Bùi Thị Xuân, Bến Thành, Hồ Chí Minh 71009 베트남",
+    "url": "https://mzentertainment.vn/lien-he",
+    "sourceUrl": "https://mzentertainment.vn/lien-he",
+    "note": "56 Bùi Thị Xuân의 MZ Club 공식 테이블 예약 신청 양식입니다. 날짜·시간·인원을 입력하고 업소의 예약 확정 연락을 확인하세요.",
+    "verifiedOn": "2026-10-09"
+  },
+  {
+    "id": "4dd4eb44-4e31-4ec3-b0c7-c5b68913cb29",
+    "name": "스카이라이트",
+    "category": "bar",
+    "address": "38 Trần Phú, Phường, Nha Trang, Khánh Hòa 650000 베트남",
+    "url": "https://skylightnhatrang.com/rooftop-beach-club/booking/",
+    "sourceUrl": "https://skylightnhatrang.com/rooftop-beach-club/booking/",
+    "note": "38 Trần Phú의 Skylight Rooftop Beach Club 공식 테이블 예약 신청 양식입니다. 날짜·시간·인원·테이블 종류를 입력하고 업소의 예약 확정 이메일을 확인하세요.",
+    "verifiedOn": "2026-10-09"
+  },
+  {
     "id": "264290b4-1b37-4f6d-bde8-79b54ec467a1",
     "name": "골든로터스 스파 & 마사지 클럽",
     "category": "spa",
@@ -581,42 +611,6 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "verifiedOn": "2026-09-18"
   },
   {
-    "id": "d1d8099f-8864-43ef-8025-7f77771b92d1",
-    "name": "Lousiane Brewhouse Nha Trang Restaurant & Craft Beer",
-    "category": "bar",
-    "address": "Lô 29 Trần Phú, Nha Trang, Khánh Hòa 650000 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://louisianebrewhouse.com.vn/contact-us-reservations/",
-    "note": "Lô 29 Trần Phú 지점입니다. 방문 날짜·시간·인원을 알려 예약 가능 여부를 문의하세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/lousianebrewhouserestaurantnhatrang"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "a3c685fa-2d7d-459c-a0bc-f5d6d3cac080",
-    "name": "MZ Club - Live Music",
-    "category": "bar",
-    "address": "56 Bùi Thị Xuân, Bến Thành, Hồ Chí Minh 71009 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://mzentertainment.vn/index.php",
-    "note": "56 Bùi Thị Xuân의 MZ Club 문의 채널입니다. 공연 일정과 테이블 예약 조건을 확인하세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/MZClubSaigon"
-      },
-      {
-        "kind": "zalo",
-        "url": "https://zalo.me/0906025658"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
     "id": "43394a14-497e-4ad9-8c91-062bd48f313a",
     "name": "Sailing Club",
     "category": "bar",
@@ -628,25 +622,14 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
       {
         "kind": "messenger",
         "url": "https://m.me/sailingclubnhatrang"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "4dd4eb44-4e31-4ec3-b0c7-c5b68913cb29",
-    "name": "스카이라이트",
-    "category": "bar",
-    "address": "38 Trần Phú, Phường, Nha Trang, Khánh Hòa 650000 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://skylightnhatrang.com/",
-    "note": "38 Trần Phú의 Skylight입니다. 루프톱 테이블 또는 Lá Kitchen 식사 중 원하는 이용 방식과 일정을 알려주세요.",
-    "channels": [
+      },
       {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/skylightnhatrang"
+        "kind": "phone",
+        "url": "tel:+84858306679",
+        "display": "+84 85 830 6679"
       }
     ],
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-09"
   },
   {
     "id": "6a01a7f0-3f2b-443b-92cb-468d085503aa",

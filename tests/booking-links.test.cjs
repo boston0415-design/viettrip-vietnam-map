@@ -13,7 +13,7 @@ run(`
   db=()=>fixture;
   Object.assign(state,{cat:'restaurant',sub:'한식',ratingFilter:'4',query:'preserve',markers:[{id:'unchanged'}]});
   const saved=JSON.stringify([state.cat,state.sub,state.ratingFilter,state.query,state.markers]);
-  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,11);
+  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,14);
   const activeDirectIds=VERIFIED_BUSINESS_BOOKINGS.map(p=>p.id);
   for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5','6eb2c0b0-8052-4d23-8753-ef143725ae6a','590758f4-d650-4195-a583-15930d8b8632','4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd'])assert(activeDirectIds.includes(id),'retain previously verified direct reservations');
   assert(activeDirectIds.includes('d2a04f77-2218-4101-b9be-3fdf172a8958'),'Rex Hotel official booking');
@@ -34,6 +34,16 @@ run(`
   assert(templeLeaf,'Temple Leaf 32 Thai Van Lung official reservation form');
   assert.equal(templeLeaf.verifiedOn,'2026-10-08');
   assert.equal(templeLeaf.url,'https://templeleafsauna.com/bookingonline');
+  for(const expected of [
+    {id:'d1d8099f-8864-43ef-8025-7f77771b92d1',url:'https://louisianebrewhouse.com.vn/contact-us-reservations/'},
+    {id:'a3c685fa-2d7d-459c-a0bc-f5d6d3cac080',url:'https://mzentertainment.vn/lien-he'},
+    {id:'4dd4eb44-4e31-4ec3-b0c7-c5b68913cb29',url:'https://skylightnhatrang.com/rooftop-beach-club/booking/'}
+  ]){
+    const entry=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id===expected.id);
+    assert(entry,'upgraded official table reservation form');
+    assert.equal(entry.verifiedOn,'2026-10-09');
+    assert.equal(entry.url,expected.url);
+  }
   for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5','6eb2c0b0-8052-4d23-8753-ef143725ae6a']){
     assert.equal(VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id===id).verifiedOn,'2026-09-29','oldest direct route rechecked');
   }
@@ -92,4 +102,4 @@ const trust=w.document.querySelector('.homeScreenTrust');
 assert.deepEqual([...trust.querySelectorAll('dt')].map(n=>n.textContent),['이용 방식','권한','공식 주소']);
 assert.equal(trust.querySelector('a').href,'https://viettrip-vietnam-map.pages.dev/');
 dom.window.close();
-console.log('PASS verified reservations for 11 businesses and 7 points, including Golden Lotus Spa and Temple Leaf, Kim Spa District 7 and XLIII Pasteur, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');
+console.log('PASS verified reservations for 14 businesses and 7 points, including Lousiane, MZ Club and Skylight table forms, Golden Lotus Spa and Temple Leaf, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');

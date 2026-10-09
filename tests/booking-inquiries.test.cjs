@@ -65,6 +65,11 @@ async function check(mobile){
     assert.equal(royce.sourceUrl,'https://roycedental-vn.com/Onlineconsultation');
     assert.deepEqual(royce.channels.map(c=>c.kind),['phone']);
     assert.equal(royce.channels[0].url,'tel:+84355112255');
+    const sailing=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='43394a14-497e-4ad9-8c91-062bd48f313a');
+    assert(sailing,'Sailing Club official reservation inquiry');
+    assert.equal(sailing.verifiedOn,'2026-10-09');
+    assert.deepEqual(sailing.channels.map(c=>c.kind),['messenger','phone']);
+    assert.equal(sailing.channels[1].url,'tel:+84858306679');
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);
