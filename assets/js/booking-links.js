@@ -3,6 +3,26 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "8b625d7d-9da2-4aa0-ac03-43984b809ea4",
+    "name": "Sushi Hokkaido Sachi",
+    "category": "restaurant",
+    "address": "139 A-B Nguyễn Trãi, Bến Thành, Hồ Chí Minh, 베트남",
+    "url": "https://sushihokkaidosachi.com.vn/en/reservation/",
+    "sourceUrl": "https://sushihokkaidosachi.com.vn/en/location/",
+    "note": "공식 예약 양식에서 Ho Chi Minh · Nguyen Trai 지점을 선택하고 날짜·시간·인원을 입력하세요. 신청 후 식당의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-10"
+  },
+  {
+    "id": "15eae798-a243-4241-a984-a885ae47d46e",
+    "name": "Yakiniku Yazawa Saigon",
+    "category": "restaurant",
+    "address": "219 Điện Biên Phủ, Xuân Hòa, Hồ Chí Minh 70000 베트남",
+    "url": "https://www.tablecheck.com/ja/yazawa-saigon/reserve/landing",
+    "sourceUrl": "https://yazawameat.vn/vi/",
+    "note": "219 Điện Biên Phủ의 Yazawa Saigon 공식 사이트가 연결하는 TableCheck 예약 화면입니다. 날짜·시간·인원을 선택하고 식당의 예약 조건과 확정 내용을 확인하세요.",
+    "verifiedOn": "2026-10-10"
+  },
+  {
     "id": "d1d8099f-8864-43ef-8025-7f77771b92d1",
     "name": "Lousiane Brewhouse Nha Trang Restaurant & Craft Beer",
     "category": "bar",
@@ -648,38 +668,6 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "verifiedOn": "2026-09-18"
   },
   {
-    "id": "8b625d7d-9da2-4aa0-ac03-43984b809ea4",
-    "name": "Sushi Hokkaido Sachi",
-    "category": "restaurant",
-    "address": "139 A-B Nguyễn Trãi, Bến Thành, Hồ Chí Minh, 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://sushihokkaidosachi.com.vn/location/",
-    "note": "공식 공통 페이지입니다. 139 A–B Nguyễn Trãi 지점을 지정하고 방문 시간·인원을 알려주세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/sushihokkaidosachi/"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "15eae798-a243-4241-a984-a885ae47d46e",
-    "name": "Yakiniku Yazawa Saigon",
-    "category": "restaurant",
-    "address": "219 Điện Biên Phủ, Xuân Hòa, Hồ Chí Minh 70000 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://yazawameat.vn/",
-    "note": "219 Điện Biên Phủ의 Yakiniku Yazawa Saigon입니다. 방문 날짜·시간·인원을 알려 예약 가능 여부를 문의하세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/yazawa.saigon/"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
     "id": "2fd8c945-2e8f-4e7c-a31f-5cfa39c32e47",
     "name": "꽌웃웃",
     "category": "restaurant",
@@ -717,15 +705,20 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "category": "restaurant",
     "address": "235 Nguyễn Văn Cừ, Nguyễn Cư Trinh, 1, Hotel Nikko Saigon, 235 Nguyễn Văn Cừ, Cầu Ông Lãnh, Hồ Chí Minh 70000 베트남",
     "mode": "inquiry",
-    "sourceUrl": "https://hotelnikkosaigon.com.vn/",
-    "note": "Hotel Nikko Saigon의 공식 페이지입니다. 객실 대신 La Brasserie 식사 예약을 원한다고 적고 날짜·인원·식사 시간을 알려주세요.",
+    "sourceUrl": "https://hotelnikkosaigon.com.vn/dining/la-brasserie-restaurant/",
+    "note": "Hotel Nikko Saigon 2층 La Brasserie의 전용 문의 경로입니다. 식사 날짜·시간·인원을 알리고 식당의 확정 답변을 확인하세요.",
     "channels": [
       {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/hotelnikkosaigonvn/"
+        "kind": "zalo",
+        "url": "https://zalo.me/0932136277"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842839295520",
+        "display": "+84 28 3929 5520"
       }
     ],
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-10"
   },
   {
     "id": "ac3d368a-ae8b-458d-b4ae-a2302a0e86d7",

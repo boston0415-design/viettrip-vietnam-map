@@ -1,5 +1,24 @@
 # 예약 경로 점검 기록
 
+## 2026-10-10
+
+기준 main: `19b827a423d6e7d6654c8702a20311487fed278c`. 공개 업체는 165곳이며 2026-10-09 기록 이후 신규 등록·이름 변경·주소 변경은 없다. 재확인 예정일이 된 보류 업체가 없어 확인일이 가장 오래된 기존 식당 경로를 순차 점검했다. 회원·후기 정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.
+
+### 문의에서 공식 예약 신청으로 변경
+
+| 업체 / ID | 변경 및 지점 대조 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| Sushi Hokkaido Sachi / `8b625d7d-9da2-4aa0-ac03-43984b809ea4` | 공식 지점 목록의 `139 A-B Nguyen Trai` 주소가 등록 주소와 일치한다. 공식 예약 양식에서 Ho Chi Minh · Nguyen Trai 지점을 선택하고 날짜·시간·성인·어린이 인원을 입력할 수 있어 기존 Facebook 문의를 공식 예약 신청으로 변경했다. | https://sushihokkaidosachi.com.vn/en/location/ · https://sushihokkaidosachi.com.vn/en/reservation/ · 2026-11-10 또는 업체명·주소 변경 시 |
+| Yakiniku Yazawa Saigon / `15eae798-a243-4241-a984-a885ae47d46e` | 공식 사이트의 `219 Điện Biên Phủ` 주소가 등록 주소와 일치하고, 사이트의 `ĐẶT BÀN ONLINE`이 Yazawa Saigon 전용 TableCheck 예약 화면으로 연결된다. 기존 Facebook 문의를 공식 예약 화면으로 변경했다. | https://yazawameat.vn/vi/ · https://www.tablecheck.com/ja/yazawa-saigon/reserve/landing · 2026-11-10 또는 업체명·주소 변경 시 |
+
+### 기존 예약 문의 경로 보강
+
+| 업체 / ID | 변경 및 지점 대조 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| 라 브라세리 / `87318604-17e7-47a8-b411-e8a66d641d55` | Hotel Nikko Saigon 공식 La Brasserie 페이지의 호텔 주소 `235 Nguyen Van Cu`가 등록 주소와 일치한다. 식당 전용 Zalo `0932136277`과 Hotline `+84 28 3929 5520`을 확인해 기존 공통 Facebook 대신 해당 경로로 보강했다. | https://hotelnikkosaigon.com.vn/dining/la-brasserie-restaurant/ · 2026-11-10 또는 업체명·주소 변경 시 |
+
+직접 예약 16곳, 문의 33곳, 교통 예약 7곳을 대상으로 지점 ID·이름·분류·주소 일치, 공식 URL 제한, PC·모바일 예약·문의 UI, 외부 링크 속성, 전화번호 복사, 뒤로가기·닫기를 관련 테스트와 빌드로 검사한다. 실제 통화·메시지·예약·결제는 수행하지 않는다.
+
 ## 2026-10-09
 
 기준 main: `d3893ee6b6a6f869c48d8f345bfbf68d7c38e062`. 공개 업체는 165곳이며 2026-10-08 기록 이후 신규 등록·이름 변경·주소 변경은 없다. 재확인 예정일이 된 보류 업체가 없어 확인일이 가장 오래된 기존 식음·공연 경로를 순차 점검했다. 회원·후기 정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.

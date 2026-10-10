@@ -70,6 +70,12 @@ async function check(mobile){
     assert.equal(sailing.verifiedOn,'2026-10-09');
     assert.deepEqual(sailing.channels.map(c=>c.kind),['messenger','phone']);
     assert.equal(sailing.channels[1].url,'tel:+84858306679');
+    const brasserie=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='87318604-17e7-47a8-b411-e8a66d641d55');
+    assert(brasserie,'La Brasserie official restaurant inquiry');
+    assert.equal(brasserie.verifiedOn,'2026-10-10');
+    assert.equal(brasserie.sourceUrl,'https://hotelnikkosaigon.com.vn/dining/la-brasserie-restaurant/');
+    assert.deepEqual(brasserie.channels.map(c=>c.kind),['zalo','phone']);
+    assert.equal(brasserie.channels[1].url,'tel:+842839295520');
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);

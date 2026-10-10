@@ -13,7 +13,7 @@ run(`
   db=()=>fixture;
   Object.assign(state,{cat:'restaurant',sub:'한식',ratingFilter:'4',query:'preserve',markers:[{id:'unchanged'}]});
   const saved=JSON.stringify([state.cat,state.sub,state.ratingFilter,state.query,state.markers]);
-  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,14);
+  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,16);
   const activeDirectIds=VERIFIED_BUSINESS_BOOKINGS.map(p=>p.id);
   for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5','6eb2c0b0-8052-4d23-8753-ef143725ae6a','590758f4-d650-4195-a583-15930d8b8632','4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd'])assert(activeDirectIds.includes(id),'retain previously verified direct reservations');
   assert(activeDirectIds.includes('d2a04f77-2218-4101-b9be-3fdf172a8958'),'Rex Hotel official booking');
@@ -42,6 +42,15 @@ run(`
     const entry=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id===expected.id);
     assert(entry,'upgraded official table reservation form');
     assert.equal(entry.verifiedOn,'2026-10-09');
+    assert.equal(entry.url,expected.url);
+  }
+  for(const expected of [
+    {id:'8b625d7d-9da2-4aa0-ac03-43984b809ea4',url:'https://sushihokkaidosachi.com.vn/en/reservation/'},
+    {id:'15eae798-a243-4241-a984-a885ae47d46e',url:'https://www.tablecheck.com/ja/yazawa-saigon/reserve/landing'}
+  ]){
+    const entry=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id===expected.id);
+    assert(entry,'upgraded official restaurant reservation');
+    assert.equal(entry.verifiedOn,'2026-10-10');
     assert.equal(entry.url,expected.url);
   }
   for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5','6eb2c0b0-8052-4d23-8753-ef143725ae6a']){
@@ -102,4 +111,4 @@ const trust=w.document.querySelector('.homeScreenTrust');
 assert.deepEqual([...trust.querySelectorAll('dt')].map(n=>n.textContent),['이용 방식','권한','공식 주소']);
 assert.equal(trust.querySelector('a').href,'https://viettrip-vietnam-map.pages.dev/');
 dom.window.close();
-console.log('PASS verified reservations for 14 businesses and 7 points, including Lousiane, MZ Club and Skylight table forms, Golden Lotus Spa and Temple Leaf, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');
+console.log('PASS verified reservations for 16 businesses and 7 points, including Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');
