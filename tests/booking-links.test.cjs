@@ -13,11 +13,21 @@ run(`
   db=()=>fixture;
   Object.assign(state,{cat:'restaurant',sub:'한식',ratingFilter:'4',query:'preserve',markers:[{id:'unchanged'}]});
   const saved=JSON.stringify([state.cat,state.sub,state.ratingFilter,state.query,state.markers]);
-  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,16);
+  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,19);
   const activeDirectIds=VERIFIED_BUSINESS_BOOKINGS.map(p=>p.id);
   for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5','6eb2c0b0-8052-4d23-8753-ef143725ae6a','590758f4-d650-4195-a583-15930d8b8632','4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd'])assert(activeDirectIds.includes(id),'retain previously verified direct reservations');
   assert(activeDirectIds.includes('d2a04f77-2218-4101-b9be-3fdf172a8958'),'Rex Hotel official booking');
   assert(activeDirectIds.includes('91b696af-588e-4a13-af5a-d50fb363172f'),'Vinpearl Landmark 81 official Marriott booking');
+  for(const expected of [
+    {id:'2e287163-0670-4370-a81a-f2904ff22bde',url:'https://www.hyatt.com/unscripted-by-hyatt/en-US/vn100-wink-saigon-centre'},
+    {id:'961940f4-eb4d-4b5d-9363-692b570fd591',url:'https://saigon.newworldhotels.com/en/'},
+    {id:'5e376d45-d6ec-49fe-b36a-2d13f86b387f',url:'https://www.bayhotelhcm.com/'}
+  ]){
+    const entry=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id===expected.id);
+    assert(entry,'upgraded official hotel reservation');
+    assert.equal(entry.verifiedOn,'2026-10-11');
+    assert.equal(entry.url,expected.url);
+  }
   const xliii=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='b028e325-1bbf-41a7-967a-384cfe78b4d9');
   assert(xliii,'XLIII Pasteur official reservation form');
   assert.equal(xliii.verifiedOn,'2026-10-04');
@@ -111,4 +121,4 @@ const trust=w.document.querySelector('.homeScreenTrust');
 assert.deepEqual([...trust.querySelectorAll('dt')].map(n=>n.textContent),['이용 방식','권한','공식 주소']);
 assert.equal(trust.querySelector('a').href,'https://viettrip-vietnam-map.pages.dev/');
 dom.window.close();
-console.log('PASS verified reservations for 16 businesses and 7 points, including Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');
+console.log('PASS verified reservations for 19 businesses and 7 points, including three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');

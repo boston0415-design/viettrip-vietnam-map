@@ -3,6 +3,36 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "2e287163-0670-4370-a81a-f2904ff22bde",
+    "name": "Wink Saigon Centre, part of Unscripted by Hyatt",
+    "category": "stay",
+    "address": "75 Nguyễn Bỉnh Khiêm, Ward, Hồ Chí Minh 700000 베트남",
+    "url": "https://www.hyatt.com/unscripted-by-hyatt/en-US/vn100-wink-saigon-centre",
+    "sourceUrl": "https://wink-hotels.com/hotel/wink-hotel-saigon-centre/",
+    "note": "75 Nguyễn Bỉnh Khiêm의 Wink Saigon Centre 공식 Hyatt 예약 화면입니다. 숙박 날짜·인원·객실과 취소 조건을 확인하세요.",
+    "verifiedOn": "2026-10-11"
+  },
+  {
+    "id": "961940f4-eb4d-4b5d-9363-692b570fd591",
+    "name": "뉴월드 사이공 호텔",
+    "category": "stay",
+    "address": "76 Lê Lai, Bến Thành, Hồ Chí Minh 700000 베트남",
+    "url": "https://saigon.newworldhotels.com/en/",
+    "sourceUrl": "https://saigon.newworldhotels.com/en/",
+    "note": "76 Lê Lai의 New World Saigon Hotel 공식 예약 화면입니다. BOOK NOW에서 숙박 날짜·인원·객실과 취소 조건을 확인하세요.",
+    "verifiedOn": "2026-10-11"
+  },
+  {
+    "id": "5e376d45-d6ec-49fe-b36a-2d13f86b387f",
+    "name": "베이 호텔 호치민",
+    "category": "stay",
+    "address": "7 Ngô Văn Năm, Sài Gòn, Hồ Chí Minh 700000 베트남",
+    "url": "https://www.bayhotelhcm.com/",
+    "sourceUrl": "https://www.bayhotelhcm.com/",
+    "note": "7 Ngô Văn Năm의 Bay Hotel Ho Chi Minh 공식 예약 화면입니다. 날짜·성인·어린이 인원·프로모션 코드를 입력해 객실 가능 여부와 예약 조건을 확인하세요.",
+    "verifiedOn": "2026-10-11"
+  },
+  {
     "id": "8b625d7d-9da2-4aa0-ac03-43984b809ea4",
     "name": "Sushi Hokkaido Sachi",
     "category": "restaurant",
@@ -772,54 +802,6 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
       {
         "kind": "whatsapp",
         "url": "https://wa.me/84971769659"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "2e287163-0670-4370-a81a-f2904ff22bde",
-    "name": "Wink Saigon Centre, part of Unscripted by Hyatt",
-    "category": "stay",
-    "address": "75 Nguyễn Bỉnh Khiêm, Ward, Hồ Chí Minh 700000 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://wink-hotels.com/",
-    "note": "Wink Hotels 공식 공통 페이지입니다. Saigon Centre · 75 Nguyễn Bỉnh Khiêm을 지정하고 숙박 날짜·인원·객실을 문의하세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/WinkHotels/"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "961940f4-eb4d-4b5d-9363-692b570fd591",
-    "name": "뉴월드 사이공 호텔",
-    "category": "stay",
-    "address": "76 Lê Lai, Bến Thành, Hồ Chí Minh 700000 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://saigon.newworldhotels.com/en/",
-    "note": "76 Lê Lai의 New World Saigon Hotel 공식 페이지입니다. 숙박 날짜·인원·객실과 예약 조건을 문의하세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/Saigon.NewWorldHotel"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "5e376d45-d6ec-49fe-b36a-2d13f86b387f",
-    "name": "베이 호텔 호치민",
-    "category": "stay",
-    "address": "7 Ngô Văn Năm, Sài Gòn, Hồ Chí Minh 700000 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://www.bayhotelhcm.com/",
-    "note": "7 Ngô Văn Năm의 Bay Hotel Ho Chi Minh 공식 페이지입니다. 숙박 날짜·인원·객실과 예약 조건을 문의하세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/bayhotelhochiminh/"
       }
     ],
     "verifiedOn": "2026-09-18"
