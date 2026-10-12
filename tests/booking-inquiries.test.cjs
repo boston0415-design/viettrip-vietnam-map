@@ -76,6 +76,17 @@ async function check(mobile){
     assert.equal(brasserie.sourceUrl,'https://hotelnikkosaigon.com.vn/dining/la-brasserie-restaurant/');
     assert.deepEqual(brasserie.channels.map(c=>c.kind),['zalo','phone']);
     assert.equal(brasserie.channels[1].url,'tel:+842839295520');
+    for(const expected of [
+      {id:'ac3d368a-ae8b-458d-b4ae-a2302a0e86d7',kinds:['messenger','facebook','phone']},
+      {id:'b4060ec5-a8a5-4566-ab5e-9bfca9701c22',kinds:['messenger','phone']},
+      {id:'c445b290-232a-4252-8d91-97b5d864ffd0',kinds:['facebook','whatsapp','phone']}
+    ]){
+      const entry=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id===expected.id);
+      assert(entry,'rechecked branch inquiry route');
+      assert.equal(entry.verifiedOn,'2026-10-12');
+      assert.deepEqual(entry.channels.map(c=>c.kind),expected.kinds);
+      assert(entry.channels.some(c=>c.kind==='phone'));
+    }
     assert(VERIFIED_BUSINESS_CONTACTS.some(p=>p.channels.every(c=>c.kind!=='phone')),'cover social-only inquiry routes');
     for(const entry of VERIFIED_BUSINESS_CONTACTS){
       assert(entry.channels.length>0);

@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "acbc3ab7-57bd-474a-86c3-9d62e97db797",
+    "name": "냐 항 응온",
+    "category": "restaurant",
+    "address": "160 Pasteur, Quận 1, Hồ Chí Minh, 베트남",
+    "url": "https://nhahangngon.com.vn/",
+    "sourceUrl": "https://nhahangngon.com.vn/",
+    "note": "160 Pasteur의 Ngon Sài Gòn 공식 온라인 예약 신청 화면입니다. 날짜·시간·인원과 연락처를 입력하고 식당의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-12"
+  },
+  {
     "id": "2e287163-0670-4370-a81a-f2904ff22bde",
     "name": "Wink Saigon Centre, part of Unscripted by Hyatt",
     "category": "stay",
@@ -714,22 +724,6 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "verifiedOn": "2026-09-18"
   },
   {
-    "id": "acbc3ab7-57bd-474a-86c3-9d62e97db797",
-    "name": "냐 항 응온",
-    "category": "restaurant",
-    "address": "160 Pasteur, Quận 1, Hồ Chí Minh, 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://nhahangngon.com.vn/",
-    "note": "160 Pasteur의 Ngon Sài Gòn 지점입니다. 다른 도시 지점과 혼동하지 않도록 주소와 방문 일정을 함께 알려주세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/Nhahang.QuanAnNgon/"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
     "id": "87318604-17e7-47a8-b411-e8a66d641d55",
     "name": "라 브라세리",
     "category": "restaurant",
@@ -757,7 +751,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "address": "136/9 Lê Thánh Tôn, Bến Thành, Hồ Chí Minh, 베트남",
     "mode": "inquiry",
     "sourceUrl": "https://bep.mein.vn/",
-    "note": "벱메인 1호점 · 136/9 Lê Thánh Tôn의 공식 예약 Messenger입니다. 방문 날짜·시간·인원을 알려주세요.",
+    "note": "벱메인 1호점 · 136/9 Lê Thánh Tôn의 공식 예약 문의 경로입니다. 방문 날짜·시간·인원을 알리고 매장의 확정 답변을 확인하세요.",
     "channels": [
       {
         "kind": "messenger",
@@ -766,9 +760,14 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
       {
         "kind": "facebook",
         "url": "https://www.facebook.com/bepmein"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842822111119",
+        "display": "+84 28 2211 1119"
       }
     ],
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-12"
   },
   {
     "id": "b4060ec5-a8a5-4566-ab5e-9bfca9701c22",
@@ -777,14 +776,19 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "address": "165/50 Nguyễn Thái Bình, Bến Thành, Hồ Chí Minh, 베트남",
     "mode": "inquiry",
     "sourceUrl": "https://bep.mein.vn/",
-    "note": "벱메인 2호점 · 165/50 Nguyễn Thái Bình의 공식 예약 Messenger입니다. 방문 날짜·시간·인원을 알려주세요.",
+    "note": "벱메인 2호점 · 165/50 Nguyễn Thái Bình의 공식 예약 문의 경로입니다. 방문 날짜·시간·인원을 알리고 매장의 확정 답변을 확인하세요.",
     "channels": [
       {
         "kind": "messenger",
         "url": "https://m.me/BepMeInNguyenThaiBinh"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842822111119",
+        "display": "+84 28 2211 1119"
       }
     ],
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-12"
   },
   {
     "id": "c445b290-232a-4252-8d91-97b5d864ffd0",
@@ -793,7 +797,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "address": "2B Chu Mạnh Trinh, Sài Gòn, Hồ Chí Minh 700000 베트남",
     "mode": "inquiry",
     "sourceUrl": "https://miumiuspa.com/",
-    "note": "Miu Miu 2 · 2B Chu Mạnh Trinh 지점을 지정하세요. 원하는 마사지·인원·시간과 당일 운영 여부를 확인하세요.",
+    "note": "Miu Miu 2 · 2B Chu Mạnh Trinh의 공식 예약 문의 경로입니다. 원하는 마사지·인원·시간을 알리고 지점의 확정 답변과 당일 운영 여부를 확인하세요.",
     "channels": [
       {
         "kind": "facebook",
@@ -802,9 +806,14 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
       {
         "kind": "whatsapp",
         "url": "https://wa.me/84971769659"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842866802652",
+        "display": "+84 28 6680 2652"
       }
     ],
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-12"
   }
 ]);
 const VERIFIED_POINT_BOOKINGS=Object.freeze([
