@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "2fd8c945-2e8f-4e7c-a31f-5cfa39c32e47",
+    "name": "꽌웃웃",
+    "category": "restaurant",
+    "address": "168 Võ Văn Kiệt, P, Bến Thành, Hồ Chí Minh 70000 베트남",
+    "url": "https://www.quanutut.com/book",
+    "sourceUrl": "https://www.quanutut.com/",
+    "note": "공식 예약 양식에서 168 Võ Văn Kiệt · Quận 1 지점을 선택하고 날짜·시간·인원을 입력하세요. 신청 후 식당이 이메일로 보내는 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-13"
+  },
+  {
     "id": "acbc3ab7-57bd-474a-86c3-9d62e97db797",
     "name": "냐 항 응온",
     "category": "restaurant",
@@ -703,22 +713,6 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
       {
         "kind": "facebook",
         "url": "https://www.facebook.com/eastwestbrewing.saigon/"
-      }
-    ],
-    "verifiedOn": "2026-09-18"
-  },
-  {
-    "id": "2fd8c945-2e8f-4e7c-a31f-5cfa39c32e47",
-    "name": "꽌웃웃",
-    "category": "restaurant",
-    "address": "168 Võ Văn Kiệt, P, Bến Thành, Hồ Chí Minh 70000 베트남",
-    "mode": "inquiry",
-    "sourceUrl": "https://quanutut.com/",
-    "note": "공식 공통 페이지입니다. 168 Võ Văn Kiệt 지점을 지정하고 예약 가능 여부를 문의하세요.",
-    "channels": [
-      {
-        "kind": "facebook",
-        "url": "https://www.facebook.com/quanutut"
       }
     ],
     "verifiedOn": "2026-09-18"
