@@ -45,7 +45,7 @@
   if(google.maps.Marker)endMarker=new google.maps.Marker({map:state.map,position:point(active.place)||path.at(-1),title:active.place.name||'목적지',label:'도착',zIndex:9999});
  }
  function element(tag,text){const el=document.createElement(tag);if(text)el.textContent=text;return el;}
- function invalidate(){if(!active)return;serial++;active.loading=false;active.steps=[];erase();status('출발지와 목적지를 선택한 후 경로를 확인하세요.');}
+ function invalidate(){if(!active)return;serial++;active.loading=false;active.steps=[];erase();status('장소·주소를 입력하고 Enter를 누르세요.');}
  function endpoint(p){return p?.placeId?{placeId:p.placeId}:point(p)||p?.address;}
  function externalUrl(){
   const url=new URL(businessDirectionsUrl(active.place,{travelmode:active.mode.toLowerCase()}));
@@ -101,6 +101,8 @@
  }
  async function calculate(){
   if(!active||active.loading)return;
+  if(!active.originReady&&!active.originInput.value.trim()){status('출발지를 입력해 주세요.');active.originInput.focus();return;}
+  if(!active.destinationReady&&!active.destinationInput.value.trim()){status('목적지를 입력해 주세요.');active.destinationInput.focus();return;}
   if(!active.originReady){status('출발지를 찾고 있습니다…');active.originInput.focus();active.originSearch?.search(true);return;}
   if(!active.destinationReady){status('목적지를 찾고 있습니다…');active.destinationInput.focus();active.destinationSearch?.search(true);return;}
   const request=++serial,current=active,mode=current.mode;erase();current.steps=[];status(current.useLocation?'현재 위치 확인 중…':'경로를 찾고 있습니다…',true);
