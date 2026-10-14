@@ -1,7 +1,7 @@
 function renderMarkers(){
   state.markers.forEach(m=>m.setMap(null));state.markers=[];
   clearPremiumEffects();
-  if(!state.map)return;
+  if(!state.map||document.body.classList.contains('routeNavigating'))return;
   const visible=items();
   (window.BusinessShare?.includeSelectedPlace(visible)||visible).forEach(p=>{
     if(!validMapLocation(p))return;

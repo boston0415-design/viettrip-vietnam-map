@@ -1,7 +1,7 @@
 // Route geometry only. Never fall back to a straight origin/destination line.
 (()=>{
  'use strict';
- let active=null,lines=[],serial=0,fullPath=[],alleyPath=[],endMarker=null;
+ let active=null,lines=[],serial=0,fullPath=[],alleyPath=[],endMarker=null,startMarker=null;
  const point=p=>{if(!p)return null;const lat=typeof p.lat==='function'?p.lat():p.lat,lng=typeof p.lng==='function'?p.lng():p.lng;return lat!=null&&lng!=null&&lat!==''&&lng!==''&&Number.isFinite(+lat)&&Number.isFinite(+lng)&&Math.abs(+lat)<=90&&Math.abs(+lng)<=180?{lat:+lat,lng:+lng}:null;};
  const destination=()=>state.selected?db().places.find(p=>p.id===state.selected):window.PlaceSearch?.currentPlace();
  const key=p=>p?String(p.id||p.placeId||[p.lat,p.lng,p.name].join('|')):'';
@@ -17,13 +17,14 @@
   const explicit=road?/^(hem|ngo|ngach|kiet|alley)(?:\s|$)/.test(namedRoad):/(?:^|\s)(?:hem|ngo|ngach)\s+\d/.test(normalize(primary));
   return {path:(step.path||[]).map(point).filter(Boolean),alley:explicit,instruction};
  }
- function erase(){lines.forEach(l=>l.setMap(null));lines=[];fullPath=[];alleyPath=[];if(endMarker)endMarker.setMap(null);endMarker=null;}
- function clear(){document.body.classList.remove('routeNavigating');serial++;active=null;erase();document.getElementById('destinationLineHint')?.remove();}
+ function erase(){lines.forEach(l=>l.setMap(null));lines=[];fullPath=[];alleyPath=[];if(endMarker)endMarker.setMap(null);endMarker=null;if(startMarker)startMarker.setMap(null);startMarker=null;}
+ function clear(){const restore=document.body.classList.contains('routeNavigating');document.body.classList.remove('routeNavigating');serial++;active=null;erase();document.getElementById('destinationLineHint')?.remove();if(restore&&typeof renderMarkers==='function')renderMarkers();}
  function sync(){if(active)queueMicrotask(render);}
  function fit(path=fullPath){
   if(!path.length||!state.map)return;
   const bounds=new google.maps.LatLngBounds();path.forEach(p=>bounds.extend(p));
   const box=document.getElementById('destinationLineHint')?.getBoundingClientRect(),map=document.getElementById('map')?.getBoundingClientRect(),padding={top:Math.min(Math.max(70,(box?.bottom||80)-(map?.top||0)+16),(map?.height||600)*.6),right:40,bottom:45,left:40};
+  if(innerWidth>900&&box){padding.top=70;padding.left=Math.min(box.right-(map?.left||0)+24,(map?.width||1200)*.45);}
   if(typeof cancelPendingMapWork==='function')cancelPendingMapWork();state.map.fitBounds(bounds,padding);
  }
  function draw(path,segments=[]){
@@ -40,6 +41,7 @@
     lines.push(new google.maps.Polyline(options));
    }
   }
+  if(google.maps.Marker)startMarker=new google.maps.Marker({map:state.map,position:path[0],title:active.origin?.name||'현재 위치',label:'출발',zIndex:9999});
   if(google.maps.Marker)endMarker=new google.maps.Marker({map:state.map,position:point(active.place)||path.at(-1),title:active.place.name||'목적지',label:'도착',zIndex:9999});
  }
  function element(tag,text){const el=document.createElement(tag);if(text)el.textContent=text;return el;}
@@ -113,7 +115,7 @@
    status(`${mode==='WALKING'?'도보':'자동차'} ${km}km · 약 ${minutes}분`);fit();
   }catch(error){if(request!==serial)return;erase();current.steps=[];status(error.message==='LOCATION'?'현재 위치를 확인할 수 없습니다. 출발지에 장소·주소를 검색하거나 위치 권한을 켜 주세요.':(String(error.code||error.message).includes('ZERO_RESULTS')?'두 장소를 잇는 도로 경로가 없습니다. 출발지·목적지와 이동 수단을 확인하세요.':'도로 경로 연결이 지연됩니다. 경로 찾기를 다시 누르거나 Google 지도에서 열어 주세요.'));console.warn('Route unavailable',error?.code||error?.message);}
  }
- function open(){const p=destination();if(!p)return;if(active?.key===key(p)&&active.loading)return;clear();if(typeof closeDetailPanel==='function')closeDetailPanel();if(typeof closeMobileBusinessList==='function')closeMobileBusinessList();window.ListLayout?.setCollapsed(true);window.ChatDock?.close();document.body.classList.add('routeNavigating');active={place:p,origin:null,useLocation:true,originReady:true,destinationReady:true,key:key(p),mode:'DRIVING',message:'',loading:false,revision:0,steps:[]};calculate();}
+ function open(){const p=destination();if(!p)return;if(active?.key===key(p)&&active.loading)return;clear();if(typeof closeDetailPanel==='function')closeDetailPanel();if(typeof closeMobileBusinessList==='function')closeMobileBusinessList();window.ListLayout?.setCollapsed(true);window.ChatDock?.close();document.body.classList.add('routeNavigating');if(typeof renderMarkers==='function')renderMarkers();active={place:p,origin:null,useLocation:true,originReady:true,destinationReady:true,key:key(p),mode:'DRIVING',message:'',loading:false,revision:0,steps:[]};calculate();}
  document.addEventListener('click',e=>{if(active&&e.target.closest?.('#chatLauncher'))clear();const link=e.target.closest?.('#detail [data-map-route]');if(!link||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open();});
  window.DestinationLine={sync,clear,fit,open,stepInfo};
 })();
