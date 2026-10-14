@@ -69,3 +69,14 @@ body.cleanMap #mapMainMenu #addBtn::after{content:none!important}
 body.cleanMap #mapMainMenu .brandLinks a,body.cleanMap #mapMainMenu .communityStats{font-size:13px!important}
 body.cleanMap #mapMainMenu #addBtn{font-size:14px!important}
 @media(min-width:901px){body.cleanMap #businessSide.menuSized{height:var(--menu-height)!important;bottom:auto!important}}
+
+/* Editors must cover map chrome, including the fixed mobile navigation. */
+body.cleanMap .modalback{z-index:2000;box-sizing:border-box;top:var(--modal-viewport-top,0px);bottom:auto;height:var(--modal-viewport-height,100dvh);padding:12px!important}
+body.cleanMap:has(.modalback.open) .top,body.cleanMap:has(.modalback.open) .mapUtilityBar,body.cleanMap:has(.modalback.open) #mapBottomNav,body.cleanMap:has(.modalback.open) #chatLauncher{visibility:hidden!important;pointer-events:none!important}
+body.cleanMap #placeModal .modal{box-sizing:border-box;height:min(850px,calc(var(--modal-viewport-height,100dvh) - 24px));max-height:calc(var(--modal-viewport-height,100dvh) - 24px)!important;min-height:0!important;padding:0 16px 12px!important;overflow-y:auto!important;overscroll-behavior:contain;scroll-padding-top:72px;scroll-padding-bottom:84px}
+body.cleanMap #placeModal .placeEditorHeader{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;background:#fff;border-bottom:1px solid #e8eaed}
+body.cleanMap #placeModal h3{margin:0;font-size:20px}
+body.cleanMap #placeModal .placeEditorClose{flex:none;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:#f1f3f4;color:#3c4043;font-size:26px;cursor:pointer}
+body.cleanMap #placeModal .modalactions{position:sticky;bottom:-12px;z-index:5;flex-wrap:wrap;background:#fff;border-top:1px solid #e8eaed;padding:12px 0 max(12px,env(safe-area-inset-bottom));margin-top:12px}
+body.cleanMap #placeModal .modalactions button{min-height:44px;min-width:84px}
+@media(max-width:900px){body.cleanMap .modalback{padding:8px!important}body.cleanMap #placeModal .modal{height:calc(var(--modal-viewport-height,100dvh) - 16px);max-height:calc(var(--modal-viewport-height,100dvh) - 16px)!important;border-radius:16px!important;padding:0 12px 12px!important}}

@@ -4,6 +4,9 @@
  const byId=id=>document.getElementById(id),top=document.querySelector('.top'),wrap=document.querySelector('.mapwrap');
  if(!top||!wrap)return;
  document.body.classList.add('cleanMap');
+ // Keep editor actions inside the visible viewport when the phone keyboard opens.
+ const syncModalViewport=()=>{const viewport=window.visualViewport;document.documentElement.style.setProperty('--modal-viewport-height',(viewport?.height||innerHeight)+'px');document.documentElement.style.setProperty('--modal-viewport-top',(viewport?.offsetTop||0)+'px');};
+ window.visualViewport?.addEventListener('resize',syncModalViewport);window.visualViewport?.addEventListener('scroll',syncModalViewport);window.addEventListener('resize',syncModalViewport);syncModalViewport();
  const menu=document.createElement('dialog');menu.id='mapMainMenu';menu.setAttribute('aria-label','베트남맵 메뉴');menu.setAttribute('data-no-sheet-resize','');
  const head=document.createElement('div');head.className='cleanMenuHead';
  const title=document.createElement('strong');title.textContent='일상탈출 베트남맵';
