@@ -44,7 +44,7 @@
 <link rel="stylesheet" href="./assets/css/refined-layout.css?v=20261008-pinned-actions">
 <link rel="stylesheet" href="./assets/css/chat-messages.css?v=20261006-ownsync">
 <link rel="stylesheet" href="./assets/css/destination-line.css?v=20261014-route-enter1">
-<link rel="stylesheet" href="./assets/css/clean-map-layout.css?v=20261007-1">
+<link rel="stylesheet" href="./assets/css/clean-map-layout.css?v=20261014-modal1">
 </head>
 <body>
 <div class="app">
@@ -225,11 +225,11 @@
   </div>
 </div>
 
-<div id="placeModal" class="modalback">
+<div id="placeModal" class="modalback" role="dialog" aria-modal="true" aria-labelledby="placeModalTitle">
   <!-- Venue details are not the visitor's personal address. Keep these fields
        out of the browser's synthetic form containing map filters and reviews. -->
   <form id="placeEditorForm" class="modal" autocomplete="off" novalidate aria-labelledby="placeModalTitle">
-    <h3 id="placeModalTitle">업체 등록</h3>
+    <div class="placeEditorHeader"><h3 id="placeModalTitle">업체 등록</h3><button type="button" class="placeEditorClose" data-close="placeModal" aria-label="업체 등록·수정 닫기">×</button></div>
     <div class="field"><label id="pNicknameLabel" for="pNickname">등록자 닉네임 · 필수</label><input id="pNickname" name="nickname" autocomplete="nickname" maxlength="30" required placeholder="카페에서 사용하는 닉네임을 적어주세요" aria-describedby="pNicknameHelp"><div id="pNicknameHelp" class="inlineHelp">업체 상세에 공개됩니다. 이 브라우저에 기억해 다음 등록·후기에 자동 입력합니다.</div></div>
     <div class="field"><label for="pName">업체명</label><input id="pName" name="venue-title" autocomplete="off" placeholder="예: Uraetei Japanese BBQ"><div class="inlineHelp">주소가 아니라 실제 상호명을 입력해주세요. Google 업체를 선택하면 상호명이 자동 입력됩니다.</div></div>
     <div class="grid2"><div class="field"><label>업종</label><select id="pCat"></select></div><div class="field"><label id="pSubLabel">세부분류</label><select id="pSub"></select></div></div>
@@ -508,6 +508,6 @@
 <script src="./assets/js/chat-comfort.js?v=20261006-badge"></script>
 <script src="./assets/js/chat-dock.js?v=20261006-ownsync"></script>
 <script src="./assets/js/chat-push.js?v=20261006-push"></script>
-<script src="./assets/js/clean-map-layout.js?v=20261007-1"></script>
+<script src="./assets/js/clean-map-layout.js?v=20261014-modal1"></script>
 </body>
 </html>
