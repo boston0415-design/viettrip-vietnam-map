@@ -12,3 +12,23 @@ body.routeNavigating .destinationRoute{max-height:calc(100% - 24px);overflow-y:a
  body.routeNavigating #chatLauncher{display:block;position:fixed;z-index:99;right:8px;top:45%;bottom:auto;min-width:40px;min-height:44px;padding:10px 8px;border:1px solid #ded8f3;border-radius:12px;background:#6157d9;color:#fff;font:600 12px/1.5 system-ui;writing-mode:vertical-rl}
  body.routeNavigating .destinationRoute{left:8px;top:8px;max-width:calc(100% - 64px);max-height:calc(100% - 16px);padding:8px 10px}
 }
+
+/* Compact, editable endpoints. Results update without rebuilding focused inputs. */
+body.cleanMap .destinationRoute{width:360px;max-width:calc(100% - 24px)}
+.routeEditorHeader{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:16px;color:#202124}
+.destinationRoute .routeEditorHeader button{border:0;padding:0;min-height:32px;width:32px;font-size:23px;color:#5f6368}
+.routeField{position:relative;display:grid;grid-template-columns:42px minmax(0,1fr);align-items:center;gap:6px;margin:6px 0}
+.routeField label{font-size:12px;color:#5f6368}
+.destinationRoute .routeField input{box-sizing:border-box;width:100%;min-width:0;height:42px;padding:8px 10px;border:1px solid #dadce0;border-radius:8px;background:#fff;color:#202124;font:400 16px/1.4 system-ui}
+.routeEditorControls{display:flex;gap:5px;margin-top:9px;align-items:center}
+.destinationRoute .routeEditorControls button,.destinationRoute .routeEditorControls select{box-sizing:border-box;min-height:40px;padding:6px 8px;font:500 13px/1.3 system-ui;white-space:nowrap}
+.routeEditorControls select{min-width:0;max-width:82px;border:1px solid #dadce0;border-radius:8px;background:#fff;color:#202124}
+.destinationRoute .routeSubmit{flex:1;background:#1a73e8;color:white;border-color:#1a73e8}
+.routeSuggestions{grid-column:1/-1;max-height:180px;overflow-y:auto;border:1px solid #dadce0;border-radius:8px;padding:3px;background:#fff}
+.routeSuggestions[hidden]{display:none}
+.destinationRoute .routeSuggestions button{display:block;width:100%;text-align:left;border:0;padding:8px;color:#202124;border-radius:5px}
+.routeSuggestions button[aria-selected=true],.routeSuggestions button:hover{background:#e8f0fe}
+.routeSuggestions strong,.routeSuggestions small{display:block;white-space:normal;overflow-wrap:anywhere}
+.routeSuggestions small{font-size:11px;color:#69737b;padding:3px 0}
+.routeResult:empty{display:none}
+@media(max-width:900px){body.cleanMap .destinationRoute{width:calc(100% - 16px);max-width:calc(100% - 16px)}.destinationRoute .routeField input{height:40px}.routeSuggestions{max-height:150px}}

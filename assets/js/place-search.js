@@ -157,7 +157,8 @@
     clearTimeout(timer);timer=null;
     const version=revision;const found=await suggestions(q,version);
     if(version!==revision)return;
-    if(found.length===1)return select(found[0]);
+    // Google can return a loosely related place. Always let the user confirm its name/address.
+    if(found.length===1 && found[0].source==='member' && text(found[0].name)===text(q))return select(found[0]);
     if(found.length){show('이름과 주소를 확인한 후 업소를 선택해 주세요.');return;}
     // Explicit submit fallback only: no text-search/nearby calls on every keystroke.
     const svc=services();if(!svc)return;
@@ -165,7 +166,7 @@
       const result=await googlePhotoRequest(svc,'findPlaceFromQuery',{query:(window.NameSearch?.googleQuery(q)||q)+' Vietnam',fields:['place_id','name','formatted_address','geometry'],...(currentCity()?.center?{locationBias:{center:currentCity().center,radius:50000}}:{})});
       if(version!==revision)return;
       rows=(result||[]).map(p=>({placeId:p.place_id,name:p.name,address:p.formatted_address,position:p.geometry?.location,source:'google'}));
-      if(rows.length===1)return select(rows[0]);show();
+      show();
     }catch{if(version===revision)show('검색 연결이 지연됩니다. 잠시 후 검색 버튼을 다시 눌러주세요.');}
   }
   function photos(entry){
