@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "53a4df24-7cbc-4adb-ba39-6ac2c2ab7e1a",
+    "name": "FUME | Japanese Modern Cuisine",
+    "category": "restaurant",
+    "address": "74/7 Hai Bà Trưng, Sài Gòn, Hồ Chí Minh 700000 베트남",
+    "url": "https://www.tablecheck.com/en/dinewithfume/reserve/message",
+    "sourceUrl": "https://beacons.ai/dinewithfume",
+    "note": "공식 프로필이 연결하는 FUME 전용 TableCheck 예약 화면입니다. 공식 안내의 74/7L Hai Bà Trưng 지점을 확인하고 날짜·시간·인원과 코스·취소 조건을 선택한 뒤 예약 확정 내용을 확인하세요.",
+    "verifiedOn": "2026-10-14"
+  },
+  {
     "id": "2fd8c945-2e8f-4e7c-a31f-5cfa39c32e47",
     "name": "꽌웃웃",
     "category": "restaurant",
