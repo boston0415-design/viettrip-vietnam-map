@@ -8,8 +8,9 @@
   const valid=token=>token===serial&&input.isConnected;
   function hide(){serial++;clearTimeout(timer);list.hidden=true;input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');selected=-1;}
   function display(message){
-   list.replaceChildren();list.hidden=false;input.setAttribute('aria-expanded','true');
-   rows.forEach((row,index)=>{const button=document.createElement('button');button.type='button';button.id=list.id+'-'+index;button.setAttribute('role','option');button.setAttribute('aria-selected',String(index===selected));const name=document.createElement('strong'),address=document.createElement('small');name.textContent=row.name;address.textContent=row.address||'';button.append(name,address);button.onclick=()=>choose(row);list.append(button);});
+   const old=new Map([...list.querySelectorAll('button')].map(node=>[node.dataset.key,node]));list.querySelector(':scope > small')?.remove();list.hidden=false;input.setAttribute('aria-expanded','true');
+   rows.forEach((row,index)=>{const key=row.id||row.placeId,button=old.get(key)||document.createElement('button');old.delete(key);button.dataset.key=key;button.type='button';button.id=list.id+'-'+index;button.setAttribute('role','option');button.setAttribute('aria-selected',String(index===selected));if(!button.children.length){button.append(document.createElement('strong'),document.createElement('small'));}button.children[0].textContent=row.name;button.children[1].textContent=row.address||'';button.onclick=()=>choose(row);if(list.children[index]!==button)list.insertBefore(button,list.children[index]||null);});
+   for(const node of old.values())node.remove();
    if(message){const note=document.createElement('small');note.textContent=message;list.append(note);}
   }
   async function choose(row){

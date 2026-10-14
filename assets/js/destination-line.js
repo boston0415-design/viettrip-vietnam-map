@@ -23,7 +23,7 @@
  function fit(path=fullPath){
   if(!path.length||!state.map)return;
   const bounds=new google.maps.LatLngBounds();path.forEach(p=>bounds.extend(p));
-  const box=document.getElementById('destinationLineHint')?.getBoundingClientRect(),map=document.getElementById('map')?.getBoundingClientRect(),padding={top:Math.min(Math.max(70,(box?.bottom||80)-(map?.top||0)+16),(map?.height||600)*.6),right:40,bottom:45,left:40};
+  const box=document.getElementById('destinationLineHint')?.getBoundingClientRect(),map=document.getElementById('map')?.getBoundingClientRect(),padding={top:Math.min(Math.max(70,(box?.bottom||80)-(map?.top||0)+48),(map?.height||600)*.6),right:40,bottom:45,left:40};
   if(innerWidth>900&&box){padding.top=70;padding.left=Math.min(box.right-(map?.left||0)+24,(map?.width||1200)*.45);}
   if(typeof cancelPendingMapWork==='function')cancelPendingMapWork();state.map.fitBounds(bounds,padding);
  }
