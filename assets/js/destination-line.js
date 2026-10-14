@@ -60,7 +60,7 @@
    const row=element('div');row.className='routeField';const title=element('label',label),input=element('input');input.id='route-'+name;title.htmlFor=input.id;input.setAttribute('aria-label',label);input.placeholder=label+' 장소·주소 검색';input.autocomplete='off';input.value=value||'';row.append(title,input);form.append(row);
    active[name+'Input']=input;
    const current=active;
-   current[name+'Search']=window.RoutePlaceSearch?.bind(input,p=>{if(active!==current)return;if(name==='origin'){active.origin=p;active.useLocation=false;}else{active.place=p;active.key=key(p);}active[name+'Ready']=true;invalidate();},()=>{if(active!==current)return;active[name+'Ready']=false;if(name==='origin')active.useLocation=false;invalidate();});
+   current[name+'Search']=window.RoutePlaceSearch?.bind(input,p=>{if(active!==current)return;if(name==='origin'){active.origin=p;active.useLocation=false;}else{active.place=p;active.key=key(p);}active[name+'Ready']=true;invalidate();calculate();},()=>{if(active!==current)return;active[name+'Ready']=false;if(name==='origin')active.useLocation=false;invalidate();},()=>calculate());
   }
   const controls=element('div');controls.className='routeEditorControls';
   const gps=element('button','내 위치');gps.type='button';gps.onclick=()=>{active.origin=null;active.useLocation=true;active.originReady=true;active.originInput.value='현재 위치';active.originSearch?.hide();invalidate();calculate();};
@@ -69,8 +69,7 @@
    const current=active;invalidate();const token=serial;
    try{const origin=current.useLocation?{...await locate(),name:'현재 위치'}:current.origin;if(active!==current||serial!==token)return;const previous=current.place;current.place=origin;current.origin=previous;current.useLocation=false;current.key=key(origin);current.originInput.value=previous.name;current.destinationInput.value=origin.name;current.originSearch?.hide();current.destinationSearch?.hide();calculate();}catch{if(active===current&&serial===token)status('현재 위치를 확인할 수 없습니다. 출발지를 검색해 주세요.');}
   };
-  const mode=element('select');mode.setAttribute('aria-label','이동 수단');for(const [value,label] of [['DRIVING','자동차'],['WALKING','도보']]){const option=element('option',label);option.value=value;mode.append(option);}mode.onchange=()=>{active.mode=mode.value;invalidate();calculate();};
-  const go=element('button','경로 찾기');go.type='submit';go.className='routeSubmit';controls.append(gps,swap,mode,go);form.append(controls);
+  const go=element('button','경로 찾기');go.type='submit';go.className='routeSubmit';controls.append(gps,swap,go);form.append(controls);
   form.onsubmit=e=>{e.preventDefault();calculate();};box.append(form);
  }
  function render(){
@@ -82,7 +81,6 @@
   if(fullPath.length){const all=element('button','전체 경로');all.type='button';all.onclick=()=>fit();actions.append(all);if(alleyPath.length){const near=element('button','골목 보기');near.type='button';near.onclick=()=>fit(alleyPath);actions.append(near);}}
   if(active.originReady&&active.destinationReady){const fallback=element('a','Google 지도에서 열기');fallback.href=externalUrl();fallback.target='_blank';fallback.rel='noopener noreferrer';actions.append(fallback);}result.append(actions);
   if(active.steps?.length){const details=element('details'),summary=element('summary','상세 경로'),list=element('ol');for(const step of active.steps)list.append(element('li',step));details.append(summary,list);result.append(details);}
-  if(active.mode==='WALKING'&&fullPath.length)result.append(element('small','보행로 정보가 누락될 수 있습니다. 현장 표지와 통행 가능 여부를 확인하세요.'));
  }
  function status(message,loading=false){if(!active)return;active.message=message;active.loading=loading;active.revision++;render();}
  function locate(){return new Promise((resolve,reject)=>{if(!navigator.geolocation)return reject(Error('LOCATION'));navigator.geolocation.getCurrentPosition(p=>resolve({lat:p.coords.latitude,lng:p.coords.longitude}),()=>reject(Error('LOCATION')),{enableHighAccuracy:true,timeout:12000,maximumAge:30000});});}
@@ -103,8 +101,8 @@
  }
  async function calculate(){
   if(!active||active.loading)return;
-  if(!active.originReady){status('출발지를 검색 결과에서 선택하세요.');active.originSearch?.search();active.originInput.focus();return;}
-  if(!active.destinationReady){status('목적지를 검색 결과에서 선택하세요.');active.destinationSearch?.search();active.destinationInput.focus();return;}
+  if(!active.originReady){status('출발지를 찾고 있습니다…');active.originInput.focus();active.originSearch?.search(true);return;}
+  if(!active.destinationReady){status('목적지를 찾고 있습니다…');active.destinationInput.focus();active.destinationSearch?.search(true);return;}
   const request=++serial,current=active,mode=current.mode;erase();current.steps=[];status(current.useLocation?'현재 위치 확인 중…':'경로를 찾고 있습니다…',true);
   try{
    const origin=current.useLocation?await locate():endpoint(current.origin);if(request!==serial)return;status('경로를 찾고 있습니다…',true);
@@ -112,8 +110,8 @@
    const path=(result.path||[]).map(point).filter(Boolean);if(path.length<2)throw Error('ZERO_RESULTS');
    draw(path,result.segments);current.steps=(result.segments||[]).map(s=>s.instruction).filter(Boolean);
    const km=(result.meters/1000).toFixed(1),minutes=Math.max(1,Math.round(result.millis/60000));
-   status(`${mode==='WALKING'?'도보':'자동차'} ${km}km · 약 ${minutes}분`);fit();
-  }catch(error){if(request!==serial)return;erase();current.steps=[];status(error.message==='LOCATION'?'현재 위치를 확인할 수 없습니다. 출발지에 장소·주소를 검색하거나 위치 권한을 켜 주세요.':(String(error.code||error.message).includes('ZERO_RESULTS')?'두 장소를 잇는 도로 경로가 없습니다. 출발지·목적지와 이동 수단을 확인하세요.':'도로 경로 연결이 지연됩니다. 경로 찾기를 다시 누르거나 Google 지도에서 열어 주세요.'));console.warn('Route unavailable',error?.code||error?.message);}
+   status(`${km}km · 약 ${minutes}분`);fit();
+  }catch(error){if(request!==serial)return;erase();current.steps=[];status(error.message==='LOCATION'?'현재 위치를 확인할 수 없습니다. 출발지에 장소·주소를 검색하거나 위치 권한을 켜 주세요.':(String(error.code||error.message).includes('ZERO_RESULTS')?'두 장소를 잇는 도로 경로가 없습니다. 출발지와 목적지를 확인하세요.':'도로 경로 연결이 지연됩니다. 경로 찾기를 다시 누르거나 Google 지도에서 열어 주세요.'));console.warn('Route unavailable',error?.code||error?.message);}
  }
  function open(){const p=destination();if(!p)return;if(active?.key===key(p)&&active.loading)return;clear();if(typeof closeDetailPanel==='function')closeDetailPanel();if(typeof closeMobileBusinessList==='function')closeMobileBusinessList();window.ListLayout?.setCollapsed(true);window.ChatDock?.close();document.body.classList.add('routeNavigating');if(typeof renderMarkers==='function')renderMarkers();active={place:p,origin:null,useLocation:true,originReady:true,destinationReady:true,key:key(p),mode:'DRIVING',message:'',loading:false,revision:0,steps:[]};calculate();}
  document.addEventListener('click',e=>{if(active&&e.target.closest?.('#chatLauncher'))clear();const link=e.target.closest?.('#detail [data-map-route]');if(!link||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open();});
