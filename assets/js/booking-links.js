@@ -226,6 +226,27 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "3d7ea892-3e75-4b26-b160-e09b53226635",
+    "name": "Cua Nghị Nguyễn 2",
+    "category": "restaurant",
+    "address": "150A Lý Thái Tổ, Bàn Cờ, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/p/Cua-Ngh%E1%BB%8B-Nguy%E1%BB%85n-100075508165326/",
+    "note": "공식 페이지가 안내하는 150A Lý Thái Tổ 지점 문의 경로입니다. 방문 날짜·시간·인원과 해산물 사전 주문 여부를 알리고 테이블 예약 가능 여부 및 매장의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/p/Cua-Ngh%E1%BB%8B-Nguy%E1%BB%85n-100075508165326/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84912229797",
+        "display": "+84 91 222 9797"
+      }
+    ],
+    "verifiedOn": "2026-10-15"
+  },
+  {
     "id": "bad22e55-f097-4202-beb2-f2aa82893110",
     "name": "로이스치과 호치민 Royce nha khoa 罗伊斯奇瓜胡志明市 ロイス歯科 ホーチミン",
     "category": "hospital",

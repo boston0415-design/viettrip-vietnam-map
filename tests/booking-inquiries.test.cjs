@@ -19,6 +19,12 @@ async function check(mobile){
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
     assert.equal(new Set(VERIFIED_BUSINESS_CONTACTS.map(p=>p.id)).size,VERIFIED_BUSINESS_CONTACTS.length,'each verified branch has one contact entry');
+    const cuaNghiNguyen=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='3d7ea892-3e75-4b26-b160-e09b53226635');
+    assert(cuaNghiNguyen,'Cua Nghi Nguyen 2 official inquiry route');
+    assert.equal(cuaNghiNguyen.verifiedOn,'2026-10-15');
+    assert.equal(cuaNghiNguyen.mode,'inquiry');
+    assert.deepEqual(cuaNghiNguyen.channels.map(c=>c.kind),['facebook','phone']);
+    assert.equal(cuaNghiNguyen.channels[1].url,'tel:+84912229797');
     for(const id of ['4a33bd0b-9bd7-433e-879b-00348ff6e15c','00c49c81-8085-43b9-a7a1-284bc2550cd2','e6acd5e1-242d-4d45-9195-953dcb0b9306','3b69b891-1c6e-465a-9379-b1dd61ce1c38']){
       const entry=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id===id);
       assert(entry,'newly verified inquiry route');
