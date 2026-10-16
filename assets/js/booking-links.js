@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "96880ccd-6015-44a1-bd7a-16185782ae70",
+    "name": "OM Nướng - Trung Sơn",
+    "category": "restaurant",
+    "address": "Vòng xoay Trung Sơn, Khu dân cư Trung Sơn, Bình Hưng, Hồ Chí Minh 70000 베트남",
+    "url": "https://booking.omnuong.vn/",
+    "sourceUrl": "https://omnuong.vn/",
+    "note": "공식 예약 화면에서 OM 5 · OM Nướng Trung Sơn 지점과 날짜·인원을 선택하세요. 공식 지점 주소는 02-04-06 Đường 9A KDC Trung Sơn(Trung Sơn 로터리)이며, 신청 뒤 식당의 예약 확정 내용을 확인하세요.",
+    "verifiedOn": "2026-10-16"
+  },
+  {
     "id": "53a4df24-7cbc-4adb-ba39-6ac2c2ab7e1a",
     "name": "FUME | Japanese Modern Cuisine",
     "category": "restaurant",
@@ -225,6 +235,27 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 ]);
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
+  {
+    "id": "72025aba-fb46-40ba-8bb8-eaa3be381715",
+    "name": "시크릿가든 레스토랑",
+    "category": "restaurant",
+    "address": "158 Pasteur, Sài Gòn, Hồ Chí Minh 70000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/secretgarden158pasteur/",
+    "note": "158 Pasteur 루프톱 Secret Garden의 공식 예약 문의 경로입니다. 방문 날짜·시간·인원을 알리고 해당 지점의 예약 가능 여부와 식당의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/secretgarden158pasteur/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84909904621",
+        "display": "+84 90 990 4621"
+      }
+    ],
+    "verifiedOn": "2026-10-16"
+  },
   {
     "id": "3d7ea892-3e75-4b26-b160-e09b53226635",
     "name": "Cua Nghị Nguyễn 2",

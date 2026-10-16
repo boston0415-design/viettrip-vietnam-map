@@ -19,6 +19,11 @@ async function check(mobile){
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
     assert.equal(new Set(VERIFIED_BUSINESS_CONTACTS.map(p=>p.id)).size,VERIFIED_BUSINESS_CONTACTS.length,'each verified branch has one contact entry');
+    const secretGarden=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='72025aba-fb46-40ba-8bb8-eaa3be381715');
+    assert(secretGarden,'Secret Garden 158 Pasteur official reservation inquiry');
+    assert.equal(secretGarden.verifiedOn,'2026-10-16');
+    assert.deepEqual(secretGarden.channels.map(c=>c.kind),['facebook','phone']);
+    assert.equal(secretGarden.channels[1].url,'tel:+84909904621');
     const cuaNghiNguyen=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='3d7ea892-3e75-4b26-b160-e09b53226635');
     assert(cuaNghiNguyen,'Cua Nghi Nguyen 2 official inquiry route');
     assert.equal(cuaNghiNguyen.verifiedOn,'2026-10-15');
