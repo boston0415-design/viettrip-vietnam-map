@@ -3,6 +3,26 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "45ff3d82-3609-4bce-85dc-2e869940ff87",
+    "name": "Cơm Niêu Sài Gòn",
+    "category": "restaurant",
+    "address": "59 Hồ Xuân Hương, Xuân Hòa, Hồ Chí Minh, 베트남",
+    "url": "https://comnieusaigon.com/dat-ban-com-nieu-sai-gon",
+    "sourceUrl": "https://comnieusaigon.com/dat-ban-com-nieu-sai-gon",
+    "note": "공식 예약 양식에서 Cơm Niêu Sài Gòn · 59 Hồ Xuân Hương 지점을 선택하고 이름·인원·날짜·시간·연락처를 입력하세요. 신청 후 식당의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-17"
+  },
+  {
+    "id": "7205f134-acfa-4be0-bb00-7028bf3318e9",
+    "name": "엘 가우초 - 하이바쯩점",
+    "category": "restaurant",
+    "address": "74/1 Hai Bà Trưng, Sài Gòn, Hồ Chí Minh 100000 베트남",
+    "url": "https://elgaucho.asia/vn/en/location/hai-ba-trung?booking=true",
+    "sourceUrl": "https://elgaucho.asia/vn/en/location/hai-ba-trung",
+    "note": "74/1 Hai Bà Trưng의 El Gaucho 공식 지점 예약 진입 화면입니다. 로그인 또는 전화번호 인증이 필요할 수 있으며, 해당 지점과 날짜·시간·인원을 확인한 뒤 예약 확정 내용을 확인하세요.",
+    "verifiedOn": "2026-10-17"
+  },
+  {
     "id": "96880ccd-6015-44a1-bd7a-16185782ae70",
     "name": "OM Nướng - Trung Sơn",
     "category": "restaurant",
