@@ -19,6 +19,13 @@ async function check(mobile){
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
     assert.equal(new Set(VERIFIED_BUSINESS_CONTACTS.map(p=>p.id)).size,VERIFIED_BUSINESS_CONTACTS.length,'each verified branch has one contact entry');
+    const ganhHao=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='8a49b1b0-2824-4472-92e8-7e978bb37525');
+    assert(ganhHao,'Ganh Hao 1 official inquiry routes');
+    assert.equal(ganhHao.sourceUrl,'https://ganhhao.com.vn/ganhhao/');
+    assert.equal(ganhHao.verifiedOn,'2026-10-18');
+    assert.deepEqual(ganhHao.channels.map(c=>c.kind),['zalo','phone']);
+    assert.equal(ganhHao.channels[0].url,'https://zalo.me/641762361488430095');
+    assert.equal(ganhHao.channels[1].url,'tel:+842543550909');
     const secretGarden=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='72025aba-fb46-40ba-8bb8-eaa3be381715');
     assert(secretGarden,'Secret Garden 158 Pasteur official reservation inquiry');
     assert.equal(secretGarden.verifiedOn,'2026-10-16');

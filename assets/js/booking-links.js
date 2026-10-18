@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "f1f1ca49-99e9-4ba8-9ca7-743a7fdfb04c",
+    "name": "137 마사지",
+    "category": "spa",
+    "address": "147-149 Hàm Nghi, Bến Thành, Hồ Chí Minh 700000 베트남",
+    "url": "https://quynhnhu137.com/dat-lich",
+    "sourceUrl": "https://quynhnhu137.com/dat-lich",
+    "note": "Quỳnh Như 137의 1군 지점 공식 예약 화면입니다. 서비스·날짜·시간을 선택한 뒤 업소의 확정 내용을 확인하세요.",
+    "verifiedOn": "2026-10-18"
+  },
+  {
     "id": "45ff3d82-3609-4bce-85dc-2e869940ff87",
     "name": "Cơm Niêu Sài Gòn",
     "category": "restaurant",
@@ -255,6 +265,27 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 ]);
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
+  {
+    "id": "8a49b1b0-2824-4472-92e8-7e978bb37525",
+    "name": "Gành Hào Seafood Restaurant",
+    "category": "restaurant",
+    "address": "03 Trần Phú, Vũng Tàu, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://ganhhao.com.vn/ganhhao/",
+    "note": "03 Trần Phú의 Gành Hào 1 공식 예약 문의 경로입니다. 방문 날짜·시간·인원과 원하는 좌석을 알리고 매장의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "zalo",
+        "url": "https://zalo.me/641762361488430095"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842543550909",
+        "display": "+84 254 355 0909"
+      }
+    ],
+    "verifiedOn": "2026-10-18"
+  },
   {
     "id": "72025aba-fb46-40ba-8bb8-eaa3be381715",
     "name": "시크릿가든 레스토랑",
