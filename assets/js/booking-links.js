@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "e1c67263-1b06-4582-b76b-83246c4a4051",
+    "name": "담센 문화공원 (워터파크)",
+    "category": "attraction",
+    "address": "3 Hòa Bình, Bình Thới, Hồ Chí Minh 70000 베트남",
+    "url": "https://booking.damsenwaterpark.com.vn/",
+    "sourceUrl": "https://damsenwaterpark.com.vn/chinh-thuc-phat-hanh-ve-combo-1-diem-den-2-cong-vien-dam-sen-2026/",
+    "note": "3 Hòa Bình의 담센 워터파크 공식 온라인 예매 화면입니다. 이용할 상품·인원과 결제 조건을 확인하고 발급된 QR 전자티켓의 사용 기한을 확인하세요.",
+    "verifiedOn": "2026-10-19"
+  },
+  {
     "id": "f1f1ca49-99e9-4ba8-9ca7-743a7fdfb04c",
     "name": "137 마사지",
     "category": "spa",
