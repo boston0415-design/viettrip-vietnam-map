@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "a1376ed1-b365-40a6-b1b7-7c7e1355fa68",
+    "name": "Luxury Anna Spa",
+    "category": "spa",
+    "address": "172/8A Bạch Đằng, Nha Trang, Khánh Hòa 650000 베트남",
+    "url": "https://annaspa.com.vn/ko_KR/contactus",
+    "sourceUrl": "https://annaspa.com.vn/ko_KR/contactus",
+    "note": "172/8A Bạch Đằng의 Luxury Anna Spa 공식 한국어 예약 문의 양식입니다. 희망 시간·서비스와 연락처를 입력한 뒤 스파의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-20"
+  },
+  {
     "id": "e1c67263-1b06-4582-b76b-83246c4a4051",
     "name": "담센 문화공원 (워터파크)",
     "category": "attraction",
