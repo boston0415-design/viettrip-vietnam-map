@@ -19,6 +19,11 @@ async function check(mobile){
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
     assert.equal(new Set(VERIFIED_BUSINESS_CONTACTS.map(p=>p.id)).size,VERIFIED_BUSINESS_CONTACTS.length,'each verified branch has one contact entry');
+    const phoHanhPhuc=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='7f3bb6d8-27f9-4547-be2a-99226eeb11ba');
+    assert(phoHanhPhuc,'Pho Hanh Phuc official Facebook reservation inquiry');
+    assert.equal(phoHanhPhuc.sourceUrl,'https://www.facebook.com/phohanhphuc/');
+    assert.equal(phoHanhPhuc.verifiedOn,'2026-10-21');
+    assert.deepEqual(phoHanhPhuc.channels.map(c=>c.kind),['facebook']);
     const ganhHao=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='8a49b1b0-2824-4472-92e8-7e978bb37525');
     assert(ganhHao,'Ganh Hao 1 official inquiry routes');
     assert.equal(ganhHao.sourceUrl,'https://ganhhao.com.vn/ganhhao/');

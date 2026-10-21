@@ -286,6 +286,22 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "7f3bb6d8-27f9-4547-be2a-99226eeb11ba",
+    "name": "포한푹",
+    "category": "restaurant",
+    "address": "19 Ngô Gia Tự, P, Nha Trang, Khánh Hòa 650000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/phohanhphuc/",
+    "note": "19 Ngô Gia Tự의 Phở Hạnh Phúc 공식 예약 문의 경로입니다. 방문 날짜·시간·인원을 알리고 식당의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/phohanhphuc/"
+      }
+    ],
+    "verifiedOn": "2026-10-21"
+  },
+  {
     "id": "8a49b1b0-2824-4472-92e8-7e978bb37525",
     "name": "Gành Hào Seafood Restaurant",
     "category": "restaurant",
