@@ -286,6 +286,47 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "b3c96e23-f811-4b3b-b4f6-166e497159e3",
+    "name": "드마리스 푸미흥 뷔페",
+    "category": "restaurant",
+    "address": "Lô 3F-01, Tòa Lotte Mart, 469 Nguyễn Hữu Thọ, Tân Hưng, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.dmaris.vn/dmaris-phu-my-hung",
+    "note": "Lotte Mart 3층의 D'Maris Phú Mỹ Hưng 공식 예약 문의 경로입니다. 방문 날짜·시간·인원을 알리고 식당의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "zalo",
+        "url": "https://zalo.me/dmarisbuffet"
+      },
+      {
+        "kind": "messenger",
+        "url": "https://m.me/dmarispremierbuffet"
+      }
+    ],
+    "verifiedOn": "2026-10-22"
+  },
+  {
+    "id": "f635adbd-015f-4aea-be88-d333d8c8d6c1",
+    "name": "한식당 경복궁 Kyung Bok Gung",
+    "category": "restaurant",
+    "address": "52 Hai Bà Trưng, Sài Gòn, Hồ Chí Minh 70000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/kyungbokgung/",
+    "note": "52 Hai Bà Trưng의 Kyung Bok Gung 공식 예약 문의 경로입니다. 방문 날짜·시간·인원을 알리고 식당의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/kyungbokgung/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842866827249",
+        "display": "+84 28 6682 7249"
+      }
+    ],
+    "verifiedOn": "2026-10-22"
+  },
+  {
     "id": "7f3bb6d8-27f9-4547-be2a-99226eeb11ba",
     "name": "포한푹",
     "category": "restaurant",
