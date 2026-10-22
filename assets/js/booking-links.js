@@ -309,7 +309,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "id": "f635adbd-015f-4aea-be88-d333d8c8d6c1",
     "name": "한식당 경복궁 Kyung Bok Gung",
     "category": "restaurant",
-    "address": "52 Hai Bà Trưng, Sài Gòn, Hồ Chí Minh 70000 베트남",
+    "address": "52 Hai Bà Trưng, Sài Gòn, Hồ Chí Minh, 베트남",
     "mode": "inquiry",
     "sourceUrl": "https://www.facebook.com/kyungbokgung/",
     "note": "52 Hai Bà Trưng의 Kyung Bok Gung 공식 예약 문의 경로입니다. 방문 날짜·시간·인원을 알리고 식당의 확정 답변을 확인하세요.",

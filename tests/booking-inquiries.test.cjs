@@ -28,6 +28,7 @@ async function check(mobile){
     assert.equal(dmaris.channels[1].url,'https://m.me/dmarispremierbuffet');
     const kyungBokGung=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='f635adbd-015f-4aea-be88-d333d8c8d6c1');
     assert(kyungBokGung,'Kyung Bok Gung official reservation inquiry');
+    assert.equal(kyungBokGung.address,'52 Hai Bà Trưng, Sài Gòn, Hồ Chí Minh, 베트남');
     assert.equal(kyungBokGung.sourceUrl,'https://www.facebook.com/kyungbokgung/');
     assert.equal(kyungBokGung.verifiedOn,'2026-10-22');
     assert.deepEqual(kyungBokGung.channels.map(c=>c.kind),['facebook','phone']);
