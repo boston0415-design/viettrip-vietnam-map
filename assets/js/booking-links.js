@@ -286,6 +286,61 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "02bba62d-d38e-4a65-9625-c9206e308c0d",
+    "name": "The Log Restaurant",
+    "category": "restaurant",
+    "address": "Rooftop, Gem Center, 8 Nguyễn Bỉnh Khiêm, Sài Gòn, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://thelog.com.vn/home/reservations",
+    "note": "GEM Center 루프톱의 The Log 공식 예약 문의 전화입니다. 방문 날짜·시간·인원과 식사 유형을 알리고 식당의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+84975002288",
+        "display": "+84 975 002 288"
+      }
+    ],
+    "verifiedOn": "2026-10-23"
+  },
+  {
+    "id": "7f424760-bc7e-42a0-bd77-946d24385e45",
+    "name": "PAPI Saigon",
+    "category": "bar",
+    "address": "123 Lê Lợi, Bến Thành, Hồ Chí Minh 700000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.facebook.com/p/PAPI-61584855027300/",
+    "note": "123 Lê Lợi의 PAPI Saigon 공식 RSVP 문의 경로입니다. 방문 날짜·시간·인원과 원하는 테이블을 알리고 업소의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "facebook",
+        "url": "https://www.facebook.com/p/PAPI-61584855027300/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+84909766969",
+        "display": "+84 909 766 969"
+      }
+    ],
+    "verifiedOn": "2026-10-23"
+  },
+  {
+    "id": "39c9b25b-08e5-4b36-831b-371ba2c0fc94",
+    "name": "CINÉ Saigon",
+    "category": "bar",
+    "address": "148 Cống Quỳnh, Bến Thành, Hồ Chí Minh 70000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.instagram.com/cine.sgn/",
+    "note": "148 Cống Quỳnh의 CINÉ Saigon 공식 예약 문의 전화입니다. 방문 날짜·시간·인원과 원하는 테이블을 알리고 업소의 확정 답변을 확인하세요.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+84901866336",
+        "display": "+84 901 866 336"
+      }
+    ],
+    "verifiedOn": "2026-10-23"
+  },
+  {
     "id": "b3c96e23-f811-4b3b-b4f6-166e497159e3",
     "name": "드마리스 푸미흥 뷔페",
     "category": "restaurant",
