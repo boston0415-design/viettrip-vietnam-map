@@ -3,6 +3,26 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "eb4a66b2-a0ed-479a-b44b-f18a5a116ad7",
+    "name": "Phong Cua 2 - Crab Restaurant",
+    "category": "restaurant",
+    "address": "1067 Bình Quới, Hồ Chí Minh, 베트남",
+    "url": "https://phongcua.com/Booking/Index/3",
+    "sourceUrl": "https://phongcua.com/Booking/Index/3",
+    "note": "공식 예약 양식에서 Phong Cua 2 · 1067 Bình Quới 지점을 선택하고 날짜·시간·인원을 입력하세요. 신청 후 식당의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-24"
+  },
+  {
+    "id": "217a240f-8511-41d5-8a8f-24fc797854c2",
+    "name": "Haidilao CrescentMall",
+    "category": "restaurant",
+    "address": "Tầng 6 TTTM, 크레센트몰 101 Đ. Tôn Dật Tiên, Khu đô thị Phú Mỹ Hưng, Tân Mỹ, Hồ Chí Minh, 베트남",
+    "url": "https://haidilaohotpot.vn/en/dat-ban",
+    "sourceUrl": "https://haidilaohotpot.vn/en/dat-ban",
+    "note": "Haidilao Vietnam 공식 예약 화면에서 Haidilao Crescent Mall 지점을 선택하고 날짜·시간·인원을 입력하세요. 6층 지점과 예약 확정 내용을 확인하세요.",
+    "verifiedOn": "2026-10-24"
+  },
+  {
     "id": "a1376ed1-b365-40a6-b1b7-7c7e1355fa68",
     "name": "Luxury Anna Spa",
     "category": "spa",
