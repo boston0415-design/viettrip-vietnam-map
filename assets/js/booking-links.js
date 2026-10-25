@@ -3,6 +3,26 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "dc1444d1-7021-4c20-ad7d-6c86ec48ae54",
+    "name": "강남비비큐",
+    "category": "restaurant",
+    "address": "50 Phan Khiêm Ích, Khu đô thị Phú Mỹ Hưng, Quận 7, Hồ Chí Minh 700000 베트남",
+    "url": "https://gangnambbqhouse.com/",
+    "sourceUrl": "https://gangnambbqhouse.com/",
+    "note": "50 Phan Khiêm Ích의 Gangnam BBQ 공식 테이블 예약 신청 화면입니다. 날짜·시간·인원과 연락처를 입력하고 식당의 예약 확정 연락을 확인하세요. 요청 접수만으로 예약이 확정되지는 않습니다.",
+    "verifiedOn": "2026-10-25"
+  },
+  {
+    "id": "be61b659-bd4c-478a-8dbf-c448f8a6b977",
+    "name": "떤하이번 (24시간 운영)",
+    "category": "restaurant",
+    "address": "152 Nguyễn Trãi, Bến Thành, Hồ Chí Minh 700000 베트남",
+    "url": "https://tanhaivan.com/dat-ban-tan-hai-van",
+    "sourceUrl": "https://tanhaivan.com/dat-ban-tan-hai-van",
+    "note": "공식 예약 양식에서 Tân Hải Vân · 152-154 Nguyễn Trãi 지점을 선택하고 날짜·시간·인원과 연락처를 입력하세요. 신청 후 식당의 예약 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-10-25"
+  },
+  {
     "id": "eb4a66b2-a0ed-479a-b44b-f18a5a116ad7",
     "name": "Phong Cua 2 - Crab Restaurant",
     "category": "restaurant",
