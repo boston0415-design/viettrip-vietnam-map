@@ -942,7 +942,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 28 3823 9000"
       }
     ],
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-26"
   },
   {
     "id": "29a25657-68f0-437a-adcf-ffaff2d56f1a",
@@ -963,7 +963,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 888 545 767"
       }
     ],
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-26"
   },
   {
     "id": "43394a14-497e-4ad9-8c91-062bd48f313a",
@@ -1000,7 +1000,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "url": "https://www.facebook.com/eastwestbrewing.saigon/"
       }
     ],
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-26"
   },
   {
     "id": "87318604-17e7-47a8-b411-e8a66d641d55",
@@ -1103,7 +1103,7 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
     "url": "https://dsvn.vn/",
     "label": "기차표 예약",
     "note": "베트남철도 공식 예매: 출발역 Sài Gòn을 선택하고 도착역·날짜·좌석을 확인하세요. 잔여석·요금·결제 가능 여부는 예약 사이트에서 확인됩니다.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-26"
   },
   {
     "name": "사이공 프린세스 · 디너 유람선 승선",
