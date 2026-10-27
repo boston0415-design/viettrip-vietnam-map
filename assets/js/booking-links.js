@@ -1111,15 +1111,15 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
     "sourceUrl": "https://www.saigonprincess.com.vn/contact",
     "url": "https://www.saigonprincess.com.vn/calendar",
     "note": "날짜·식사 포함 상품·승선 시간을 확인하세요.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-27"
   },
   {
     "name": "바익당 선착장 · 사이공 워터버스",
     "type": "유람선·수상버스",
     "sourceUrl": "https://saigonwaterbus.com/ben-tau-bach-dang",
-    "url": "https://saigonwaterbus.com/trang-chu",
+    "url": "https://saigonwaterbus.com/dat-ve-truc-tuyen",
     "note": "Waterbus 상품의 Bạch Đằng 출발편과 돌아오는 편을 확인하세요.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-27"
   },
   {
     "name": "시티투어 버스 · 중앙우체국 낮 출발",
@@ -1127,7 +1127,7 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
     "sourceUrl": "https://hopon-hopoff.vn/tour/1-round-ho-chi-minh-city-panoramic-bus-tour/",
     "url": "https://hopon-hopoff.vn/tour/1-round-ho-chi-minh-city-panoramic-bus-tour/",
     "note": "낮·야간 상품과 출발 장소를 확인하세요.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-27"
   },
   {
     "name": "시티투어 버스 · 응우옌후에 야간 출발",
@@ -1135,7 +1135,7 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
     "sourceUrl": "https://hopon-hopoff.vn/tour/1-round-ho-chi-minh-city-panoramic-bus-tour/",
     "url": "https://hopon-hopoff.vn/tour/1-round-ho-chi-minh-city-panoramic-bus-tour/",
     "note": "낮·야간 상품과 출발 장소를 확인하세요.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-27"
   },
   {
     "name": "시티투어 버스 · 호안끼엠 호수 출발",
@@ -1143,7 +1143,7 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
     "sourceUrl": "https://hopon-hopoff.vn/tour/1-round-hanoi-panoramic-bus-tour/",
     "url": "https://hopon-hopoff.vn/tour/1-round-hanoi-panoramic-bus-tour/",
     "note": "탑승 날짜의 집결 장소를 예약 안내에서 확인하세요.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-27"
   },
   {
     "name": "시티투어 버스 · 하노이 오페라하우스 출발",
@@ -1151,7 +1151,7 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
     "sourceUrl": "https://hopon-hopoff.vn/tour/1-round-hanoi-panoramic-bus-tour/",
     "url": "https://hopon-hopoff.vn/tour/1-round-hanoi-panoramic-bus-tour/",
     "note": "탑승 날짜의 집결 장소를 예약 안내에서 확인하세요.",
-    "verifiedOn": "2026-09-18"
+    "verifiedOn": "2026-10-27"
   }
 ]);
 function bookingIdentity(value){return String(value||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase()}
