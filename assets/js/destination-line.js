@@ -33,6 +33,7 @@
   if(!path.length||!state.map)return;
   const bounds=new google.maps.LatLngBounds();path.forEach(p=>bounds.extend(p));
   const box=document.getElementById('destinationLineHint')?.getBoundingClientRect(),map=document.getElementById('map')?.getBoundingClientRect(),padding={top:Math.min(Math.max(70,(box?.bottom||80)-(map?.top||0)+48),(map?.height||600)*.6),right:40,bottom:45,left:40};
+  if(!active?.expanded){padding.top=140;padding.bottom=110;}
   if(innerWidth>900&&box&&active?.expanded){padding.top=70;padding.left=Math.min(box.right-(map?.left||0)+24,(map?.width||1200)*.45);}
   if(typeof cancelPendingMapWork==='function')cancelPendingMapWork();state.map.fitBounds(bounds,padding);
  }
@@ -87,12 +88,12 @@
   if(box.dataset.revision===String(active.revision))return;box.dataset.revision=String(active.revision);const result=box.querySelector('.routeResult');result.replaceChildren();
   box.classList.toggle('routeCompact',!active.expanded);box.classList.toggle('routeReady',fullPath.length>1);box.querySelector('.routeEditor').hidden=!active.expanded;
   const submit=box.querySelector('.routeSubmit');submit.disabled=active.loading;submit.textContent=active.loading?'경로 찾는 중…':'경로 찾기';
-  const trip=element('p',`${active.origin?.name||'현재 위치'} → ${active.place.name||'목적지'}`);trip.className='routeTrip';trip.title=trip.textContent;result.append(trip);
-  const message=element('p',active.message);message.className='routeStatus';message.setAttribute('role','status');result.append(message);
+  const trip=element('p',`${active.origin?.name||'현재 위치'} → ${active.place.name||'목적지'}`);trip.className='routeTrip';trip.title=trip.textContent;trip.hidden=!active.expanded;result.append(trip);
+  const message=element('p',active.message);message.className='routeStatus';message.setAttribute('role','status');message.hidden=!active.expanded;result.append(message);
   const actions=element('div');actions.className='routeActions';
-  if(!active.expanded){const reopen=element('button','경로 다시 보기');reopen.type='button';reopen.className='routeReopen';reopen.setAttribute('aria-expanded','false');reopen.onclick=()=>setExpanded(true,true);actions.append(reopen);}
-  if(fullPath.length){const all=element('button','전체 경로');all.type='button';all.onclick=()=>fit();actions.append(all);if(alleyPath.length){const near=element('button','골목 보기');near.type='button';near.onclick=()=>fit(alleyPath);actions.append(near);}}
-  if(active.originReady&&active.destinationReady){const fallback=element('a','Google 지도에서 열기');fallback.href=externalUrl();fallback.target='_blank';fallback.rel='noopener noreferrer';fallback.hidden=!active.expanded;actions.append(fallback);}const end=element('button','경로 종료');end.type='button';end.className='routeEnd';end.onclick=clear;actions.append(end);result.append(actions);
+  if(!active.expanded){const reopen=element('button',`경로 안내 · ${fullPath.length?active.message:active.loading?'검색 중…':'확인 필요'}`);reopen.type='button';reopen.className='routeReopen';reopen.setAttribute('aria-expanded','false');reopen.setAttribute('aria-label','경로 안내 열기');reopen.onclick=()=>setExpanded(true,true);actions.append(reopen);}
+  if(fullPath.length){const all=element('button','전체 경로');all.type='button';all.hidden=!active.expanded;all.onclick=()=>fit();actions.append(all);if(alleyPath.length){const near=element('button','골목 보기');near.type='button';near.hidden=!active.expanded;near.onclick=()=>fit(alleyPath);actions.append(near);}}
+  if(active.originReady&&active.destinationReady){const fallback=element('a','Google 지도에서 열기');fallback.href=externalUrl();fallback.target='_blank';fallback.rel='noopener noreferrer';fallback.hidden=!active.expanded;actions.append(fallback);}const end=element('button','경로 종료');end.type='button';end.className='routeEnd';end.hidden=!active.expanded;end.onclick=clear;actions.append(end);result.append(actions);
   if(active.steps?.length){const details=element('details'),summary=element('summary','상세 경로'),list=element('ol');for(const step of active.steps)list.append(element('li',step));details.hidden=!active.expanded;details.append(summary,list);result.append(details);}
  }
  function status(message,loading=false){if(!active)return;active.message=message;active.loading=loading;active.revision++;render();}
@@ -118,7 +119,7 @@
   if(!active.destinationReady&&!active.destinationInput.value.trim()){status('목적지를 입력해 주세요.');active.destinationInput.focus();return;}
   if(!active.originReady){status('출발지를 찾고 있습니다…');active.originInput.focus();active.originSearch?.search(true);return;}
   if(!active.destinationReady){status('목적지를 찾고 있습니다…');active.destinationInput.focus();active.destinationSearch?.search(true);return;}
-  const request=++serial,current=active,mode=current.mode;erase();current.steps=[];status(current.useLocation?'현재 위치 확인 중…':'경로를 찾고 있습니다…',true);
+  const request=++serial,current=active,mode=current.mode;erase();current.steps=[];current.expanded=false;current.originSearch?.hide();current.destinationSearch?.hide();document.activeElement?.blur?.();status(current.useLocation?'현재 위치 확인 중…':'경로를 찾고 있습니다…',true);
   try{
    const origin=current.useLocation?await locate():endpoint(current.origin);if(request!==serial)return;status('경로를 찾고 있습니다…',true);
    let timer;const result=await Promise.race([route(origin,endpoint(current.place),mode),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('TIMEOUT')),18000);})]).finally(()=>clearTimeout(timer));if(request!==serial||active!==current)return;
