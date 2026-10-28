@@ -267,10 +267,10 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "name": "렉스 호텔",
     "category": "stay",
     "address": "141 Nguyễn Huệ, Sài Gòn, Hồ Chí Minh 700000 베트남",
-    "url": "https://www.rexhotelsaigon.com/",
-    "sourceUrl": "https://www.rexhotelsaigon.com/",
-    "note": "141 Nguyễn Huệ의 Rex Hotel Saigon 공식 사이트입니다. Book Now에서 숙박 날짜·인원·객실과 취소 조건을 확인하세요.",
-    "verifiedOn": "2026-09-19"
+    "url": "https://www.rexhotelsaigon.com/discover-benefits-of-direct-booking/",
+    "sourceUrl": "https://www.rexhotelsaigon.com/discover-benefits-of-direct-booking/",
+    "note": "141 Nguyễn Huệ의 Rex Hotel Saigon 공식 직접 예약 화면입니다. 숙박 날짜·인원·객실과 취소 조건을 확인하세요.",
+    "verifiedOn": "2026-10-28"
   },
   {
     "id": "890c1003-06f9-482b-b601-bfa9a8b6e2ff",
@@ -833,7 +833,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 708 999 184"
       }
     ],
-    "verifiedOn": "2026-09-21"
+    "verifiedOn": "2026-10-28"
   },
   {
     "id": "4a33bd0b-9bd7-433e-879b-00348ff6e15c",
@@ -854,7 +854,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 944 795 522"
       }
     ],
-    "verifiedOn": "2026-09-19"
+    "verifiedOn": "2026-10-28"
   },
   {
     "id": "00c49c81-8085-43b9-a7a1-284bc2550cd2",
@@ -875,7 +875,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "url": "https://www.facebook.com/shgardenhcm"
       }
     ],
-    "verifiedOn": "2026-09-19"
+    "verifiedOn": "2026-10-28"
   },
   {
     "id": "e6acd5e1-242d-4d45-9195-953dcb0b9306",
@@ -896,7 +896,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "url": "https://www.facebook.com/caravellesaigon"
       }
     ],
-    "verifiedOn": "2026-09-19"
+    "verifiedOn": "2026-10-28"
   },
   {
     "id": "3b69b891-1c6e-465a-9379-b1dd61ce1c38",
@@ -913,7 +913,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 28 3824 1234"
       }
     ],
-    "verifiedOn": "2026-09-19"
+    "verifiedOn": "2026-10-28"
   },
   {
     "id": "4150f0a4-0dc5-4454-8b8e-e32c1c4fc092",

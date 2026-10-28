@@ -71,7 +71,10 @@ run(`
   assert.equal(ngon.url,'https://nhahangngon.com.vn/');
   assert.equal(ngon.verifiedOn,'2026-10-12');
   for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5','6eb2c0b0-8052-4d23-8753-ef143725ae6a','590758f4-d650-4195-a583-15930d8b8632','4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd'])assert(activeDirectIds.includes(id),'retain previously verified direct reservations');
-  assert(activeDirectIds.includes('d2a04f77-2218-4101-b9be-3fdf172a8958'),'Rex Hotel official booking');
+  const rexHotel=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='d2a04f77-2218-4101-b9be-3fdf172a8958');
+  assert(rexHotel,'Rex Hotel official booking');
+  assert.equal(rexHotel.url,'https://www.rexhotelsaigon.com/discover-benefits-of-direct-booking/');
+  assert.equal(rexHotel.verifiedOn,'2026-10-28');
   assert(activeDirectIds.includes('91b696af-588e-4a13-af5a-d50fb363172f'),'Vinpearl Landmark 81 official Marriott booking');
   for(const expected of [
     {id:'2e287163-0670-4370-a81a-f2904ff22bde',url:'https://www.hyatt.com/unscripted-by-hyatt/en-US/vn100-wink-saigon-centre'},

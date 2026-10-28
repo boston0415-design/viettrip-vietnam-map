@@ -76,12 +76,12 @@ async function check(mobile){
     for(const id of ['4a33bd0b-9bd7-433e-879b-00348ff6e15c','00c49c81-8085-43b9-a7a1-284bc2550cd2','e6acd5e1-242d-4d45-9195-953dcb0b9306','3b69b891-1c6e-465a-9379-b1dd61ce1c38']){
       const entry=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id===id);
       assert(entry,'newly verified inquiry route');
-      assert.equal(entry.verifiedOn,'2026-09-19');
+      assert.equal(entry.verifiedOn,'2026-10-28');
       assert(entry.channels.some(c=>c.kind==='phone'),'verified operator phone retained');
     }
     const nj184=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='12579ac9-0154-40f9-b58c-bc666ed78451');
     assert(nj184,'new NJ184 inquiry route');
-    assert.equal(nj184.verifiedOn,'2026-09-21');
+    assert.equal(nj184.verifiedOn,'2026-10-28');
     assert.equal(nj184.sourceUrl,'https://nj184barbershop.com/lien-he');
     assert.deepEqual(nj184.channels.map(c=>c.kind),['zalo','whatsapp','facebook','phone']);
     assert(nj184.channels.some(c=>c.url==='tel:+84708999184'));
