@@ -20,24 +20,33 @@
  function erase(){lines.forEach(l=>l.setMap(null));lines=[];fullPath=[];alleyPath=[];if(endMarker)endMarker.setMap(null);endMarker=null;if(startMarker)startMarker.setMap(null);startMarker=null;}
  function clear(){const restore=document.body.classList.contains('routeNavigating');document.body.classList.remove('routeNavigating');serial++;active=null;erase();document.getElementById('destinationLineHint')?.remove();if(restore&&typeof renderMarkers==='function')renderMarkers();}
  function sync(){if(active)queueMicrotask(render);}
+ function setExpanded(expanded,focus=false){
+  if(!active)return;
+  active.expanded=expanded;active.revision++;
+  active.originSearch?.hide();active.destinationSearch?.hide();
+  document.activeElement?.blur?.();render();
+  if(focus)document.querySelector(expanded?'#destinationLineHint .routeEditorHeader button':'#destinationLineHint .routeReopen')?.focus({preventScroll:true});
+ }
+ function minimize(){setExpanded(false,true);}
+
  function fit(path=fullPath){
   if(!path.length||!state.map)return;
   const bounds=new google.maps.LatLngBounds();path.forEach(p=>bounds.extend(p));
   const box=document.getElementById('destinationLineHint')?.getBoundingClientRect(),map=document.getElementById('map')?.getBoundingClientRect(),padding={top:Math.min(Math.max(70,(box?.bottom||80)-(map?.top||0)+48),(map?.height||600)*.6),right:40,bottom:45,left:40};
-  if(innerWidth>900&&box){padding.top=70;padding.left=Math.min(box.right-(map?.left||0)+24,(map?.width||1200)*.45);}
+  if(innerWidth>900&&box&&active?.expanded){padding.top=70;padding.left=Math.min(box.right-(map?.left||0)+24,(map?.width||1200)*.45);}
   if(typeof cancelPendingMapWork==='function')cancelPendingMapWork();state.map.fitBounds(bounds,padding);
  }
  function draw(path,segments=[]){
   erase();fullPath=path;
   // Solid base preserves every returned path vertex; dotted overlays erase only explicitly named alley steps.
-  lines.push(new google.maps.Polyline({map:state.map,path,strokeColor:'#2878e8',strokeWeight:3,strokeOpacity:1,clickable:false,zIndex:85}));
+  lines.push(new google.maps.Polyline({map:state.map,path,strokeColor:'#2878e8',strokeWeight:5,strokeOpacity:1,clickable:false,zIndex:85}));
   // Render individual steps instead when all geometry is available, so no solid line remains under dots.
   if(segments.length&&segments.every(s=>s.path.length>1)){
    lines[0].setMap(null);lines=[];
    for(const segment of segments){
     const options={map:state.map,path:segment.path,clickable:false,zIndex:85};
     if(segment.alley){alleyPath.push(...segment.path);Object.assign(options,{strokeOpacity:0,icons:[{icon:{path:google.maps.SymbolPath.CIRCLE,scale:2,fillColor:'#2878e8',fillOpacity:1,strokeColor:'#fff',strokeWeight:1},offset:'0',repeat:'9px'}]});}
-    else Object.assign(options,{strokeColor:'#2878e8',strokeWeight:3,strokeOpacity:1});
+    else Object.assign(options,{strokeColor:'#2878e8',strokeWeight:5,strokeOpacity:1});
     lines.push(new google.maps.Polyline(options));
    }
   }
@@ -55,7 +64,7 @@
  function editor(box){
   const form=element('form');form.className='routeEditor';
   const header=element('div');header.className='routeEditorHeader';header.append(element('strong','길찾기'));
-  const close=element('button','×');close.type='button';close.setAttribute('aria-label','안내 닫기');close.onclick=clear;header.append(close);form.append(header);
+  const close=element('button','×');close.type='button';close.setAttribute('aria-label','길찾기 창 접기');close.title='창만 접고 경로는 유지합니다';close.onclick=minimize;header.append(close);form.append(header);
   for(const [name,label,value] of [['origin','출발지','현재 위치'],['destination','목적지',active.place.name]]){
    const row=element('div');row.className='routeField';const title=element('label',label),input=element('input');input.id='route-'+name;title.htmlFor=input.id;input.setAttribute('aria-label',label);input.placeholder=label+' 장소·주소 검색';input.autocomplete='off';input.value=value||'';row.append(title,input);form.append(row);
    active[name+'Input']=input;
@@ -74,13 +83,17 @@
  }
  function render(){
   if(!active)return;const panel=document.querySelector('.mapwrap');if(!panel)return;
-  let box=document.getElementById('destinationLineHint');if(!box){box=element('section');box.id='destinationLineHint';box.className='destinationRoute';box.setAttribute('aria-label','길찾기');panel.append(box);editor(box);box.append(Object.assign(element('div'),{className:'routeResult'}));}
+  let box=document.getElementById('destinationLineHint');if(!box){box=element('section');box.id='destinationLineHint';box.className='destinationRoute';box.setAttribute('aria-label','길찾기');panel.append(box);editor(box);box.append(Object.assign(element('div'),{className:'routeResult'}));box.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();minimize();}});}
   if(box.dataset.revision===String(active.revision))return;box.dataset.revision=String(active.revision);const result=box.querySelector('.routeResult');result.replaceChildren();
-  const message=element('p',active.message);message.setAttribute('role','status');result.append(message);
+  box.classList.toggle('routeCompact',!active.expanded);box.classList.toggle('routeReady',fullPath.length>1);box.querySelector('.routeEditor').hidden=!active.expanded;
+  const submit=box.querySelector('.routeSubmit');submit.disabled=active.loading;submit.textContent=active.loading?'경로 찾는 중…':'경로 찾기';
+  const trip=element('p',`${active.origin?.name||'현재 위치'} → ${active.place.name||'목적지'}`);trip.className='routeTrip';trip.title=trip.textContent;result.append(trip);
+  const message=element('p',active.message);message.className='routeStatus';message.setAttribute('role','status');result.append(message);
   const actions=element('div');actions.className='routeActions';
+  if(!active.expanded){const reopen=element('button','경로 다시 보기');reopen.type='button';reopen.className='routeReopen';reopen.setAttribute('aria-expanded','false');reopen.onclick=()=>setExpanded(true,true);actions.append(reopen);}
   if(fullPath.length){const all=element('button','전체 경로');all.type='button';all.onclick=()=>fit();actions.append(all);if(alleyPath.length){const near=element('button','골목 보기');near.type='button';near.onclick=()=>fit(alleyPath);actions.append(near);}}
-  if(active.originReady&&active.destinationReady){const fallback=element('a','Google 지도에서 열기');fallback.href=externalUrl();fallback.target='_blank';fallback.rel='noopener noreferrer';actions.append(fallback);}result.append(actions);
-  if(active.steps?.length){const details=element('details'),summary=element('summary','상세 경로'),list=element('ol');for(const step of active.steps)list.append(element('li',step));details.append(summary,list);result.append(details);}
+  if(active.originReady&&active.destinationReady){const fallback=element('a','Google 지도에서 열기');fallback.href=externalUrl();fallback.target='_blank';fallback.rel='noopener noreferrer';fallback.hidden=!active.expanded;actions.append(fallback);}const end=element('button','경로 종료');end.type='button';end.className='routeEnd';end.onclick=clear;actions.append(end);result.append(actions);
+  if(active.steps?.length){const details=element('details'),summary=element('summary','상세 경로'),list=element('ol');for(const step of active.steps)list.append(element('li',step));details.hidden=!active.expanded;details.append(summary,list);result.append(details);}
  }
  function status(message,loading=false){if(!active)return;active.message=message;active.loading=loading;active.revision++;render();}
  function locate(){return new Promise((resolve,reject)=>{if(!navigator.geolocation)return reject(Error('LOCATION'));navigator.geolocation.getCurrentPosition(p=>resolve({lat:p.coords.latitude,lng:p.coords.longitude}),()=>reject(Error('LOCATION')),{enableHighAccuracy:true,timeout:12000,maximumAge:30000});});}
@@ -112,10 +125,10 @@
    const path=(result.path||[]).map(point).filter(Boolean);if(path.length<2)throw Error('ZERO_RESULTS');
    draw(path,result.segments);current.steps=(result.segments||[]).map(s=>s.instruction).filter(Boolean);
    const km=(result.meters/1000).toFixed(1),minutes=Math.max(1,Math.round(result.millis/60000));
-   status(`${km}km · 약 ${minutes}분`);fit();
-  }catch(error){if(request!==serial)return;erase();current.steps=[];status(error.message==='LOCATION'?'현재 위치를 확인할 수 없습니다. 출발지에 장소·주소를 검색하거나 위치 권한을 켜 주세요.':(String(error.code||error.message).includes('ZERO_RESULTS')?'두 장소를 잇는 도로 경로가 없습니다. 출발지와 목적지를 확인하세요.':'도로 경로 연결이 지연됩니다. 경로 찾기를 다시 누르거나 Google 지도에서 열어 주세요.'));console.warn('Route unavailable',error?.code||error?.message);}
+   current.expanded=false;current.originSearch?.hide();current.destinationSearch?.hide();document.activeElement?.blur?.();status(`${km}km · 약 ${minutes}분`);fit();
+  }catch(error){if(request!==serial)return;erase();current.steps=[];current.expanded=true;status(error.message==='LOCATION'?'현재 위치를 확인할 수 없습니다. 출발지에 장소·주소를 검색하거나 위치 권한을 켜 주세요.':(String(error.code||error.message).includes('ZERO_RESULTS')?'두 장소를 잇는 도로 경로가 없습니다. 출발지와 목적지를 확인하세요.':'도로 경로 연결이 지연됩니다. 경로 찾기를 다시 누르거나 Google 지도에서 열어 주세요.'));console.warn('Route unavailable',error?.code||error?.message);}
  }
- function open(){const p=destination();if(!p)return;if(active?.key===key(p)&&active.loading)return;clear();if(typeof closeDetailPanel==='function')closeDetailPanel();if(typeof closeMobileBusinessList==='function')closeMobileBusinessList();window.ListLayout?.setCollapsed(true);window.ChatDock?.close();document.body.classList.add('routeNavigating');if(typeof renderMarkers==='function')renderMarkers();active={place:p,origin:null,useLocation:true,originReady:true,destinationReady:true,key:key(p),mode:'DRIVING',message:'',loading:false,revision:0,steps:[]};calculate();}
+ function open(){const p=destination();if(!p)return;if(active?.key===key(p)&&active.loading)return;clear();if(typeof closeDetailPanel==='function')closeDetailPanel();if(typeof closeMobileBusinessList==='function')closeMobileBusinessList();window.ListLayout?.setCollapsed(true);window.ChatDock?.close();document.body.classList.add('routeNavigating');if(typeof renderMarkers==='function')renderMarkers();active={place:p,origin:null,useLocation:true,originReady:true,destinationReady:true,key:key(p),mode:'DRIVING',message:'',loading:false,expanded:true,revision:0,steps:[]};calculate();}
  document.addEventListener('click',e=>{if(active&&e.target.closest?.('#chatLauncher'))clear();const link=e.target.closest?.('#detail [data-map-route]');if(!link||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open();});
- window.DestinationLine={sync,clear,fit,open,stepInfo};
+ window.DestinationLine={sync,clear,fit,open,minimize,stepInfo};
 })();
