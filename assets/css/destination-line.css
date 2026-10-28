@@ -32,3 +32,26 @@ body.cleanMap .destinationRoute{width:360px;max-width:calc(100% - 24px)}
 .routeSuggestions small{font-size:11px;color:#69737b;padding:3px 0}
 .routeResult:empty{display:none}
 @media(max-width:900px){body.cleanMap .destinationRoute{width:calc(100% - 16px);max-width:calc(100% - 16px)}.destinationRoute .routeField input{height:40px}.routeSuggestions{max-height:150px}}
+
+/* Closing directions leaves only a small reopen button, never a summary window. */
+.destinationRoute [hidden]{display:none!important}
+.destinationRoute .routeTrip{margin:0 0 4px;font-size:13px;font-weight:600;color:#334155;overflow-wrap:anywhere}
+.destinationRoute .routeStatus{margin:6px 0 10px;color:#123b70;font-size:14px;font-weight:600;line-height:1.35}
+.destinationRoute .routeActions button,.destinationRoute .routeActions a{min-height:44px;font-size:13px;font-weight:600;padding:9px 12px}
+.destinationRoute .routeReopen{background:#1a63cf;color:#fff;border-color:#1a63cf}
+.destinationRoute .routeEnd{margin-left:auto;color:#92402e;background:#fff8f6;border-color:#f0d6ce}
+.destinationRoute .routeEditorHeader{position:sticky;top:-10px;padding:6px 0;background:#fff;z-index:2}
+.destinationRoute .routeEditorHeader button{min-width:44px;min-height:44px}
+body.cleanMap .destinationRoute.routeCompact{top:auto;bottom:54px;left:12px;width:auto;max-width:calc(100% - 80px);padding:0;border:0;border-radius:24px;background:transparent;box-shadow:none;overflow:visible}
+.destinationRoute.routeCompact .routeReopen{min-height:44px;padding:10px 16px;border:2px solid #fff;border-radius:24px;box-shadow:0 2px 10px #17345a33;white-space:nowrap;font-size:13px}
+.destinationRoute.routeCompact .routeActions{gap:6px}
+.destinationRoute details summary{min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:600;color:#234d7e}
+.destinationRoute details li{padding:6px 2px;font-size:14px;color:#26374d}
+@media(max-width:900px){
+ body.cleanMap .destinationRoute.routeCompact{left:8px;bottom:max(54px,env(safe-area-inset-bottom));width:auto;padding:0}
+ .destinationRoute.routeReady .routeStatus{font-size:21px}
+ .destinationRoute .routeActions button{flex:1;padding:8px 7px;white-space:nowrap}
+ .destinationRoute .routeEditorHeader{top:-8px}
+}
+
+.destinationRoute.routeReady .routeStatus{font-size:21px;font-weight:750}

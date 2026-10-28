@@ -473,7 +473,7 @@ function setDetailExpanded(expanded){
 }
 
 function closeDetailPanel(){
-  window.DestinationLine?.clear();
+  // Closing a place sheet must not end a separately active route.
   window.MapUX?.onDetailClosed();
   window.PlaceSearch?.clearExternal();
   const sharedSelection=window.BusinessShare?.isSharedSelection({id:state.selected});
