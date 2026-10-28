@@ -55,3 +55,8 @@ body.cleanMap .destinationRoute.routeCompact{top:auto;bottom:54px;left:12px;widt
 }
 
 .destinationRoute.routeReady .routeStatus{font-size:21px;font-weight:750}
+
+/* A collapsed route control is click-through except for its actual reopen button. */
+body.cleanMap .destinationRoute:not(.routeCompact){overflow-y:auto;overscroll-behavior:contain}
+body.cleanMap .destinationRoute.routeCompact{pointer-events:none}
+body.cleanMap .destinationRoute.routeCompact .routeReopen{pointer-events:auto}
