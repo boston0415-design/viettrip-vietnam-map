@@ -26,7 +26,7 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     window.PersonalPlaces={getView:()=>window.personalView||'favorites',setView:v=>window.personalView=v,filter:places=>places.filter(p=>!${hidden}||p.id!=='shared-1'),isHidden:id=>${hidden}&&id==='shared-1',isFavorite:()=>false};
   `);
   w.DestinationLine={open:()=>w.routeOpened=true,sync(){},clear(){}};
-  run(read('assets/js/business-share.js'));await tick();
+  run(read('assets/js/map-sharing.js'));run(read('assets/js/business-share.js'));await tick();
   return {w,run,close:()=>w.close()};
 }
 (async()=>{
@@ -39,16 +39,29 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     assert(!f.w.document.getElementById('guideMapNotice'));
     f.run(`assert.equal(state.city,'nhatrang');setDetailExpanded(true)`);
     const trigger=f.w.document.querySelector('#detail [data-business-share]');
-    assert(trigger);assert.equal(f.w.document.querySelectorAll('#detail [data-copy-value]').length,0,'secondary controls only appear on request');
+    assert(trigger);
+    const addressButton=f.w.document.querySelector('#detail .businessAddress [data-copy-value]');
+    assert(addressButton,'address is directly copyable without opening share');
+    assert.equal(decodeURIComponent(addressButton.dataset.copyValue),'나트랑 테스트 주소');
+    assert.equal(f.w.document.querySelectorAll('#detail .businessAddress').length,1);
+    assert.match(f.run(`businessAddressHtml({address:'<img src=x onerror=alert(1)>'})`),/&lt;img/);
+    assert.equal(f.run(`businessAddressHtml({address:'   '})`),'');
     trigger.click();
     const dialog=f.w.document.getElementById('businessShareDialog');assert(dialog.open);
     assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'테스트 <업소>');
-    const buttons=dialog.querySelectorAll('[data-copy-value]');assert.equal(buttons.length,1);
+    const buttons=dialog.querySelectorAll('[data-copy-value]');assert.equal(buttons.length,3);
+    assert(dialog.querySelector('[data-kakao-share]').hidden,'never display an unusable Kakao button');
+    assert(dialog.querySelector('[data-native-share]').hidden);
+    assert.equal(decodeURIComponent(buttons[1].dataset.copyValue),'나트랑 테스트 주소');
+    assert.equal(decodeURIComponent(buttons[2].dataset.copyValue),'https://viettrip-vietnam-map.pages.dev/share/place/shared-1');
     const copied=decodeURIComponent(buttons[0].dataset.copyValue);
     assert.equal(copied,'테스트 <업소>\n나트랑 테스트 주소\nhttps://viettrip-vietnam-map.pages.dev/share/place/shared-1');
     assert.equal(decodeURIComponent(buttons[0].dataset.copyValue),copied);
     assert(!dialog.querySelector('script'));
     let clipboard;Object.defineProperty(f.w,'isSecureContext',{value:true});Object.defineProperty(f.w.navigator,'clipboard',{value:{writeText:async value=>clipboard=value}});
+    const recordsBefore=f.run('JSON.stringify(db())');
+    f.w.handleCopyButton(null,addressButton);await tick();assert.equal(clipboard,'나트랑 테스트 주소');
+    assert.equal(f.run('JSON.stringify(db())'),recordsBefore,'copy must not mutate places or reviews');
     f.w.handleCopyButton({preventDefault(){},stopPropagation(){},stopImmediatePropagation(){}},buttons[0]);await tick();assert.equal(clipboard,copied);assert.equal(buttons[0].textContent,'복사됨 ✓');
     f.w.navigator.clipboard.writeText=async()=>{throw Error('clipboard denied')};
     f.w.console.warn=()=>{};
@@ -60,9 +73,21 @@ async function fixture(query='',{mobile=false,delayed=false,missing=false,offlin
     // Reopening always reads the selected business, never the previous dialog contents.
     f.run(`fixtures.push({...target,id:'shared-2',name:'다른 업체',address:''});state.selected='shared-2';renderDetail()`);
     f.w.document.querySelector('#detail [data-business-share]').click();assert(dialog.open);
-    assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'다른 업체');assert.equal(dialog.querySelectorAll('[data-copy-value]').length,1);
+    assert.equal(f.w.document.getElementById('businessSharePlace').textContent,'다른 업체');assert.equal(dialog.querySelectorAll('[data-copy-value]').length,2);
+    assert(!f.w.document.querySelector('#detail .businessAddress'),'no stale address for a venue without an address');
     assert.equal(decodeURIComponent(dialog.querySelectorAll('[data-copy-value]')[0].dataset.copyValue),'다른 업체\nhttps://viettrip-vietnam-map.pages.dev/share/place/shared-2');
     dialog.close();f.run(`fixtures=[target];state.selected='shared-1';renderDetail()`);
+    let shared;
+    f.w.navigator.share=async data=>{shared=data;};
+    f.w.document.querySelector('#detail [data-business-share]').click();
+    const native=dialog.querySelector('[data-native-share]');
+    assert(!native.hidden,'native share uses capability, not mobile user agent');
+    native.click();await tick();assert.equal(shared.url,'https://viettrip-vietnam-map.pages.dev/share/place/shared-1');
+    assert.equal(shared.text,'테스트 <업소>\n나트랑 테스트 주소');
+    const hint=dialog.querySelector('#businessShareHint'),beforeCancel=hint.textContent;
+    f.w.navigator.share=async()=>{throw Object.assign(Error('cancel'),{name:'AbortError'});};native.click();await tick();assert.equal(hint.textContent,beforeCancel);
+    f.w.navigator.share=async()=>{throw Error('blocked');};native.click();await tick();assert.match(hint.textContent,/열지 못했습니다/);
+    dialog.close();
     f.run(`closeDetailPanel();assert.equal(state.markers.length,0);assert.equal(PersonalPlaces.isHidden('shared-1'),true);assert.equal(BusinessShare.url({id:'bad?id'}),'')`);
     f.close();
   }

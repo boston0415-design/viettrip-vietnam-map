@@ -24,18 +24,30 @@
     if(!place || !url(place) || !dialog)return false;
     shareTrigger=trigger;
     dialog.querySelector('#businessSharePlace').textContent=place.name;
-    const nativeAvailable=Boolean(navigator.share&&/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
     dialog.querySelector('#businessShareOptions').innerHTML=[
-      '<button type="button" class="copyBtn kakaoShareButton" data-kakao-share>카카오톡 공유</button>',
+      '<button type="button" class="copyBtn kakaoShareButton" data-kakao-share hidden>카카오톡 공유</button>',
+      '<button type="button" class="copyBtn" data-native-share hidden>공유 앱 선택</button>',
       copyButtonHtml('공유 내용 복사',text(place)),
-      nativeAvailable?'<button type="button" class="copyBtn" data-native-share>휴대폰 공유 메뉴</button>':''
+      copyButtonHtml('주소만 복사',String(place.address||'').trim()),
+      copyButtonHtml('링크만 복사',url(place))
     ].join('');
     const hint=dialog.querySelector('#businessShareHint');
     const kakaoButton=dialog.querySelector('[data-kakao-share]');
-    const ready=()=>{kakaoButton.disabled=!window.MapSharing?.kakaoReady;hint.textContent=kakaoButton.disabled?'카카오톡 직접 공유 연결이 준비되지 않았습니다. 링크를 복사해 대화방에 붙여넣어 주세요.':'사진·업소명·주소를 카카오톡으로 보내세요.';};
-    ready();
-    document.addEventListener('map-sharing-ready',ready,{once:true});
-    const share=async kakao=>{const ok=await window.MapSharing?.share(place,{kakao});if(!ok)hint.textContent='공유창을 열지 못했습니다. 공유 링크 복사를 이용해 주세요.';};
+    const nativeButton=dialog.querySelector('[data-native-share]');
+    const update=()=>{
+      kakaoButton.hidden=!window.MapSharing?.kakaoReady;
+      nativeButton.hidden=!window.MapSharing?.nativeAvailable(place);
+      hint.textContent=window.MapSharing?.helpText(place)||'공유 내용을 복사해 카카오톡 대화방에 붙여넣어 주세요.';
+    };
+    update();
+    // One listener per opening; never retain callbacks for previous businesses.
+    dialog._sharingUpdate&&document.removeEventListener('map-sharing-change',dialog._sharingUpdate);
+    dialog._sharingUpdate=update;
+    document.addEventListener('map-sharing-change',update);
+    const share=async kakao=>{
+      const ok=await window.MapSharing?.share(place,{kakao});
+      if(!ok)hint.textContent='공유창을 열지 못했습니다. 공유 내용을 복사해 카카오톡 대화방에 붙여넣어 주세요.';
+    };
     dialog.querySelector('[data-native-share]')?.addEventListener('click',()=>share(false));
     kakaoButton.onclick=()=>share(true);
     if(!dialog.open)dialog.showModal();
@@ -51,6 +63,8 @@
     });
     dialog.querySelector('#businessShareClose').addEventListener('click',()=>dialog.close());
     dialog.addEventListener('close',()=>{
+      document.removeEventListener('map-sharing-change',dialog._sharingUpdate);
+      dialog._sharingUpdate=null;
       const target=shareTrigger?.isConnected?shareTrigger:document.querySelector('#detail [data-business-share]');
       target?.focus({preventScroll:true});shareTrigger=null;
     });

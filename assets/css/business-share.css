@@ -8,6 +8,10 @@
 #detail .detailBody{border-top:0;padding-top:0}
 #detail .detailBody>.placePhotos:first-child{margin-top:0}
 #detail .detailBody>#googlePlacePhotoSlot:first-child .googlePlacePhotos{margin-top:0;padding-top:0;border-top:0}
+#detail .businessAddress{display:flex;align-items:flex-start;gap:10px;margin:10px 0 14px;padding:10px 0;border-bottom:1px solid #e8eeea}
+#detail .businessAddress p{flex:1;min-width:0;margin:0;color:#52635b;font:400 13px/1.65 system-ui,sans-serif;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+#detail .businessAddress .copyBtn{flex:0 0 auto;min-width:78px;min-height:44px;padding:9px 10px;border:1px solid #dce6e2;border-radius:9px;background:#f4f7f5;color:#285f55;font:600 12px/1.4 system-ui,sans-serif;white-space:nowrap}
+#detail .businessAddress .copyBtn.copied{background:#e0f0e7;color:#176344}
 #businessShareDialog{width:min(380px,calc(100% - 24px));padding:16px;max-height:85dvh}
 #businessShareDialog .travellerDialogHead{align-items:center;gap:10px;margin:0 0 8px}
 #businessShareDialog .travellerDialogHead h2{margin:0;font-size:19px}
@@ -34,4 +38,4 @@
 
 #businessShareOptions .kakaoShareButton,.appShareDialog .kakaoShareButton{background:#fee500;color:#191919}
 #businessShareOptions button:disabled,.appShareDialog button:disabled{opacity:.5;cursor:not-allowed}
-.appShareDialog button[hidden]{display:none!important}
+#businessShareOptions button[hidden],.appShareDialog button[hidden]{display:none!important}
