@@ -94,9 +94,9 @@ async function check(mobile){
       {id:'0a6fd58f-dc5b-4fda-a975-45e5c98c0929',kinds:['zalo','phone'],phone:'tel:+842838201237',date:'2026-09-27'},
       {id:'16846a28-1150-4a14-9502-484af685e13f',kinds:['facebook','phone'],phone:'tel:+84944565557',date:'2026-09-27'},
       {id:'2508c6e3-494f-43b9-811f-fcd4096894c9',kinds:['facebook','phone'],phone:'tel:+84705089598',date:'2026-09-26'},
-      {id:'af1acd65-08fc-4f97-8040-83aa2b90f1d2',kinds:['facebook','phone'],phone:'tel:+84338044646',date:'2026-09-26'},
-      {id:'e29a5622-8556-4fee-9814-85089929cbd7',kinds:['facebook','phone'],phone:'tel:+84384308587'},
-      {id:'500ccf1c-201f-4837-abd1-f465c4317a21',kinds:['facebook','phone'],phone:'tel:+842432006379'},
+      {id:'af1acd65-08fc-4f97-8040-83aa2b90f1d2',kinds:['facebook','phone'],phone:'tel:+84338044646',date:'2026-10-29'},
+      {id:'e29a5622-8556-4fee-9814-85089929cbd7',kinds:['facebook','phone'],phone:'tel:+84384308587',date:'2026-10-29'},
+      {id:'500ccf1c-201f-4837-abd1-f465c4317a21',kinds:['facebook','phone'],phone:'tel:+842432006379',date:'2026-10-29'},
       {id:'f5bdf96e-c292-46ae-bbd6-4b5bdebe25d7',kinds:['kakao','facebook','phone'],phone:'tel:+84364682281'}
     ]){
       const entry=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id===expected.id);
@@ -105,6 +105,8 @@ async function check(mobile){
       assert.deepEqual(entry.channels.map(c=>c.kind),expected.kinds);
       assert(entry.channels.some(c=>c.url===expected.phone));
     }
+    assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='af1acd65-08fc-4f97-8040-83aa2b90f1d2').sourceUrl,'https://banhmihuynhhoa.vn/lien-he/');
+    assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='500ccf1c-201f-4837-abd1-f465c4317a21').sourceUrl,'https://phothinhanoi.vn/gioi-thieu');
     const blossom=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='0de5fe8b-8033-4b7c-a6c8-085d826f8e51');
     assert(blossom,'Blossom Dental official appointment inquiry');
     assert.equal(blossom.verifiedOn,'2026-09-27');

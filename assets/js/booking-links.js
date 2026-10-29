@@ -724,7 +724,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "category": "restaurant",
     "address": "26 Lê Thị Riêng, Bến Thành, Hồ Chí Minh, 베트남",
     "mode": "inquiry",
-    "sourceUrl": "https://www.facebook.com/banhmihuynhhoa/posts/1676118647849767/",
+    "sourceUrl": "https://banhmihuynhhoa.vn/lien-he/",
     "note": "Bánh Mì Huynh Hoa 공식 주문 문의입니다. 26 Lê Thị Riêng 지점 주문이라고 알리고 수량·수령 방법과 확정 여부를 확인하세요.",
     "channels": [
       {
@@ -737,7 +737,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 33 804 4646"
       }
     ],
-    "verifiedOn": "2026-09-26"
+    "verifiedOn": "2026-10-29"
   },
   {
     "id": "e29a5622-8556-4fee-9814-85089929cbd7",
@@ -758,7 +758,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 38 430 8587"
       }
     ],
-    "verifiedOn": "2026-09-24"
+    "verifiedOn": "2026-10-29"
   },
   {
     "id": "500ccf1c-201f-4837-abd1-f465c4317a21",
@@ -766,7 +766,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "category": "restaurant",
     "address": "CT9 Mỹ Đình Sông Đà, Từ Liêm, Hà Nội, 베트남",
     "mode": "inquiry",
-    "sourceUrl": "https://www.facebook.com/61579495108369/",
+    "sourceUrl": "https://phothinhanoi.vn/gioi-thieu",
     "note": "CT9 Mỹ Đình 지점의 공식 예약 문의입니다. 방문 날짜·시간·인원을 알리고 업소의 확정 답변을 확인하세요.",
     "channels": [
       {
@@ -779,7 +779,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 24 3200 6379"
       }
     ],
-    "verifiedOn": "2026-09-24"
+    "verifiedOn": "2026-10-29"
   },
   {
     "id": "f5bdf96e-c292-46ae-bbd6-4b5bdebe25d7",
