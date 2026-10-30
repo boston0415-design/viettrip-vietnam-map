@@ -76,6 +76,7 @@ run(`
   assert.equal(rexHotel.url,'https://www.rexhotelsaigon.com/discover-benefits-of-direct-booking/');
   assert.equal(rexHotel.verifiedOn,'2026-10-28');
   assert(activeDirectIds.includes('91b696af-588e-4a13-af5a-d50fb363172f'),'Vinpearl Landmark 81 official Marriott booking');
+  assert.equal(VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='91b696af-588e-4a13-af5a-d50fb363172f').verifiedOn,'2026-10-30');
   for(const expected of [
     {id:'2e287163-0670-4370-a81a-f2904ff22bde',url:'https://www.hyatt.com/unscripted-by-hyatt/en-US/vn100-wink-saigon-centre'},
     {id:'961940f4-eb4d-4b5d-9363-692b570fd591',url:'https://saigon.newworldhotels.com/en/'},

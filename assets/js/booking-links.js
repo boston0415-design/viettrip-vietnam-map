@@ -260,7 +260,7 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "url": "https://www.marriott.com/en-us/hotels/sgnak-vinpearl-landmark-81-autograph-collection/overview/",
     "sourceUrl": "https://www.marriott.com/en-us/hotels/sgnak-vinpearl-landmark-81-autograph-collection/overview/",
     "note": "720A Điện Biên Phủ의 Vinpearl Landmark 81 공식 Marriott 예약 화면입니다. 날짜·인원·객실과 취소 조건을 확인하세요.",
-    "verifiedOn": "2026-09-27"
+    "verifiedOn": "2026-10-30"
   },
   {
     "id": "d2a04f77-2218-4101-b9be-3fdf172a8958",
@@ -624,15 +624,24 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "category": "hospital",
     "address": "119 Võ Văn Tần, Xuân Hòa, Hồ Chí Minh 72117 베트남",
     "mode": "inquiry",
-    "sourceUrl": "https://www.facebook.com/NhaKhoaBlossom/photos/1558879026251799/",
-    "note": "119 Võ Văn Tần의 Blossom Dental Clinic 공식 진료 예약 문의입니다. 희망 진료와 날짜·시간을 알리고 병원의 확정 답변을 확인하세요.",
+    "sourceUrl": "https://nhakhoablossom.vn/ve-blossom/thong-tin-lien-he/",
+    "note": "119-121 Võ Văn Tần의 Blossom Dental Clinic 공식 진료 예약 문의입니다. 희망 진료와 날짜·시간을 알리고 병원의 확정 답변을 확인하세요.",
     "channels": [
       {
         "kind": "facebook",
         "url": "https://www.facebook.com/NhaKhoaBlossom/"
+      },
+      {
+        "kind": "messenger",
+        "url": "https://m.me/NhaKhoaBlossom/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842822103280",
+        "display": "+84 28 2210 3280"
       }
     ],
-    "verifiedOn": "2026-09-27"
+    "verifiedOn": "2026-10-30"
   },
   {
     "id": "16846a28-1150-4a14-9502-484af685e13f",
@@ -640,7 +649,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "category": "restaurant",
     "address": "290 Điện Biên Phủ, Xuân Hòa, Hồ Chí Minh 70000 베트남",
     "mode": "inquiry",
-    "sourceUrl": "https://steaklove.vn/blogs/khuyen-mai/bo-viet-chuan-nhat",
+    "sourceUrl": "https://steaklove.vn/pages/lien-he",
     "note": "290 Điện Biên Phủ의 Steak Love The Villa 공식 문의입니다. 방문 날짜·시간·인원을 알리고 The Villa 지점의 확정 답변을 확인하세요.",
     "channels": [
       {
@@ -653,7 +662,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 944 565 557"
       }
     ],
-    "verifiedOn": "2026-09-27"
+    "verifiedOn": "2026-10-30"
   },
   {
     "id": "5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc",
@@ -695,7 +704,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 28 3820 1237"
       }
     ],
-    "verifiedOn": "2026-09-27"
+    "verifiedOn": "2026-10-30"
   },
   {
     "id": "2508c6e3-494f-43b9-811f-fcd4096894c9",

@@ -91,8 +91,8 @@ async function check(mobile){
       {id:'949be81f-6a88-4b1c-a187-426c4a1e2c95',kinds:['facebook','phone','phone'],phone:'tel:+84865488548',date:'2026-10-02'},
       {id:'3d1f25fa-91cd-442e-80ac-7f14311d6e7b',kinds:['facebook','phone'],phone:'tel:+84389856780',date:'2026-09-28'},
       {id:'5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc',kinds:['facebook','phone'],phone:'tel:+84919021994',date:'2026-09-27'},
-      {id:'0a6fd58f-dc5b-4fda-a975-45e5c98c0929',kinds:['zalo','phone'],phone:'tel:+842838201237',date:'2026-09-27'},
-      {id:'16846a28-1150-4a14-9502-484af685e13f',kinds:['facebook','phone'],phone:'tel:+84944565557',date:'2026-09-27'},
+      {id:'0a6fd58f-dc5b-4fda-a975-45e5c98c0929',kinds:['zalo','phone'],phone:'tel:+842838201237',date:'2026-10-30'},
+      {id:'16846a28-1150-4a14-9502-484af685e13f',kinds:['facebook','phone'],phone:'tel:+84944565557',date:'2026-10-30'},
       {id:'2508c6e3-494f-43b9-811f-fcd4096894c9',kinds:['facebook','phone'],phone:'tel:+84705089598',date:'2026-09-26'},
       {id:'af1acd65-08fc-4f97-8040-83aa2b90f1d2',kinds:['facebook','phone'],phone:'tel:+84338044646',date:'2026-10-29'},
       {id:'e29a5622-8556-4fee-9814-85089929cbd7',kinds:['facebook','phone'],phone:'tel:+84384308587',date:'2026-10-29'},
@@ -107,10 +107,16 @@ async function check(mobile){
     }
     assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='af1acd65-08fc-4f97-8040-83aa2b90f1d2').sourceUrl,'https://banhmihuynhhoa.vn/lien-he/');
     assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='500ccf1c-201f-4837-abd1-f465c4317a21').sourceUrl,'https://phothinhanoi.vn/gioi-thieu');
+    assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='16846a28-1150-4a14-9502-484af685e13f').sourceUrl,'https://steaklove.vn/pages/lien-he');
     const blossom=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='0de5fe8b-8033-4b7c-a6c8-085d826f8e51');
     assert(blossom,'Blossom Dental official appointment inquiry');
-    assert.equal(blossom.verifiedOn,'2026-09-27');
-    assert.deepEqual(blossom.channels.map(c=>c.kind),['facebook']);
+    assert.equal(blossom.mode,'inquiry');
+    assert.equal(blossom.sourceUrl,'https://nhakhoablossom.vn/ve-blossom/thong-tin-lien-he/');
+    assert.equal(blossom.verifiedOn,'2026-10-30');
+    assert.deepEqual(blossom.channels.map(c=>c.kind),['facebook','messenger','phone']);
+    assert.equal(blossom.channels[1].url,'https://m.me/NhaKhoaBlossom/');
+    assert.equal(blossom.channels[2].url,'tel:+842822103280');
+    assert.equal(blossom.channels[2].display,'+84 28 2210 3280');
     const foremost=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='7576a9e9-d3c0-48c8-849b-9306dda2079c');
     assert(foremost,'FOREMOST official cake order inquiry');
     assert.equal(foremost.verifiedOn,'2026-10-02');
