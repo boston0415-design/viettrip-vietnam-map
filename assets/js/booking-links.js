@@ -280,17 +280,17 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "url": "https://www.tablecheck.com/en/the-deck-saigon/reserve/landing",
     "sourceUrl": "https://www.thedecksaigon.com/",
     "note": "The Deck Saigon · 38 Nguyễn Ư Dĩ",
-    "verifiedOn": "2026-09-29"
+    "verifiedOn": "2026-10-31"
   },
   {
     "id": "c6b8a22b-f577-42ca-8381-37218a4677c5",
     "name": "꽌부이-오리지널",
     "category": "restaurant",
     "address": "19 Ngô Văn Năm, Sài Gòn, Hồ Chí Minh 700000 베트남",
-    "url": "https://quan-bui.com/",
+    "url": "https://quan-bui.com/original/",
     "sourceUrl": "https://quan-bui.com/original/",
-    "note": "예약 양식에서 Original · 19 Ngô Văn Năm을 선택하세요.",
-    "verifiedOn": "2026-09-29"
+    "note": "공식 지점 페이지의 Reservations를 누르고 예약 양식에서 Original · 19 Ngô Văn Năm을 선택하세요. 날짜·시간·인원을 입력한 뒤 식당의 확정 연락을 확인하세요. 신청 접수만으로 예약이 확정되지는 않습니다.",
+    "verifiedOn": "2026-10-31"
   },
   {
     "id": "6eb2c0b0-8052-4d23-8753-ef143725ae6a",
@@ -604,7 +604,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "address": "355 Lê Văn Lương, Quận 7, Hồ Chí Minh 100000 베트남",
     "mode": "inquiry",
     "sourceUrl": "https://www.bunquayphuquoc.com.vn/",
-    "note": "공식 사이트에 안내된 355 Lê Văn Lương 지점의 문의 경로입니다. 방문·주문 내용과 예약 가능 여부를 묻고 매장의 확정 답변을 확인하세요.",
+    "note": "Tâm Quán 공통 브랜드 계정·전화에 7번 지점(CN7) · 355 Lê Văn Lương 문의라고 알려 주세요. 방문·주문 내용과 예약 가능 여부를 묻고 해당 지점의 확정 답변을 확인하세요.",
     "channels": [
       {
         "kind": "facebook",
@@ -616,7 +616,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 38 985 6780"
       }
     ],
-    "verifiedOn": "2026-09-28"
+    "verifiedOn": "2026-10-31"
   },
   {
     "id": "0de5fe8b-8033-4b7c-a6c8-085d826f8e51",

@@ -89,7 +89,7 @@ async function check(mobile){
       {id:'94f96d79-adf6-492f-9929-c41c6c67d9fb',kinds:['phone'],phone:'tel:+84797778877',date:'2026-10-03'},
       {id:'1a0a4dee-cb01-496e-8b88-cfb2d3589972',kinds:['facebook','phone'],phone:'tel:+84963013989',date:'2026-10-02'},
       {id:'949be81f-6a88-4b1c-a187-426c4a1e2c95',kinds:['facebook','phone','phone'],phone:'tel:+84865488548',date:'2026-10-02'},
-      {id:'3d1f25fa-91cd-442e-80ac-7f14311d6e7b',kinds:['facebook','phone'],phone:'tel:+84389856780',date:'2026-09-28'},
+      {id:'3d1f25fa-91cd-442e-80ac-7f14311d6e7b',kinds:['facebook','phone'],phone:'tel:+84389856780',date:'2026-10-31'},
       {id:'5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc',kinds:['facebook','phone'],phone:'tel:+84919021994',date:'2026-09-27'},
       {id:'0a6fd58f-dc5b-4fda-a975-45e5c98c0929',kinds:['zalo','phone'],phone:'tel:+842838201237',date:'2026-10-30'},
       {id:'16846a28-1150-4a14-9502-484af685e13f',kinds:['facebook','phone'],phone:'tel:+84944565557',date:'2026-10-30'},
@@ -108,6 +108,10 @@ async function check(mobile){
     assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='af1acd65-08fc-4f97-8040-83aa2b90f1d2').sourceUrl,'https://banhmihuynhhoa.vn/lien-he/');
     assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='500ccf1c-201f-4837-abd1-f465c4317a21').sourceUrl,'https://phothinhanoi.vn/gioi-thieu');
     assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='16846a28-1150-4a14-9502-484af685e13f').sourceUrl,'https://steaklove.vn/pages/lien-he');
+    const tamQuan=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='3d1f25fa-91cd-442e-80ac-7f14311d6e7b');
+    assert(tamQuan.note.includes('공통 브랜드 계정·전화'));
+    assert(tamQuan.note.includes('CN7'));
+    assert(tamQuan.note.includes('355 Lê Văn Lương'));
     const blossom=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='0de5fe8b-8033-4b7c-a6c8-085d826f8e51');
     assert(blossom,'Blossom Dental official appointment inquiry');
     assert.equal(blossom.mode,'inquiry');

@@ -2,9 +2,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {JSDOM}=require(process.env.JSDOM_PATH||'jsdom');
 const root=path.join(__dirname,'..');
 const read=name=>fs.readFileSync(path.join(root,name),'utf8');
+for(const mobile of [true,false]){
 const dom=new JSDOM(read('index.html'),{url:'https://viettrip-vietnam-map.pages.dev/',runScripts:'outside-only',pretendToBeVisual:true});
 const w=dom.window,ctx=dom.getInternalVMContext(),run=code=>vm.runInContext(code,ctx);
-w.assert=assert;w.matchMedia=query=>({matches:query.includes('max-width')});
+w.assert=assert;w.matchMedia=query=>({matches:mobile&&query.includes('max-width')});
 for(const name of fs.readdirSync(path.join(root,'assets/js')).filter(name=>/^0[1-8]-/.test(name)).sort())run(read('assets/js/'+name));
 run(read('assets/js/booking-links.js'));
 run(`
@@ -122,9 +123,16 @@ run(`
     assert.equal(entry.verifiedOn,'2026-10-10');
     assert.equal(entry.url,expected.url);
   }
-  for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5','6eb2c0b0-8052-4d23-8753-ef143725ae6a']){
-    assert.equal(VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id===id).verifiedOn,'2026-09-29','oldest direct route rechecked');
+  for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5']){
+    assert.equal(VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id===id).verifiedOn,'2026-10-31','oldest direct route rechecked');
   }
+  const quanBuiOriginal=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='c6b8a22b-f577-42ca-8381-37218a4677c5');
+  assert.equal(quanBuiOriginal.url,'https://quan-bui.com/original/','reservation opens the verified branch, not the generic home page');
+  assert.equal(quanBuiOriginal.sourceUrl,quanBuiOriginal.url);
+  assert(quanBuiOriginal.note.includes('Reservations'));
+  assert(quanBuiOriginal.note.includes('19 Ngô Văn Năm'));
+  assert(quanBuiOriginal.note.includes('신청 접수만으로 예약이 확정되지는 않습니다'));
+  assert.equal(VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='6eb2c0b0-8052-4d23-8753-ef143725ae6a').verifiedOn,'2026-09-29','limited external form access must not advance the verification date');
   const mismatchedQuanBuiGarden={id:'4eccf861-1154-461b-b257-20a48f8850c6',name:'콴 부이 가든',category:'restaurant',address:'55A Ngô Quang Huy, An Khánh, Hồ Chí Minh 70000 베트남'};
   assert.equal(verifiedBookingFor(mismatchedQuanBuiGarden),null,'current official 55 address mismatch suspends reservation');
   assert.equal(bookingLinkHtml(mismatchedQuanBuiGarden),'','no mismatched branch reservation action');
@@ -180,4 +188,5 @@ const trust=w.document.querySelector('.homeScreenTrust');
 assert.deepEqual([...trust.querySelectorAll('dt')].map(n=>n.textContent),['이용 방식','권한','공식 주소']);
 assert.equal(trust.querySelector('a').href,'https://viettrip-vietnam-map.pages.dev/');
 dom.window.close();
-console.log('PASS verified reservations for 32 businesses and 7 points, including Gangnam BBQ and Tan Hai Van, Phong Cua 2 and Haidilao Crescent Mall, Luxury Anna Spa, Dam Sen Water Park, Quynh Nhu 137, Com Nieu Sai Gon, El Gaucho Hai Ba Trung, OM Nuong Trung Son, FUME, Quan Ut Ut and Nha Hang Ngon, three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, compact detail, directions, passive hover, install trust copy and unchanged filters');
+}
+console.log('PASS desktop/mobile verified reservations for 32 businesses and 7 points, including branch-specific Quan Bui Original, Gangnam BBQ and Tan Hai Van, Phong Cua 2 and Haidilao Crescent Mall, Luxury Anna Spa, Dam Sen Water Park, Quynh Nhu 137, Com Nieu Sai Gon, El Gaucho Hai Ba Trung, OM Nuong Trung Son, FUME, Quan Ut Ut and Nha Hang Ngon, three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, detail, directions, passive hover, install trust copy and unchanged filters');
