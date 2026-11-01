@@ -86,9 +86,9 @@ async function check(mobile){
     assert.deepEqual(nj184.channels.map(c=>c.kind),['zalo','whatsapp','facebook','phone']);
     assert(nj184.channels.some(c=>c.url==='tel:+84708999184'));
     for(const expected of [
-      {id:'94f96d79-adf6-492f-9929-c41c6c67d9fb',kinds:['phone'],phone:'tel:+84797778877',date:'2026-10-03'},
+      {id:'94f96d79-adf6-492f-9929-c41c6c67d9fb',kinds:['phone'],phone:'tel:+84797778877',date:'2026-11-01'},
       {id:'1a0a4dee-cb01-496e-8b88-cfb2d3589972',kinds:['facebook','phone'],phone:'tel:+84963013989',date:'2026-10-02'},
-      {id:'949be81f-6a88-4b1c-a187-426c4a1e2c95',kinds:['facebook','phone','phone'],phone:'tel:+84865488548',date:'2026-10-02'},
+      {id:'949be81f-6a88-4b1c-a187-426c4a1e2c95',kinds:['booking','facebook','phone','phone'],phone:'tel:+84865488548',date:'2026-11-01'},
       {id:'3d1f25fa-91cd-442e-80ac-7f14311d6e7b',kinds:['facebook','phone'],phone:'tel:+84389856780',date:'2026-10-31'},
       {id:'5994cfb9-ba8c-485b-b4ed-7a3e4a4740dc',kinds:['facebook','phone'],phone:'tel:+84919021994',date:'2026-09-27'},
       {id:'0a6fd58f-dc5b-4fda-a975-45e5c98c0929',kinds:['zalo','phone'],phone:'tel:+842838201237',date:'2026-10-30'},
@@ -108,6 +108,12 @@ async function check(mobile){
     assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='af1acd65-08fc-4f97-8040-83aa2b90f1d2').sourceUrl,'https://banhmihuynhhoa.vn/lien-he/');
     assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='500ccf1c-201f-4837-abd1-f465c4317a21').sourceUrl,'https://phothinhanoi.vn/gioi-thieu');
     assert.equal(VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='16846a28-1150-4a14-9502-484af685e13f').sourceUrl,'https://steaklove.vn/pages/lien-he');
+    const samwon=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='949be81f-6a88-4b1c-a187-426c4a1e2c95');
+    assert.equal(samwon.sourceUrl,'https://samwonjung.vn/home');
+    assert.equal(samwon.channels[0].url,'https://inline.app/booking/samwonjung/mydinh');
+    assert.equal(samwon.channels[1].url,'https://www.facebook.com/Samwonjung.vn/');
+    assert.equal(samwon.channels[3].url,'tel:+84865466946','preserve the VN/EN contact alongside Korean phone and booking');
+    assert(samwon.note.includes('당일 예약은 전화로 문의'));
     const tamQuan=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='3d1f25fa-91cd-442e-80ac-7f14311d6e7b');
     assert(tamQuan.note.includes('공통 브랜드 계정·전화'));
     assert(tamQuan.note.includes('CN7'));
@@ -161,6 +167,16 @@ async function check(mobile){
       for(const key of ['name','category','address'])assert.equal(verifiedBookingFor({...entry,[key]:'changed'}),null);
     }
     for(const bad of [
+      {kind:'booking',url:'http://inline.app/booking/samwonjung/mydinh'},
+      {kind:'booking',url:'https://inline.app.evil.test/booking/samwonjung/mydinh'},
+      {kind:'booking',url:'https://inline.app@evil.test/booking/samwonjung/mydinh'},
+      {kind:'booking',url:'https://attacker@inline.app/booking/samwonjung/mydinh'},
+      {kind:'booking',url:'https://inline.app:444/booking/samwonjung/mydinh'},
+      {kind:'booking',url:'https://inline.app/login'},
+      {kind:'booking',url:'https://inline.app/booking/samwonjung'},
+      {kind:'booking',url:'https://inline.app/booking/samwonjung/mydinh/extra'},
+      {kind:'booking',url:'https://inline.app/booking/samwonjung/mydinh?redirect=https://evil.test'},
+      {kind:'booking',url:'https://inline.app/booking/samwonjung/mydinh#other-branch'},
       {kind:'zalo',url:'javascript:alert(1)'},
       {kind:'zalo',url:'https://zalo.me.evil.test/contact'},
       {kind:'messenger',url:'https://m.me@evil.test/contact'},
@@ -176,6 +192,7 @@ async function check(mobile){
       {kind:'tiktok',url:'https://www.tiktok.com/login'},
       {kind:'unknown',url:'https://example.test/booking'}
     ])assert(!validBookingContact(bad),'invalid route rejected: '+bad.url);
+    assert(validBookingContact({kind:'booking',url:'https://inline.app/booking/samwonjung/mydinh'}));
     assert(validBookingContact({kind:'tiktok',url:'https://www.tiktok.com/@example.venue_1'}));
     assert(validBookingContact({kind:'tiktok',url:'https://tiktok.com/@example_venue/'}));
     assert(validBookingContact({kind:'whatsapp',url:'https://wa.me/84888545767'}));
@@ -191,6 +208,7 @@ async function check(mobile){
     await action(`state.selected=${JSON.stringify(entry.id)};renderDetail()`);
     const triggers=[...w.document.querySelectorAll('#detail [data-booking-inquiry]')];
     assert.equal(triggers.length,1,'one booking action is shared by mobile and desktop');
+    assert(triggers[0].textContent.includes('예약 문의'));
     assert(w.document.querySelector('#detail .detailQuickActions').classList.contains('hasBooking'));
     assert.equal(w.document.getElementById('detailBody').hidden,false,'booking details open ready to read on mobile and desktop');
     const depth=w.history.state.viettripPanelBack.depth,url=w.location.href;
@@ -206,6 +224,17 @@ async function check(mobile){
     assert.equal(links.length,entry.channels.length);
     for(const [i,link] of links.entries()){
       assert.equal(link.href,entry.channels[i].url);
+      if(entry.channels[i].kind==='booking'){
+        assert.equal(link.querySelector('strong').textContent,'예약하기','online forms are distinct from inquiry channels');
+        assert(link.textContent.includes('공식 온라인 예약'));
+        // Cancel only the external navigation: page handlers must still preserve
+        // the inquiry dialog and selected place while a new booking tab opens.
+        link.addEventListener('click',event=>event.preventDefault(),{once:true});
+        link.click();await pause();
+        assert(dialog.open);assert.equal(w.location.href,url);
+        assert.equal(w.history.state.viettripPanelBack.depth,depth+1);
+        assert.equal(run('state.selected'),entry.id);
+      }else assert(!link.querySelector('strong').textContent.includes('예약하기'));
       if(entry.channels[i].kind==='phone')assert(!link.target);
       else {assert.equal(link.target,'_blank');assert.equal(link.rel,'noopener noreferrer')}
     }

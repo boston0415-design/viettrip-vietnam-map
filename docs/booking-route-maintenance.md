@@ -31,6 +31,7 @@
 ## 반영·검사
 
 - 직접 예약 페이지는 ‘예약하기’, 연락 채널은 ‘예약 문의’로 표시한다. TikTok 연결은 ‘틱톡 예약 안내’로 표시하며 프로필에서 예약 안내를 확인하도록 한다.
+- 기존 연락 채널을 유지하면서 직접 예약 양식도 제공하는 업체는 `VERIFIED_BUSINESS_CONTACTS`의 `channels`에 `kind: 'booking'`을 함께 둘 수 있다. 문의 화면에서 이 링크만 ‘예약하기’로 구분한다. 현재 허용 범위는 운영자가 직접 연결한 `https://inline.app/booking/브랜드/지점` 형식이며 쿼리·해시·유사 도메인은 허용하지 않는다. 지점 주소와 실제 예약 양식을 검증한 뒤에만 추가하고 기존 전화·메신저를 대체하지 않는다. 직접 예약만 안내하는 업체는 기존 `VERIFIED_BUSINESS_BOOKINGS`를 사용한다.
 - `verifiedBookingFor`의 업체 ID/이름/분류/주소 검증을 유지한다. 임의 입력이나 비슷한 상호에 링크가 자동 부여되지 않도록 한다.
 - 기존 직접 예약과 교통 예약을 보존한다. 새 연락 채널에 맞는 안전한 URL 검증 및 실제 문의 화면을 점검한다.
 - 변경된 예약 스크립트의 `index.html` 버전 문자열을 갱신한다. `tests/booking-inquiries.test.cjs`, `tests/booking-links.test.cjs`와 `node scripts/build-pages.mjs`로 관련 동작을 검사한다. 실제 브라우저/기기 검사를 하지 않았다면 한 것처럼 보고하지 않는다.

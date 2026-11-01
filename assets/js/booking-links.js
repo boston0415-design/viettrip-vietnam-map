@@ -323,7 +323,7 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "verifiedOn": "2026-10-07"
   }
 ]);
-// Contact channels are copied from the operator site, never inferred from a phone/name.
+// Booking/contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
     "id": "02bba62d-d38e-4a65-9625-c9206e308c0d",
@@ -532,7 +532,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 79 777 8877"
       }
     ],
-    "verifiedOn": "2026-10-03"
+    "verifiedOn": "2026-11-01"
   },
   {
     "id": "1a0a4dee-cb01-496e-8b88-cfb2d3589972",
@@ -577,9 +577,13 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "category": "restaurant",
     "address": "Lô 08-TT4-KĐT Mỹ Đình – Mễ Trì, Đường Trần Văn Lai, Phường Mỹ Đình 1, Quận Nam Từ Liêm, Hà Nội, Từ Liêm, Hà Nội 10000 베트남",
     "mode": "inquiry",
-    "sourceUrl": "https://samwonjung.vn/contact",
-    "note": "Lô 08-TT4 Mỹ Đình 지점의 공식 예약 문의입니다. 한국어·베트남어/영어 전용 전화가 구분되어 있습니다. 날짜·시간·인원을 알리고 매장의 확정 답변을 확인하세요.",
+    "sourceUrl": "https://samwonjung.vn/home",
+    "note": "Lô 08-TT4 Mỹ Đình 지점입니다. 온라인은 예약하기에서 날짜·시간·인원과 확정 내용을 확인하세요. 당일 예약은 전화로 문의하세요. 한국어·베트남어/영어 번호가 구분되며 문의 후 매장의 확정 답변을 확인하세요.",
     "channels": [
+      {
+        "kind": "booking",
+        "url": "https://inline.app/booking/samwonjung/mydinh"
+      },
       {
         "kind": "facebook",
         "url": "https://www.facebook.com/Samwonjung.vn/"
@@ -595,7 +599,7 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
         "display": "+84 86 546 6946 (VN/EN)"
       }
     ],
-    "verifiedOn": "2026-10-02"
+    "verifiedOn": "2026-11-01"
   },
   {
     "id": "3d1f25fa-91cd-442e-80ac-7f14311d6e7b",
@@ -1165,6 +1169,7 @@ const VERIFIED_POINT_BOOKINGS=Object.freeze([
 ]);
 function bookingIdentity(value){return String(value||'').normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase()}
 const BOOKING_CONTACT_TYPES=Object.freeze({
+  booking:{label:'예약하기',hosts:['inline.app']},
   zalo:{label:'Zalo로 문의',hosts:['zalo.me']},
   messenger:{label:'메신저로 문의',hosts:['m.me','www.messenger.com','messenger.com']},
   facebook:{label:'페이스북으로 문의',hosts:['www.facebook.com','facebook.com','m.facebook.com','web.facebook.com']},
@@ -1181,6 +1186,9 @@ function validBookingContact(channel){
     const allowed=url.protocol==='https:' && !url.username && !url.password && !url.port &&
       BOOKING_CONTACT_TYPES[channel.kind].hosts.includes(url.hostname) && url.pathname.length>1;
     if(!allowed)return false;
+    // A verified branch may offer an online form alongside its existing contacts.
+    // Only canonical branch-booking paths on the approved provider are accepted.
+    if(channel.kind==='booking')return /^\/booking\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+\/?$/.test(url.pathname) && !url.search && !url.hash;
     // Curate canonical operator profiles; short links and arbitrary videos are not
     // reservation destinations. The operator must publish a booking inquiry route.
     if(channel.kind==='tiktok')return /^\/@[A-Za-z0-9._]+\/?$/.test(url.pathname) && !url.search && !url.hash;
@@ -1222,7 +1230,7 @@ function openBookingInquiry(id){
   dialog.querySelector('#bookingInquiryNote').textContent=booking.note;
   dialog.querySelector('#bookingInquiryChannels').innerHTML=channels.map(channel=>{
     const phone=channel.kind==='phone',label=BOOKING_CONTACT_TYPES[channel.kind].label;
-    const hint=phone?channel.display:channel.kind==='facebook'?'페이지의 메시지 버튼으로 문의':channel.kind==='tiktok'?'공식 프로필에서 예약 안내 확인':'앱 또는 웹으로 열기';
+    const hint=phone?channel.display:channel.kind==='booking'?'공식 온라인 예약 · 지점·날짜·인원 확인':channel.kind==='facebook'?'페이지의 메시지 버튼으로 문의':channel.kind==='tiktok'?'공식 프로필에서 예약 안내 확인':'앱 또는 웹으로 열기';
     return `<div class="bookingContactRow"><a class="bookingContactLink" href="${esc(channel.url)}" ${phone?'':'target="_blank" rel="noopener noreferrer"'} aria-label="${esc(place.name)} ${esc(label)}${phone?'':' · 외부 서비스, 새 창'}"><span><strong>${esc(label)}</strong><small>${esc(hint||channel.url.slice(4))}</small></span><span class="bookingContactArrow" aria-hidden="true">↗</span></a>${phone?`<button type="button" class="bookingPhoneCopy" data-booking-phone="${esc(channel.url.slice(4))}" aria-label="${esc(channel.display||'전화번호')} 복사">번호 복사</button>`:''}</div>`;
   }).join('');
   const source=dialog.querySelector('#bookingInquirySource');
