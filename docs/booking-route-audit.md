@@ -1,5 +1,31 @@
 # 예약 경로 점검 기록
 
+## 2026-11-02
+
+기준 main: `887eca5c1fd94d3b879b15481b2ae5c4f91899f3`. 공개 업체 167곳을 다시 읽었으며 전일 이후 신규 등록·이름·주소 변경은 없다. 현재 업체 ID 전체에 조사 이력이 있고 기존 예약·문의 항목 69곳의 ID·이름·분류·주소도 공개 등록 정보와 일치한다. 오래된 미연결 업체부터 순환 조사했다. 회원·후기 개인정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.
+
+### 미연결 업체 순환 조사 — 연결 보류 유지
+
+| 업체 / ID | 결과 | 근거·후보 출처 / 재확인일 |
+| --- | --- | --- |
+| Wonton Noodles 44 / `9fec28d7-5d32-4660-8fcb-0beccc643b88` | `44 Lê Quốc Hưng` 관련 검색 결과는 제3자 안내 위주이며 기존 Facebook 후보는 접근 제한으로 내용을 읽지 못했다. 운영자의 현재 예약·문의 안내를 확인하지 못해 번호·계정을 추가하지 않았다. | https://www.facebook.com/p/Hủ-Tiếu-Mì-Hoành-Thánh-44-100043686416337/ · 2026-11-16 또는 운영자 공식 안내 확인 시 |
+| Cơm 48 / `a4669782-fc0d-442c-8896-4aef59e04532` | 제3자 자료의 `K28 Cư Xá Vĩnh Hội`와 등록된 Vĩnh Hội 지도 위치를 운영자 공식 출처로 함께 대조하지 못했다. 기존 Facebook 후보도 읽지 못해 연결을 보류했다. | https://www.facebook.com/100027918353286/ · 2026-11-16 또는 운영자·지점 확인 시 |
+| 마루카메 우동 / `8048b1f0-8bf8-4103-8391-4cdacfd83c3c` | 운영사 Lotus Group의 지점 목록에서 `215 Lý Tự Trọng`을 확인하여 이전의 ‘현재 공식 지점 목록에 없음’ 사유를 정정한다. 운영사가 직접 연결하는 브랜드 사이트는 `www.marukameudon.vn`이며 접근 시 403, 공식 Facebook·TikTok도 내용을 읽지 못했다. 운영사 연결 Lotus Delivery의 공통 주문 전화는 배달 주문용이므로 좌석 예약 경로로 추가하지 않았다. `marukameudon.com` 목록만으로 현재 지점 유무를 판단하지 않는다. | https://lotusgroup.com.vn/dia-chi/ · https://lotusgroup.com.vn/thuong-hieu/thuong-thuc-mon-an-nhat-ban-chuan-vi-cung-marukame-udon/ · https://lotusdelivery.vn/pages/phuong-thuc-dat-hang-va-giao-hang · 2026-11-16 또는 공식 좌석 예약 안내 확인 시 |
+| 풍투이 / `e523f843-7a83-4477-bcd1-11c047f520cb` | 공식 Facebook 후보에서 접근 제한 화면만 읽혔다. `4 Đ. Số 2`의 제3자 스파 소개·다른 번호를 운영자 예약 안내로 채택하지 않았다. | https://www.facebook.com/massagephungthuy.net/ · 2026-11-16 또는 운영자 공식 예약 안내 확인 시 |
+| 콴 부이 가든 / `4eccf861-1154-461b-b257-20a48f8850c6` | 등록 주소 `55A Ngô Quang Huy`와 공식 지점 페이지의 `55 Ngo Quang Huy` 차이가 유지된다. 기존 주소 불일치 보류를 유지하고 업체·후기 정보는 수정하지 않았다. | https://quan-bui.com/garden/ · 2026-11-16 또는 업체 주소 변경 시 |
+| Sen Trắng Spa & Wellness-GỘI ĐẦU DƯỠNG SINH & MASSAGE BODY QUẬN 1 / `51c33dbd-d6ff-4232-9e1f-af36dae3495d` | `72 Trần Đình Xu` 검색은 제3자 사업자·스파 목록 위주였다. 검색된 예약 이메일·Facebook은 `7/2 Phùng Khắc Khoan`의 동명 스파가 안내하는 경로여서 등록 지점에 연결하지 않았다. 채용 연락처도 제외했다. | https://www.tripadvisor.com/Attraction_Review-g293925-d2417715-Reviews-Sen_Trang_Spa-Ho_Chi_Minh_City.html · 2026-11-16 또는 등록 지점의 운영자 공식 안내 확인 시 |
+| 랜드마크 81 / `56fcf9f7-2d0b-48a2-b472-a6d95f36056b`, Landmark 1 – Vinhomes Central Park / `763cbbd5-4c92-48de-9c57-bc68309bde60` | 현재 공개 등록 정보가 여전히 건물명·주소뿐이어서 숙박 운영 주체를 특정할 수 없다. 같은 건물의 호텔·임의 호스트·중개인 경로를 대신 연결하지 않았다. | 현재 공개 업체명·분류·주소 대조 · 2026-11-16 또는 운영 숙소명 등록 시 |
+
+### 오래된 기존 경로 재점검 — URL·채널 변경 없음
+
+| 업체 / ID | 결과 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| XLIII Specialty Coffee / `b028e325-1bbf-41a7-967a-384cfe78b4d9` | 공식 지점 페이지의 `178A Pasteur`와 이름·전화·날짜·시간·인원·지점을 입력하는 Reservation information 양식을 다시 확인했다. 기존 직접 예약 경로를 유지했다. | https://xliiicoffee.com/en/location/xliii-coffee-hcmc/ · 2026-12-02 또는 업체명·주소·경로 변경 시 |
+| Kim spa / `bedc2ca1-07b3-4c7f-b49a-8d5f5cc4d1cd` | 공식 페이지의 `F11 3A Street`와 Book us 양식의 이름·국가·전화·Date & Time, Requests 및 BOOK NOW를 다시 확인했다. 검색 도구는 시간 초과했지만 일반 HTTP 본문은 읽혔다. 기존 직접 예약 경로를 유지했다. 공개 카카오 ID나 WhatsApp 번호에서 별도 계정 URL을 추측하지 않았다. | https://kimmassagequan7.com/ · 2026-12-02 또는 업체명·주소·경로 변경 시 |
+| 로이스치과 호치민 / `bad22e55-f097-4202-beb2-f2aa82893110` | 공식 사이트의 공개 검색 결과에는 `155 Phạm Thái Bường`과 기존 상담전화 `035.511.2255`가 유지된다. 온라인상담 본문은 403으로 직접 재확인하지 못해 기존 경로와 코드의 이전 확인일을 유지하고 다른 번호를 추가하지 않았다. | https://roycedental-vn.com/ · https://roycedental-vn.com/Onlineconsultation · 2026-11-16 또는 공식 본문 접근 가능 시 |
+
+새 예약·문의 경로나 새 주소 불일치·끊어진 경로가 확인되지 않아 운영 코드·기존 확인일은 바꾸지 않고 이 순환 점검 기록만 갱신한다. 직접 예약 32곳·문의 37곳·교통 예약 7곳은 그대로다. `booking-links`, `booking-inquiries`, `business-share`, `review-preservation`, `review-vault`, `recommendations` 검사와 JavaScript 문법 검사·Pages 빌드를 통과했다. URL·지점 검증, 전화번호 복사 성공·대체·실패, 뒤로가기·닫기·Escape, 기존 공유 및 후기 보존을 점검했다. 관련 PC·모바일 분기는 jsdom 자동검사이며 실기기 검사는 아니다. 양식 제출·실제 통화·메시지·예약·결제는 하지 않았다.
+
 ## 2026-11-01
 
 기준 main: `18c0c4f0847f9bbfa85cbe8445b955711a2c1125`. 공개 업체 167곳을 다시 읽었으며 전일 이후 신규 등록·이름·주소 변경은 없다. 현재 ID 전체에 조사 이력이 있고 기존 예약·문의 항목은 ID·이름·분류·주소가 공개 등록 정보와 일치한다. 미연결 업체 중 마지막 확인일이 오래된 대상을 순환 조사했다. 회원·후기 개인정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.
