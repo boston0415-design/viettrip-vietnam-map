@@ -1,5 +1,37 @@
 # 예약 경로 점검 기록
 
+## 2026-11-03
+
+기준 main: `426122db5b6c21ad7560dc6e47f6b1b8a2a5ef07`. 공개 업체 167곳을 다시 읽고 전일 공개 목록과 대조했다. 신규 등록·이름·분류·주소 변경은 없고, 기존 예약·문의 항목 69곳의 ID·이름·분류·주소도 일치한다. 신규 미조사 업체가 없어 오래된 미연결 업체를 순환 조사했다. 회원·후기 개인정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.
+
+### 공식 예약 문의 추가
+
+| 업체 / ID | 검증 및 변경 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| Mắm Restaurant - Hidden Vietnamese Flavors / `ba762ccb-09a4-4bed-9211-6fc7c90ed68f` | 공식 연락 페이지의 `72 Nguyễn Thiện Thuật` 주소가 등록 지점과 일치한다. 홈페이지의 `GỌI ĐẶT BÀN` 버튼은 `tel:0938881618`로 연결되고, 운영자 게시물의 테이블 예약 안내도 같은 주소·전화 `093 888 1618`을 명시한다. 국제 형식 전화 `+84 93 888 1618`만 ‘예약 문의’로 추가했다. 방문 날짜·시간·인원을 알리고 확정 답변을 확인하도록 안내한다. 일반 문의 양식을 직접 예약 양식으로 표시하거나 전화번호로 Zalo·메신저 URL을 만들지 않았다. | https://www.mamrestaurant.com/ · https://www.mamrestaurant.com/pages/lien-he · https://www.mamrestaurant.com/blogs/news/mot-ngay-kham-pha-nha-trang-va-bua-com-am-long-tai-nha-hang-mam · 2026-12-03 또는 업체명·주소·경로 변경 시 |
+
+### 미연결 업체 순환 조사 — 미반영
+
+| 업체 / ID | 보류 사유 | 근거·후보 출처 / 재확인일 |
+| --- | --- | --- |
+| Millennium Apartment / `875f7d7b-8bcf-4ce1-a024-215f931a58d5` | 현재 공개 등록 정보가 여전히 아파트 단지명·주소뿐이어서 숙박 운영 주체를 특정할 수 없다. 임의 호스트·중개인 경로를 대신 연결하지 않았다. | 현재 공개 업체명·분류·주소 대조 · 2026-11-17 또는 운영 숙소명 등록 시 |
+| Dong Pho Restaurant / `daf724d4-6645-4c93-a49b-a0e44509e5b5` | 공식 홈페이지·연락 페이지는 `57 Hồ Xuân Hương`과 기존 전화를 안내하지만 예약 접수용이라는 운영자 안내를 확인하지 못했다. 제3자의 예약 권장 문구만으로 연결하지 않았다. | https://www.dongphorest.vn/ · https://www.dongphorest.vn/contact-1 · 2026-11-17 또는 운영자 예약 안내 확인 시 |
+| 꽌 94 게요리 전문점 / `b0d7d3fd-7187-46ad-a4d5-3b77a973691b` | 등록 주소 `94 Đinh Tiên Hoàng`의 정보는 제3자 목록 위주였다. `84 Đinh Tiên Hoàng`의 Quán Thuý 94와 등록 지점의 운영 주체를 동일하다고 확정하지 않아 다른 지점 연락처는 연결하지 않았다. | https://www.momo.vn/page/9810136 · 2026-11-17 또는 등록 지점의 운영자 공식 안내 확인 시 |
+| Onsi Spa / `3ba7e578-703e-4766-b00a-2e20129c1c50` | 공식 사이트가 현재도 `6/30 Nguyen Thien Thuat`을 안내하며 등록 주소 `08 Nguyễn Thiện Thuật`과 차이가 있다. 2026-09-18 별도 감사 기록의 주소 불일치 보류를 유지한다. 공식 번호·카카오 ID가 있어도 등록 지점에 연결하거나 업체 주소를 수정하지 않았다. | https://onsispa.com/ · docs/booking-facebook-audit-20260918.md · 2026-11-17 또는 지점 주소 일치 확인 시 |
+| 1군 맛찬들 / `f0edaaeb-47d5-40cd-b638-55a99ebb1d6b` | `6-8 Tôn Thất Tùng` 지점의 예약 홍보는 제3자 재게시 페이지에서 확인됐지만 Facebook 후보는 접근 제한으로 읽지 못했다. 재게시된 전화·Zalo 번호만으로 공식 채널을 추가하지 않았다. | https://www.facebook.com/Matchandeulbbq.hcm · 2026-11-17 또는 운영자 공식 예약 안내 접근 가능 시 |
+| Nhà Hàng Pearl - 93 ktv (구 스카이) / `1d3b7912-0bd4-437c-aaf1-3fd184504c92` | `93 An Dương Vương` 예약 소개는 여러 업소를 취급하는 중개 사이트 위주였다. 등록 Plus Code 위치·운영 주체·공식 예약 목적지를 함께 확인하지 못해 중개 연락처를 제외했다. | https://ezbooking.com.vn/dia-diem/karaoke-pearl-93-an-duong-vuong/ · 2026-11-17 또는 운영자 공식 안내 확인 시 |
+| 호치민 가라오케 넘버원 KTV NO1 KARAOKE / `5853e6a2-c8dc-4e1d-aadb-0baac67468f3` | `104 Ký Con` 주소·예약 안내는 제3자 여행·중개 목록에서 확인됐다. 등록 업소 운영자가 직접 제공한 예약 경로를 확인하지 못해 카카오톡·텔레그램 대행 연락처를 추가하지 않았다. | https://perfectviet.com/ho-chi-minh/ktv/numberone-karaoke-ho-chi-minh/ · 2026-11-17 또는 운영자 공식 안내 확인 시 |
+| 서울 불고기 / `0d587bab-fd3b-4c76-84e8-dd91c69dd706` | `34 Trần Quang Khải` 관련 검색 결과는 여행·후기 자료 위주였다. 이전 사이트 제작 플랫폼 후보의 공식 운영자 관계를 추가 입증할 예약 안내를 찾지 못해 보류했다. | https://kr.trip.com/restaurant/vietnam/nha-trang/detail/seoul-bulgogi-150985894/ · 2026-11-17 또는 운영자 공식 연결 확인 시 |
+
+### 오래된 기존 경로 재점검 — 유지
+
+| 업체 / ID | 결과 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| Opera / `590758f4-d650-4195-a583-15930d8b8632` | 공식 지점 페이지의 Park Hyatt Saigon·예약 문의 안내와 기존 TableCheck 목적지가 유지된다. 연결 대상은 검색 도구에서 시간 초과하여 예약 양식을 재확인하지 못했다. 기존 URL·이전 확인일을 유지하고 일회성 접속 실패를 예약 중단으로 단정하지 않았다. | https://www.parkhyattsaigonrestaurants.com/opera · https://www.tablecheck.com/en/park-hyatt-saigon-opera/reserve/landing · 2026-11-07 또는 예약 양식 접근 가능 시 |
+| Square One / `4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd` | 공식 지점 페이지의 Park Hyatt Saigon·예약 문의 안내가 기존 TableCheck 화면으로 계속 연결된다. 대상에서 상호·인원·날짜·시간 선택 초기 화면만 읽혔으므로 전체 예약 조건을 다시 검증했다고 표시하지 않았다. 기존 URL·이전 확인일을 유지했다. | https://www.parkhyattsaigonrestaurants.com/square-one · https://www.tablecheck.com/en/park-hyatt-saigon-square-one/reserve/landing · 2026-11-07 또는 전체 예약 양식 접근 가능 시 |
+
+기존 직접 예약 32곳·문의 37곳·교통 예약 7곳의 데이터와 채널은 모두 보존하고 문의 1곳만 추가했다(직접 예약 32·문의 38·교통 7). 추가 후 70개 업체의 지점 정보가 현재 공개 정보와 일치한다. `booking-links`, `booking-inquiries`, `business-share`, `review-preservation`, `review-vault`, `recommendations` 검사와 JavaScript 문법 검사·Pages 빌드를 통과했다. 문의·직접 예약 구분, URL·지점 검증, 전화번호 복사 성공·대체·실패, 뒤로가기·닫기·Escape, 기존 공유 및 후기 보존을 점검했다. 지도 내부 PC·모바일 분기는 jsdom 자동검사이며 실제 브라우저·실기기 검사는 아니다. 실제 통화·메시지·예약·결제는 하지 않았다.
+
 ## 2026-11-02
 
 기준 main: `887eca5c1fd94d3b879b15481b2ae5c4f91899f3`. 공개 업체 167곳을 다시 읽었으며 전일 이후 신규 등록·이름·주소 변경은 없다. 현재 업체 ID 전체에 조사 이력이 있고 기존 예약·문의 항목 69곳의 ID·이름·분류·주소도 공개 등록 정보와 일치한다. 오래된 미연결 업체부터 순환 조사했다. 회원·후기 개인정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.

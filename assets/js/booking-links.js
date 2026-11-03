@@ -326,6 +326,23 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 // Booking/contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
   {
+    "id": "ba762ccb-09a4-4bed-9211-6fc7c90ed68f",
+    "name": "Mắm Restaurant - Hidden Vietnamese Flavors",
+    "category": "restaurant",
+    "address": "72 Nguyễn Thiện Thuật, Nha Trang, Khánh Hòa 650000 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://www.mamrestaurant.com/",
+    "note": "나트랑 72 Nguyễn Thiện Thuật의 Mắm Restaurant 공식 예약 문의 전화입니다. 방문 날짜·시간·인원을 알리고 식당의 확정 답변을 확인하세요. 문의만으로 예약이 확정되지는 않습니다.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+84938881618",
+        "display": "+84 93 888 1618"
+      }
+    ],
+    "verifiedOn": "2026-11-03"
+  },
+  {
     "id": "02bba62d-d38e-4a65-9625-c9206e308c0d",
     "name": "The Log Restaurant",
     "category": "restaurant",
