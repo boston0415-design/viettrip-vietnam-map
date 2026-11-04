@@ -100,6 +100,10 @@ run(`
   assert(goldenLotusSpa,'Golden Lotus 15 Thai Van Lung official appointment form');
   assert.equal(goldenLotusSpa.verifiedOn,'2026-10-08');
   assert.equal(goldenLotusSpa.url,'https://saigonwellness.vn/');
+  assert(goldenLotusSpa.note.includes('24시간 전에'),'show the operator online-request lead time');
+  assert(goldenLotusSpa.note.includes('주말(토·일) 신청은 다음 월요일 오전'),'weekend requests are not promised immediate confirmation');
+  assert(goldenLotusSpa.note.includes('+84 28 3822 1515'),'retain the published hotline for urgent requests');
+  assert(goldenLotusSpa.note.includes('신청 접수만으로 예약이 확정되지는 않으므로'));
   const templeLeaf=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='ab1794e5-1897-4a13-920d-688b6cdffaa7');
   assert(templeLeaf,'Temple Leaf 32 Thai Van Lung official reservation form');
   assert.equal(templeLeaf.verifiedOn,'2026-10-08');

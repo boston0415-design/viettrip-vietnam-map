@@ -219,7 +219,7 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "address": "15 Thái Văn Lung, Sài Gòn, Hồ Chí Minh, 베트남",
     "url": "https://saigonwellness.vn/",
     "sourceUrl": "https://saigonwellness.vn/",
-    "note": "15 Thái Văn Lung 지점의 공식 예약 신청 화면입니다. 서비스·날짜·시간을 선택해 신청하고 업소의 예약 확정 답변을 확인하세요. 당일 예약은 공식 안내에 따라 전화 문의를 권장합니다.",
+    "note": "15 Thái Văn Lung 지점의 공식 예약 신청 화면입니다. 온라인 신청은 24시간 전에 진행하세요. 주말(토·일) 신청은 다음 월요일 오전에 확정 처리된다고 안내되어 있어, 당일·주말 예약은 공식 전화 +84 28 3822 1515로 문의하는 것이 좋습니다. 신청 접수만으로 예약이 확정되지는 않으므로 업소의 확정 답변을 확인하세요.",
     "verifiedOn": "2026-10-08"
   },
   {
