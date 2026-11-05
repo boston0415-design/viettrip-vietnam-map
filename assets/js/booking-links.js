@@ -209,8 +209,8 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "address": "38 Trần Phú, Phường, Nha Trang, Khánh Hòa 650000 베트남",
     "url": "https://skylightnhatrang.com/rooftop-beach-club/booking/",
     "sourceUrl": "https://skylightnhatrang.com/rooftop-beach-club/booking/",
-    "note": "38 Trần Phú의 Skylight Rooftop Beach Club 공식 테이블 예약 신청 양식입니다. 날짜·시간·인원·테이블 종류를 입력하고 업소의 예약 확정 이메일을 확인하세요.",
-    "verifiedOn": "2026-10-09"
+    "note": "38 Trần Phú의 Skylight Rooftop Beach Club 공식 VIP 테이블 예약 신청 양식입니다. 날짜·시간·인원을 입력하고 최소 3시간 전에 신청하세요. 테이블별 최소 주류 주문 조건이 있으며 VIP 테이블 보관 시간은 15분입니다. 신청 접수만으로 예약이 확정되지는 않으므로 업소의 확정 이메일을 기다리세요.",
+    "verifiedOn": "2026-11-05"
   },
   {
     "id": "264290b4-1b37-4f6d-bde8-79b54ec467a1",

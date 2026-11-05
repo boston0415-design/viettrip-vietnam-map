@@ -1,5 +1,32 @@
 # 예약 경로 점검 기록
 
+## 2026-11-05
+
+기준 main: `2b273c92fadd201382a2d51c49e9c2b0cf1d2a3f`. 공개 업체 167곳을 다시 읽어 전일 공개 목록·현재 코드·기존 기록과 대조했다. 신규 등록·이름·분류·주소 변경과 미조사 업체는 없으며, 기존 예약·문의 70곳의 ID·이름·분류·주소도 일치한다. 재확인일이 된 미연결 업체와 오래된 기존 경로부터 순환 조사했다. 회원·후기 개인정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.
+
+### 기존 예약 안내 보강 — 목적지 유지
+
+| 업체 / ID | 확인 및 변경 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| 스카이라이트 / `4dd4eb44-4e31-4ec3-b0c7-c5b68913cb29` | 공식 예약 페이지의 `38 Tran Phu` 주소, 이름·날짜·시간·이메일·전화·인원 양식과 VIP 테이블 정책을 확인했다. 기존 URL은 유지하며 최소 3시간 전 신청, 테이블별 최소 주류 주문 조건, VIP 테이블 15분 보관, 신청 후 확정 이메일 대기를 안내에 추가했다. 기존의 ‘테이블 종류 입력’ 표현은 현재 양식의 실제 입력 항목과 구분하여 정리했다. 신청 접수만으로 예약이 확정된다고 표시하지 않는다. | https://skylightnhatrang.com/rooftop-beach-club/booking/ · 2026-12-05 또는 업체명·주소·예약 조건 변경 시 |
+
+### 미연결 업체 순환 조사 — 미반영
+
+| 업체 / ID | 보류 사유 | 근거·후보 출처 / 재확인일 |
+| --- | --- | --- |
+| 돈탐 - Dontam Thảo Điền / `1c8301f3-df2e-48e6-b275-c692743760f1` | 제3자 목록은 `44 Nguyễn Cừ`와 Instagram 후보 `dontamtaodien`을 안내하지만 프로필 본문을 읽지 못해 운영자가 게시한 현재 예약 안내와 대조하지 못했다. 제3자의 예약 권장·번호를 대신 연결하지 않았다. | https://www.instagram.com/dontamtaodien/ · 2026-11-19 또는 운영자 공식 예약 안내 확인 시 |
+| RaRa Massage - 라라 마사지 / `5a5c1eb1-4806-41d8-8010-7aa0308d3c1c` | The Star Hotel의 공식 서비스 페이지에서 `21–23 Hung Phuoc 2`, 전화 `076 35 35 350`, 카카오 ID `rara3535`를 대조했다. 다만 서비스 연락처가 실제 예약 접수용이라는 안내는 확인하지 못했다. 별도 `rarabeauty.com.vn` 후보는 웹 도구에서 접근되지 않고 일반 HTTP 요청은 503이었다. 호텔 객실 Reservation이나 호텔 공통 카카오 경로를 마사지 예약으로 연결하지 않았고, ID에서 카카오 URL도 만들지 않았다. 일회성 오류를 폐업으로 단정하지 않았다. | https://thestarhotel.com.vn/services/rara-massage-and-beauty/ · https://rarabeauty.com.vn/ · 2026-11-19 또는 마사지 예약 안내 확인 시 |
+| Red Bison Grill / `80753943-468e-4c76-a10f-eb813d7ce992` | `56 Pho Duc Chinh`의 브랜드 소개 페이지가 `Reservation: 0901162860`과 전화 링크를 제공한다. 그러나 브랜드 Linktree가 연결한 다른 Canva 페이지의 공개 초기 데이터에는 예약 표시 번호 `0996 655 188`과 전화 링크 `0901162860`이 함께 있어 번호가 일치하지 않는다. Facebook은 접근 제한, Instagram은 읽기 오류로 현재 운영자 예약 번호를 교차 확인하지 못했다. 후보 번호·Order Now Messenger를 예약 문의로 추가하지 않았다. | https://redbisongrill.my.canva.site/ · https://linktr.ee/redbisongrill · https://theironbanksaigon.my.canva.site/website-red-bison-grill-sai-gon-i-m · 2026-11-19 또는 운영자 예약 번호 일치 확인 시 |
+
+### 오래된 기존 경로 재확인 — 유지
+
+| 업체 / ID | 결과 | 공식 근거 / 다음 확인 |
+| --- | --- | --- |
+| Lousiane Brewhouse Nha Trang Restaurant & Craft Beer / `d1d8099f-8864-43ef-8025-7f77771b92d1` | 검색 도구는 시간 초과했지만 일반 HTTP 본문에서 `Lot 29 Tran Phu Park`와 테이블 예약 안내, 이름·전화·이메일·날짜·시간·인원 양식을 다시 확인했다. 기존 URL·코드 확인일은 유지했다. | https://louisianebrewhouse.com.vn/contact-us-reservations/ · 2026-12-05 또는 업체명·주소·경로 변경 시 |
+| MZ Club - Live Music / `a3c685fa-2d7d-459c-a0bc-f5d6d3cac080` | 검색 도구는 redirect loop 오류였으나 일반 HTTP 본문은 정상으로 `56 Bùi Thị Xuân`과 테이블 예약 신청의 고객명·전화·인원·날짜·시간 항목을 확인했다. 기존 URL·코드 확인일은 유지하고 도구 오류를 끊어진 운영 링크로 단정하지 않았다. | https://mzentertainment.vn/lien-he · 2026-12-05 또는 업체명·주소·경로 변경 시 |
+
+직접 예약 32곳·문의 38곳·교통 예약 7곳의 기존 목적지·연락 채널·지점 검증은 모두 보존했으며, 이번 운영 변경은 스카이라이트 안내·확인일과 스크립트 캐시 버전뿐이다. `booking-links`, `booking-inquiries`, `business-share`, `review-preservation`, `review-vault`, `recommendations` 자동검사와 JavaScript 문법 검사·Pages 빌드를 통과했다. PC·모바일 분기, 안내 표시, 안전한 URL·지점 변경 시 연결 중지, 번호 복사 성공·대체·실패, 뒤로가기·닫기·Escape 및 기존 공유·후기 보존을 검사했다. 지도 UI 검사는 jsdom 자동검사이며 실제 브라우저·실기기 검사나 양식 제출·통화·메시지·예약·결제는 하지 않았다.
+
 ## 2026-11-04
 
 기준 main: `a3fb0ac05f369c1a7bcf82186c78b09a90759bba`. 공개 업체 167곳을 다시 읽어 전일 공개 목록·기존 기록과 대조했다. 신규 등록·이름·분류·주소 변경과 미조사 업체는 없으며, 기존 예약·문의 항목 70곳의 ID·이름·분류·주소도 일치한다. 오래된 미연결 업체부터 순환 조사했다. 회원·후기 개인정보와 비밀키는 조회하지 않았고 데이터베이스는 수정하지 않았다.

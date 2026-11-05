@@ -115,9 +115,16 @@ run(`
   ]){
     const entry=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id===expected.id);
     assert(entry,'upgraded official table reservation form');
-    assert.equal(entry.verifiedOn,'2026-10-09');
+    assert.equal(entry.verifiedOn,expected.id==='4dd4eb44-4e31-4ec3-b0c7-c5b68913cb29'?'2026-11-05':'2026-10-09');
     assert.equal(entry.url,expected.url);
   }
+  const skylight=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='4dd4eb44-4e31-4ec3-b0c7-c5b68913cb29');
+  assert(skylight.note.includes('38 Trần Phú'),'retain the verified Skylight branch');
+  assert(skylight.note.includes('최소 3시간 전에'),'show the operator reservation lead time');
+  assert(skylight.note.includes('최소 주류 주문 조건'),'table requests have minimum order conditions');
+  assert(skylight.note.includes('보관 시간은 15분'),'show the operator VIP table hold limit');
+  assert(skylight.note.includes('신청 접수만으로 예약이 확정되지는 않으므로'));
+  assert(skylight.note.includes('확정 이메일을 기다리세요'));
   for(const expected of [
     {id:'8b625d7d-9da2-4aa0-ac03-43984b809ea4',url:'https://sushihokkaidosachi.com.vn/en/reservation/'},
     {id:'15eae798-a243-4241-a984-a885ae47d46e',url:'https://www.tablecheck.com/ja/yazawa-saigon/reserve/landing'}
