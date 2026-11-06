@@ -18,7 +18,14 @@ async function check(mobile){
     db=()=>contactFixture;
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
-    assert.equal(VERIFIED_BUSINESS_CONTACTS.length,38,'retain all prior inquiries and add Mam Nha Trang');
+    assert.equal(VERIFIED_BUSINESS_CONTACTS.length,39,'retain prior inquiries and add Hai Lua');
+    const haiLua=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='e80f3905-28b2-489d-b9f6-dff397f78d9e');
+    assert.equal(haiLua.address,'648 Nguyễn Trãi, Chợ Lớn, Hồ Chí Minh, 베트남');
+    assert.equal(haiLua.mode,'inquiry');
+    assert.equal(haiLua.sourceUrl,'https://hailuaq5.com/');
+    assert.equal(haiLua.verifiedOn,'2026-11-06');
+    assert.deepEqual(haiLua.channels.map(c=>[c.kind,c.url]),[['phone','tel:+84919563338']]);
+    assert(haiLua.note.includes('문의만으로 예약이 확정되지는 않습니다'));
     assert.equal(new Set(VERIFIED_BUSINESS_CONTACTS.map(p=>p.id)).size,VERIFIED_BUSINESS_CONTACTS.length,'each verified branch has one contact entry');
     const mam=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='ba762ccb-09a4-4bed-9211-6fc7c90ed68f');
     assert(mam,'Mam Nha Trang official table reservation phone');
