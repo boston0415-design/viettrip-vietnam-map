@@ -1,5 +1,19 @@
 # 예약 경로 점검 기록
 
+## 2026-11-07
+
+기준 main: `ddf68dbd7c7589546370160305cc8c604e737215`. 공개 업체 167곳을 기존 기록과 대조했다. 신규 등록, 미조사 업체, 이름·분류·주소 변경 및 기존 예약·문의 71곳의 지점 불일치는 없었다. 운영 코드와 업체 데이터는 변경하지 않았다.
+
+| 업체 / ID | 확인 결과 | 근거 / 다음 확인 |
+| --- | --- | --- |
+| 맛찬들 - Matchandeul BBQ Quận 7 / `d7614b35-e405-44b4-baf5-21b1bd836c6e` | 브랜드 예약 사이트는 4 Trường Sơn 탄빈 지점을 안내한다. 49 Cao Triều Phát 후보 Facebook은 접근 제한으로 지점과 예약 안내를 확인하지 못해 연결하지 않았다. | https://matchandeul.vn/ · https://www.facebook.com/matchandeulQ7/ · 2026-11-21 또는 7군 공식 예약 안내 확인 시 |
+| 괭이부리마을 / `a64e5c03-93ae-4d39-8247-d7a1043db460` | 제3자 목록에는 같은 48 Cao Triều Phát에 우몽이 표시된다. 기존 업체와 동일 운영자인지 또는 입점이 바뀌었는지 공식 출처로 확인하지 못해 상호·연락처를 변경하지 않았다. | https://chintaisaigon.com/buildings/hung-gia/ (제3자 후보) · 2026-11-21 또는 운영자·지점 변경 확인 시 |
+| 호치민 가라오케 오딧세이 KTV / `cfcea983-088e-4208-ac22-7fc00b9ba9a6` | 13 Yersin과 카카오 예약 문의를 표시한 사이트는 읽혔지만 현지 운영자가 해당 사이트·채널을 지정했다는 근거를 확인하지 못했다. 중개 경로는 제외했다. | https://odysseyktv.com/ (후보) · 2026-11-21 또는 운영자 공식 연결 확인 시 |
+| Opera / `590758f4-d650-4195-a583-15930d8b8632` | 호텔 공식 지점 안내 및 TableCheck의 상호·인원·날짜·시간 선택 초기 화면을 확인했다. 전체 예약 조건과 실제 잔여석은 확인하지 않았으며 기존 연결을 유지했다. | https://www.parkhyattsaigonrestaurants.com/opera · https://www.tablecheck.com/en/park-hyatt-saigon-opera/reserve/landing · 2026-12-07 또는 경로 변경 시 |
+| Square One / `4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd` | 호텔 공식 지점 페이지의 Reserve Now가 기존 TableCheck 목적지로 연결되고 상호·인원·날짜·시간 선택 초기 화면이 표시된다. 전체 예약 조건과 잔여석은 확인하지 않았으며 기존 연결을 유지했다. | https://www.parkhyattsaigonrestaurants.com/square-one · https://www.tablecheck.com/en/park-hyatt-saigon-square-one/reserve/landing · 2026-12-07 또는 경로 변경 시 |
+
+회원·후기 개인정보와 비밀키는 조회하지 않았고 통화·메시지·예약·결제를 하지 않았다.
+
 ## 2026-11-06
 
 기준 main: `391f72901f1a1b6ce56e3794fcf96a56ef325664`. 공개 업체 167곳을 전일 목록·기존 확인 항목과 대조했다. 신규 등록, 이름·분류·주소 변경, 미조사 업체 및 기존 연결의 지점 불일치는 없었다.
