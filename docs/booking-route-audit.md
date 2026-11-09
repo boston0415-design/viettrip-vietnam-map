@@ -1,5 +1,20 @@
 # 예약 경로 점검 기록
 
+## 2026-11-09
+
+기준 main: `9125ea8d9c93e1e4bb2bb87df1746631b6354cda`. 공개 업체 167곳 및 기존 예약·문의 연결 71곳을 대조했다. 신규·미조사 업체, 이름·분류·주소 변경 및 연결 지점 불일치는 없었다.
+
+| 업체 | 결과 / 다음 확인 |
+| --- | --- |
+| 배베식당 (182 Dương Đình Nghệ) | [지역 업체 목록](https://ekoreatown.net/home/b/korearestaurant/3127)의 전화·배달 정보와 사이트 공통 예약 문구만 확인됐다. 운영자가 공개한 좌석 예약 목적지는 미확인. 2026-11-23 재확인. |
+| 하나이발관 (108 Thăng Long), 112 Thăng Long (파티), 고향이발관 본점 (16–18 Hậu Giang) | [하나이발관 소개](https://hcmhp.com/massage/?mod=document&uid=15), [파티 소개](https://vvg-vietnam.com/city/hochiminh/partybar) 등 제3자 경로는 운영자 예약 근거가 아니다. 고향이발관은 다낭 동명 업체도 검색되어 제외했다. 세 지점 모두 2026-11-23 재확인. |
+| 배트맨이발소 (41 Nội Khu Hưng Gia 2), MANONG (40 Hưng Gia 4), 헤어소울 (R2-32 Lý Long Tường) | [채용 목록](https://vn.joboko.com/batman-barber-shop-xci775001), [업체 목록](https://www.viet-biz.com/en/manong-hair-salon-academy-028-5410-7978), [리뷰 목록](https://topaz.vn/toplist/salon-lam-toc-quan-7)에서 주소 후보는 확인되나 운영자 공식 예약 경로는 미확인. 2026-11-23 재확인. |
+| Sushi Hokkaido Sachi (139 A–B Nguyễn Trãi) | [공식 지점 목록](https://sushihokkaidosachi.com.vn/en/location/)과 [예약 양식](https://sushihokkaidosachi.com.vn/en/reservation/)의 Nguyễn Trãi 선택·인원·날짜·시간 항목 확인. 기존 연결 유지, 2026-12-09 재확인. |
+| Yakiniku Yazawa Saigon | [공식 사이트](https://yazawameat.vn/vi/)에서 기존 [TableCheck](https://www.tablecheck.com/ja/yazawa-saigon/reserve/landing)로 연결되며 식당명과 초기 예약 화면을 확인했다. 기존 연결 유지, 2026-12-09 재확인. |
+| 라 브라세리 (235 Nguyễn Văn Cừ, 호텔 2층) | [호텔 공식 식당 페이지](https://hotelnikkosaigon.com.vn/dining/la-brasserie-restaurant/)의 예약 전화와 기존 Zalo 목적지가 유지된다. Zalo 내부 화면은 로그인 제한으로 미확인. 기존 연결 유지, 2026-12-09 재확인. |
+
+운영 코드와 업체 데이터는 변경하지 않았으며, 회원·후기 개인정보나 비밀키를 조회하지 않았다. 통화·메시지·예약·결제는 하지 않았다.
+
 ## 2026-11-08
 
 기준 main: `5e2e56113e6496bf10ba04039a5de0c8dfa03cdd`. 공개 업체 167곳과 기존 예약·문의 71곳을 대조했다. 신규·미조사 업체, 등록 정보 변경, 연결 지점 불일치는 없었다. 다음 미연결 후보는 공식 예약 근거가 확보될 때까지 보류한다.
