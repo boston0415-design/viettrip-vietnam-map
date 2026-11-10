@@ -1,5 +1,17 @@
 # 예약 경로 점검 기록
 
+## 2026-11-10
+
+기준 main: `7a0706d3972cf8cf745f6c5eefa62b7fab08ffc4`. 공개 업체 167곳과 기존 예약·문의 연결 71곳을 대조했다. 신규·미조사 업체, 등록 정보 변경 또는 연결 지점 불일치는 없었다.
+
+| 업체 | 결과 / 다음 확인 |
+| --- | --- |
+| 진순대& 진설렁탕 (17/9 Lê Thánh Tôn) | 이전 기록의 운영 주체 불일치 보류를 유지했다. 검색된 후기·배달 목록으로는 현재 운영자를 확정할 수 없고 [브랜드 Facebook](https://www.facebook.com/nhahangjinsundae/)은 공개 열람으로 재확인하지 못했다. 연결·업체 정보 수정 없이 2026-11-24 재확인. |
+| Wink Saigon Centre (75 Nguyễn Bỉnh Khiêm) | [Wink 지점 안내](https://wink-hotels.com/hotel/wink-hotel-saigon-centre/)와 [Hyatt 지점 화면](https://www.hyatt.com/unscripted-by-hyatt/en-US/vn100-wink-saigon-centre)의 기존 예약 진입점 유지. 2026-12-10 재확인. |
+| 뉴월드 사이공 호텔 (76 Lê Lai), 베이 호텔 호치민 (7 Ngô Văn Năm) | [뉴월드 공식 사이트](https://saigon.newworldhotels.com/en/)와 [베이 호텔 공식 사이트](https://www.bayhotelhcm.com/)의 지점 주소와 예약 버튼을 확인했다. 객실 재고·결제는 확인하지 않았고 기존 연결을 유지했다. 2026-12-10 재확인. |
+
+운영 코드와 업체 데이터는 변경하지 않았다. 회원·후기 개인정보나 비밀키를 조회하지 않았고 통화·메시지·예약·결제를 하지 않았다.
+
 ## 2026-11-09
 
 기준 main: `9125ea8d9c93e1e4bb2bb87df1746631b6354cda`. 공개 업체 167곳 및 기존 예약·문의 연결 71곳을 대조했다. 신규·미조사 업체, 이름·분류·주소 변경 및 연결 지점 불일치는 없었다.
