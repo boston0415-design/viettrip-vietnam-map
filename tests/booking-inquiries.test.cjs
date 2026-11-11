@@ -18,7 +18,14 @@ async function check(mobile){
     db=()=>contactFixture;
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
-    assert.equal(VERIFIED_BUSINESS_CONTACTS.length,39,'retain prior inquiries and add Hai Lua');
+    assert.equal(VERIFIED_BUSINESS_CONTACTS.length,40,'retain prior inquiries and move Ngon to phone inquiry');
+    const ngon=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='acbc3ab7-57bd-474a-86c3-9d62e97db797');
+    assert.equal(ngon.address,'160 Pasteur, Quận 1, Hồ Chí Minh, 베트남');
+    assert.equal(ngon.mode,'inquiry');
+    assert.equal(ngon.sourceUrl,'https://nhahangngon.com.vn/');
+    assert.equal(ngon.verifiedOn,'2026-11-11');
+    assert.deepEqual(ngon.channels.map(c=>[c.kind,c.url]),[['phone','tel:+842838277131']]);
+    assert(ngon.note.includes('문의만으로 예약이 확정되지는 않습니다'));
     const haiLua=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='e80f3905-28b2-489d-b9f6-dff397f78d9e');
     assert.equal(haiLua.address,'648 Nguyễn Trãi, Chợ Lớn, Hồ Chí Minh, 베트남');
     assert.equal(haiLua.mode,'inquiry');

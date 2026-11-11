@@ -123,16 +123,6 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
     "verifiedOn": "2026-10-13"
   },
   {
-    "id": "acbc3ab7-57bd-474a-86c3-9d62e97db797",
-    "name": "냐 항 응온",
-    "category": "restaurant",
-    "address": "160 Pasteur, Quận 1, Hồ Chí Minh, 베트남",
-    "url": "https://nhahangngon.com.vn/",
-    "sourceUrl": "https://nhahangngon.com.vn/",
-    "note": "160 Pasteur의 Ngon Sài Gòn 공식 온라인 예약 신청 화면입니다. 날짜·시간·인원과 연락처를 입력하고 식당의 예약 확정 답변을 확인하세요.",
-    "verifiedOn": "2026-10-12"
-  },
-  {
     "id": "2e287163-0670-4370-a81a-f2904ff22bde",
     "name": "Wink Saigon Centre, part of Unscripted by Hyatt",
     "category": "stay",
@@ -325,6 +315,23 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 ]);
 // Booking/contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
+  {
+    "id": "acbc3ab7-57bd-474a-86c3-9d62e97db797",
+    "name": "냐 항 응온",
+    "category": "restaurant",
+    "address": "160 Pasteur, Quận 1, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://nhahangngon.com.vn/",
+    "note": "Ngon Sài Gòn · 160 Pasteur의 공식 예약 전화입니다. 방문 날짜·시간·인원을 알리고 식당의 확정 답변을 확인하세요. 문의만으로 예약이 확정되지는 않습니다.",
+    "channels": [
+      {
+        "kind": "phone",
+        "url": "tel:+842838277131",
+        "display": "+84 28 3827 7131"
+      }
+    ],
+    "verifiedOn": "2026-11-11"
+  },
   {
     "id": "e80f3905-28b2-489d-b9f6-dff397f78d9e",
     "name": "Hai Lua Restaurant (구 짬찐)",

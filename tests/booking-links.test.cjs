@@ -14,7 +14,7 @@ run(`
   db=()=>fixture;
   Object.assign(state,{cat:'restaurant',sub:'한식',ratingFilter:'4',query:'preserve',markers:[{id:'unchanged'}]});
   const saved=JSON.stringify([state.cat,state.sub,state.ratingFilter,state.query,state.markers]);
-  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,32);
+  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,31);
   const activeDirectIds=VERIFIED_BUSINESS_BOOKINGS.map(p=>p.id);
   const gangnamBbq=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='dc1444d1-7021-4c20-ad7d-6c86ec48ae54');
   assert(gangnamBbq,'Gangnam BBQ official reservation request form');
@@ -68,9 +68,7 @@ run(`
   assert.equal(quanUtUt.url,'https://www.quanutut.com/book');
   assert.equal(quanUtUt.verifiedOn,'2026-10-13');
   const ngon=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='acbc3ab7-57bd-474a-86c3-9d62e97db797');
-  assert(ngon,'Nha Hang Ngon official online reservation');
-  assert.equal(ngon.url,'https://nhahangngon.com.vn/');
-  assert.equal(ngon.verifiedOn,'2026-10-12');
+  assert.equal(ngon,undefined,'Ngon now publishes reservation phone guidance, not an online form');
   for(const id of ['890c1003-06f9-482b-b601-bfa9a8b6e2ff','c6b8a22b-f577-42ca-8381-37218a4677c5','6eb2c0b0-8052-4d23-8753-ef143725ae6a','590758f4-d650-4195-a583-15930d8b8632','4d17d5da-5f7b-4dc0-b49d-01ca48fcd3bd'])assert(activeDirectIds.includes(id),'retain previously verified direct reservations');
   const rexHotel=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='d2a04f77-2218-4101-b9be-3fdf172a8958');
   assert(rexHotel,'Rex Hotel official booking');
@@ -200,4 +198,4 @@ assert.deepEqual([...trust.querySelectorAll('dt')].map(n=>n.textContent),['이�
 assert.equal(trust.querySelector('a').href,'https://viettrip-vietnam-map.pages.dev/');
 dom.window.close();
 }
-console.log('PASS desktop/mobile verified reservations for 32 businesses and 7 points, including branch-specific Quan Bui Original, Gangnam BBQ and Tan Hai Van, Phong Cua 2 and Haidilao Crescent Mall, Luxury Anna Spa, Dam Sen Water Park, Quynh Nhu 137, Com Nieu Sai Gon, El Gaucho Hai Ba Trung, OM Nuong Trung Son, FUME, Quan Ut Ut and Nha Hang Ngon, three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, detail, directions, passive hover, install trust copy and unchanged filters');
+console.log('PASS desktop/mobile verified reservations for 31 businesses and 7 points, including branch-specific Quan Bui Original, Gangnam BBQ and Tan Hai Van, Phong Cua 2 and Haidilao Crescent Mall, Luxury Anna Spa, Dam Sen Water Park, Quynh Nhu 137, Com Nieu Sai Gon, El Gaucho Hai Ba Trung, OM Nuong Trung Son, FUME, Quan Ut Ut; Ngon phone inquiry migration, three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, detail, directions, passive hover, install trust copy and unchanged filters');
