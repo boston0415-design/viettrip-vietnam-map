@@ -1,5 +1,19 @@
 # 예약 경로 점검 기록
 
+## 2026-11-14
+
+기준 main: `67e8ac1faa2603400ce95d80a55a252be755dfe8`. 공개 업체 167곳과 기존 예약·문의 연결 71곳을 대조했다. 신규·미조사 업체, 등록 정보 변경 및 연결 지점 불일치는 없었다.
+
+| 업체 | 결과 / 다음 확인 |
+| --- | --- |
+| FUME (74/7 Hai Bà Trưng), Hum Signature (34 Võ Văn Tần) | [FUME 공식 프로필](https://beacons.ai/dinewithfume)과 [Hum 공식 사이트](https://hum-dining.vn/en/)에서 각 지점의 기존 TableCheck 목적지를 확인했다. 도착 화면의 상호는 일치하나 공개 열람으로 양식·조건 전체를 재확인하지 못했다. 기존 경로 및 확인일 유지, 2026-12-14 재확인. |
+| Shan Dimsum (57–59 Phù Đổng Thiên Vương) | [기존 Facebook](https://www.facebook.com/p/SHAN-DIMSUM-61555667754674/)은 열람 제한. 제3자 전화 정보는 변경 근거로 사용하지 않았다. 기존 연결 유지, 2026-12-14 재확인. |
+| 꾹각꽌 (10 Đặng Tất), Tib - Hue Restaurant (187 Ter Hai Bà Trưng) | [꾹각꽌 공식 주소·전화 안내](https://cucgachquan.com/vi/an-bua-com-nha/duong-den-cuc-gach-quan.html)는 여전히 구형 전화 표기이며 좌석 소개는 예약 양식이 아니다. [Tib 연락 페이지](https://www.tib-huerestaurant.com.vn/lien-he/)는 시간 초과로 공식 주소 표기·예약 경로를 재확인하지 못했다. 연결 보류, 2026-11-28 재확인. |
+| 행님아 푸미흥·빈홈점, 보배반점 (S36 Sky Garden 1), 바다마트, Quán 79 Restaurant (44 Đề Thám) | 이용자 글·제3자 목록 및 [보배반점 브랜드 소식](https://bobaebanjum.co.kr/community/news_detail.php?id=199)만으로 등록 지점별 운영자 예약 목적지를 확인하지 못했다. 연결 보류, 2026-11-28 재확인. |
+| 선라이즈 아파트 (27 Nguyễn Hữu Thọ) | 등록 정보에 예약 대상 숙소명과 공식 운영 주체가 없어 임의 호스트는 연결하지 않았다. 등록 정보 변경 시 재확인. |
+
+운영 코드와 업체 데이터는 변경하지 않았다. 회원·후기 개인정보나 비밀키는 조회하지 않았으며 통화·메시지·예약·결제를 하지 않았다.
+
 ## 2026-11-13
 
 기준 main: `da83a37da3929bbecff0a7fbdb9b186ee8a643d0`. 공개 업체 167곳과 기존 예약·문의 71곳을 대조했다. 신규·미조사 업체, 등록 정보 변경 및 코드와 등록 정보 간 지점 불일치는 없었다.
