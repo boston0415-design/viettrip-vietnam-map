@@ -602,15 +602,20 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "category": "cafe",
     "address": "베트남 12000 Hà Nội, Từ Liêm, Tổ 3 Sông Đà CT6 Khu Đô Thị Mỹ Đình - Sông Đà Trần Văn Lai",
     "mode": "inquiry",
-    "sourceUrl": "https://www.facebook.com/foremostbakery/posts/122167560878945250/",
-    "note": "CT6 Mỹ Đình Sông Đà의 FOREMOST Bakery 공식 케이크 주문 문의입니다. 공통 브랜드 Facebook에 CT6 지점 주문이라고 밝히고 케이크·수량·수령 날짜를 알린 뒤 확정 답변을 확인하세요.",
+    "sourceUrl": "https://www.foremostbakery.com/",
+    "note": "FOREMOST Bakery 공식 케이크 주문 문의입니다. 브랜드 공통 전화 또는 Facebook으로 CT6 Mỹ Đình Sông Đà 지점 주문임을 밝히고 케이크·수량·수령 날짜를 알리세요. 주문 확정은 매장 답변을 확인하세요.",
     "channels": [
       {
         "kind": "facebook",
         "url": "https://www.facebook.com/foremostbakery/"
+      },
+      {
+        "kind": "phone",
+        "url": "tel:+842466899776",
+        "display": "+84 24 6689 9776"
       }
     ],
-    "verifiedOn": "2026-10-02"
+    "verifiedOn": "2026-11-15"
   },
   {
     "id": "949be81f-6a88-4b1c-a187-426c4a1e2c95",

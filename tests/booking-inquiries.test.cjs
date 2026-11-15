@@ -158,8 +158,10 @@ async function check(mobile){
     assert.equal(blossom.channels[2].display,'+84 28 2210 3280');
     const foremost=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='7576a9e9-d3c0-48c8-849b-9306dda2079c');
     assert(foremost,'FOREMOST official cake order inquiry');
-    assert.equal(foremost.verifiedOn,'2026-10-02');
-    assert.deepEqual(foremost.channels.map(c=>c.kind),['facebook']);
+    assert.equal(foremost.verifiedOn,'2026-11-15');
+    assert.equal(foremost.sourceUrl,'https://www.foremostbakery.com/');
+    assert.deepEqual(foremost.channels.map(c=>[c.kind,c.url]),[['facebook','https://www.facebook.com/foremostbakery/'],['phone','tel:+842466899776']]);
+    assert(foremost.note.includes('CT6 Mỹ Đình Sông Đà'));
     const royce=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='bad22e55-f097-4202-beb2-f2aa82893110');
     assert(royce,'Royce Dental official appointment inquiry');
     assert.equal(royce.verifiedOn,'2026-10-04');
