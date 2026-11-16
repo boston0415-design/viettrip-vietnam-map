@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "4eccf861-1154-461b-b257-20a48f8850c6",
+    "name": "콴 부이 가든",
+    "category": "restaurant",
+    "address": "55A Ngô Quang Huy, An Khánh, Hồ Chí Minh 70000 베트남",
+    "url": "https://quan-bui.com/garden/",
+    "sourceUrl": "https://quan-bui.com/garden/",
+    "note": "공식 지점 페이지의 Reservation을 누르고 Garden 1 · 55 Ngô Quang Huy(브랜드 안내 55A–55B)를 선택하세요. 날짜·시간·인원을 입력한 뒤 식당의 확정 연락을 확인하세요. 신청 접수만으로 예약이 확정되지는 않습니다.",
+    "verifiedOn": "2026-11-16"
+  },
+  {
     "id": "dc1444d1-7021-4c20-ad7d-6c86ec48ae54",
     "name": "강남비비큐",
     "category": "restaurant",

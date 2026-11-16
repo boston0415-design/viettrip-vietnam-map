@@ -14,7 +14,7 @@ run(`
   db=()=>fixture;
   Object.assign(state,{cat:'restaurant',sub:'한식',ratingFilter:'4',query:'preserve',markers:[{id:'unchanged'}]});
   const saved=JSON.stringify([state.cat,state.sub,state.ratingFilter,state.query,state.markers]);
-  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,31);
+  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,32);
   const activeDirectIds=VERIFIED_BUSINESS_BOOKINGS.map(p=>p.id);
   const gangnamBbq=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='dc1444d1-7021-4c20-ad7d-6c86ec48ae54');
   assert(gangnamBbq,'Gangnam BBQ official reservation request form');
@@ -142,9 +142,15 @@ run(`
   assert(quanBuiOriginal.note.includes('19 Ngô Văn Năm'));
   assert(quanBuiOriginal.note.includes('신청 접수만으로 예약이 확정되지는 않습니다'));
   assert.equal(VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='6eb2c0b0-8052-4d23-8753-ef143725ae6a').verifiedOn,'2026-09-29','limited external form access must not advance the verification date');
-  const mismatchedQuanBuiGarden={id:'4eccf861-1154-461b-b257-20a48f8850c6',name:'콴 부이 가든',category:'restaurant',address:'55A Ngô Quang Huy, An Khánh, Hồ Chí Minh 70000 베트남'};
-  assert.equal(verifiedBookingFor(mismatchedQuanBuiGarden),null,'current official 55 address mismatch suspends reservation');
-  assert.equal(bookingLinkHtml(mismatchedQuanBuiGarden),'','no mismatched branch reservation action');
+  const garden=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='4eccf861-1154-461b-b257-20a48f8850c6');
+  assert.equal(garden.address,'55A Ngô Quang Huy, An Khánh, Hồ Chí Minh 70000 베트남');
+  assert.equal(garden.url,'https://quan-bui.com/garden/');
+  assert.equal(garden.sourceUrl,garden.url);
+  assert.equal(garden.verifiedOn,'2026-11-16');
+  assert(garden.note.includes('Garden 1')&&garden.note.includes('55A–55B'));
+  const wrongGarden={...garden,address:'03 Trần Ngọc Diện, An Khánh, Hồ Chí Minh'};
+  assert.equal(verifiedBookingFor(wrongGarden),null,'Garden 2 must not acquire the Garden 1 route');
+  assert.equal(bookingLinkHtml(wrongGarden),'','no mismatched branch reservation action');
   const mismatchedPizza={id:'a229bbfc-41eb-4749-8da2-4cedecaff5e7',name:'Pizza 4P’s Le Thanh Ton',category:'restaurant',address:'Vincom Building, Lê Thánh Tôn, Sài Gòn, Hồ Chí Minh 700000 베트남'};
   assert.equal(verifiedBookingFor(mismatchedPizza),null,'official branch address mismatch suspends reservation');
   assert.equal(bookingLinkHtml(mismatchedPizza),'','no stale reservation action');
@@ -198,4 +204,4 @@ assert.deepEqual([...trust.querySelectorAll('dt')].map(n=>n.textContent),['이�
 assert.equal(trust.querySelector('a').href,'https://viettrip-vietnam-map.pages.dev/');
 dom.window.close();
 }
-console.log('PASS desktop/mobile verified reservations for 31 businesses and 7 points, including branch-specific Quan Bui Original, Gangnam BBQ and Tan Hai Van, Phong Cua 2 and Haidilao Crescent Mall, Luxury Anna Spa, Dam Sen Water Park, Quynh Nhu 137, Com Nieu Sai Gon, El Gaucho Hai Ba Trung, OM Nuong Trung Son, FUME, Quan Ut Ut; Ngon phone inquiry migration, three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, detail, directions, passive hover, install trust copy and unchanged filters');
+console.log('PASS desktop/mobile verified reservations for 32 businesses and 7 points, including branch-specific Quan Bui Original and Garden 1, Gangnam BBQ and Tan Hai Van, Phong Cua 2 and Haidilao Crescent Mall, Luxury Anna Spa, Dam Sen Water Park, Quynh Nhu 137, Com Nieu Sai Gon, El Gaucho Hai Ba Trung, OM Nuong Trung Son, FUME, Quan Ut Ut; Ngon phone inquiry migration, three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, detail, directions, passive hover, install trust copy and unchanged filters');
