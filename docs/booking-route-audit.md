@@ -1,5 +1,19 @@
 # 예약 경로 점검 기록
 
+## 2026-11-17
+
+기준 main: `fa975aa49299644d9f4d504fb282c9ad58d0c9bc`. 공개 업체 167곳과 기존 예약·문의 72곳을 대조했다. 신규·미조사 업체, 등록 정보 변경 및 코드와 등록 정보 간 지점 불일치는 없었다.
+
+| 업체 | 결과 / 다음 확인 |
+| --- | --- |
+| Cơm Niêu Sài Gòn (59 Hồ Xuân Hương), 엘 가우초 하이바쯩점 (74/1 Hai Bà Trưng) | [Cơm Niêu 공식 예약 화면](https://comnieusaigon.com/dat-ban-com-nieu-sai-gon)의 지점 주소와 날짜·시간·인원 입력이 유지된다. [El Gaucho 공식 지점](https://elgaucho.asia/vn/en/location/hai-ba-trung)의 주소와 예약 버튼이 유지되며 기존 예약 URL도 HTTP 200으로 지점 페이지를 반환한다. 인증 이후 단계는 미확인. 기존 연결 유지, 2026-12-17 재확인. |
+| Dong Pho Restaurant (57 Hồ Xuân Hương), Onsi Spa | [Dong Pho 공식 연락 페이지](https://www.dongphorest.vn/contact-1)는 일반 전화·이메일만 안내하고 예약 목적은 미확인. [Onsi 공식 사이트](https://onsispa.com/)는 6/30 Nguyễn Thiện Thuật로 등록 08과 차이가 유지된다. 연결 보류, 2026-12-01 재확인. |
+| 꽌 94 게요리 전문점, 1군 맛찬들 | 94 Đinh Tiên Hoàng의 현재 운영자를 확인하지 못했다. [84번지 업주의 이전 설명](https://znews.vn/chu-quan-tphcm-nho-cuoc-goi-email-cua-michelin-guide-vi-so-lua-dao-post1483520.html)은 94번지에 현재 등록된 업소의 예약 근거가 아니다. [1군 맛찬들 후보 Facebook](https://www.facebook.com/Matchandeulbbq.hcm)은 열람 제한. 연결 보류, 2026-12-01 재확인. |
+| Pearl 93 KTV, 넘버원 KTV, 서울 불고기 | KTV 두 곳은 중개·업체 목록과 운영자 공식 경로를 구분할 근거가 부족했다. [서울 불고기 사이트 후보](https://seoulbulgoginhatrang.lovable.app/)는 등록 주소와 예약 전화를 표시하지만 업소가 게시·지정한 사이트인지 확인되지 않았으며 연결된 소셜도 열람 제한. 연결 보류, 2026-12-01 재확인. |
+| Millennium Apartment | 공개 등록은 단지명·주소뿐이므로 숙소 운영 주체를 특정할 수 없다. 임의 호스트는 연결하지 않았으며 운영 숙소명 등록 시 재확인. |
+
+운영 코드와 업체 데이터는 변경하지 않았다. 공개 업체 정보만 읽었으며 통화·메시지·예약·결제를 하지 않았다.
+
 ## 2026-11-16
 
 기준 main: `8e9f1cad544147dd3f4ec8e9c003f34960b2389d`. 공개 업체 167곳을 기존 예약·문의 연결 71곳 및 점검 이력과 대조했다. 신규·미조사 업체나 등록 정보 변경은 없었다.
