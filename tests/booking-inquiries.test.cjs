@@ -86,11 +86,15 @@ async function check(mobile){
     assert.deepEqual(phoHanhPhuc.channels.map(c=>c.kind),['facebook']);
     const ganhHao=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='8a49b1b0-2824-4472-92e8-7e978bb37525');
     assert(ganhHao,'Ganh Hao 1 official inquiry routes');
-    assert.equal(ganhHao.sourceUrl,'https://ganhhao.com.vn/ganhhao/');
-    assert.equal(ganhHao.verifiedOn,'2026-10-18');
+    assert.equal(ganhHao.sourceUrl,'https://ganhhao.com.vn/ganhhao/lien-he/');
+    assert.equal(ganhHao.verifiedOn,'2026-11-18');
     assert.deepEqual(ganhHao.channels.map(c=>c.kind),['zalo','phone']);
     assert.equal(ganhHao.channels[0].url,'https://zalo.me/641762361488430095');
-    assert.equal(ganhHao.channels[1].url,'tel:+842543550909');
+    assert.equal(ganhHao.channels[1].url,'tel:19003332');
+    assert.equal(ganhHao.channels[1].display,'1900 3332');
+    assert(ganhHao.note.includes('베트남 국내용')&&ganhHao.note.includes('선입금'));
+    assert(validBookingContact(ganhHao.channels[1]));
+    for(const url of ['tel:19003333','tel:19003332;ext=1','tel:19003332#','tel:19003332?x=1'])assert(!validBookingContact({kind:'phone',url}));
     const secretGarden=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='72025aba-fb46-40ba-8bb8-eaa3be381715');
     assert(secretGarden,'Secret Garden 158 Pasteur official reservation inquiry');
     assert.equal(secretGarden.verifiedOn,'2026-10-16');

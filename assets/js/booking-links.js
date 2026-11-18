@@ -494,8 +494,8 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
     "category": "restaurant",
     "address": "03 Trần Phú, Vũng Tàu, Hồ Chí Minh, 베트남",
     "mode": "inquiry",
-    "sourceUrl": "https://ganhhao.com.vn/ganhhao/",
-    "note": "03 Trần Phú의 Gành Hào 1 공식 예약 문의 경로입니다. 방문 날짜·시간·인원과 원하는 좌석을 알리고 매장의 확정 답변을 확인하세요.",
+    "sourceUrl": "https://ganhhao.com.vn/ganhhao/lien-he/",
+    "note": "03 Trần Phú의 Gành Hào 1 지점 Zalo 또는 브랜드 공통 예약 전화 1900 3332(베트남 국내용)로 문의하세요. 전화로는 Gành Hào 1 지점을 지정하고 날짜·시간·인원을 알린 뒤 확정 답변을 확인하세요. 공식 사이트는 선입금을 요구하지 않는다고 경고하므로 가짜 페이지의 예약금 요구에 주의하세요.",
     "channels": [
       {
         "kind": "zalo",
@@ -503,11 +503,11 @@ const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
       },
       {
         "kind": "phone",
-        "url": "tel:+842543550909",
-        "display": "+84 254 355 0909"
+        "url": "tel:19003332",
+        "display": "1900 3332"
       }
     ],
-    "verifiedOn": "2026-10-18"
+    "verifiedOn": "2026-11-18"
   },
   {
     "id": "72025aba-fb46-40ba-8bb8-eaa3be381715",
@@ -1236,7 +1236,7 @@ const BOOKING_CONTACT_TYPES=Object.freeze({
 });
 function validBookingContact(channel){
   if(!channel || !BOOKING_CONTACT_TYPES[channel.kind])return false;
-  if(channel.kind==='phone')return /^tel:\+[1-9]\d{7,14}$/.test(channel.url||'');
+  if(channel.kind==='phone')return /^tel:\+[1-9]\d{7,14}$/.test(channel.url||'') || channel.url==='tel:19003332';
   try{
     const url=new URL(channel.url);
     const allowed=url.protocol==='https:' && !url.username && !url.password && !url.port &&
@@ -1299,7 +1299,7 @@ function openBookingInquiry(id){
 
 async function copyBookingPhone(button){
   const dialog=button.closest('#bookingInquiryDialog'),number=button.dataset.bookingPhone;
-  if(!dialog || !/^\+[1-9]\d{7,14}$/.test(number||''))return;
+  if(!dialog || !validBookingContact({kind:'phone',url:'tel:'+String(number||'')}))return;
   let copied=false;
   try{await navigator.clipboard.writeText(number);copied=true}catch{}
   if(!copied){
