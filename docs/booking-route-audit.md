@@ -1,5 +1,19 @@
 # 예약 경로 점검 기록
 
+## 2026-11-23
+
+기준 main: `274dafff310565126631546e46a9923a6a5d05ea`. 공개 업체 167곳과 기존 예약·문의 연결 72곳을 대조했다. 신규·미조사 업체, 등록 정보 변경 및 연결 지점 불일치는 없었다.
+
+| 업체 | 결과 / 다음 확인 |
+| --- | --- |
+| 배베식당 (182 Dương Đình Nghệ) | [지역 업체 목록](https://ekoreatown.net/home/b/korearestaurant/3127)과 여행·배달 소개는 있으나 운영자가 직접 게시한 좌석 예약 채널을 확인하지 못했다. 보류 유지, 2026-12-07 재확인. |
+| 하나이발관 (108 Thăng Long), 112 Thăng Long (파티), 고향이발관 본점 (16–18 Hậu Giang) | [하나 소개](https://hcmhp.com/massage/?mod=document&pageid=1&uid=15), [파티 소개](https://vvg-vietnam.com/city/hochiminh/partybar)는 중개·여행 경로이며 고향은 제3자 목록·방문기뿐이다. 등록 지점 운영자 직접 예약 목적지 미확인. 2026-12-07 재확인. |
+| 배트맨이발소 (41 Hưng Gia 2), MANONG (40 Hưng Gia 4), 헤어소울 (R2-32 Lý Long Tường) | 배트맨의 여행·예약 중개 계정, [MANONG 업체 목록](https://www.viet-biz.com/en/manong-hair-salon-academy-028-5410-7978), [헤어소울 리뷰 목록](https://topaz.vn/toplist/salon-lam-toc-quan-7)의 번호를 공식 예약 채널로 추가하지 않았다. 운영자가 공개한 지점별 예약 안내 미확인. 2026-12-07 재확인. |
+| The Log Restaurant (GEM Center 루프톱) | [공식 예약 안내](https://thelog.com.vn/home/reservations)의 주소와 직접 예약 전화 0975 002 288이 기존 연결과 일치한다. 기존 경로 유지, 2026-12-23 재확인. |
+| PAPI Saigon (123 Lê Lợi), CINÉ Saigon (148 Cống Quỳnh) | 기존 [PAPI Instagram](https://www.instagram.com/papi.sgn/)·[Facebook](https://www.facebook.com/p/PAPI-61584855027300/) 및 [CINÉ Instagram](https://www.instagram.com/cine.sgn/)은 요청 제한으로 본문 재확인 불가. 이를 폐업·전화 폐기 근거로 삼지 않았고 기존 경로·확인일 유지. 2026-12-07 재확인. |
+
+운영 코드와 업체 데이터는 변경하지 않았다. 회원·후기 개인정보나 비밀키를 조회하지 않았고 통화·메시지·예약·결제를 하지 않았다.
+
 ## 2026-11-22
 
 기준 main: `8f226be8028867555a414f4f6403aeee4ea10941`. 공개 업체 167곳과 기존 예약·문의 연결 72곳을 대조했다. 신규·미조사 업체, 등록 정보 변경 및 연결 지점 불일치는 없었다.
