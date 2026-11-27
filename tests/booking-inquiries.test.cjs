@@ -18,7 +18,17 @@ async function check(mobile){
     db=()=>contactFixture;
     Object.assign(state,{cat:'spa',sub:'발마사지',query:'keep',ratingFilter:'4'});
     const savedCriteria=JSON.stringify([state.cat,state.sub,state.query,state.ratingFilter]);
-    assert.equal(VERIFIED_BUSINESS_CONTACTS.length,40,'retain prior inquiries and move Ngon to phone inquiry');
+    assert.equal(VERIFIED_BUSINESS_CONTACTS.length,41,'retain prior inquiries and add Mayonaka official channels');
+    const mayonaka=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='8190a405-b068-4be3-bb6d-1517cb54064f');
+    assert.equal(mayonaka.name,'Mayonaka Sushi');
+    assert.equal(mayonaka.category,'restaurant');
+    assert.equal(mayonaka.address,'175 Đề Thám, Bến Thành, Hồ Chí Minh, 베트남');
+    assert.equal(mayonaka.mode,'inquiry');
+    assert.equal(mayonaka.sourceUrl,'https://mayonakasushi.com/en/sushi/');
+    assert.equal(mayonaka.verifiedOn,'2026-11-27');
+    assert.deepEqual(mayonaka.channels.map(c=>[c.kind,c.url]),[['phone','tel:+84767447999'],['messenger','https://m.me/215286331667084'],['whatsapp','https://wa.me/84767447999']]);
+    assert(mayonaka.note.includes('문의만으로 예약이 확정되지는 않습니다'));
+    assert(!VERIFIED_BUSINESS_CONTACTS.some(p=>p.id==='a3456250-c487-4f64-9a54-bba546461eee'),'Miyakoya address mismatch remains unlinked');
     const ngon=VERIFIED_BUSINESS_CONTACTS.find(p=>p.id==='acbc3ab7-57bd-474a-86c3-9d62e97db797');
     assert.equal(ngon.address,'160 Pasteur, Quận 1, Hồ Chí Minh, 베트남');
     assert.equal(ngon.mode,'inquiry');

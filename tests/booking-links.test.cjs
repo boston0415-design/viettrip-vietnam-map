@@ -14,7 +14,16 @@ run(`
   db=()=>fixture;
   Object.assign(state,{cat:'restaurant',sub:'한식',ratingFilter:'4',query:'preserve',markers:[{id:'unchanged'}]});
   const saved=JSON.stringify([state.cat,state.sub,state.ratingFilter,state.query,state.markers]);
-  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,32);
+  assert.equal(VERIFIED_BUSINESS_BOOKINGS.length,33);
+  const yuugatei=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='f7a48b65-d56c-475c-8a32-2b67fc2bec44');
+  assert.equal(yuugatei.name,'Yuugatei Mutsumian');
+  assert.equal(yuugatei.category,'restaurant');
+  assert.equal(yuugatei.address,'15/7 Lê Thánh Tôn, Sài Gòn, Hồ Chí Minh 700000 베트남');
+  assert.equal(yuugatei.url,'https://yuugatei.vn/en/dat-ban-yuugatei-en/');
+  assert.equal(yuugatei.sourceUrl,'https://yuugatei.vn/en/he-thong-nha-hang-yuugatei-en/');
+  assert.equal(yuugatei.verifiedOn,'2026-11-27');
+  assert(yuugatei.note.includes('HCM Cơ Sở 1')&&yuugatei.note.includes('확정 답변'));
+  assert(!VERIFIED_BUSINESS_BOOKINGS.some(p=>p.id==='a3456250-c487-4f64-9a54-bba546461eee'),'Miyakoya address mismatch remains unlinked');
   const activeDirectIds=VERIFIED_BUSINESS_BOOKINGS.map(p=>p.id);
   const gangnamBbq=VERIFIED_BUSINESS_BOOKINGS.find(p=>p.id==='dc1444d1-7021-4c20-ad7d-6c86ec48ae54');
   assert(gangnamBbq,'Gangnam BBQ official reservation request form');
@@ -204,4 +213,4 @@ assert.deepEqual([...trust.querySelectorAll('dt')].map(n=>n.textContent),['이�
 assert.equal(trust.querySelector('a').href,'https://viettrip-vietnam-map.pages.dev/');
 dom.window.close();
 }
-console.log('PASS desktop/mobile verified reservations for 32 businesses and 7 points, including branch-specific Quan Bui Original and Garden 1, Gangnam BBQ and Tan Hai Van, Phong Cua 2 and Haidilao Crescent Mall, Luxury Anna Spa, Dam Sen Water Park, Quynh Nhu 137, Com Nieu Sai Gon, El Gaucho Hai Ba Trung, OM Nuong Trung Son, FUME, Quan Ut Ut; Ngon phone inquiry migration, three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, detail, directions, passive hover, install trust copy and unchanged filters');
+console.log('PASS desktop/mobile verified reservations for 33 businesses and 7 points, including Yuugatei HCM 1 and branch-specific Quan Bui Original and Garden 1, Gangnam BBQ and Tan Hai Van, Phong Cua 2 and Haidilao Crescent Mall, Luxury Anna Spa, Dam Sen Water Park, Quynh Nhu 137, Com Nieu Sai Gon, El Gaucho Hai Ba Trung, OM Nuong Trung Son, FUME, Quan Ut Ut; Ngon phone inquiry migration, three official hotel booking screens, Sushi Hokkaido Sachi and Yazawa Saigon, Lousiane, MZ Club and Skylight table forms, Saigon station booking and corrected route destination; identity changes, unsafe/unverified inputs, detail, directions, passive hover, install trust copy and unchanged filters');

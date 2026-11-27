@@ -1,5 +1,17 @@
 # 예약 경로 점검 기록
 
+## 2026-11-27
+
+기준 main: `56cfba708e629aaa62211913c20bd9c77a11ae62`. 현재 공개 업체 170곳을 읽고 기존 167곳 및 예약·문의 연결 72곳의 id/name/category/address를 대조했다. 기존 업체의 등록 정보 변경은 없었고 신규 3곳을 우선 조사했다. 기존 순환 점검 대기 항목은 다음 실행으로 이어가며 이번에 재검증한 것으로 처리하지 않는다.
+
+| 업체 | 결과 / 다음 확인 |
+| --- | --- |
+| Mayonaka Sushi (`8190a405-b068-4be3-bb6d-1517cb54064f`) | [공식 사이트](https://mayonakasushi.com/en/sushi/)의 175 Đề Thám, 예약 Hotline or Chat 안내와 +84 76 7447999를 확인했다. 운영자가 직접 연결한 [Messenger](https://m.me/215286331667084)·[WhatsApp](https://wa.me/84767447999) 및 전화만 예약 문의로 추가. Messenger 도착 화면은 로그인 요구이며 메시지 전송 가능 여부는 미확인. 2026-12-27 재확인. |
+| Yuugatei Mutsumian (`f7a48b65-d56c-475c-8a32-2b67fc2bec44`) | [공식 지점 목록](https://yuugatei.vn/en/he-thong-nha-hang-yuugatei-en/)의 HCM 1 · 15/7 Lê Thánh Tôn과 [공식 예약 양식](https://yuugatei.vn/en/dat-ban-yuugatei-en/)의 지점·이름·전화·날짜·시간·인원 입력을 확인해 예약하기 추가. 신청 접수와 확정을 구분한다. 검색에 나온 booking.mutsumian.vn은 15/1의 다른 지점이므로 제외. 2026-12-27 재확인. |
+| Miyakoyaお好み焼き本舗 みやこ屋 (`a3456250-c487-4f64-9a54-bba546461eee`) | 등록 주소는 8/6 Lê Thánh Tôn이나 [브랜드 공식 지점 안내](https://sple.jp/miyakoya/info.html)는 8/11 LE THANH TON이다. 제3자 목록의 8/6과 같은 전화번호만으로 이전·운영 관계를 확정하지 않았다. Instagram(miyakoya.hiramatsu.92)은 열람 제한, Facebook(Miyakoya-Ho-Chi-Minh-1547373408841100)은 접근 불가여서 현 지점·예약 목적 미확인. 연결·등록 주소 수정 없이 보류, 2026-12-11 재확인. |
+
+회원·후기 개인정보나 비밀키를 조회하지 않았고 통화·메시지·예약·결제를 하지 않았다. 공개 업체 데이터는 수정하지 않았다.
+
 ## 2026-11-26
 
 기준 main: `6864469f080b997e12d79294867b5da9cbc2eed3`. 공개 업체 167곳과 기존 예약·문의 연결 72곳을 대조했다. 신규·미조사 업체, 등록 정보 변경 및 연결 지점 불일치는 없었다. 미연결 후보는 기록된 다음 확인일에 따라 순환한다.

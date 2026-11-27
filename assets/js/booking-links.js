@@ -3,6 +3,16 @@
 // A changed business identity/address suspends its link until checked again.
 const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
   {
+    "id": "f7a48b65-d56c-475c-8a32-2b67fc2bec44",
+    "name": "Yuugatei Mutsumian",
+    "category": "restaurant",
+    "address": "15/7 Lê Thánh Tôn, Sài Gòn, Hồ Chí Minh 700000 베트남",
+    "url": "https://yuugatei.vn/en/dat-ban-yuugatei-en/",
+    "sourceUrl": "https://yuugatei.vn/en/he-thong-nha-hang-yuugatei-en/",
+    "note": "공식 예약 양식에서 HCM Cơ Sở 1 · 15/7 Lê Thánh Tôn 지점을 확인하고 날짜·시간·인원과 연락처를 입력하세요. 15/1의 다른 식당 예약 화면과 혼동하지 마세요. 신청 접수만으로 예약이 확정되지는 않으며 식당의 확정 답변을 확인하세요.",
+    "verifiedOn": "2026-11-27"
+  },
+  {
     "id": "4eccf861-1154-461b-b257-20a48f8850c6",
     "name": "콴 부이 가든",
     "category": "restaurant",
@@ -325,6 +335,21 @@ const VERIFIED_BUSINESS_BOOKINGS=Object.freeze([
 ]);
 // Booking/contact channels are copied from the operator site, never inferred from a phone/name.
 const VERIFIED_BUSINESS_CONTACTS=Object.freeze([
+  {
+    "id": "8190a405-b068-4be3-bb6d-1517cb54064f",
+    "name": "Mayonaka Sushi",
+    "category": "restaurant",
+    "address": "175 Đề Thám, Bến Thành, Hồ Chí Minh, 베트남",
+    "mode": "inquiry",
+    "sourceUrl": "https://mayonakasushi.com/en/sushi/",
+    "note": "175 Đề Thám의 Mayonaka Sushi 공식 예약 문의 채널입니다. 방문 날짜·시간·인원을 알리고 식당의 확정 답변을 확인하세요. Messenger는 로그인이 필요할 수 있습니다. 문의만으로 예약이 확정되지는 않습니다.",
+    "channels": [
+      { "kind": "phone", "url": "tel:+84767447999", "display": "+84 76 744 7999" },
+      { "kind": "messenger", "url": "https://m.me/215286331667084" },
+      { "kind": "whatsapp", "url": "https://wa.me/84767447999" }
+    ],
+    "verifiedOn": "2026-11-27"
+  },
   {
     "id": "acbc3ab7-57bd-474a-86c3-9d62e97db797",
     "name": "냐 항 응온",
