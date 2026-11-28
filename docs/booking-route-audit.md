@@ -1,5 +1,26 @@
 # 예약 경로 점검 기록
 
+## 2026-11-28
+
+기준 main: `d7e2486ef04934436f0d3815e865b9da57fe93a5`. 현재 공개 업체 170곳을 읽고 기존 예약·문의 연결 74곳의 id/name/category/address를 대조했다. 신규 등록과 연결 지점 불일치는 없으며, 이전 167곳의 등록 정보 및 11월 27일 기록의 신규 3곳도 유지된다. 기록에 없는 미조사 업체는 없어 확인일이 지난 미연결 후보 15곳과 기존 연결 12곳을 순환 점검했다.
+
+| 업체 | 결과 / 다음 확인 |
+| --- | --- |
+| Uraetei Japanese BBQ (545 Trần Hưng Đạo) | [공식 사이트](https://www.uraetei-yakiniku.com.vn/)는 403, [브랜드 Facebook](https://www.facebook.com/uraeteiBBQJapan)은 열람 제한. 제3자 주소·예약 가능 표기만으로 현재 운영자 채널을 추가하지 않았다. 보류, 2026-12-12 재확인. |
+| 부뚜막 타오디엔 (22 Đường Số 10), 더 챔버 (21 Nguyễn Như Uyên), Gardenia (CT5 Trần Văn Lai) | 지역 목록·이용자 글·광고 제휴 글·사업자 조회 결과만 발견했다. [부뚜막 지역 목록](https://thaodien.app/vi/venue/butoomac-thao-dien)의 번호와 챔버 광고 문의 계정을 운영자 공식 예약 채널로 간주하지 않았다. 세 지점 모두 보류, 2026-12-12 재확인. |
+| 이가철판, 가마솥, 새우공장, 남매식당 (하노이) | 지점별 여행 후기·지역 목록·배달 소개는 있으나 운영자의 공식 예약 안내는 확인하지 못했다. [남매식당 배달 소개](https://welcome.deliveryk.com/top-nha-hang-han-quoc-chuan-vi-tai-ha-noi-deliveryk/)는 좌석 예약 근거가 아니며 국내 동명 새우공장은 제외했다. 네 업체 모두 보류, 2026-12-12 재확인. |
+| 꾹각꽌 (10 Đặng Tất), Tib - Hue Restaurant (187 Ter Hai Bà Trưng) | [꾹각꽌 공식 안내](https://cucgachquan.com/vi/an-bua-com-nha/duong-den-cuc-gach-quan.html)는 구형 전화 표기이며 현재 예약 목적의 연락처를 새로 확정하지 못했다. [Tib 연락 페이지](https://www.tib-huerestaurant.com.vn/lien-he/)는 시간 초과. 보류, 2026-12-12 재확인. |
+| 행님아 푸미흥·빈홈점, 보배반점 (S36 Sky Garden 1), 바다마트, Quán 79 (44 Đề Thám) | 행님아 지점 자료와 바다마트 공급사 목록·Quán 79 후기만으로 운영자 예약 목적지를 확인하지 못했다. [보배반점 공식 해외 목록](https://bobaebanjum.co.kr/store/foreign_find.php) 공개 목록에는 등록 지점의 주소·전화가 없으며 본사 가맹 문의는 식당 예약이 아니다. 다섯 지점 모두 연결 보류, 2026-12-12 재확인. |
+| 바익당 선착장 · 사이공 워터버스 | [공식 선착장](https://saigonwaterbus.com/ben-tau-bach-dang)의 10B Tôn Đức Thắng과 [온라인 예매 안내](https://saigonwaterbus.com/dat-ve-truc-tuyen)의 출발·도착·날짜·좌석·결제 및 편도별 예매 안내가 유지된다. 동적 잔여석·실제 결제는 확인하지 않았다. 기존 연결 유지, 2026-12-28 재확인. |
+| 사이공 프린세스 | [공식 달력](https://www.saigonprincess.com.vn/calendar)과 [연락 페이지](https://www.saigonprincess.com.vn/contact)의 승선 장소 05 Nguyễn Tất Thành·예약 문의가 유지된다. 달력 본문은 동적 템플릿으로 실제 날짜별 예약 가능 여부는 미확인. 기존 연결·확인일 유지, 2026-12-12 재확인. |
+| 시티투어 버스 · 호치민 2곳 / 하노이 2곳 | [호치민 공식 상품](https://hopon-hopoff.vn/tour/1-round-ho-chi-minh-city-panoramic-bus-tour/)의 낮 중앙우체국·야간 92–96 Nguyễn Huệ, [하노이 공식 상품](https://hopon-hopoff.vn/tour/1-round-hanoi-panoramic-bus-tour/)의 호안끼엠·오페라하우스 집결 안내와 Book Now 목적지가 유지된다. 하노이는 금요일 19:30 이후 오페라하우스로 안내하므로 기존 날짜별 집결 장소 확인 문구를 유지했다. 상품·전자표 진입만 확인했으며 신청·결제하지 않았다. 기존 연결 유지, 2026-12-28 재확인. |
+| 렉스 호텔 | [공식 직접 예약 화면](https://www.rexhotelsaigon.com/discover-benefits-of-direct-booking/)의 141 Nguyễn Huệ와 체크인·체크아웃 입력이 유지된다. 기존 연결 유지, 2026-12-28 재확인. |
+| NJ184 (184 Trần Hưng Đạo) | [공식 연락 페이지](https://nj184barbershop.com/lien-he)와 홈페이지 직접 응답은 503/시간 초과. 검색에 보존된 공식 페이지는 일반 번호 0938930196과 별도로 기존 0708 999 184를 Đặt lịch(예약)로 명시하므로 일반 번호로 교체하지 않았다. 현행 사이트·외부 채널의 도착 화면 전체는 재검증하지 못했으며 일시 오류를 폐기 근거로 삼지 않았다. 기존 연결·확인일 유지, 2026-12-01 재확인. |
+| The View Rooftop Bar, SH Garden Thảo Điền | [The View 공식 안내](https://ducvuonghotel.com/en/restaurant-2/)의 195 Bùi Viện·예약 전화 +84 944 795 522와 [SH Garden 공식 안내](https://shgarden.com.vn/vi/)의 26 Ngô Quang Huy·예약 전화 0965 596 266이 유지된다. SH Garden Facebook 도착 화면은 이번에 재검증하지 않았다. The View Facebook은 접근 제한이고 TikTok은 공식 프로필의 예약 안내를 열람하지 못했으므로 추가하지 않았다. 기존 연결 유지, 2026-12-28 재확인. |
+| 카라벨 사이공, 파크 하얏트 사이공 | [Caravelle 공식 연락처](https://www.caravellehotel.com/contact-us/)의 19–23 Lam Son Square·+84 28 3823 4999·객실 예약 이메일과 [Hyatt 공식 안내](https://www.hyatt.com/park-hyatt/en-US/saiph-park-hyatt-saigon)의 2 Lam Son Square·+84 28 3824 1234가 유지된다. 기존 대표전화 안내 유지, 2026-12-28 재확인. |
+
+예약 경로·운영 코드는 변경하지 않고 이번 확인 결과와 다음 확인일만 기록했다. 회원·후기 개인정보나 비밀키를 조회하지 않았으며 업체 데이터 수정·통화·메시지·예약·결제를 하지 않았다.
+
 ## 2026-11-27
 
 기준 main: `56cfba708e629aaa62211913c20bd9c77a11ae62`. 현재 공개 업체 170곳을 읽고 기존 167곳 및 예약·문의 연결 72곳의 id/name/category/address를 대조했다. 기존 업체의 등록 정보 변경은 없었고 신규 3곳을 우선 조사했다. 기존 순환 점검 대기 항목은 다음 실행으로 이어가며 이번에 재검증한 것으로 처리하지 않는다.
